@@ -1,0 +1,109 @@
+/* --- HERO VIDEO --- */
+.hero-video {
+    cursor: none;
+}
+.hero-video-holder,
+.hero-video-holder * {
+    cursor: none !important;
+}
+.play-icon {
+    position: fixed;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+/* --- SERVICES --- */
+.services-titles {
+    opacity: 1
+}
+.services-title.active{
+   /* text-decoration: underline */
+}
+.stat-no {
+    line-height: 0.69;
+}
+.stat-plus {
+    line-height: 0.28;
+}
+.stat-detail {
+    line-height: 1.2;
+    font-weight: 500
+}
+
+/* --- CASE STUDIES --- */
+.client-name {
+    margin-top: 0.5rem;
+    opacity: 0.2;
+    cursor: pointer;
+    transition: opacity 1s ease;
+}
+.client-name.active {
+    margin-top: 6.5rem;
+    margin-bottom: 6.5rem;
+    opacity: 1;
+}
+.client-name.active:first-child {
+    margin-top: 0.5rem;
+    margin-bottom: 6.5rem;
+    opacity: 1;
+}
+.client-name.active:last-child {
+    margin-top: 6.5rem;
+    margin-bottom: 0.5rem;
+    opacity: 1;
+}
+.client-detail {
+    /*text-decoration: underline;*/
+    line-height: 1.2;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+.client-detail:hover {
+    text-decoration: underline;
+}
+.client-name.active .client-detail {
+  
+    opacity: 1
+}
+.quote {
+    font-size: 3.125rem;
+    font-weight: 300;
+    line-height: 1.2; 
+}
+.quote span {
+    font-family: var(--font-literata);
+    font-weight: 500;
+}
+
+/* --- FAQS --- */
+.faq-slider {
+    scrollbar-width: none;
+}
+
+.faq-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.faq-pill {
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.faq-answer-fade {
+    animation: faqAnswerFade 260ms ease-out;
+}
+
+@keyframes faqAnswerFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .faq-answer-fade {
+        animation: none;
+    }
+}

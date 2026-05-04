@@ -1,0 +1,10 @@
+@import 'lenis/dist/lenis.css';
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@import './modules/fonts.css';
+@import './modules/theme.css';
+@import './modules/nav.css';
+@import './modules/typography.css';
+@import './modules/landing.css';
+@import './modules/buttons.css';
+@import './modules/images.css';

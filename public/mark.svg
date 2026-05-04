@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Simplr mark</title>
+  <desc id="desc">Stylized circular Simplr symbol.</desc>
+  <rect width="160" height="160" rx="36" fill="#151512" />
+  <path d="M48 108.4V91.6c0-11.2 6.9-18.8 18.1-18.8 6.2 0 11.7 2.3 15.7 6.7 4.3-4.4 10.1-6.7 16.7-6.7 11.8 0 21.5 8 21.5 21.4v14.2h-16.1V95.9c0-5.6-3.2-8.7-8-8.7-4.6 0-8 3.1-8 8.7v12.5H72V95.9c0-5.6-3.1-8.7-7.8-8.7s-8 3.1-8 8.7v12.5H48Z" fill="#f4efe7" />
+</svg>

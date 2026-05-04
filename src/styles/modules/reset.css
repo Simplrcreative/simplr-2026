@@ -1,0 +1,56 @@
+@layer base {
+  :root {
+    --brand-strategy: #d5e09e;
+    --brand-branding-design: #f15941;
+    --brand-web-design-development: #c8bbff;
+    --brand-motion: #705f07;
+    --brand-templates: #596bf0;
+    --brand-coffee: #300f1d;
+    color: var(--brand-dark);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-width: 320px;
+     scroll-behavior: auto;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    color: var(--brand-coffee);
+    font-family: var(--font-aeonik);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: rgba(197, 107, 67, 0.2);
+  }
+}

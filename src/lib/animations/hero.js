@@ -1,0 +1,584 @@
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { SplitText } from 'gsap/SplitText'
+
+const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
+
+let pluginsRegistered = false
+
+function registerPlugins() {
+  if (!pluginsRegistered) {
+    gsap.registerPlugin(ScrollTrigger, SplitText)
+    pluginsRegistered = true
+  }
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max)
+}
+
+function getHeroImageMetrics(heroImage) {
+    const bounds = heroImage.getBoundingClientRect()
+    const availableWidth = window.innerWidth
+
+    if (bounds.width <= 0 || bounds.height <= 0) {
+      return {
+        scale: 1,
+        x: 0,
+        y: 0,
+      }
+    }
+
+    const scale = availableWidth / bounds.width
+    const bottom = bounds.bottom / 2
+
+  return {
+    scale,
+    x: window.innerWidth - bounds.right,
+    y: window.innerHeight - bounds.bottom,
+  }
+}
+
+function isMeasurableMedia(element) {
+  if (!element) {
+    return false
+  }
+
+  const bounds = element.getBoundingClientRect()
+
+  return bounds.width > 0 && bounds.height > 0
+}
+
+function isVideoElement(element) {
+  return element?.tagName === 'VIDEO'
+}
+
+function pauseMediaPlayback(element) {
+  if (!isVideoElement(element)) {
+    return
+  }
+
+  if (!element.paused) {
+    element.pause()
+  }
+}
+
+function resumeMediaPlayback(element) {
+  if (!isVideoElement(element)) {
+    return
+  }
+
+  if (element.paused) {
+    element.play?.().catch(() => undefined)
+  }
+}
+
+function getHeroStart() {
+  const viewportHeight = window.innerHeight
+  const viewportWidth = window.innerWidth
+  const isSmallViewport = viewportWidth < 768
+  const ratio = isSmallViewport ? 0.42 : 0.5
+  const minOffset = isSmallViewport ? 180 : 260
+  const maxOffset = isSmallViewport ? 420 : 560
+  const startOffset = Math.round(clamp(viewportHeight * ratio, minOffset, maxOffset))
+
+  return `top ${startOffset}`
+}
+
+function getHeroEndDistance() {
+  return `+=${window.innerHeight}`
+}
+
+const NAV_LIGHT_TOP = 95
+const LOGO_LIGHT_LEFT = 130
+const LIGHT_RELEASE_OFFSET = 12
+
+function setCompactLogoActive(isActive) {
+  document.documentElement.classList.toggle('compact-logo-active', isActive)
+}
+
+function resolveLightState(currentState, value, enterThreshold) {
+  if (currentState) {
+    return value <= enterThreshold + LIGHT_RELEASE_OFFSET
+  }
+
+  return value <= enterThreshold
+}
+
+function getSectionThemeLightState(sections, threshold) {
+  let activeLightState = null
+  let activeSectionTop = -Infinity
+
+  for (const section of sections) {
+    const bounds = section.getBoundingClientRect()
+    const crossesThreshold = bounds.top <= threshold && bounds.bottom >= threshold
+
+    if (!crossesThreshold) {
+      continue
+    }
+
+     // When sections overlap (e.g. pinned hero), prefer the one nearest the threshold line.
+    if (bounds.top < activeSectionTop) {
+      continue
+    }
+
+    if (section.classList.contains('section-dark')) {
+      activeSectionTop = bounds.top
+      activeLightState = true
+      continue
+    }
+
+    if (section.classList.contains('section-light')) {
+      activeSectionTop = bounds.top
+      activeLightState = false
+    }
+  }
+
+  return activeLightState
+}
+
+function applySectionLightState(nav, logo, lightState, nextLightState) {
+  lightState.nav = nextLightState
+  lightState.logo = nextLightState
+  nav?.classList.toggle('light', nextLightState)
+  logo?.classList.toggle('light', nextLightState)
+}
+
+function createSectionThemeWatcher(sections, nav, logo, lightState, getThreshold) {
+  const applyThemeState = (nextLightState) => {
+    applySectionLightState(nav, logo, lightState, nextLightState)
+  }
+
+  const syncSectionTheme = () => {
+    const threshold = getThreshold()
+    const initialLightState = getSectionThemeLightState(sections, threshold)
+
+    if (initialLightState !== null) {
+      applyThemeState(initialLightState)
+    }
+  }
+
+  const watcher = ScrollTrigger.create({
+    trigger: document.documentElement,
+    start: 0,
+    end: 'max',
+    invalidateOnRefresh: true,
+    onUpdate: syncSectionTheme,
+    onRefresh: syncSectionTheme,
+  })
+
+  syncSectionTheme()
+
+  return watcher
+}
+
+function resolveCompactLogoState(changeLogoSections, changeLogoBackSections, threshold) {
+  const triggerSections = [
+    ...changeLogoSections.map((section) => ({ section, isCompact: true })),
+    ...changeLogoBackSections.map((section) => ({ section, isCompact: false })),
+  ]
+
+  let activeState = false
+  let activeSectionTop = -Infinity
+
+  for (const trigger of triggerSections) {
+    const bounds = trigger.section.getBoundingClientRect()
+
+    if (bounds.top > threshold || bounds.top < activeSectionTop) {
+      continue
+    }
+
+    activeSectionTop = bounds.top
+    activeState = trigger.isCompact
+  }
+
+  return activeState
+}
+
+function createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, getThreshold) {
+  const allTriggerSections = [...changeLogoSections, ...changeLogoBackSections]
+
+  if (!allTriggerSections.length) {
+    setCompactLogoActive(false)
+
+    return {
+      kill() {
+        setCompactLogoActive(false)
+      },
+    }
+  }
+
+  const syncChangeLogoState = () => {
+    setCompactLogoActive(
+      resolveCompactLogoState(changeLogoSections, changeLogoBackSections, getThreshold()),
+    )
+  }
+
+  const watchers = [
+    ...changeLogoSections.map((section) =>
+      ScrollTrigger.create({
+        trigger: section,
+        start: () => `top ${getThreshold()}`,
+        invalidateOnRefresh: true,
+        onEnter: () => setCompactLogoActive(true),
+        onEnterBack: () => setCompactLogoActive(true),
+        onRefresh: syncChangeLogoState,
+      }),
+    ),
+    ...changeLogoBackSections.map((section) =>
+    ScrollTrigger.create({
+      trigger: section,
+      start: () => `top ${getThreshold()}`,
+      invalidateOnRefresh: true,
+      onEnter: () => setCompactLogoActive(false),
+      onEnterBack: () => setCompactLogoActive(false),
+      onRefresh: syncChangeLogoState,
+    }),
+    ),
+  ]
+
+  syncChangeLogoState()
+
+  return {
+    kill() {
+      watchers.forEach((watcher) => watcher.kill())
+      setCompactLogoActive(false)
+    },
+  }
+}
+
+function updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, sectionThreshold) {
+  const bounds = heroImage.getBoundingClientRect()
+  const sectionThemeLightState = getSectionThemeLightState(themedSections, sectionThreshold)
+
+  lightState.nav = resolveLightState(lightState.nav, bounds.top, NAV_LIGHT_TOP)
+  lightState.logo = resolveLightState(lightState.logo, bounds.left, LOGO_LIGHT_LEFT)
+
+  if (sectionThemeLightState !== null) {
+    applySectionLightState(nav, logo, lightState, sectionThemeLightState)
+    return
+  }
+
+  nav?.classList.toggle('light', lightState.nav)
+  logo?.classList.toggle('light', lightState.logo)
+}
+
+export function createHeroScrollAnimation(scope) {
+  if (!scope) {
+    return () => undefined
+  }
+
+  registerPlugins()
+
+  const media = gsap.matchMedia()
+
+  media.add('(prefers-reduced-motion: no-preference)', () => {
+    const section = scope.matches?.('.landing') ? scope : scope.querySelector('.landing')
+    const heroTitle = section?.querySelector('.hero-title')
+    const heroImage = section?.querySelector('.hero-video')
+    const heroVideoHolder = section?.querySelector('.hero-video-holder')
+    const heroContent = section?.querySelector('.hero-content')
+    const navHolder = document.querySelector('.nav-holder')
+    const nav = document.querySelector('nav.main')
+    const logo = document.querySelector('.logo-holder')
+    const themedSections = Array.from(document.querySelectorAll('.section-light, .section-dark'))
+    const changeLogoSections = Array.from(document.querySelectorAll('.change-logo'))
+    const changeLogoBackSections = Array.from(document.querySelectorAll('.change-logo-back'))
+    const lightState = {
+      nav: nav?.classList.contains('light') ?? false,
+      logo: logo?.classList.contains('light') ?? false,
+    }
+    let timeline
+    let changeLogoWatcher
+    let sectionThemeWatcher
+    let isDisposed = false
+    let cursorCleanup = null
+
+    const getSectionThreshold = () => {
+      const navBounds = nav?.getBoundingClientRect()
+
+      if (navBounds && navBounds.height > 0) {
+        return Math.round(navBounds.bottom)
+      }
+
+      return NAV_LIGHT_TOP
+    }
+
+    const refreshTrigger = () => {
+      if (!isDisposed) {
+        timeline?.scrollTrigger?.refresh()
+        ScrollTrigger.refresh()
+      }
+    }
+
+    if (!section || !heroTitle || !heroImage) {
+      return undefined
+    }
+
+    const playIcon = document.querySelector('.play-icon')
+
+    if (heroVideoHolder && playIcon) {
+      gsap.set(playIcon, {
+        xPercent: -50,
+        yPercent: -50,
+        autoAlpha: 0,
+        scale: 0.92,
+        willChange: 'transform, opacity',
+      })
+
+      const movePlayIconX = gsap.quickTo(playIcon, 'x', { duration: 0.18, ease: 'power3.out' })
+      const movePlayIconY = gsap.quickTo(playIcon, 'y', { duration: 0.18, ease: 'power3.out' })
+
+      let isOver = false
+      let hiddenBySection = false
+      let hasPointer = false
+      let pointerX = 0
+      let pointerY = 0
+
+      const updatePlayIconVisibility = (visible) => {
+        if (visible === isOver) return
+
+        isOver = visible
+        gsap.to(playIcon, {
+          autoAlpha: visible ? 1 : 0,
+          scale: visible ? 1 : 0.92,
+          duration: visible ? 0.22 : 0.16,
+          ease: visible ? 'power2.out' : 'power2.in',
+          overwrite: 'auto',
+        })
+      }
+
+      const syncPlayIconState = () => {
+        if (hiddenBySection || !hasPointer) {
+          updatePlayIconVisibility(false)
+          return
+        }
+
+        const bounds = heroImage.getBoundingClientRect()
+        const over = (
+          pointerX >= bounds.left &&
+          pointerX <= bounds.right &&
+          pointerY >= bounds.top &&
+          pointerY <= bounds.bottom
+        )
+
+        updatePlayIconVisibility(over)
+      }
+
+      const updatePointerPosition = (e) => {
+        hasPointer = true
+        pointerX = e.clientX
+        pointerY = e.clientY
+        movePlayIconX(pointerX)
+        movePlayIconY(pointerY)
+      }
+
+      const onDocPointerMove = (e) => {
+        updatePointerPosition(e)
+        syncPlayIconState()
+      }
+
+      const onHeroPointerEnter = (e) => {
+        updatePointerPosition(e)
+        syncPlayIconState()
+      }
+
+      const onHeroPointerLeave = () => {
+        updatePlayIconVisibility(false)
+      }
+
+      const onViewportChange = () => {
+        syncPlayIconState()
+      }
+
+      document.addEventListener('pointermove', onDocPointerMove)
+      heroVideoHolder.addEventListener('pointerenter', onHeroPointerEnter)
+      heroVideoHolder.addEventListener('pointerleave', onHeroPointerLeave)
+      window.addEventListener('scroll', onViewportChange, { passive: true })
+      window.addEventListener('resize', onViewportChange)
+
+      const brandsGrow = document.querySelector('.brands-grow')
+
+      const onBrandsGrowEnter = () => {
+        hiddenBySection = true
+        updatePlayIconVisibility(false)
+      }
+
+      const onBrandsGrowLeave = () => {
+        hiddenBySection = false
+        syncPlayIconState()
+      }
+
+      brandsGrow?.addEventListener('mouseenter', onBrandsGrowEnter)
+      brandsGrow?.addEventListener('mouseleave', onBrandsGrowLeave)
+
+      cursorCleanup = () => {
+        document.removeEventListener('pointermove', onDocPointerMove)
+        heroVideoHolder.removeEventListener('pointerenter', onHeroPointerEnter)
+        heroVideoHolder.removeEventListener('pointerleave', onHeroPointerLeave)
+        window.removeEventListener('scroll', onViewportChange)
+        window.removeEventListener('resize', onViewportChange)
+        brandsGrow?.removeEventListener('mouseenter', onBrandsGrowEnter)
+        brandsGrow?.removeEventListener('mouseleave', onBrandsGrowLeave)
+        gsap.set(playIcon, { autoAlpha: 0, scale: 0.92 })
+      }
+    }
+
+    sectionThemeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
+  changeLogoWatcher = createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, getSectionThreshold)
+
+    gsap.set(heroTitle, {
+      willChange: 'opacity',
+    })
+
+    gsap.set(navHolder, {
+        y: 0,
+    })
+
+    // gsap.set(heroContent, {
+    //   y: 0
+    // })
+
+    gsap.set(heroImage, {
+      display: 'block',
+      transformOrigin: 'right bottom',
+      filter: 'brightness(100%) saturate(100%)',
+      willChange: 'transform',
+      borderRadius: '10px',
+    })
+
+    function buildTimeline() {
+      timeline?.kill()
+
+      timeline = gsap.timeline({
+        defaults: {
+          ease: 'none',
+        },
+        scrollTrigger: {
+          trigger: heroImage,
+          pin: section,
+          start: () => getHeroStart(),
+          end: () => getHeroEndDistance(),
+          scrub: true,
+          invalidateOnRefresh: true,
+          refreshPriority: 1,
+          anticipatePin: 0,
+          onUpdate: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
+          onRefresh: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
+          onLeave: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
+          onLeaveBack: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
+        },
+      })
+
+      timeline.addLabel('hero-start', 0)
+      timeline.addLabel('hero-mid', 1)
+      timeline.addLabel('hero-end', 2)
+
+      timeline.to(heroImage, {
+        x: () => getHeroImageMetrics(heroImage).x,
+        y: () => getHeroImageMetrics(heroImage).y,
+        scale: () => getHeroImageMetrics(heroImage).scale,
+        borderRadius: '0px',
+        filter: 'brightness(20%)',
+        duration: 1,
+      }, 'hero-start')
+
+      timeline.to(heroTitle, {
+        opacity: 0,
+        y: -400,
+        filter: 'blur(20px)',
+        duration: 1,
+      }, 'hero-start')
+
+      /*timeline.to(navHolder, {
+        y: -200,
+        duration: 0.5,
+      }, 'hero-start+=0.4')*/
+
+      /*timeline.to(heroImage, {
+        filter: 'brightness(10%)',
+        opacity: 1,
+        duration: 0.5,
+      }, 'hero-end')*/
+
+      /*timeline.to(navHolder, {
+        y: 0,
+        duration: 0.5,
+      }, 'hero-end+=0.25')*/
+
+      /*timeline.to(heroContent, {
+        opacity: 1,
+        yPercent: -100,
+        borderRadius:'0',
+        filter: 'blur(0px)',
+        onComplete: () => pauseMediaPlayback(heroImage),
+        onReverseComplete: () => resumeMediaPlayback(heroImage),
+        duration: 0.5,
+      }, 'hero-end+=0.3')
+
+      timeline.fromTo(splitCoffee.words,
+        { color: 'rgba(48, 15, 29, 0)' },
+        { color: 'rgba(48, 15, 29, 1)', stagger: 0.05, duration: 0.5, ease: 'none' },
+        'hero-end+=0.3'
+      )*/
+
+      requestAnimationFrame(() => {
+        if (!isDisposed) {
+          updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold())
+        }
+      })
+    }
+
+    function initialise() {
+      if (isDisposed) {
+        return
+      }
+
+      if (!isMeasurableMedia(heroImage)) {
+        requestAnimationFrame(initialise)
+        return
+      }
+
+      buildTimeline()
+      ScrollTrigger.refresh()
+    }
+
+    window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, refreshTrigger)
+
+    // Handle both image and video elements
+    const isVideo = heroImage.tagName === 'VIDEO'
+    
+    if (isVideo) {
+      // For video elements, start animation immediately or when metadata is loaded
+      if (heroImage.readyState >= 1) {
+        // Video metadata already loaded
+        initialise()
+      } else {
+        // Wait for video metadata to load
+        heroImage.addEventListener('loadedmetadata', initialise, { once: true })
+      }
+    } else {
+      // For image elements
+      if (heroImage.complete && heroImage.naturalWidth > 0) {
+        initialise()
+      } else {
+        heroImage.addEventListener('load', initialise, { once: true })
+        heroImage.decode?.().then(initialise).catch(() => undefined)
+      }
+    }
+
+    return () => {
+      isDisposed = true
+      window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, refreshTrigger)
+      timeline?.kill()
+      changeLogoWatcher?.kill()
+      sectionThemeWatcher?.kill()
+      cursorCleanup?.()
+      nav?.classList.remove('light')
+      logo?.classList.remove('light')
+      gsap.set([heroTitle, heroImage], { clearProps: 'all' })
+    }
+  })
+
+  return () => media.revert()
+}

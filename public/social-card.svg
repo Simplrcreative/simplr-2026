@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Simplr social card</title>
+  <desc id="desc">Simplr editorial branded social preview image.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8f3ea" />
+      <stop offset="52%" stop-color="#f3ede2" />
+      <stop offset="100%" stop-color="#ebe0cc" />
+    </linearGradient>
+    <radialGradient id="glowOne" cx="0.12" cy="0.1" r="0.7">
+      <stop offset="0%" stop-color="#d9b15f" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#d9b15f" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowTwo" cx="0.88" cy="0.14" r="0.55">
+      <stop offset="0%" stop-color="#5d6b4f" stop-opacity="0.28" />
+      <stop offset="100%" stop-color="#5d6b4f" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg)" />
+  <rect width="1200" height="630" rx="32" fill="url(#glowOne)" />
+  <rect width="1200" height="630" rx="32" fill="url(#glowTwo)" />
+  <g fill="none" stroke="#151512" stroke-opacity="0.08">
+    <path d="M0 84H1200" />
+    <path d="M0 168H1200" />
+    <path d="M0 252H1200" />
+    <path d="M0 336H1200" />
+    <path d="M0 420H1200" />
+    <path d="M0 504H1200" />
+    <path d="M0 588H1200" />
+    <path d="M150 0V630" />
+    <path d="M300 0V630" />
+    <path d="M450 0V630" />
+    <path d="M600 0V630" />
+    <path d="M750 0V630" />
+    <path d="M900 0V630" />
+    <path d="M1050 0V630" />
+  </g>
+  <text x="90" y="120" fill="#ab5d3a" font-family="Manrope, sans-serif" font-size="28" font-weight="700" letter-spacing="8">SIMPLR</text>
+  <text x="90" y="290" fill="#151512" font-family="Fraunces, serif" font-size="124" font-weight="700">Headless</text>
+  <text x="90" y="404" fill="#151512" font-family="Fraunces, serif" font-size="124" font-weight="700">WordPress</text>
+  <text x="90" y="514" fill="#151512" font-family="Fraunces, serif" font-size="124" font-weight="700">Scaffold</text>
+  <text x="90" y="575" fill="#2f2f2a" font-family="Manrope, sans-serif" font-size="28">Vite, React, Tailwind, GSAP, structured data, llms.txt and dynamic routes.</text>
+</svg>

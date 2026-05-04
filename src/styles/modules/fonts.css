@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'Aeonik Pro';
+  src: url('../../fonts/AeonikPro-Light.woff') format('woff');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Aeonik Pro';
+  src: url('../../fonts/AeonikPro-Regular.woff') format('woff');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Aeonik Pro';
+  src: url('../../fonts/AeonikPro-Medium.woff') format('woff');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+.font-literata {
+  font-family: "Literata", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-literata-medium {
+  font-family: "Literata", serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}

@@ -1,0 +1,77 @@
+.button-wrapper {
+    overflow: visible;
+}
+.btn {
+    display: inline-flex;
+    padding: 24.5px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 100px;
+    background: var(--color-coffee);
+    color: white;
+    margin-right: 30px;
+    font-weight: 500;
+    isolation: isolate;
+    overflow: visible;
+}
+.btn-fill {
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+.btn-fill::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 160%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    transform-origin: center;
+    transform: scale(0);
+    border-radius: 999px;
+    transition: transform 0.45s ease;
+    background-color: white;
+}
+.btn:hover .btn-fill::before {
+    transform: scale(1);
+}
+.btn-inner {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-text {
+    opacity: 0;
+    position: absolute;
+    inset: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -25px;
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    transform: scale(1);
+    transition: transform 0.4s ease;
+    background-color: var(--color-coffee);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M0.292893 9.29289C-0.0976311 9.68342 -0.0976311 10.3166 0.292893 10.7071C0.683418 11.0976 1.31658 11.0976 1.70711 10.7071L1 10L0.292893 9.29289ZM11 1C11 0.447715 10.5523 -3.74211e-07 10 4.72575e-08L1 -1.63477e-07C0.447715 -1.63477e-07 2.8711e-07 0.447715 2.8711e-07 1C2.8711e-07 1.55228 0.447715 2 1 2L9 2L9 10C9 10.5523 9.44772 11 10 11C10.5523 11 11 10.5523 11 10L11 1ZM1 10L1.70711 10.7071L10.7071 1.70711L10 1L9.29289 0.292893L0.292893 9.29289L1 10Z" fill="white"/></svg>');
+    z-index: 2;
+}
+.btn:hover::after {
+    transform: scale(1.2)
+}

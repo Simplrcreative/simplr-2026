@@ -1,0 +1,120 @@
+@theme {
+  --font-aeonik: 'Aeonik Pro', sans-serif;
+  --font-literata: 'Literata', serif;
+  --color-coffee: #300F1D;
+  --color-strategy: #d5e09e;
+  --color-branding-design: #f15941;
+  --color-web-design-development: #c8bbff;
+  --color-motion: #705f07;
+  --color-templates: #596bf0;
+}
+
+@utility container {
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.5rem;
+}
+
+@layer base {
+  :root {
+    --brand-strategy: #d5e09e;
+    --brand-branding-design: #f15941;
+    --brand-web-design-development: #c8bbff;
+    --brand-motion: #705f07;
+    --brand-templates: #596bf0;
+    --brand-coffee: #300f1d;
+    color: var(--brand-dark);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @layer components {
+  .surface-card {
+    @apply rounded-[2rem] border border-black/8 bg-white/80 shadow-[0_24px_90px_rgba(21,21,18,0.06)] backdrop-blur;
+  }
+
+  .eyebrow {
+    padding-left: 40px!important;
+    line-height: 30px;
+    margin-bottom: 1.25rem!important;
+    @apply text-[1,375rem] font-semibold text-coffee relative;
+  }
+  .eyebrow::before {
+    content:'';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: var(--color-coffee);
+  }
+
+  .section-title {
+    @apply font-literata text-4xl leading-tight text-coffee md:text-6xl;
+  }
+
+  .body-copy {
+    @apply text-base leading-7 text-coffee md:text-lg;
+  }
+
+  .brand-chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em];
+  }
+
+  .coffee-to-light,
+  .coffee-to-light-incoming,
+  .coffee-to-light-outgoing {
+    background-color: var(--color-coffee);
+  }
+
+  .light-to-coffee,
+  .light-to-coffee-incoming,
+  .light-to-coffee-outgoing {
+    background-color: #ffffff;
+  }
+}
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-width: 320px;
+    scroll-behavior: auto;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    color: var(--brand-coffee);
+    font-family: var(--font-aeonik);
+    background-color: white
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: rgba(197, 107, 67, 0.2);
+  }
+}
