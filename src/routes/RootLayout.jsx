@@ -1,6 +1,7 @@
 import { useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLoaderData, useLocation, useMatches, useNavigation } from 'react-router-dom'
 import BrandLogo from '../components/BrandLogo.jsx'
+import PageLogo from '../components/PageLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
@@ -44,6 +45,7 @@ function NavLinkLabel({ label, count, inverted = false }) {
 export default function RootLayout() {
   const layoutRef = useRef(null)
   const footerRef = useRef(null)
+  const destroyLogoRef = useRef(null)
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
@@ -61,27 +63,30 @@ export default function RootLayout() {
     }
   }, [isHomePage])
 
-  // On every route change: scroll to top and wipe all GSAP inline styles that
-  // logo/hero animations leave on header elements, so the next page starts clean.
-  // useLayoutEffect fires after old effect cleanups but before new effects run.
+  // On every route change: kill the previous logo animation, scroll to top,
+  // and clear any GSAP inline styles left by the scroll animation.
   useLayoutEffect(() => {
+    destroyLogoRef.current?.()
+    destroyLogoRef.current = null
     window.scrollTo(0, 0)
+    document.querySelector('nav.main')?.classList.remove('light')
+    document.querySelector('.logo-holder')?.classList.remove('light')
+    document.documentElement.classList.remove('compact-logo-active')
     gsap.set(
       ['.logo', '#logo-implr g', '.tagline', '.header', 'nav.main', '.nav-holder', '.logo-holder'],
       { clearProps: 'all' },
     )
-    document.querySelector('nav.main')?.classList.remove('light')
-    document.querySelector('.logo-holder')?.classList.remove('light')
-    document.documentElement.classList.remove('compact-logo-active')
   }, [location.pathname])
 
   useEffect(() => {
     // const destroySmoothScroll = createSmoothScroll()
-    const destroyLogoScrollAnimation = createLogoScrollAnimation(layoutRef.current)
+    // Only run the scroll-triggered logo animation on the home page.
+    // On other pages the logo is already set to its compact end-state.
+    destroyLogoRef.current = isHomePage ? createLogoScrollAnimation(layoutRef.current) : undefined
     const destroyNavSectionTheme = createNavSectionTheme(layoutRef.current)
 
     return () => {
-      destroyLogoScrollAnimation?.()
+      // Logo animation is killed synchronously in useLayoutEffect via destroyLogoRef.
       destroyNavSectionTheme?.()
       // destroySmoothScroll?.()
     }
@@ -126,15 +131,21 @@ export default function RootLayout() {
         />
       </div>
 
-      <header className="header fixed z-5 w-full pb-5">
+      <header className={`header fixed z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
         <div className="nav-holder flex flex-col px-5 pt-[3.125rem] md:flex-row md:items-start md:justify-between">
           <div className="logo-holder">
-            <BrandLogo />
-            <div className="tagline">
-              Creative.<br/>
-              Intelligence.<br/>
-              Applied.
-            </div>
+            {isHomePage ? (
+              <>
+                <BrandLogo />
+                <div className="tagline">
+                  Creative.<br/>
+                  Intelligence.<br/>
+                  Applied.
+                </div>
+              </>
+            ) : (
+              <PageLogo />
+            )}
           </div>
           <nav className="main flex flex-wrap gap-[2.5rem] pt-[1.875rem]">
             {navigation.map((item) => (
@@ -157,7 +168,7 @@ export default function RootLayout() {
         </div>
       </header>
 
-      <div className="compact-logo fixed top-[0.65rem] left-[1.25rem] z-3">
+      <div className="compact-logo fixed top-[0.65rem] left-[1.25rem] z-10">
         <Link to="/" title="Simplr">
           <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
             <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>

@@ -206,3 +206,7 @@ nav a:focus-visible .nav-link__orb {
         transition: none;
     }
 }
+.page-header {
+    height: 130px;
+    transform: translate(0px, -40px);
+}
