@@ -86,7 +86,7 @@ export function createBulletsAnimation(section) {
       start: 'top 70%',
       end: 'top 55%',
       scrub: 1,
-      markers: true,
+      //markers: true,
     },
   })
 
@@ -100,7 +100,7 @@ export function createBulletsAnimation(section) {
       //pin: true,
       //pinSpacing: true,
       scrub: 2,
-      markers: true,
+      //markers: true,
     }
   })
 
