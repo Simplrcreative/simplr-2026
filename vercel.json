@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/graphql",
+      "destination": "https://stg-simplragency-dashboard.kinsta.cloud/graphql"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
