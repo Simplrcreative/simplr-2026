@@ -22,11 +22,34 @@
   font-display: swap;
 }
 
+.font-aeonik {
+  font-family: 'Aeonik Pro';
+  src: url('../../fonts/AeonikPro-Regular.woff') format('woff');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.font-aeonik-italic {
+  font-family: 'Aeonik Pro';
+  src: url('../../fonts/AeonikPro-Regular.woff') format('woff');
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
 .font-literata {
   font-family: "Literata", serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+}
+
+.font-literata-italic {
+  font-family: "Literata", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: italic;
 }
 
 .font-literata-medium {

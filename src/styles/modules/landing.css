@@ -13,14 +13,15 @@
     opacity: 0;
 }
 /* --- SERVICES --- */
-.services-titles {
-    opacity: 1
+.services-title {
+    opacity: 0.3;
 }
 .services-title.active{
    /* text-decoration: underline */
 }
 .stat-no {
     line-height: 0.69;
+     color: var(--color-strategy)
 }
 .stat-plus {
     line-height: 0.28;
@@ -33,7 +34,7 @@
 /* --- CASE STUDIES --- */
 .client-name {
     margin-top: 0.5rem;
-    opacity: 0.2;
+    opacity: 0.5;
     cursor: pointer;
     transition: opacity 1s ease;
 }

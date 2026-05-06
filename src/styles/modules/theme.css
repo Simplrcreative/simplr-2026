@@ -37,8 +37,8 @@
   .eyebrow {
     padding-left: 40px!important;
     line-height: 30px;
-    margin-bottom: 1.25rem!important;
-    @apply text-[1,375rem] font-semibold text-coffee relative;
+    margin-bottom: 3.25rem!important;
+    @apply text-[1,375rem] font-semibold relative;
   }
   .eyebrow::before {
     content:'';
@@ -49,6 +49,10 @@
     height: 30px;
     border-radius: 999px;
     background: var(--color-coffee);
+  }
+  .text-white.eyebrow::before,
+  .text-white .eyebrow::before { 
+     background: white;
   }
 
   .section-title {
@@ -76,45 +80,13 @@
   }
 }
 
-  * {
-    box-sizing: border-box;
-  }
+/* Unlayered — beats Tailwind preflight's body { background-color: white } */
+html[data-page-bg="dark"],
+html[data-page-bg="dark"] body {
+  background-color: var(--color-coffee)
+}
+}
 
-  html {
-    min-width: 320px;
-    scroll-behavior: auto;
-  }
-
-  body {
-    margin: 0;
-    min-width: 320px;
-    min-height: 100vh;
-    color: var(--brand-coffee);
-    font-family: var(--font-aeonik);
-    background-color: white
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  img {
-    display: block;
-    max-width: 100%;
-  }
-
-  button,
-  input,
-  textarea {
-    font: inherit;
-  }
-
-  #root {
-    min-height: 100vh;
-  }
-
-  ::selection {
-    background: rgba(197, 107, 67, 0.2);
-  }
+.footer-off {
+  min-height: calc(70vh - 54px)
 }

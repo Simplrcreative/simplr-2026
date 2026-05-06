@@ -17,12 +17,12 @@ export const siteConfig = {
   contact: {
     email: 'hello@simplr.studio',
     phone: '+44 20 7946 0958',
-    city: 'London',
+    city: 'Cape Town',
     country: 'United Kingdom',
   },
   transitions: {
     enabled: true,
-    duration: 0.72,
+    duration: 1,
     ease: 'power2.out',
     opacity: 0,
     y: 26,

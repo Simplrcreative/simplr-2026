@@ -3,8 +3,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const SERVICES_PIN_TOP = 95
 const SERVICES_ENTRY_START = 'top bottom'
-const TITLE_TRIGGER_LEFT_OFFSET = 120
-const INACTIVE_TITLE_OPACITY = 0.2
+const TITLE_TRIGGER_LEFT_OFFSET = '50%'
+const getTitleTriggerLeft = () => window.innerWidth * 0.333
+const INACTIVE_TITLE_OPACITY = 0.3
 const ACTIVE_TITLE_OPACITY = 1
 
 let pluginsRegistered = false
@@ -38,6 +39,16 @@ function formatStatValue(value) {
   return Math.round(value).toString()
 }
 
+function getColorForClass(className) {
+  const el = document.createElement('span')
+  el.className = className
+  el.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none'
+  document.body.appendChild(el)
+  const color = getComputedStyle(el).color
+  document.body.removeChild(el)
+  return color
+}
+
 export function createServicesScrollAnimation(scope) {
   if (!scope) {
     return () => undefined
@@ -57,6 +68,7 @@ export function createServicesScrollAnimation(scope) {
     let entranceTween
     let scrubTimeline
     let activeStatTween
+    let activeColorTween
     let activeTitleKey = null
 
     if (!section || !titles) {
@@ -110,7 +122,7 @@ export function createServicesScrollAnimation(scope) {
       activeStatTween = gsap.to(counter, {
         value: targetValue,
         duration:1,
-        ease: 'power4.out',
+        ease: 'power4.inOut',
         onUpdate: () => {
           statNo.textContent = formatStatValue(counter.value)
         },
@@ -127,8 +139,15 @@ export function createServicesScrollAnimation(scope) {
       const nextDetail = title.dataset.detail
 
       if (statNo && nextColorClass) {
+        const targetColor = getColorForClass(nextColorClass)
         statNo.classList.remove(...statColorClasses)
         statNo.classList.add(nextColorClass)
+        activeColorTween?.kill()
+        activeColorTween = gsap.to([statNo, statPlus].filter(Boolean), {
+          color: targetColor,
+          duration: 0.5,
+          ease: 'power2.out',
+        })
       }
 
       if (statPlus && nextColorClass) {
@@ -145,21 +164,19 @@ export function createServicesScrollAnimation(scope) {
 
     const resetStatState = () => {
       activeTitleKey = null
+      activeColorTween?.kill()
+      activeStatTween?.kill()
       setActiveTitleOpacity()
 
       if (statNo) {
         statNo.textContent = '0'
-        if (statColorClasses.length > 0) {
-          statNo.classList.remove(...statColorClasses)
-        }
-        statNo.classList.add(defaultStatColorClass)
+        statNo.classList.remove(...statColorClasses)
+        gsap.set(statNo, { clearProps: 'color' })
       }
 
       if (statPlus) {
-        if (statColorClasses.length > 0) {
-          statPlus.classList.remove(...statColorClasses)
-        }
-        statPlus.classList.add(defaultStatColorClass)
+        statPlus.classList.remove(...statColorClasses)
+        gsap.set(statPlus, { clearProps: 'color' })
       }
 
       if (statDetail) {
@@ -174,7 +191,7 @@ export function createServicesScrollAnimation(scope) {
       for (const title of serviceTitles) {
         const bounds = title.getBoundingClientRect()
 
-        if (bounds.left > TITLE_TRIGGER_LEFT_OFFSET) {
+        if (bounds.left > getTitleTriggerLeft()) {
           continue
         }
 
@@ -273,6 +290,7 @@ export function createServicesScrollAnimation(scope) {
       entranceTween?.kill()
       scrubTimeline?.kill()
       activeStatTween?.kill()
+      activeColorTween?.kill()
       gsap.set([section, titles], { clearProps: 'all' })
     }
   })

@@ -172,6 +172,59 @@ function createSectionThemeWatcher(sections, nav, logo, lightState, getThreshold
   return watcher
 }
 
+/**
+ * Standalone nav section theme watcher for pages that don't have a hero animation.
+ * Reads .section-dark / .section-light elements and keeps nav.main in sync.
+ * Skip pages with a .landing section — createHeroScrollAnimation handles those.
+ */
+export function createNavSectionTheme(scope) {
+  if (!scope) return () => undefined
+  if (scope.querySelector('.landing')) return () => undefined
+
+  registerPlugins()
+
+  const nav = document.querySelector('nav.main')
+  const logo = document.querySelector('.logo-holder')
+  const themedSections = Array.from(scope.querySelectorAll('.section-light, .section-dark'))
+  const changeLogoSections = Array.from(scope.querySelectorAll('.change-logo'))
+  const changeLogoBackSections = Array.from(scope.querySelectorAll('.change-logo-back'))
+
+  if (!themedSections.length && !changeLogoSections.length && !changeLogoBackSections.length) {
+    nav?.classList.remove('light')
+    logo?.classList.remove('light')
+    return () => undefined
+  }
+
+  const getSectionThreshold = () => {
+    const navBounds = nav?.getBoundingClientRect()
+    if (navBounds && navBounds.height > 0) return Math.round(navBounds.bottom)
+    return NAV_LIGHT_TOP
+  }
+
+  let themeWatcher = null
+  let changeLogoWatcher = null
+
+  if (themedSections.length) {
+    const lightState = {
+      nav: nav?.classList.contains('light') ?? false,
+      logo: logo?.classList.contains('light') ?? false,
+    }
+    themeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
+  } else {
+    nav?.classList.remove('light')
+    logo?.classList.remove('light')
+  }
+
+  if (changeLogoSections.length || changeLogoBackSections.length) {
+    changeLogoWatcher = createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, getSectionThreshold)
+  }
+
+  return () => {
+    themeWatcher?.kill()
+    changeLogoWatcher?.kill()
+  }
+}
+
 function resolveCompactLogoState(changeLogoSections, changeLogoBackSections, threshold) {
   const triggerSections = [
     ...changeLogoSections.map((section) => ({ section, isCompact: true })),
@@ -398,6 +451,7 @@ export function createHeroScrollAnimation(scope) {
       window.addEventListener('resize', onViewportChange)
 
       const brandsGrow = document.querySelector('.brands-grow')
+      const navHolder = document.querySelector('.nav-holder')
 
       const onBrandsGrowEnter = () => {
         hiddenBySection = true
@@ -409,8 +463,20 @@ export function createHeroScrollAnimation(scope) {
         syncPlayIconState()
       }
 
+      const onNavEnter = () => {
+        hiddenBySection = true
+        updatePlayIconVisibility(false)
+      }
+
+      const onNavLeave = () => {
+        hiddenBySection = false
+        syncPlayIconState()
+      }
+
       brandsGrow?.addEventListener('mouseenter', onBrandsGrowEnter)
       brandsGrow?.addEventListener('mouseleave', onBrandsGrowLeave)
+      navHolder?.addEventListener('mouseenter', onNavEnter)
+      navHolder?.addEventListener('mouseleave', onNavLeave)
 
       cursorCleanup = () => {
         document.removeEventListener('pointermove', onDocPointerMove)
@@ -420,6 +486,8 @@ export function createHeroScrollAnimation(scope) {
         window.removeEventListener('resize', onViewportChange)
         brandsGrow?.removeEventListener('mouseenter', onBrandsGrowEnter)
         brandsGrow?.removeEventListener('mouseleave', onBrandsGrowLeave)
+        navHolder?.removeEventListener('mouseenter', onNavEnter)
+        navHolder?.removeEventListener('mouseleave', onNavLeave)
         gsap.set(playIcon, { autoAlpha: 0, scale: 0.92 })
       }
     }

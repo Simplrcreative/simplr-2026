@@ -29,7 +29,6 @@ export default function IntroOverlay({ onComplete }) {
       }
 
       hasFinishedRef.current = true
-      document.body.style.backgroundColor = '#ffffff'
       document.body.style.overflow = ''
       onCompleteRef.current?.()
     }

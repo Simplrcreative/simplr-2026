@@ -1,0 +1,151 @@
+/* ─── People scatter section ─────────────────────────────── */
+
+.person-item.align-end  { margin-left: auto; }
+.person-item.align-start { margin-right: auto; }
+
+/* Individual person name + meta group */
+.person-item {
+  cursor: pointer;
+}
+
+.person-name {
+  font-size: clamp(3.5rem, 5vw, 5.5rem);
+  line-height: 1;
+  color: #fff;
+  transition: color 0.4s ease;
+}
+
+.person-item.is-hovered .person-name {
+  text-decoration: underline;
+  text-underline-offset: 0.1em;
+}
+
+.person-item.is-hovered .person-name.branding-design {
+  color: var(--color-branding-design);
+}
+
+.person-item.is-hovered .person-name.strategy {
+  color: var(--color-strategy);
+}
+
+.person-item.is-hovered .person-name.web-design-development {
+  color: var(--color-web-design-development);
+}
+
+.person-item.is-hovered .person-name.templates {
+  color: var(--color-templates);
+}
+
+.person-item.is-hovered .person-name.motion {
+  color: var(--color-motion);
+}
+
+.person-meta {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 0.25rem 0 0.5rem;
+}
+
+.person-exp,
+.person-linkedin {
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.person-linkedin {
+  text-decoration: underline;
+}
+
+/* ─── Profile image — inside image column, vertically centered ── */
+
+.person-hover-img {
+  position: absolute;
+  top: 90px;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+  opacity: 0;
+  scale: 0.5;
+  pointer-events: none;
+  transform-origin: center center;
+  transition: opacity 0.4s ease-in-out, scale 0.4s ease-in-out, filter 0.4s ease-in-out;
+  filter: grayscale(0.5)
+}
+
+.person-hover-img.is-visible {
+  opacity: 0.8;
+  scale: 1;
+}
+
+.person-hover-img.is-active {
+  opacity: 1;
+  filter: grayscale(0)
+}
+
+/* ─── Bio overlay ────────────────────────────────────────── */
+.people-grid {
+  top: 50%;
+  transform: translateY(-50%);
+  height: clamp(510px, 50vh, 600px);
+  overflow: hidden
+}
+.bio-close {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0 1rem;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.bio-close:hover {
+  opacity: 1;
+}
+
+.bio-name {
+    font-family: var(--font-aeonik);
+    font-size: 1.375rem;
+    line-height: 2.185rem;
+    font-weight: 500;
+    margin-bottom: 0
+}
+
+.bio-role {
+  font-size: 1.375rem;
+  font-weight: 400;
+  line-height: 2.185rem;
+  margin-bottom: 1.5rem;
+}
+
+.bio-exp {
+    font-size: 0.875rem;
+}
+
+.bio-linkedin {
+    display: inline-block;
+    font-size: 0.875rem;
+    text-decoration:underline
+}
+.bio-linkedin:hover {
+    text-decoration:none
+}
+
+.bio-text {
+  font-size: clamp(0.875rem, 5vw, 1rem);
+  line-height: 1.5;
+  margin-top: 1.5rem;
+}
+
+.bio-text p + p {
+  margin-top: 1.5rem;
+}

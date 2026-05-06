@@ -108,10 +108,10 @@ export default function HomePage() {
         </svg>
       </div>
       
-      <section ref={heroRef} className="landing relative w-full px-5  min-h-screen flex flex-col justify-end change-logo-back">
+      <section ref={heroRef} className="landing relative w-full px-5 min-h-screen flex flex-col justify-end change-logo-back">
           <div className="grid grid-cols-12 items-start gap-x-5">
-            <div className="col-start-1 col-span-7 pb-8 "> 
-              <h1 className="hero-title">Simplr is a Brand Identity and Digital Design Agency in Cape Town.</h1>
+            <div className="col-start-1 col-span-6 pb-8 max-w-[85ch]"> 
+              <h1 className="hero-title">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
             <div className="hero-video-holder col-start-8 col-span-5 section-dark flex items-end justify-end pb-5"> 
               <video className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden" autoPlay muted loop>
@@ -121,7 +121,7 @@ export default function HomePage() {
           </div>
       </section>
 
-      <section className="brands-grow bg-white px-5 py-20 section-light relative z-1 change-logo">
+      <section className="brands-grow px-5 bg-white py-20 section-light relative z-1 change-logo">
         <div className="grid grid-cols-12">
           <div className="trigger-split-text-coffee col-start-4 col-span-5 lead max-w-[47ch] "> 
               <div className="split-text-coffee">We help brands grow through creativity, craft, and intelligent design. From strategy and branding to digital experiences, motion, and presentation systems, we create work that connects purpose with performance.</div>
@@ -241,7 +241,7 @@ export default function HomePage() {
                   </picture>
                 </div>
                 <div className="categories mt-5 flex">
-                  <div className="category bg-strategy text-[0.875rem] text-white leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Strategy</div>
+                  <div className="category bg-strategy text-[0.875rem] text-coffee leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Strategy</div>
                   <div className="category bg-web-design-development text-[0.875rem] text-coffee leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Web Design & Development</div>
                   <div className="category bg-motion text-[0.875rem] text-white leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Motion</div>
                 </div>
@@ -278,7 +278,7 @@ export default function HomePage() {
                   </picture>
                 </div>
                 <div className="categories mt-5 flex">
-                  <div className="category bg-strategy text-[0.875rem] text-white leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Strategy</div>
+                  <div className="category bg-strategy text-[0.875rem] text-coffee leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Strategy</div>
                   <div className="category bg-web-design-development text-[0.875rem] text-coffee leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Web Design & Development</div>
                   <div className="category bg-motion text-[0.875rem] text-white leading-none px-[10px] pt-[8px] pb-[10px] font-medium rounded-full">Motion</div>
                 </div>
@@ -706,10 +706,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="faqs ps-5 py-30 bg-white section-light slide-up footer-off min-h-screen flex flex-col justify-center">
+      <section className="faqs ps-5 pt-60 bg-white section-light slide-up flex flex-col justify-center">
         <div className="grid grid-cols-1 gap-y-10 md:grid-cols-12 md:gap-x-5 md:gap-y-12">
           <div className="trigger-split-text-coffee md:col-span-4">
-            <p className="eyebrow">FAQs</p>
+            <div className="eyebrow">FAQs</div>
             <h1 className="split-text-coffee">Have questions?</h1>
           </div>
 

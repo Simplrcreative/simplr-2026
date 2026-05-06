@@ -76,6 +76,30 @@ const collectionCountQuery = `
   }
 `
 
+const peopleQuery = `
+  query People {
+    page(id: "10", idType: DATABASE_ID) {
+      acfPeople {
+        people {
+          acfBio
+          acfDivision
+          acfName
+          acfRole
+          acfExperience
+          acfLinkedIn
+          acfFont
+          acfAlign
+          acfProfileImage {
+            node {
+              sourceUrl
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 function remember(key, producer) {
   if (!cache.has(key)) {
     cache.set(
@@ -333,8 +357,7 @@ export async function fetchNavigationData() {
   return buildNavigation({ work: workCount })
 }
 
-export async function fetchHomeData() {
-  const [pagePayload, workPayload] = await Promise.all([
+export async function fetchHomeData() {  const [pagePayload, workPayload] = await Promise.all([
     fetchPageData('home'),
     fetchCollectionData('work'),
   ])
@@ -342,6 +365,23 @@ export async function fetchHomeData() {
   return {
     ...pagePayload,
     featuredWork: (workPayload.items || []).slice(0, 3),
+  }
+}
+
+export async function fetchPeopleData() {
+  if (!wpConfig.endpoint) {
+    return { people: [] }
+  }
+
+  try {
+    const data = await remember('people', () => graphQlRequest(peopleQuery))
+    const people = data.page?.acfPeople?.people ?? []
+
+    return { people }
+  } catch (error) {
+    reportError('Unable to load people data', error)
+
+    return { people: [] }
   }
 }
 

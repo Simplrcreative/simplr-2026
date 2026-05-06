@@ -1,9 +1,10 @@
-import { useDeferredValue, useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Outlet, useLoaderData, useLocation, useNavigation } from 'react-router-dom'
+import { useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Link, NavLink, Outlet, useLoaderData, useLocation, useMatches, useNavigation } from 'react-router-dom'
 import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
-import { createLogoScrollAnimation, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
+import { gsap } from 'gsap'
+import { createLogoScrollAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
 
 function setNavLinkPointer(target, clientX, clientY) {
   const bounds = target.getBoundingClientRect()
@@ -43,21 +44,45 @@ function NavLinkLabel({ label, count, inverted = false }) {
 export default function RootLayout() {
   const layoutRef = useRef(null)
   const footerRef = useRef(null)
-  const [isIntroVisible, setIsIntroVisible] = useState(true)
   const { navigation } = useLoaderData()
   const location = useLocation()
+  const isHomePage = location.pathname === '/'
+  const [isIntroVisible, setIsIntroVisible] = useState(false)
   const navigationState = useNavigation().state
   const deferredNavigationState = useDeferredValue(navigationState)
   const isNavigating = deferredNavigationState !== 'idle'
   const btnRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
 
+  // Dismiss the intro if the user navigates away from home before it completes
+  useEffect(() => {
+    if (!isHomePage) {
+      setIsIntroVisible(false)
+    }
+  }, [isHomePage])
+
+  // On every route change: scroll to top and wipe all GSAP inline styles that
+  // logo/hero animations leave on header elements, so the next page starts clean.
+  // useLayoutEffect fires after old effect cleanups but before new effects run.
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+    gsap.set(
+      ['.logo', '#logo-implr g', '.tagline', '.header', 'nav.main', '.nav-holder', '.logo-holder'],
+      { clearProps: 'all' },
+    )
+    document.querySelector('nav.main')?.classList.remove('light')
+    document.querySelector('.logo-holder')?.classList.remove('light')
+    document.documentElement.classList.remove('compact-logo-active')
+  }, [location.pathname])
+
   useEffect(() => {
     // const destroySmoothScroll = createSmoothScroll()
     const destroyLogoScrollAnimation = createLogoScrollAnimation(layoutRef.current)
+    const destroyNavSectionTheme = createNavSectionTheme(layoutRef.current)
 
     return () => {
       destroyLogoScrollAnimation?.()
+      destroyNavSectionTheme?.()
       // destroySmoothScroll?.()
     }
   }, [location.pathname])
@@ -67,25 +92,30 @@ export default function RootLayout() {
   }, [location.pathname])
 
   useEffect(() => {
-    let frameId = 0
-
-    frameId = requestAnimationFrame(() => {
-      const hasLandingSection = Boolean(layoutRef.current?.querySelector('.landing'))
-      document.documentElement.classList.toggle('compact-logo-active', !hasLandingSection)
+    // compact-logo-active is managed by createChangeLogoWatcher on the home page
+    // as the user scrolls. On route change we always start with the full logo visible.
+    let frameId = requestAnimationFrame(() => {
+      document.documentElement.classList.remove('compact-logo-active')
     })
 
-    return () => {
-      if (frameId) {
-        cancelAnimationFrame(frameId)
-      }
-    }
+    return () => cancelAnimationFrame(frameId)
   }, [location.pathname])
+
+  // Derive pageBg from the matched route's handle, falling back to 'light'.
+  // Set handle: { pageBg: 'dark' } on any route that opens on a coffee section.
+  const matches = useMatches()
+  const pageBg = matches.findLast((m) => m.handle?.pageBg)?.handle.pageBg ?? 'light'
+
+  // Set html[data-page-bg] synchronously before the browser paints.
+  useLayoutEffect(() => {
+    document.documentElement.dataset.pageBg = pageBg
+  }, [pageBg])
 
   useEffect(() => createBtnHoverAnimation(btnRef.current), [])
   useEffect(() => createFooterAnimation(footerRef.current), [location.pathname])
 
   return (
-    <div ref={layoutRef} className="relative min-h-screen pb-10">
+    <div ref={layoutRef} className="relative min-h-screen">
       {isIntroVisible ? <IntroOverlay onComplete={() => setIsIntroVisible(false)} /> : null}
 
       <div className="fixed inset-x-0 top-0 z-50 h-1 bg-transparent">
@@ -128,12 +158,14 @@ export default function RootLayout() {
       </header>
 
       <div className="compact-logo fixed top-[0.65rem] left-[1.25rem] z-3">
-        <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
-          <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
-          <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
-          <path d="M24.5075 45.744C27.3879 44.5739 28.8836 42.3885 28.8836 39.2684C28.8836 37.1635 28.0616 35.2939 26.4422 33.7028C24.0996 31.2946 20.8299 29.8955 17.0409 28.2673C16.0087 27.8215 14.9518 27.3696 13.8701 26.8805C11.305 25.7476 8.90059 24.5094 6.96595 23.5189C2.60837 21.1107 0 17.2043 0 13.0688C0 9.46575 1.39072 6.33319 4.14125 3.764C5.89046 2.12343 7.83128 0.990508 9.93281 0.365234C7.91782 1.44863 6.75579 3.40493 6.75579 5.9184C6.75579 12.8336 13.2582 15.2294 20.1376 17.7738C27.7278 20.5783 35.5715 23.4694 35.5715 32.6999C35.5715 36.9159 34.0509 40.1784 30.9357 42.6733C29.0629 44.1344 26.9366 45.1558 24.5137 45.744H24.5075Z" />
-          <circle cx="48.3376" cy="5.16818" r="5.16818"/>
-        </svg>
+        <Link to="/" title="Simplr">
+          <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
+            <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
+            <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
+            <path d="M24.5075 45.744C27.3879 44.5739 28.8836 42.3885 28.8836 39.2684C28.8836 37.1635 28.0616 35.2939 26.4422 33.7028C24.0996 31.2946 20.8299 29.8955 17.0409 28.2673C16.0087 27.8215 14.9518 27.3696 13.8701 26.8805C11.305 25.7476 8.90059 24.5094 6.96595 23.5189C2.60837 21.1107 0 17.2043 0 13.0688C0 9.46575 1.39072 6.33319 4.14125 3.764C5.89046 2.12343 7.83128 0.990508 9.93281 0.365234C7.91782 1.44863 6.75579 3.40493 6.75579 5.9184C6.75579 12.8336 13.2582 15.2294 20.1376 17.7738C27.7278 20.5783 35.5715 23.4694 35.5715 32.6999C35.5715 36.9159 34.0509 40.1784 30.9357 42.6733C29.0629 44.1344 26.9366 45.1558 24.5137 45.744H24.5075Z" />
+            <circle cx="48.3376" cy="5.16818" r="5.16818"/>
+          </svg>
+        </Link>
       </div>
 
       <main>
@@ -142,7 +174,9 @@ export default function RootLayout() {
         </TransitionFrame>
       </main>
 
-      <footer ref={footerRef} className="px-5 pt-40 bg-white min-h-[50vh]">
+      <div className="bg-white section-light footer-off"></div>
+
+      <footer ref={footerRef} className="px-5 bg-white min-h-[50vh]">
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-6">

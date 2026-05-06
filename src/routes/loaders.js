@@ -1,4 +1,4 @@
-import { fetchCollectionData, fetchEntryData, fetchHomeData, fetchNavigationData, fetchPageData } from '../lib/wp-api.js'
+import { fetchCollectionData, fetchEntryData, fetchHomeData, fetchNavigationData, fetchPageData, fetchPeopleData } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -11,6 +11,12 @@ export function createRootLoader() {
 export function createHomeLoader() {
   return async function homeLoader() {
     return fetchHomeData()
+  }
+}
+
+export function createAboutLoader() {
+  return async function aboutLoader() {
+    return fetchPeopleData()
   }
 }
 

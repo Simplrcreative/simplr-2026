@@ -74,6 +74,23 @@ nav.footer-light a,
     fill: white;
 }
 
+/*
+  GSAP pin-spacers are transparent by default. When mix-blend-mode: difference
+  is active on the compact logo, it blends against the pin-spacer — not through
+  it — because overflow:hidden on the pinned section creates an isolated stacking
+  context. A transparent pin-spacer makes the white SVG invisible on a white page.
+  Give pin-spacers a background matching their section's theme so the blend
+  always has a surface to work with.
+*/
+.pin-spacer:has(.section-light) {
+    background-color: white;
+}
+.pin-spacer:has(.section-dark) {
+    background-color: #300F1D;
+}
+.pin-spacer:has(.landing) {
+    background-color: white;
+}
 .compact-logo {
     opacity: 0;
     pointer-events: none;

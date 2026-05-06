@@ -18,3 +18,11 @@ h1 {
 .split-text-coffee {
     color: rgba(48, 15, 29, 0)
 }
+.hero-title {
+    font-family: var(--font-aeonik);
+    font-weight: 300;
+}
+.hero-title span {
+    font-family: var(--font-literata);
+    font-weight: 400;
+}

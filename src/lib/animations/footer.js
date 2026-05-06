@@ -105,8 +105,8 @@ export function createFooterAnimation(scope) {
       scrollTrigger: {
         id: 'footer-logo-reset',
         trigger: footer,
-        start: 'top 90%',
-        end: 'bottom bottom',
+        start: 'top 70%',
+        end: 'top 50%',
         scrub: true,
         invalidateOnRefresh: true,
         refreshPriority: -30,
@@ -157,17 +157,20 @@ export function createFooterAnimation(scope) {
     }
 
     if (footerOffItems.length) {
+     
+
       timeline.to(
         footerOffItems,
         {
-          autoAlpha: 0,
-          filter: 'blur(20px)',
-          y: '-50vh',
-          duration: 1,
-          immediateRender: false,
+          //autoAlpha: 1,
+          //filter: 'blur(20px)',
+          //y: '-50vh',
+          //duration: 1,
+          //immediateRender: false,
         },
         0,
       )
+      
     }
 
     timeline.to(
@@ -278,6 +281,10 @@ export function createFooterAnimation(scope) {
 
     return () => {
       timeline.kill()
+      gsap.set([logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock].filter(Boolean), { clearProps: 'all' })
+      gsap.set(document.body, { clearProps: 'backgroundColor' })
+      nav?.classList.remove(FOOTER_LIGHT_CLASS)
+      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
     }
   })
 
@@ -344,6 +351,9 @@ export function createFooterAnimation(scope) {
 
     return () => {
       trigger.kill()
+      gsap.set([logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock].filter(Boolean), { clearProps: 'all' })
+      nav?.classList.remove(FOOTER_LIGHT_CLASS)
+      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
     }
   })
 
