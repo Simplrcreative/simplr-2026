@@ -1,9 +1,32 @@
+.nav-holder {
+    height: 30px
+}
+
 nav.main {
     padding: 1rem 1.5rem;
     border-radius: 999px;
     backdrop-filter: blur(10px);
     position: relative;
     overflow:hidden;
+}
+
+/* Applied by TransitionFrame at the start of every page transition.
+   Hides the real header instantly so the re-rendered incoming logo format
+   is never visible during the outgoing phase. The overlay's solid bgColor
+   covers the header area. Class-based rule survives RootLayout's
+   gsap.set('.header', { clearProps:'all' }). Removed in done() before
+   GSAP fades the incoming header in. */
+html.page-transitioning .header {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Prevent compact-logo flash during route handoff snapshots.
+     This avoids inline GSAP opacity ownership and lets
+     .compact-logo-active remain the single visibility source. */
+html.page-transitioning .compact-logo {
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 /*
 nav.main::before {
@@ -104,6 +127,7 @@ nav.footer-light a,
 
 .compact-logo-active .compact-logo {
     opacity: 1;
+    pointer-events: auto;
 }
 .nav-link__orb {
     position: absolute;
@@ -207,6 +231,6 @@ nav a:focus-visible .nav-link__orb {
     }
 }
 .page-header {
-    height: 130px;
-    transform: translate(0px, -40px);
+    /*height: 130px;
+    transform: translate(0px, -40px);*/
 }

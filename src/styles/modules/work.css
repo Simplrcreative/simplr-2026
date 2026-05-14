@@ -1,0 +1,56 @@
+/* ---- WORK FILTER ---- */
+
+.work-filter-btn {
+  font-family: var(--font-aeonik);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  padding: 10px 16px;
+  border-radius: 100px;
+  border: 1px solid var(--color-coffee);
+  background-color: #fff;
+  color: var(--color-coffee);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.work-filter-btn:hover:not([data-active='true']) {
+  background-color: rgba(48, 15, 29, 0.06);
+}
+
+/* Individual grid card */
+.work-card {
+    flex-basis: calc(50%);
+    display: flex;
+    flex-direction: column;
+}
+
+.work-card__title {
+  font-family: var(--font-aeonik);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-coffee);
+}
+
+.work-card__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+@media (max-width: 900px) {
+  .work-section {
+    flex-direction: column;
+  }
+
+  .work-featured__image {
+    min-height: 50vw;
+  }
+
+  .work-grid {
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+}

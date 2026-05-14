@@ -1,53 +1,381 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { siteConfig } from '../config/site.js'
 import { createSurfaceColorTransitions } from '../lib/animations/transitions.js'
 import { createSlideUpAnimations } from '../lib/animations/slide-up.js'
 
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
+const COFFEE = '#300F1D'
+const WHITE = '#FFFFFF'
 
 export default function TransitionFrame({ children }) {
   const ref = useRef(null)
-  const hasMounted = useRef(false)
+  const snapshotRef = useRef(null)
+  const isFirstMount = useRef(true)
+  // Separate ref so we can detect the first useEffect run independently of
+  // useLayoutEffect (which runs before effects and would already have cleared isFirstMount).
+  const isFirstEffectRun = useRef(true)
   const location = useLocation()
 
+  function applyCompactLogoState() {
+    gsap.set('.logo', {
+      scale: 0.35,
+      y: -10,
+      transformOrigin: 'left top',
+      willChange: 'transform',
+    })
+    gsap.set('#logo-implr g', {
+      x: -20,
+      filter: 'blur(10px)',
+      autoAlpha: 0,
+    })
+    gsap.set('.tagline', {
+      y: -213,
+      x: 65,
+      scale: 0.68,
+      transformOrigin: 'left top',
+      willChange: 'transform',
+    })
+  }
+
+  function animateHomeLogoIn() {
+    const timeline = gsap.timeline({
+      defaults: {
+        ease: 'power2.out',
+      },
+    })
+
+    timeline.to(
+      '.tagline',
+      {
+        y: 0,
+        x: 0,
+        scale: 1,
+        stagger: 0.02,
+        duration: 0.36,
+      },
+      0,
+    )
+
+    timeline.to(
+      '.logo',
+      {
+        autoAlpha: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.2,
+      },
+      0.12,
+    )
+
+    timeline.to(
+      '#logo-implr g',
+      {
+        x: 0,
+        filter: 'blur(0px)',
+        autoAlpha: 1,
+        stagger: -0.1,
+        duration: 0.2,
+      },
+      0.16,
+    )
+  }
+
+  // Capture the outgoing snapshot synchronously at the moment the user triggers
+  // navigation — before React has any chance to re-render or batch state updates.
+  // Using a click/popstate listener (rather than reacting to navState) avoids the
+  // race condition where React 18 batches loading→idle in a single commit cycle
+  // (e.g. instant/cached loaders), which caused the snapshot to be stale or missed.
+  // The footer is appended to the clone so navigating from the footer area produces
+  // a complete outgoing snapshot instead of a blank lower half.
   useEffect(() => {
-    if (!ref.current || !siteConfig.transitions.enabled) {
-      return undefined
+    const capture = () => {
+      if (!ref.current) return
+      const clone = ref.current.cloneNode(true)
+
+      // Replace each cloned <video> with a canvas snapshot of the live frame
+      // so the outgoing snapshot shows what was visible, not a blank element.
+      const liveVideos = Array.from(ref.current.querySelectorAll('video'))
+      const clonedVideos = Array.from(clone.querySelectorAll('video'))
+      let capturedVisibleVideos = 0
+
+      liveVideos.forEach((video, index) => {
+        if (capturedVisibleVideos >= 2) return
+
+        const rect = video.getBoundingClientRect()
+        const isVisible = (
+          rect.bottom > 0 &&
+          rect.top < window.innerHeight &&
+          rect.right > 0 &&
+          rect.left < window.innerWidth
+        )
+
+        if (!isVisible) return
+        capturedVisibleVideos += 1
+
+        const clonedVideo = clonedVideos[index]
+        if (!clonedVideo || video.readyState < 2) return
+        try {
+          const computed = getComputedStyle(video)
+          const vw = video.videoWidth
+          const vh = video.videoHeight
+          const cw = Math.round(rect.width)
+          const ch = Math.round(rect.height)
+          if (!cw || !ch || !vw || !vh) return
+          // Replicate object-fit: cover crop
+          const scale = Math.max(cw / vw, ch / vh)
+          const sw = cw / scale
+          const sh = ch / scale
+          const sx = (vw - sw) / 2
+          const sy = (vh - sh) / 2
+          const canvas = document.createElement('canvas')
+          canvas.width = cw
+          canvas.height = ch
+          // Preserve CSS classes and GSAP inline styles (transforms, borderRadius, etc.)
+          canvas.className = clonedVideo.className
+          if (clonedVideo.style.cssText) canvas.style.cssText = clonedVideo.style.cssText
+          // Enforce explicit pixel dimensions so the canvas doesn't rely on
+          // aspect-ratio / object-fit CSS that only applies to replaced elements.
+          const cssWidth = computed.width && computed.width !== 'auto' ? computed.width : `${cw}px`
+          const cssHeight = computed.height && computed.height !== 'auto' ? computed.height : `${ch}px`
+          canvas.style.width = cssWidth
+          canvas.style.height = cssHeight
+          canvas.style.display = 'block'
+          if (!canvas.style.borderRadius) {
+            canvas.style.borderRadius = getComputedStyle(video).borderRadius
+          }
+          canvas.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch)
+          clonedVideo.replaceWith(canvas)
+        } catch {
+          // Cross-origin video — leave the cloned element (poster will show)
+        }
+      })
+
+      const footerOff = document.querySelector('.footer-off')
+      const footer = document.querySelector('footer')
+      if (footerOff) clone.appendChild(footerOff.cloneNode(true))
+      if (footer) clone.appendChild(footer.cloneNode(true))
+      snapshotRef.current = clone
     }
 
-    if (!hasMounted.current) {
-      hasMounted.current = true
-      return undefined
+    const canCaptureFromEventTarget = (target) => {
+      const link = target?.closest?.('a[href]')
+      if (!link) return false
+      const href = link.getAttribute('href')
+      if (!href || href.startsWith('#') || link.hasAttribute('download') || link.target === '_blank') return false
+
+      // Only capture for same-origin navigation.
+      const url = new URL(link.href, window.location.href)
+      return url.origin === window.location.origin
     }
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ref.current,
-        {
-          autoAlpha: siteConfig.transitions.opacity,
-          y: siteConfig.transitions.y,
-          filter: `blur(${siteConfig.transitions.blur}px)`,
-        },
-        {
-          autoAlpha: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: siteConfig.transitions.duration,
-          ease: siteConfig.transitions.ease,
-          onComplete: () => window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT)),
-          onInterrupt: () => window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT)),
-          clearProps: 'opacity,transform,filter',
-        },
-      )
-    }, ref)
+    const handlePointerDown = (e) => {
+      // Only primary-button navigations; ignore modified clicks/new-tab gestures.
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      if (!canCaptureFromEventTarget(e.target)) return
+      capture()
+    }
 
-    return () => ctx.revert()
+    const handleClick = (e) => {
+      // Ignore modified clicks that open a new tab / window
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      if (!canCaptureFromEventTarget(e.target)) return
+
+      capture()
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown, { capture: true })
+    document.addEventListener('click', handleClick, { capture: true })
+    window.addEventListener('popstate', capture)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown, { capture: true })
+      document.removeEventListener('click', handleClick, { capture: true })
+      window.removeEventListener('popstate', capture)
+    }
+  }, [])
+
+  // MAIN TRANSITION — synchronous before browser paint on every route change.
+  useLayoutEffect(() => {
+    const isFirst = isFirstMount.current
+    if (isFirst) isFirstMount.current = false
+
+    if (!siteConfig.transitions.enabled || isFirst) return
+
+    const el = ref.current
+    const snapshot = snapshotRef.current
+    if (!el || !snapshot) return
+
+    snapshotRef.current = null
+
+    // Child layout effects run before parent (React bottom-up order), so at
+    // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
+    // the OUTGOING page's value. Use it to colour the overlay background.
+    const outgoingPageBg = document.documentElement.dataset.pageBg
+    const bgColor = outgoingPageBg === 'dark' ? COFFEE : WHITE
+
+    const scrollY = window.scrollY
+
+    // Two-layer overlay:
+    //   wrapper  — full-screen, z-9999, overflow:hidden, solid background.
+    //              NEVER scales, so the real header (z-5) is always fully
+    //              covered. The solid bgColor fills any transparent gaps in
+    //              the snapshot (e.g. the padding area that sits behind the
+    //              fixed header on every page).
+    //   content  — receives scale/blur/opacity animation. Contains the page
+    //              snapshot AND a frozen header clone positioned at viewport-
+    //              top (top:0 of content), so the outgoing nav/logo state is
+    //              always visible and animates out together with the page.
+    const wrapper = document.createElement('div')
+    const content = document.createElement('div')
+
+    Object.assign(wrapper.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100vh',
+      overflow: 'hidden',
+      pointerEvents: 'none',
+      zIndex: '9999',
+      background: bgColor,
+    })
+    Object.assign(content.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      transformOrigin: '50% 50%',
+    })
+    Object.assign(snapshot.style, {
+      position: 'absolute',
+      top: `${-scrollY}px`,
+      left: '0',
+      width: '100%',
+      pointerEvents: 'none',
+    })
+
+    if (location.pathname === '/') {
+      snapshot.querySelectorAll('.compact-logo').forEach((node) => {
+        node.style.opacity = '0'
+        node.style.visibility = 'hidden'
+      })
+    }
+
+    content.appendChild(snapshot)
+    wrapper.appendChild(content)
+    document.body.appendChild(wrapper)
+
+    // Hide the real header via CSS class before the first paint. By the time
+    // useLayoutEffect runs, React has already committed the incoming render so
+    // .header contains the new logo. The overlay's solid bgColor covers the
+    // header area so the instant hide is invisible. Class-based so it survives
+    // RootLayout's gsap.set('.header', { clearProps:'all' }).
+    document.documentElement.classList.add('page-transitioning')
+
+    // Suppress scrollbar flash while content is translated off-screen.
+    document.documentElement.style.overflowX = 'hidden'
+
+    // Entering page starts below the viewport at 0.85 scale.
+    gsap.set(el, { y: window.innerHeight, scale: 0.85, autoAlpha: 1 })
+
+    const done = () => {
+      // Remove transitioning class then immediately pin header to autoAlpha:0
+      // via GSAP so the incoming header doesn't snap visible before fade-in.
+      document.documentElement.classList.remove('page-transitioning')
+      const realHeader = document.querySelector('.header')
+      if (realHeader) gsap.set(realHeader, { autoAlpha: 0, y: -20 })
+      
+      const isHomePage = location.pathname === '/'
+
+      applyCompactLogoState()
+      gsap.set('.compact-logo', { clearProps: 'all' })
+
+      if (isHomePage) {
+        document.documentElement.classList.remove('compact-logo-active')
+        animateHomeLogoIn()
+      }
+
+      wrapper.remove()
+      document.documentElement.style.overflowX = ''
+
+      // Apply the correct nav/logo colour theme for the INCOMING page before
+      // fading the header in. dataset.pageBg has now been updated by
+      // RootLayout's layout effect (parent runs after child).
+      const incomingPageBg = document.documentElement.dataset.pageBg
+      const nav = document.querySelector('nav.main')
+      const logoHolder = document.querySelector('.logo-holder')
+      if (incomingPageBg === 'dark') {
+        nav?.classList.add('light')
+        logoHolder?.classList.add('light')
+      } else {
+        nav?.classList.remove('light')
+        logoHolder?.classList.remove('light')
+      }
+
+      // Recalculate all scroll-trigger positions now that the transition is
+      // complete and elements are in their final layout positions.
+      requestAnimationFrame(() => ScrollTrigger.refresh())
+      window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT))
+
+      // Slide the incoming header in from above. clearProps:'all' removes all
+      // GSAP inline styles afterwards so CSS fully owns the element.
+      if (realHeader) {
+        gsap.to(realHeader, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out', clearProps: 'all' })
+      }
+    }
+
+    const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
+
+    tl.to(content, { scale: 0.9, duration: 0.25, ease: 'power1.in', transformOrigin: '50% 50%' }, 0)
+    tl.to(wrapper, { autoAlpha: 1, y: -window.innerHeight, duration: 0.4, ease: 'power1.in' }, 0.2)
+    tl.to(el, { y: 0, duration: 0.4, ease: 'power1.out' }, 0.5)
+    tl.to(el, { scale: 1, duration: 0.25, ease: 'power1.out', clearProps: 'all' }, 0.7)
+
+    return () => {
+      tl.kill()
+      wrapper.remove()
+      document.documentElement.classList.remove('page-transitioning')
+      document.documentElement.style.overflowX = ''
+      const realHeader = document.querySelector('.header')
+      if (realHeader) {
+        gsap.killTweensOf(realHeader)
+        gsap.set(realHeader, { clearProps: 'all' })
+      }
+    }
   }, [location.pathname])
 
-  useEffect(() => createSurfaceColorTransitions(ref.current), [location.pathname])
-  useEffect(() => createSlideUpAnimations(ref.current), [location.pathname])
+  // Register per-route animation listeners BEFORE dispatching the event below.
+  // React guarantees useEffects run in definition order, so these two are
+  // registered before the "fire immediately" effect that follows.
+  useEffect(() => {
+    const handler = () => createSurfaceColorTransitions(ref.current)
+    window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler, { once: true })
+    return () => window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
+  }, [location.pathname])
+
+  useEffect(() => {
+    const handler = () => createSlideUpAnimations(ref.current)
+    window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler, { once: true })
+    return () => window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
+  }, [location.pathname])
+
+  // For first page load and when transitions are disabled, dispatch the event
+  // immediately so the listeners above still fire. Runs after them (effect order).
+  useEffect(() => {
+    const isFirst = isFirstEffectRun.current
+    isFirstEffectRun.current = false
+
+    if (!siteConfig.transitions.enabled || isFirst) {
+      if (isFirst && location.pathname === '/') {
+        applyCompactLogoState()
+        animateHomeLogoIn()
+      }
+      window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT))
+    }
+  }, [location.pathname])
 
   return (
     <div key={location.pathname} ref={ref}>

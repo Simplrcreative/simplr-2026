@@ -3,7 +3,7 @@ const wpSiteName = import.meta.env.VITE_WP_SITE_NAME || 'Simplr'
 
 export const siteConfig = {
   name: wpSiteName,
-  legalName: `${wpSiteName} Studio`,
+  legalName: wpSiteName,
   siteUrl,
   description:
     'Editorial portfolio scaffold for Simplr with headless WordPress content, motion-led transitions, and search-ready structured data.',
@@ -15,18 +15,18 @@ export const siteConfig = {
     linkedin: 'https://www.linkedin.com/',
   },
   contact: {
-    email: 'hello@simplr.studio',
+    email: 'hello@simplr.co.za',
     phone: '+44 20 7946 0958',
     city: 'Cape Town',
-    country: 'United Kingdom',
+    country: 'South Africa',
   },
   transitions: {
     enabled: true,
-    duration: 1,
+    /*duration: 1,
     ease: 'power2.out',
     opacity: 0,
     y: 26,
-    blur: 8,
+    blur: 8,*/
   },
 }
 
@@ -40,7 +40,7 @@ export const brandColors = {
 }
 
 export const wpConfig = {
-  endpoint: import.meta.env.VITE_WPGRAPHQL_ENDPOINT || '',
+  endpoint: import.meta.env.VITE_WPGRAPHQL_ENDPOINT || '/graphql',
   workContentType: import.meta.env.VITE_WORK_CONTENT_TYPE || 'WORK',
   thinkingContentType: import.meta.env.VITE_THINKING_CONTENT_TYPE || 'POST',
   workUriBase: import.meta.env.VITE_WORK_URI_BASE || '/work/',

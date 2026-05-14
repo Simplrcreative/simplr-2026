@@ -106,7 +106,7 @@ export default function AboutPage() {
         ]}
       />
 
-      <section className="page-header px-5 pb-40 section-dark min-h-screen flex items-end">
+      <section className="page-hero px-5 pb-40 bg-coffee section-dark min-h-screen flex items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-6 text-white change-logo mt-40 max-w-[85ch]">
@@ -125,7 +125,7 @@ export default function AboutPage() {
       </section>
 
       {/* People section */}
-      <section ref={peopleSectionRef} className="people py-40 section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
+      <section ref={peopleSectionRef} className="people py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
         <div ref={scatterRef} className="people-scatter relative z-3 max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
@@ -233,7 +233,7 @@ export default function AboutPage() {
                 <div className="bullet-dot bullet-dot-coral" />
                 <div className="bullet-body">
                   <h3 className="bullet-heading">Brand is where<br/>everything begins</h3>
-                  <p className="bullet-text">Every project begins with understanding your brand - who you are, what you stand for, and where you're going. That clarity informs every design, line of code, and creative decision we make.</p>
+                  <p className="bullet-text">Every project begins with understanding your brand - who you are, what you stand for, and where you&apos;re going. That clarity informs every design, line of code, and creative decision we make.</p>
                 </div>
               </div>
 
@@ -249,7 +249,7 @@ export default function AboutPage() {
                 <div className="bullet-dot bullet-dot-lime" />
                 <div className="bullet-body">
                   <h3 className="bullet-heading">Built for<br/>lasting impact</h3>
-                  <p className="bullet-text">We're in it for the long run - building partnerships that grow with your business and deliver lasting impact over time.</p>
+                  <p className="bullet-text">We&apos;re in it for the long run - building partnerships that grow with your business and deliver lasting impact over time.</p>
                 </div>
               </div>
 

@@ -3,7 +3,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const SERVICES_PIN_TOP = 95
 const SERVICES_ENTRY_START = 'top bottom'
-const TITLE_TRIGGER_LEFT_OFFSET = '50%'
 const getTitleTriggerLeft = () => window.innerWidth * 0.333
 const INACTIVE_TITLE_OPACITY = 0.3
 const ACTIVE_TITLE_OPACITY = 1
@@ -84,7 +83,6 @@ export function createServicesScrollAnimation(scope) {
     )
 
     const defaultStatDetailText = statDetail?.textContent ?? ''
-    const defaultStatColorClass = serviceTitles[0]?.dataset.color || 'text-strategy'
 
     const setActiveTitleOpacity = (activeTitle = null) => {
       if (serviceTitles.length === 0) {

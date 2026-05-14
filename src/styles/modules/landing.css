@@ -12,13 +12,7 @@
     left: 0;
     opacity: 0;
 }
-/* --- SERVICES --- */
-.services-title {
-    opacity: 0.3;
-}
-.services-title.active{
-   /* text-decoration: underline */
-}
+
 .stat-no {
     line-height: 0.69;
      color: var(--color-strategy)

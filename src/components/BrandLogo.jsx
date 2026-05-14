@@ -1,8 +1,6 @@
-import { Link } from 'react-router-dom'
-
 export default function BrandLogo() {
   return (
-    <Link to="/" className="logo inline-block font-literata text-2xl text-coffee mb-5">
+    <div className="logo inline-block font-literata text-2xl text-coffee mb-5">
       <svg width="527" height="172" viewBox="0 0 527 172" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <g id="logo-implr">
           <g>
@@ -31,6 +29,6 @@ export default function BrandLogo() {
         </g>
         <ellipse id="logo-dot" cx="139.655" cy="14.9805" rx="14.9317" ry="14.9805"/>
       </svg>
-    </Link>
+    </div>
   )
 }

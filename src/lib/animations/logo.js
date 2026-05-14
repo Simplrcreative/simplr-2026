@@ -94,8 +94,8 @@ export function createLogoScrollAnimation(scope) {
   timeline.to(
     '.header',
     {
-      y: -30,
-      height: '130px',
+      y: -20,
+      //height: '130px',
       duration: 0.5,
     },
     0.3,
@@ -104,7 +104,63 @@ export function createLogoScrollAnimation(scope) {
   timeline.to(
     'nav.main',
     {
-      y: -10,
+      y: -20,
+      duration: 0.5,
+    },
+    0.3,
+  )
+
+  timeline.to(
+    '.nav-holder',
+    {
+      height: '30px',
+      duration: 0.1,
+    },
+    0,
+  )
+
+  return () => {
+    timeline.kill()
+  }
+}
+
+export function createLogoPageAnimation(scope) {
+  if (!scope) {
+    return () => undefined
+  }
+
+  registerPlugins()
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return () => undefined
+  }
+
+  const timeline = gsap.timeline({
+    defaults: {
+      ease: 'none',
+    },
+    scrollTrigger: {
+      trigger: scope,
+      start: 'top top',
+      end: '+=320',
+      scrub: true,
+    },
+  })
+
+  timeline.to(
+    '.header',
+    {
+      y: -20,
+      //height: '130px',
+      duration: 0.5,
+    },
+    0.3,
+  )
+
+  timeline.to(
+    'nav.main',
+    {
+      y: -20,
       duration: 0.5,
     },
     0.3,

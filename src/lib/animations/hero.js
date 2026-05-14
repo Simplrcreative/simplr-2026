@@ -3,6 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
 
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
+const HERO_SCROLL_DEBUG_QUERY_PARAM = 'debugHero'
 
 let pluginsRegistered = false
 
@@ -30,7 +31,6 @@ function getHeroImageMetrics(heroImage) {
     }
 
     const scale = availableWidth / bounds.width
-    const bottom = bounds.bottom / 2
 
   return {
     scale,
@@ -49,37 +49,14 @@ function isMeasurableMedia(element) {
   return bounds.width > 0 && bounds.height > 0
 }
 
-function isVideoElement(element) {
-  return element?.tagName === 'VIDEO'
-}
-
-function pauseMediaPlayback(element) {
-  if (!isVideoElement(element)) {
-    return
-  }
-
-  if (!element.paused) {
-    element.pause()
-  }
-}
-
-function resumeMediaPlayback(element) {
-  if (!isVideoElement(element)) {
-    return
-  }
-
-  if (element.paused) {
-    element.play?.().catch(() => undefined)
-  }
-}
-
 function getHeroStart() {
   const viewportHeight = window.innerHeight
   const viewportWidth = window.innerWidth
   const isSmallViewport = viewportWidth < 768
-  const ratio = isSmallViewport ? 0.42 : 0.5
-  const minOffset = isSmallViewport ? 180 : 260
-  const maxOffset = isSmallViewport ? 420 : 560
+  // Keep the start line near the top so the hero tween doesn't begin immediately on load.
+  const ratio = isSmallViewport ? 0.16 : 0.18
+  const minOffset = isSmallViewport ? 90 : 110
+  const maxOffset = isSmallViewport ? 150 : 190
   const startOffset = Math.round(clamp(viewportHeight * ratio, minOffset, maxOffset))
 
   return `top ${startOffset}`
@@ -324,13 +301,13 @@ export function createHeroScrollAnimation(scope) {
   registerPlugins()
 
   const media = gsap.matchMedia()
+  const debugHeroScroll = import.meta.env.DEV && window.location.search.includes(HERO_SCROLL_DEBUG_QUERY_PARAM)
 
   media.add('(prefers-reduced-motion: no-preference)', () => {
     const section = scope.matches?.('.landing') ? scope : scope.querySelector('.landing')
     const heroTitle = section?.querySelector('.hero-title')
     const heroImage = section?.querySelector('.hero-video')
     const heroVideoHolder = section?.querySelector('.hero-video-holder')
-    const heroContent = section?.querySelector('.hero-content')
     const navHolder = document.querySelector('.nav-holder')
     const nav = document.querySelector('nav.main')
     const logo = document.querySelector('.logo-holder')
@@ -523,16 +500,28 @@ export function createHeroScrollAnimation(scope) {
           ease: 'none',
         },
         scrollTrigger: {
-          trigger: heroImage,
+          id: 'hero-scroll',
+          trigger: section,
           pin: section,
-          start: () => getHeroStart(),
+          start: 'top top',
           end: () => getHeroEndDistance(),
           scrub: true,
+          markers: debugHeroScroll,
           invalidateOnRefresh: true,
           refreshPriority: 1,
           anticipatePin: 0,
           onUpdate: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
-          onRefresh: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
+          onRefresh: (self) => {
+            updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold())
+            if (debugHeroScroll) {
+              console.info('[hero-scroll]', {
+                start: self.start,
+                end: self.end,
+                progress: self.progress,
+                scroll: ScrollTrigger.scroll(),
+              })
+            }
+          },
           onLeave: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
           onLeaveBack: () => updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, getSectionThreshold()),
         },

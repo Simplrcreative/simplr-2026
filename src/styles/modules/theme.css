@@ -24,6 +24,8 @@
     --brand-templates: #596bf0;
     --brand-coffee: #300f1d;
     color: var(--brand-dark);
+  }
+  html {
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -76,15 +78,18 @@
   .light-to-coffee,
   .light-to-coffee-incoming,
   .light-to-coffee-outgoing {
-    background-color: #ffffff;
+    background-color: white;
   }
 }
 
-/* Unlayered — beats Tailwind preflight's body { background-color: white } */
-html[data-page-bg="dark"],
-html[data-page-bg="dark"] body {
-  background-color: var(--color-coffee)
-}
+  body {
+    background: white;
+  }
+
+  html[data-page-bg="dark"],
+  html[data-page-bg="dark"] body {
+    background-color: var(--color-coffee)
+  }
 }
 
 .footer-off {

@@ -1,11 +1,10 @@
 import { useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLoaderData, useLocation, useMatches, useNavigation } from 'react-router-dom'
 import BrandLogo from '../components/BrandLogo.jsx'
-import PageLogo from '../components/PageLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
 
 function setNavLinkPointer(target, clientX, clientY) {
   const bounds = target.getBoundingClientRect()
@@ -42,10 +41,15 @@ function NavLinkLabel({ label, count, inverted = false }) {
   )
 }
 
+function handleTransitionLinkClick(event) {
+  hideNavLinkOrb(event)
+}
+
 export default function RootLayout() {
   const layoutRef = useRef(null)
   const footerRef = useRef(null)
   const destroyLogoRef = useRef(null)
+  const destroyNavSectionThemeRef = useRef(null)
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
@@ -68,42 +72,60 @@ export default function RootLayout() {
   useLayoutEffect(() => {
     destroyLogoRef.current?.()
     destroyLogoRef.current = null
+    
+    // Kill nav section theme watcher IMMEDIATELY before scroll/paint
+    // to prevent race condition with old watcher firing on new page
+    destroyNavSectionThemeRef.current?.()
+    destroyNavSectionThemeRef.current = null
+    
     window.scrollTo(0, 0)
     document.querySelector('nav.main')?.classList.remove('light')
     document.querySelector('.logo-holder')?.classList.remove('light')
     document.documentElement.classList.remove('compact-logo-active')
-    gsap.set(
-      ['.logo', '#logo-implr g', '.tagline', '.header', 'nav.main', '.nav-holder', '.logo-holder'],
-      { clearProps: 'all' },
-    )
-  }, [location.pathname])
+
+    // Let CSS own compact logo visibility via .compact-logo-active.
+    gsap.set('.compact-logo', { clearProps: 'all' })
+
+    // Non-home routes open in the compact logo end-state.
+    gsap.set('.logo', {
+      scale: 0.35,
+      y: -10,
+      transformOrigin: 'left top',
+      willChange: 'transform',
+    })
+    gsap.set('#logo-implr g', {
+      x: -20,
+      filter: 'blur(10px)',
+      autoAlpha: 0,
+    })
+    gsap.set('.tagline', {
+      y: -213,
+      x: 65,
+      scale: 0.68,
+      transformOrigin: 'left top',
+      willChange: 'transform',
+    })
+  }, [location.pathname, isHomePage])
 
   useEffect(() => {
     // const destroySmoothScroll = createSmoothScroll()
     // Only run the scroll-triggered logo animation on the home page.
-    // On other pages the logo is already set to its compact end-state.
-    destroyLogoRef.current = isHomePage ? createLogoScrollAnimation(layoutRef.current) : undefined
-    const destroyNavSectionTheme = createNavSectionTheme(layoutRef.current)
+    // On other pages, run the page animation variant.
+    destroyLogoRef.current = isHomePage
+      ? createLogoScrollAnimation(layoutRef.current)
+      : createLogoPageAnimation(layoutRef.current)
+    destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
 
     return () => {
-      // Logo animation is killed synchronously in useLayoutEffect via destroyLogoRef.
-      destroyNavSectionTheme?.()
+      // Watchers are killed synchronously in useLayoutEffect via refs.
+      // This return cleanup is kept for safety but shouldn't normally run.
+      destroyNavSectionThemeRef.current?.()
       // destroySmoothScroll?.()
     }
-  }, [location.pathname])
+  }, [location.pathname, isHomePage])
 
   useEffect(() => {
     refreshSmoothScroll()
-  }, [location.pathname])
-
-  useEffect(() => {
-    // compact-logo-active is managed by createChangeLogoWatcher on the home page
-    // as the user scrolls. On route change we always start with the full logo visible.
-    let frameId = requestAnimationFrame(() => {
-      document.documentElement.classList.remove('compact-logo-active')
-    })
-
-    return () => cancelAnimationFrame(frameId)
   }, [location.pathname])
 
   // Derive pageBg from the matched route's handle, falling back to 'light'.
@@ -131,22 +153,33 @@ export default function RootLayout() {
         />
       </div>
 
+      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-[1000]">
+        <Link to="/" title="Simplr">
+          <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
+            <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
+            <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
+            <path d="M24.5075 45.744C27.3879 44.5739 28.8836 42.3885 28.8836 39.2684C28.8836 37.1635 28.0616 35.2939 26.4422 33.7028C24.0996 31.2946 20.8299 29.8955 17.0409 28.2673C16.0087 27.8215 14.9518 27.3696 13.8701 26.8805C11.305 25.7476 8.90059 24.5094 6.96595 23.5189C2.60837 21.1107 0 17.2043 0 13.0688C0 9.46575 1.39072 6.33319 4.14125 3.764C5.89046 2.12343 7.83128 0.990508 9.93281 0.365234C7.91782 1.44863 6.75579 3.40493 6.75579 5.9184C6.75579 12.8336 13.2582 15.2294 20.1376 17.7738C27.7278 20.5783 35.5715 23.4694 35.5715 32.6999C35.5715 36.9159 34.0509 40.1784 30.9357 42.6733C29.0629 44.1344 26.9366 45.1558 24.5137 45.744H24.5075Z" />
+            <circle cx="48.3376" cy="5.16818" r="5.16818"/>
+          </svg>
+        </Link>
+      </div>
+
       <header className={`header fixed z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
         <div className="nav-holder flex flex-col px-5 pt-[3.125rem] md:flex-row md:items-start md:justify-between">
+          
           <div className="logo-holder">
-            {isHomePage ? (
-              <>
-                <BrandLogo />
+              <Link to="/">
+              <BrandLogo />
+              
                 <div className="tagline">
                   Creative.<br/>
                   Intelligence.<br/>
                   Applied.
                 </div>
-              </>
-            ) : (
-              <PageLogo />
-            )}
+              </Link>
+            
           </div>
+          
           <nav className="main flex flex-wrap gap-[2.5rem] pt-[1.875rem]">
             {navigation.map((item) => (
               <NavLink
@@ -158,6 +191,7 @@ export default function RootLayout() {
                 onPointerLeave={hideNavLinkOrb}
                 onFocus={showNavLinkOrb}
                 onBlur={hideNavLinkOrb}
+                onClick={handleTransitionLinkClick}
               >
                 <span className="nav-link__orb" aria-hidden="true" />
                 <NavLinkLabel label={item.label} count={item.count} />
@@ -168,16 +202,7 @@ export default function RootLayout() {
         </div>
       </header>
 
-      <div className="compact-logo fixed top-[0.65rem] left-[1.25rem] z-10">
-        <Link to="/" title="Simplr">
-          <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
-            <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
-            <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
-            <path d="M24.5075 45.744C27.3879 44.5739 28.8836 42.3885 28.8836 39.2684C28.8836 37.1635 28.0616 35.2939 26.4422 33.7028C24.0996 31.2946 20.8299 29.8955 17.0409 28.2673C16.0087 27.8215 14.9518 27.3696 13.8701 26.8805C11.305 25.7476 8.90059 24.5094 6.96595 23.5189C2.60837 21.1107 0 17.2043 0 13.0688C0 9.46575 1.39072 6.33319 4.14125 3.764C5.89046 2.12343 7.83128 0.990508 9.93281 0.365234C7.91782 1.44863 6.75579 3.40493 6.75579 5.9184C6.75579 12.8336 13.2582 15.2294 20.1376 17.7738C27.7278 20.5783 35.5715 23.4694 35.5715 32.6999C35.5715 36.9159 34.0509 40.1784 30.9357 42.6733C29.0629 44.1344 26.9366 45.1558 24.5137 45.744H24.5075Z" />
-            <circle cx="48.3376" cy="5.16818" r="5.16818"/>
-          </svg>
-        </Link>
-      </div>
+      
 
       <main>
         <TransitionFrame>
@@ -191,7 +216,7 @@ export default function RootLayout() {
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-6">
-            <h1>Let's build something that works.</h1>
+            <h1>Let&apos;s build something that works.</h1>
             <div className="button-wrapper">
               <Link 
                 to="contact"
@@ -200,8 +225,8 @@ export default function RootLayout() {
               >
                 <span className="btn-fill" aria-hidden="true" />
                 <span className="btn-inner">
-                  <span className="btn-text text-coffee">Let's chat</span>
-                  Let's chat
+                  <span className="btn-text text-coffee">Let&apos;s chat</span>
+                  Let&apos;s chat
                 </span>
               </Link>
             </div>

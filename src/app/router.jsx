@@ -1,18 +1,29 @@
 import { createBrowserRouter } from 'react-router-dom'
-import AboutPage from '../routes/AboutPage.jsx'
-import CollectionPage from '../routes/CollectionPage.jsx'
-import EntryPage from '../routes/EntryPage.jsx'
 import HomePage from '../routes/HomePage.jsx'
+import WorkPage from '../routes/WorkPage.jsx'
+import WorkSinglePage from '../routes/WorkSinglePage.jsx'
+import AboutPage from '../routes/AboutPage.jsx'
+import ServicesPage from '../routes/ServicesPage.jsx'
+import ServicesSinglePage from '../routes/ServicesSinglePage.jsx'
+import ThinkingPage from '../routes/ThinkingPage.jsx'
+import ThinkingSinglePage from '../routes/ThinkingSinglePage.jsx'
+import ContactPage from '../routes/ContactPage.jsx'
+import Est2014Page from '../routes/Est2014Page.jsx'
 import NotFoundPage from '../routes/NotFoundPage.jsx'
+
 import RootLayout from '../routes/RootLayout.jsx'
-import StaticPage from '../routes/StaticPage.jsx'
 import {
-  createAboutLoader,
-  createCollectionLoader,
-  createEntryLoader,
   createHomeLoader,
+  createWorkLoader,
+  createWorkSingleLoader,
+  createAboutLoader,
+  createServicesLoader,
+  createServicesSinglePageLoader,
+  createThinkingPageLoader,
+  createThinkingSinglePageLoader,
+  createContactPageLoader,
+  createEst2014PageLoader,
   createRootLoader,
-  createStaticPageLoader,
 } from '../routes/loaders.js'
 
 export const router = createBrowserRouter([
@@ -31,14 +42,14 @@ export const router = createBrowserRouter([
       },
       {
         path: 'work',
-        element: <CollectionPage collectionKey="work" />,
-        loader: createCollectionLoader('work'),
+        element: <WorkPage />,
+        loader: createWorkLoader(),
         handle: { pageBg: 'light' },
       },
       {
         path: 'work/:slug',
-        element: <EntryPage collectionKey="work" />,
-        loader: createEntryLoader('work'),
+        element: <WorkSinglePage />,
+        loader: createWorkSingleLoader(),
         handle: { pageBg: 'light' },
       },
       {
@@ -49,33 +60,39 @@ export const router = createBrowserRouter([
       },
       {
         path: 'services',
-        element: <StaticPage pageKey="services" />,
-        loader: createStaticPageLoader('services'),
+        element: <ServicesPage />,
+        loader: createServicesLoader(),
+        handle: { pageBg: 'light' },
+      },
+      {
+        path: 'services/:slug',
+        element: <ServicesSinglePage />,
+        loader: createServicesSinglePageLoader(),
         handle: { pageBg: 'light' },
       },
       {
         path: 'thinking',
-        element: <CollectionPage collectionKey="thinking" />,
-        loader: createCollectionLoader('thinking'),
+        element: <ThinkingPage />,
+        loader: createThinkingPageLoader(),
         handle: { pageBg: 'light' },
       },
       {
         path: 'thinking/:slug',
-        element: <EntryPage collectionKey="thinking" />,
-        loader: createEntryLoader('thinking'),
+        element: <ThinkingSinglePage />,
+        loader: createThinkingSinglePageLoader(),
         handle: { pageBg: 'light' },
       },
       {
         path: 'contact',
-        element: <StaticPage pageKey="contact" />,
-        loader: createStaticPageLoader('contact'),
-        handle: { pageBg: 'light' },
+        element: <ContactPage />,
+        loader: createContactPageLoader(),
+        handle: { pageBg: 'dark' },
       },
       {
         path: 'est-2014',
-        element: <StaticPage pageKey="est2014" />,
-        loader: createStaticPageLoader('est2014'),
-        handle: { pageBg: 'light' },
+        element: <Est2014Page />,
+        loader: createEst2014PageLoader(),
+        handle: { pageBg: 'dark' },
       },
     ],
   },

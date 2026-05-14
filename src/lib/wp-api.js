@@ -66,11 +66,20 @@ const collectionQuery = `
   }
 `
 
-const collectionCountQuery = `
-  query CollectionCount($contentType: ContentTypeEnum!, $first: Int = 500) {
-    contentNodes(first: $first, where: { contentTypes: [$contentType], status: PUBLISH }) {
-      nodes {
-        id
+const servicesQuery = `
+  query servicesQuery {
+    page(id: "12", idType: DATABASE_ID) {
+      acfServices {
+        acfServices {
+          acfDescription
+          acfService
+          acfTitle
+          acfVideo {
+            node {
+              guid
+            }
+          }
+        }
       }
     }
   }
@@ -95,6 +104,91 @@ const peopleQuery = `
             }
           }
         }
+      }
+    }
+  }
+`
+
+const worksQuery = `
+  query WorksQuery {
+    acfWorks {
+      nodes {
+        databaseId
+        slug
+        title
+        acfWorkBuilder {
+          acfFeaturedWork
+          acfCategory {
+            nodes {
+              name
+            }
+          }
+          acfClient {
+            nodes {
+              name
+            }
+          }
+          acfFeaturedThumbnail {
+            node {
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
+          acfFeaturedVideo {
+            node {
+              guid
+            }
+          }
+          acfSections {
+            acfAlignment
+            acfContent
+            acfImage1 {
+              node {
+                mediaDetails {
+                  sizes {
+                    name
+                    sourceUrl
+                  }
+                }
+              }
+            }
+            acfImage2 {
+              node {
+                mediaDetails {
+                  sizes {
+                    name
+                    sourceUrl
+                  }
+                }
+              }
+            }
+          }
+          acfTestimonial {
+            nodes {
+              databaseId
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+const testimonialQuery = `
+  query TestimonialQuery($id: ID!) {
+    acfTestimonial(id: $id, idType: DATABASE_ID) {
+      acfClients {
+        nodes {
+          name
+        }
+      }
+      acfTestimonials {
+        acfRole
+        acfTestimonial
       }
     }
   }
@@ -201,10 +295,6 @@ function reportError(label, error) {
 
 function getCollectionContentType(collectionKey) {
   return collectionKey === 'work' ? wpConfig.workContentType : wpConfig.thinkingContentType
-}
-
-function getDefaultCollectionCount(collectionKey) {
-  return routeDefinitions[collectionKey]?.count ?? 0
 }
 
 export async function graphQlRequest(query, variables = {}) {
@@ -330,31 +420,10 @@ export async function fetchCollectionData(collectionKey) {
   }
 }
 
-export async function fetchCollectionCount(collectionKey) {
-  const fallbackCount = getDefaultCollectionCount(collectionKey)
-
-  if (!wpConfig.endpoint) {
-    return fallbackCount
-  }
-
-  try {
-    const contentType = getCollectionContentType(collectionKey)
-    const data = await remember(`collection-count:${collectionKey}`, () =>
-      graphQlRequest(collectionCountQuery, { contentType }),
-    )
-
-    return data.contentNodes?.nodes?.length ?? fallbackCount
-  } catch (error) {
-    reportError(`Unable to load collection count for ${collectionKey}`, error)
-
-    return fallbackCount
-  }
-}
-
 export async function fetchNavigationData() {
-  const workCount = await fetchCollectionCount('work')
+  const { works } = await fetchWorksData()
 
-  return buildNavigation({ work: workCount })
+  return buildNavigation({ work: works.length })
 }
 
 export async function fetchHomeData() {  const [pagePayload, workPayload] = await Promise.all([
@@ -385,52 +454,42 @@ export async function fetchPeopleData() {
   }
 }
 
-export async function fetchEntryData(collectionKey, slug) {
-  const siteSettings = await getSiteSettings()
-  const fallbackItem = fallbackCollections[collectionKey].find((item) => item.slug === slug)
-
-  if (!slug) {
-    throw new Response('Not found', { status: 404 })
+export async function fetchServicesSinglePageData(slug) {
+  if (!wpConfig.endpoint) {
+    return { slug, page: null }
   }
 
-  if (wpConfig.endpoint) {
-    const baseUri = collectionKey === 'work' ? wpConfig.workUriBase : wpConfig.thinkingUriBase
-    const entryUri = `${normaliseUri(baseUri)}${slug}/`
+  try {
+    const uri = `/services/${slug}/`
+    const data = await remember(`service-page:${slug}`, () =>
+      graphQlRequest(pageByUriQuery, { uri }),
+    )
 
-    try {
-      const data = await remember(`entry:${collectionKey}:${slug}`, () =>
-        graphQlRequest(pageByUriQuery, { uri: entryUri }),
-      )
-
-      const entry = normaliseNode(data.nodeByUri, collectionKey)
-
-      if (entry) {
-        return {
-          collectionKey,
-          entry: {
-            ...fallbackItem,
-            ...entry,
-            isFallback: false,
-          },
-          siteSettings,
-        }
-      }
-    } catch (error) {
-      reportError(`Unable to load entry for ${collectionKey}/${slug}`, error)
+    const node = data.nodeByUri
+    return {
+      slug,
+      page: node ? { title: node.title || slug, description: '' } : null,
     }
+  } catch (error) {
+    reportError(`Unable to load service page for ${slug}`, error)
+    return { slug, page: null }
+  }
+}
+
+export async function fetchServicesData() {
+  if (!wpConfig.endpoint) {
+    return { services: [] }
   }
 
-  if (!fallbackItem) {
-    throw new Response('Not found', { status: 404 })
-  }
+  try {
+    const data = await remember('services', () => graphQlRequest(servicesQuery))
+    const services = data.page?.acfServices?.acfServices ?? []
 
-  return {
-    collectionKey,
-    entry: {
-      ...fallbackItem,
-      isFallback: true,
-    },
-    siteSettings,
+    return { services }
+  } catch (error) {
+    reportError('Unable to load services data', error)
+
+    return { services: [] }
   }
 }
 
@@ -438,6 +497,58 @@ export function buildEntryPath(collectionKey, slug) {
   return `${routeDefinitions[collectionKey].path}/${slug}`
 }
 
-export function createPagePath(pageKey) {
-  return routeDefinitions[pageKey].path
+export async function fetchWorksData() {
+  if (!wpConfig.endpoint) {
+    return { works: [] }
+  }
+
+  try {
+    const data = await remember('works', () => graphQlRequest(worksQuery))
+    const works = data.acfWorks?.nodes ?? []
+
+    return { works }
+  } catch (error) {
+    reportError('Unable to load works data', error)
+
+    return { works: [] }
+  }
+}
+
+export async function fetchTestimonialData(databaseId) {
+  if (!wpConfig.endpoint || !databaseId) {
+    return null
+  }
+
+  try {
+    const data = await remember(`testimonial:${databaseId}`, () =>
+      graphQlRequest(testimonialQuery, { id: String(databaseId) }),
+    )
+
+    return data.acfTestimonial ?? null
+  } catch (error) {
+    reportError(`Unable to load testimonial ${databaseId}`, error)
+
+    return null
+  }
+}
+
+export async function fetchWorkEntryData(slug) {
+  if (!slug) {
+    throw new Response('Not found', { status: 404 })
+  }
+
+  try {
+    const { works } = await fetchWorksData()
+    const work = works.find((w) => w.slug === slug) ?? null
+
+    if (!work) {
+      throw new Response('Not found', { status: 404 })
+    }
+
+    return { work }
+  } catch (error) {
+    if (error instanceof Response) throw error
+    reportError(`Unable to load work entry for ${slug}`, error)
+    throw new Response('Not found', { status: 404 })
+  }
 }

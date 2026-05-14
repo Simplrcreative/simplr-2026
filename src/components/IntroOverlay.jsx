@@ -18,7 +18,6 @@ export default function IntroOverlay({ onComplete }) {
     }
 
     const overlayNode = overlayRef.current
-    let timeline
 
     window.scrollTo(0, 0)
     document.body.style.overflow = 'hidden'

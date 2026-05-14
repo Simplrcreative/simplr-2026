@@ -1,0 +1,150 @@
+/* --- SERVICES --- */
+.services-title {
+    opacity: 0.3;
+}
+
+/* --- SERVICE CARDS --- */
+.services-cards {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.service-card {
+  position: sticky;
+  top: 0;
+  min-height: 120vh;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  padding-bottom: calc(1.25rem + 20vh);
+  border-top: 1px solid rgba(48, 15, 29, 0.12);
+  box-shadow: 0 -8px 32px rgba(48, 15, 29, 0.06);
+}
+
+.service-card:last-of-type {
+     min-height: 100vh;
+     padding-bottom: 1.25rem;
+}
+
+.service-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 6.25rem;
+  max-width: 70ch;
+}
+
+.service-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.service-label-icon {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  width: 45px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.service-label-icon__circle {
+  display: block;
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.service-label-icon__circle--left {
+  background: white;
+  left: 0;
+  z-index: 2;
+}
+
+.service-label-icon__circle--left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-coffee);
+    border-radius: 50%;
+}
+
+.service-label-icon__circle--right {
+    border-radius: 50%;
+    background-color: var(--service-accent, var(--color-branding-design));
+    left: 15px;
+    z-index: 1;
+}
+
+.service-card__label-text {
+  font-family: var(--font-aeonik);
+  font-size: 1.375rem;
+  font-weight: 500;
+  color: var(--color-coffee);
+  white-space: nowrap;
+}
+
+.service-card__title {
+  font-family: var(--font-literata);
+  font-size: clamp(2rem, 3.5vw, 3.125rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-coffee);
+}
+
+.service-card__body {
+  /*display: grid;
+  grid-template-columns: minmax(0, 375px) minmax(0, 1fr);
+  gap: clamp(4rem, 8vw, 9.5rem);*/
+  align-items: stretch;
+}
+
+.service-card__content {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.service-card__description {
+  font-family: var(--font-aeonik);
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.service-card__video {
+  justify-self: end;
+  align-self: start;
+  width: 100%;
+  max-width: 638px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.service-card__video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .service-card__body {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .service-card__content {
+    width: 100%;
+  }
+
+  .service-card__video {
+    width: 100%;
+    max-width: 100%;
+  }
+}

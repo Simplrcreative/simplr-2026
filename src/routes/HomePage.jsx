@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom'
 
 export default function HomePage() {
   const heroRef = useRef(null)
+  const heroVideoRef = useRef(null)
   const servicesRef = useRef(null)
   const caseStudiesRef = useRef(null)
   const clientsRef = useRef(null)
@@ -32,13 +33,43 @@ export default function HomePage() {
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(0)
 
-  useEffect(() => createHeroScrollAnimation(heroRef.current), [])
-  useEffect(() => createServicesScrollAnimation(servicesRef.current), [])
-  useEffect(() => createCaseStudiesScrollAnimation(caseStudiesRef.current), [])
-  useEffect(() => createClientsScrollAnimation(clientsRef.current), [])
-  useEffect(() => createBtnHoverAnimation(btnRef.current), [])
+  // Defer heavy animations until after page transition completes (~300ms)
+  // This prevents main thread blocking during transition
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      createHeroScrollAnimation(heroRef.current)
+      createServicesScrollAnimation(servicesRef.current)
+      createCaseStudiesScrollAnimation(caseStudiesRef.current)
+      createClientsScrollAnimation(clientsRef.current)
+      createBtnHoverAnimation(btnRef.current)
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Lazy SplitText animations (uses Intersection Observer)
   useEffect(() => createSplitTextAnimation(), [])
-  useEffect(() => refreshScrollTriggers(), [])
+
+  // Refresh scroll triggers after deferred animations initialize
+  useEffect(() => {
+    const timer = setTimeout(() => refreshScrollTriggers(), 420)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Video pause/play on visibility change
+  useEffect(() => {
+    const video = heroVideoRef.current
+    if (!video) return
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        video.pause()
+      } else {
+        video.play().catch(() => {})
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+  }, [])
   useEffect(() => {
     const slider = faqSliderRef.current
     const activeButton = faqButtonRefs.current[activeFaqIndex]
@@ -114,7 +145,7 @@ export default function HomePage() {
               <h1 className="hero-title">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
             <div className="hero-video-holder col-start-8 col-span-5 section-dark flex items-end justify-end pb-5"> 
-              <video className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden" autoPlay muted loop>
+              <video ref={heroVideoRef} className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden" autoPlay muted playsInline>
                 <source src={heroVideo} type="video/mp4"/>
               </video>
             </div>
@@ -203,7 +234,7 @@ export default function HomePage() {
               </div>
 
               <div data-client="cecilias-farm" className="client-name max-w-[55ch]">
-                <div className="text-xl">Cecilia's Farm</div>
+                <div className="text-xl">Cecilia&apos;s Farm</div>
                 <div className="client-detail font-literata text-5xl font-light pb-3">The client detail goes here</div>
               </div>
 
@@ -698,7 +729,7 @@ export default function HomePage() {
           <div className="col-start-8 col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
             <div className="testimonial lead max-w-[38ch]">
               <div className="split-text-coffee">
-                <p className="mb-20">"Simplr's creativity has brought Satalia's bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we’re excited to share it with the world."</p>
+                <p className="mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
                 <p><b>Daniel Hulme</b><br/>CEO Satalia</p>
               </div>
             </div>
@@ -706,8 +737,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="faqs ps-5 pt-60 bg-white section-light slide-up flex flex-col justify-center">
-        <div className="grid grid-cols-1 gap-y-10 md:grid-cols-12 md:gap-x-5 md:gap-y-12">
+      <section className="faqs ps-5 pt-60 bg-white section-light flex flex-col justify-center">
+        <div className="grid grid-cols-1 gap-y-10 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
           <div className="trigger-split-text-coffee md:col-span-4">
             <div className="eyebrow">FAQs</div>
             <h1 className="split-text-coffee">Have questions?</h1>

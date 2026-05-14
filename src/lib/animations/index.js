@@ -1,4 +1,4 @@
-export { createLogoScrollAnimation } from './logo.js'
+export { createLogoScrollAnimation, createLogoPageAnimation } from './logo.js'
 export { createHeroScrollAnimation, createNavSectionTheme } from './hero.js'
 export { createServicesScrollAnimation } from './services.js'
 export { createCaseStudiesScrollAnimation } from './case-studies.js'
