@@ -96,3 +96,7 @@
   min-height: calc(70vh - 54px)
 }
 
+.category {
+  font-size: 0.75rem;
+  padding: 7px 14px 7.5px 14px
+}

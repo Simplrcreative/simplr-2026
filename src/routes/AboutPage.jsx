@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
-import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import {
@@ -8,6 +7,7 @@ import {
   createBulletsAnimation,
   createPeopleScatterAnimation,
   createPeopleSectionClear,
+  createBioAnimation,
 } from '../lib/animations/index.js'
 
 
@@ -52,27 +52,7 @@ export default function AboutPage() {
     [],
   )
   useEffect(() => {
-    const scatter = scatterRef.current
-    const overlay = overlayRef.current
-    if (!scatter || !overlay) return
-
-    if (activeBio) {
-      gsap.to(scatter, { x: '-60%', opacity: 0.5, duration: 0.7, ease: 'power4.inOut' })
-      gsap.fromTo(
-        overlay,
-        { opacity: 0, x: 100 },
-        { opacity: 1, x: 0, duration: 0.4, ease: 'power4.out', delay: 0.35, pointerEvents: 'auto' },
-      )
-      gsap.fromTo(
-        closeRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.3, ease: 'power4.out', delay: 0.5, pointerEvents: 'auto' },
-      )
-    } else {
-      gsap.to(overlay, { opacity: 0, x: 50, duration: 0.4, ease: 'power4.inOut', pointerEvents: 'none' })
-      gsap.to(closeRef.current, { opacity: 0, duration: 0.2, ease: 'power4.in', pointerEvents: 'none' })
-      gsap.to(scatter, { x: '0%', opacity: 1, duration: 0.5, ease: 'power4.inOut', delay: 0.15 })
-    }
+    return createBioAnimation(scatterRef.current, overlayRef.current, closeRef.current, !!activeBio)
   }, [activeBio])
 
   const handlePersonClick = (name) => {

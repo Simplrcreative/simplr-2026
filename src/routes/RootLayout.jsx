@@ -1,5 +1,6 @@
 import { useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLoaderData, useLocation, useMatches, useNavigation } from 'react-router-dom'
+import { useRoutePrefetch } from '../lib/useRoutePrefetch.js'
 import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
@@ -53,19 +54,33 @@ export default function RootLayout() {
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
-  const [isIntroVisible, setIsIntroVisible] = useState(false)
+  const [isIntroVisible, setIsIntroVisible] = useState(true)
+  const [introComplete, setIntroComplete] = useState(false)
+  const [shouldFadeOutIntro, setShouldFadeOutIntro] = useState(false)
   const navigationState = useNavigation().state
   const deferredNavigationState = useDeferredValue(navigationState)
   const isNavigating = deferredNavigationState !== 'idle'
   const btnRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
 
-  // Dismiss the intro if the user navigates away from home before it completes
+  // Reset intro state when leaving home page
   useEffect(() => {
     if (!isHomePage) {
       setIsIntroVisible(false)
+      setShouldFadeOutIntro(false)
     }
   }, [isHomePage])
+
+  // Start 3-second minimum timer for intro, then dismiss
+  useEffect(() => {
+    if (!isHomePage || !isIntroVisible) return
+    
+    const timer = setTimeout(() => {
+      setShouldFadeOutIntro(true)
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [isHomePage, isIntroVisible])
 
   // On every route change: kill the previous logo animation, scroll to top,
   // and clear any GSAP inline styles left by the scroll animation.
@@ -83,22 +98,29 @@ export default function RootLayout() {
     document.querySelector('.logo-holder')?.classList.remove('light')
     document.documentElement.classList.remove('compact-logo-active')
 
-    // Let CSS own compact logo visibility via .compact-logo-active.
-    gsap.set('.compact-logo', { clearProps: 'all' })
+    // Scope all GSAP targets to layoutRef.current so body-appended header/compact-logo
+    // clones (used for the outgoing animation) aren't clobbered by these sets.
+    const layout = layoutRef.current
+    gsap.set(layout?.querySelector('.compact-logo'), { clearProps: 'all' })
 
-    // Non-home routes open in the compact logo end-state.
-    gsap.set('.logo', {
+    // Home page: logo starts hidden; the intro-entrance animation reveals it.
+    // Non-home pages: logo is permanently in its compact end-state and visible.
+    // This matches what TransitionFrame's applyCompactLogoState() does on routing,
+    // so direct loads and client-side navigations behave identically.
+    gsap.set(layout?.querySelector('.logo'), {
+      autoAlpha: isHomePage ? 0 : 1,
       scale: 0.35,
       y: -10,
       transformOrigin: 'left top',
       willChange: 'transform',
     })
-    gsap.set('#logo-implr g', {
+    gsap.set(Array.from(layout?.querySelectorAll('#logo-implr g') ?? []), {
+      autoAlpha: 0,
       x: -20,
       filter: 'blur(10px)',
-      autoAlpha: 0,
     })
-    gsap.set('.tagline', {
+    gsap.set(layout?.querySelector('.tagline'), {
+      autoAlpha: isHomePage ? 0 : 1,
       y: -213,
       x: 65,
       scale: 0.68,
@@ -108,21 +130,58 @@ export default function RootLayout() {
   }, [location.pathname, isHomePage])
 
   useEffect(() => {
-    // const destroySmoothScroll = createSmoothScroll()
-    // Only run the scroll-triggered logo animation on the home page.
-    // On other pages, run the page animation variant.
-    destroyLogoRef.current = isHomePage
-      ? createLogoScrollAnimation(layoutRef.current)
-      : createLogoPageAnimation(layoutRef.current)
+    if (!isHomePage) {
+      // Non-home: set up logo page animation and nav theme immediately.
+      destroyLogoRef.current = createLogoPageAnimation(layoutRef.current)
+      destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
+      return () => { destroyNavSectionThemeRef.current?.() }
+    }
+
+    // Home page: always wire up the nav section theme.
     destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
 
-    return () => {
-      // Watchers are killed synchronously in useLayoutEffect via refs.
-      // This return cleanup is kept for safety but shouldn't normally run.
-      destroyNavSectionThemeRef.current?.()
-      // destroySmoothScroll?.()
+    // Home page: wait for the loader to finish before revealing the logo.
+    if (!introComplete) return () => { destroyNavSectionThemeRef.current?.() }
+
+    // If a page transition is in progress, TransitionFrame's animateHomeLogoIn()
+    // already handles the logo reveal. Just schedule the scroll animation to start
+    // after the transition animation completes (~650ms covers the full transition).
+    if (document.documentElement.classList.contains('page-transitioning')) {
+      const timer = setTimeout(() => {
+        destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
+      }, 650)
+      return () => {
+        clearTimeout(timer)
+        destroyNavSectionThemeRef.current?.()
+      }
     }
-  }, [location.pathname, isHomePage])
+
+    // Initial load after intro overlay — animate logo from compact → full,
+    // then hand off to the scroll animation.
+    const logo = layoutRef.current?.querySelector('.logo')
+    const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
+
+    const entranceTl = gsap.timeline({
+      onComplete: () => {
+        destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
+      },
+    })
+
+    entranceTl.to(logo, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
+    entranceTl.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
+    entranceTl.to(
+      Array.from(implrPaths),
+      { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
+      0.15,
+    )
+
+    return () => {
+      entranceTl.kill()
+      destroyLogoRef.current?.()
+      destroyLogoRef.current = null
+      destroyNavSectionThemeRef.current?.()
+    }
+  }, [location.pathname, isHomePage, introComplete])
 
   useEffect(() => {
     refreshSmoothScroll()
@@ -142,8 +201,20 @@ export default function RootLayout() {
   useEffect(() => createFooterAnimation(footerRef.current), [location.pathname])
 
   return (
-    <div ref={layoutRef} className="relative min-h-screen">
-      {isIntroVisible ? <IntroOverlay onComplete={() => setIsIntroVisible(false)} /> : null}
+    <div 
+      ref={layoutRef} 
+      className="relative min-h-screen"
+      data-intro-visible={isHomePage && isIntroVisible ? 'true' : 'false'}
+    >
+      {isHomePage && isIntroVisible ? (
+        <IntroOverlay 
+          shouldFadeOut={shouldFadeOutIntro}
+          onFadeOutComplete={() => {
+            setIsIntroVisible(false)
+            setTimeout(() => setIntroComplete(true), 100)
+          }}
+        />
+      ) : null}
 
       <div className="fixed inset-x-0 top-0 z-50 h-1 bg-transparent">
         <div
@@ -154,7 +225,7 @@ export default function RootLayout() {
       </div>
 
       <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-[1000]">
-        <Link to="/" title="Simplr">
+        <Link id="compact-logo-link" to="/" title="Simplr">
           <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
             <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
             <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
@@ -168,7 +239,7 @@ export default function RootLayout() {
         <div className="nav-holder flex flex-col px-5 pt-[3.125rem] md:flex-row md:items-start md:justify-between">
           
           <div className="logo-holder">
-              <Link to="/">
+              <Link id="logo-link" to="/">
               <BrandLogo />
               
                 <div className="tagline">
@@ -181,23 +252,26 @@ export default function RootLayout() {
           </div>
           
           <nav className="main flex flex-wrap gap-[2.5rem] pt-[1.875rem]">
-            {navigation.map((item) => (
-              <NavLink
-                key={item.key}
-                to={item.path}
-                className={navLinkClassName}
-                onPointerEnter={showNavLinkOrb}
-                onPointerMove={showNavLinkOrb}
-                onPointerLeave={hideNavLinkOrb}
-                onFocus={showNavLinkOrb}
-                onBlur={hideNavLinkOrb}
-                onClick={handleTransitionLinkClick}
-              >
-                <span className="nav-link__orb" aria-hidden="true" />
-                <NavLinkLabel label={item.label} count={item.count} />
-                <NavLinkLabel label={item.label} count={item.count} inverted />
-              </NavLink>
-            ))}
+            {navigation.map((item) => {
+              const prefetch = useRoutePrefetch(item.path)
+              return (
+                <NavLink
+                  key={item.key}
+                  to={item.path}
+                  className={navLinkClassName}
+                  onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
+                  onPointerMove={showNavLinkOrb}
+                  onPointerLeave={hideNavLinkOrb}
+                  onFocus={e => { showNavLinkOrb(e); prefetch(); }}
+                  onBlur={hideNavLinkOrb}
+                  onClick={handleTransitionLinkClick}
+                >
+                  <span className="nav-link__orb" aria-hidden="true" />
+                  <NavLinkLabel label={item.label} count={item.count} />
+                  <NavLinkLabel label={item.label} count={item.count} inverted />
+                </NavLink>
+              )
+            })}
           </nav>
         </div>
       </header>
@@ -206,7 +280,7 @@ export default function RootLayout() {
 
       <main>
         <TransitionFrame>
-          <Outlet />
+          <Outlet context={{ introComplete }} />
         </TransitionFrame>
       </main>
 

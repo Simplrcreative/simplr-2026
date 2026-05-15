@@ -11,13 +11,18 @@ const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
 
 export default function TransitionFrame({ children }) {
+  const layoutRef = useRef(null)
   const ref = useRef(null)
   const snapshotRef = useRef(null)
+  const headerSnapshotRef = useRef(null)
+  const compactLogoSnapshotRef = useRef(null)
   const isFirstMount = useRef(true)
   // Separate ref so we can detect the first useEffect run independently of
   // useLayoutEffect (which runs before effects and would already have cleared isFirstMount).
   const isFirstEffectRun = useRef(true)
   const location = useLocation()
+  const logo = layoutRef.current?.querySelector('.logo')
+  const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
 
   function applyCompactLogoState() {
     gsap.set('.logo', {
@@ -47,39 +52,14 @@ export default function TransitionFrame({ children }) {
       },
     })
 
-    timeline.to(
-      '.tagline',
-      {
-        y: 0,
-        x: 0,
-        scale: 1,
-        stagger: 0.02,
-        duration: 0.36,
-      },
-      0,
-    )
+    timeline.to('.logo', { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
 
-    timeline.to(
-      '.logo',
-      {
-        autoAlpha: 1,
-        scale: 1,
-        y: 0,
-        duration: 0.2,
-      },
-      0.12,
-    )
+    timeline.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
 
     timeline.to(
       '#logo-implr g',
-      {
-        x: 0,
-        filter: 'blur(0px)',
-        autoAlpha: 1,
-        stagger: -0.1,
-        duration: 0.2,
-      },
-      0.16,
+      { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
+      0.15,
     )
   }
 
@@ -93,6 +73,46 @@ export default function TransitionFrame({ children }) {
   useEffect(() => {
     const capture = () => {
       if (!ref.current) return
+
+      // --- Header clone ---
+      const liveHeader = document.querySelector('.header')
+      headerSnapshotRef.current = liveHeader?.cloneNode(true) ?? null
+      if (headerSnapshotRef.current) {
+        // Bake in the computed opacity/visibility of .logo-holder so CSS rules
+        // tied to html.compact-logo-active don't hide it after the class changes.
+        const liveLogoHolder = liveHeader?.querySelector('.logo-holder')
+        const clonedLogoHolder = headerSnapshotRef.current.querySelector('.logo-holder')
+        if (liveLogoHolder && clonedLogoHolder) {
+          const cs = getComputedStyle(liveLogoHolder)
+          clonedLogoHolder.style.opacity = cs.opacity
+          clonedLogoHolder.style.visibility = cs.visibility
+        }
+      }
+
+      // --- Compact-logo clone (only when it's the currently visible logo) ---
+      const isCompactLogoActive = document.documentElement.classList.contains('compact-logo-active')
+      const liveCompactLogo = isCompactLogoActive ? document.querySelector('.compact-logo') : null
+      if (liveCompactLogo) {
+        const rect = liveCompactLogo.getBoundingClientRect()
+        const clonedCompact = liveCompactLogo.cloneNode(true)
+        // Bake in position/dimensions so the clone renders identically when
+        // detached from its Tailwind layout context.
+        Object.assign(clonedCompact.style, {
+          position: 'fixed',
+          top: `${rect.top}px`,
+          left: `${rect.left}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`,
+          opacity: '1',
+          visibility: 'visible',
+          pointerEvents: 'none',
+          zIndex: '10000',
+        })
+        compactLogoSnapshotRef.current = clonedCompact
+      } else {
+        compactLogoSnapshotRef.current = null
+      }
+
       const clone = ref.current.cloneNode(true)
 
       // Replace each cloned <video> with a canvas snapshot of the live frame
@@ -268,6 +288,52 @@ export default function TransitionFrame({ children }) {
     wrapper.appendChild(content)
     document.body.appendChild(wrapper)
 
+    // --- Compact-logo clone (icon-only logo state) ---
+    // Animate the compact-logo out when it was the active logo at capture time.
+    const compactLogoClone = compactLogoSnapshotRef.current
+    compactLogoSnapshotRef.current = null
+    if (compactLogoClone) {
+      // Use data-frozen-clone so html.page-transitioning .compact-logo:not([data-frozen-clone])
+      // doesn't fire, while keeping the class so fill/mix-blend-mode CSS still applies.
+      compactLogoClone.dataset.frozenClone = 'true'
+      document.body.appendChild(compactLogoClone)
+      gsap.to(compactLogoClone, {
+        autoAlpha: 0,
+        y: -20,
+        duration: 0.35,
+        ease: 'power2.in',
+        onComplete: () => compactLogoClone.remove(),
+      })
+    }
+
+    // --- Outgoing header clone (Logo Device + nav) ---
+    // Animate the outgoing header out using the frozen clone captured on pointerdown.
+    // The clone is appended directly to <body> (fixed, above the overlay) so it
+    // slides up independently of the wrapper's own scroll animation.
+    const headerClone = headerSnapshotRef.current
+    headerSnapshotRef.current = null
+    if (headerClone) {
+      // Remove 'header' class so html.page-transitioning .header { opacity:0 !important }
+      // doesn't instantly kill the clone when we add the page-transitioning class below.
+      headerClone.classList.remove('header')
+      Object.assign(headerClone.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100%',
+        zIndex: '10000',
+        pointerEvents: 'none',
+      })
+      document.body.appendChild(headerClone)
+      gsap.to(headerClone, {
+        autoAlpha: 0,
+        y: -30,
+        duration: 0.35,
+        ease: 'power2.in',
+        onComplete: () => headerClone.remove(),
+      })
+    }
+
     // Hide the real header via CSS class before the first paint. By the time
     // useLayoutEffect runs, React has already committed the incoming render so
     // .header contains the new logo. The overlay's solid bgColor covers the
@@ -279,7 +345,7 @@ export default function TransitionFrame({ children }) {
     document.documentElement.style.overflowX = 'hidden'
 
     // Entering page starts below the viewport at 0.85 scale.
-    gsap.set(el, { y: window.innerHeight, scale: 0.85, autoAlpha: 1 })
+    gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
 
     const done = () => {
       // Remove transitioning class then immediately pin header to autoAlpha:0
@@ -329,10 +395,10 @@ export default function TransitionFrame({ children }) {
 
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
 
-    tl.to(content, { scale: 0.9, duration: 0.25, ease: 'power1.in', transformOrigin: '50% 50%' }, 0)
-    tl.to(wrapper, { autoAlpha: 1, y: -window.innerHeight, duration: 0.4, ease: 'power1.in' }, 0.2)
-    tl.to(el, { y: 0, duration: 0.4, ease: 'power1.out' }, 0.5)
-    tl.to(el, { scale: 1, duration: 0.25, ease: 'power1.out', clearProps: 'all' }, 0.7)
+    tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
+    tl.to(wrapper, { y: -window.innerHeight * 1.5, duration: 1, ease: 'power4.in' }, 0.1)
+    tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
+    tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
 
     return () => {
       tl.kill()
@@ -371,7 +437,8 @@ export default function TransitionFrame({ children }) {
     if (!siteConfig.transitions.enabled || isFirst) {
       if (isFirst && location.pathname === '/') {
         applyCompactLogoState()
-        animateHomeLogoIn()
+        // Skip animateHomeLogoIn() on first load — RootLayout handles the
+        // initial home logo reveal after the intro overlay finishes.
       }
       window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT))
     }

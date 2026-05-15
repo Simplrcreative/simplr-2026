@@ -96,7 +96,7 @@ function ServiceVideo({ src, poster, title }) {
         src={src}
         poster={poster}
         title={title}
-        loop
+        //loop
         muted
         playsInline
         preload="none"
@@ -168,7 +168,7 @@ export default function ServicesPage() {
           ease: 'power2.out',
           scrollTrigger: {
             trigger: card,
-            start: 'top 10%',
+            start: 'top 40%',
             toggleActions: 'play none none reverse',
           },
         })

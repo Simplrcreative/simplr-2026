@@ -40,7 +40,7 @@ export const brandColors = {
 }
 
 export const wpConfig = {
-  endpoint: import.meta.env.VITE_WPGRAPHQL_ENDPOINT || '/graphql',
+  endpoint: import.meta.env.VITE_WPGRAPHQL_ENDPOINT || '',
   workContentType: import.meta.env.VITE_WORK_CONTENT_TYPE || 'WORK',
   thinkingContentType: import.meta.env.VITE_THINKING_CONTENT_TYPE || 'POST',
   workUriBase: import.meta.env.VITE_WORK_URI_BASE || '/work/',

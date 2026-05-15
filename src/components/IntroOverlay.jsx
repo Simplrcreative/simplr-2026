@@ -1,16 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 
-export default function IntroOverlay({ onComplete }) {
+export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete }) {
   const overlayRef = useRef(null)
-  const boxRef = useRef(null)
-  const creativeRef = useRef(null)
-  const intelligenceRef = useRef(null)
-  const appliedRef = useRef(null)
-  const onCompleteRef = useRef(onComplete)
-  const hasFinishedRef = useRef(false)
-
-  onCompleteRef.current = onComplete
+  const hasStartedFadeOut = useRef(false)
 
   useEffect(() => {
     if (!overlayRef.current) {
@@ -22,90 +15,63 @@ export default function IntroOverlay({ onComplete }) {
     window.scrollTo(0, 0)
     document.body.style.overflow = 'hidden'
 
-    const finishIntro = () => {
-      if (hasFinishedRef.current) {
-        return
-      }
-
-      hasFinishedRef.current = true
-      document.body.style.overflow = ''
-      onCompleteRef.current?.()
-    }
-
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      finishIntro()
       return undefined
     }
 
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline({
-        defaults: { ease: 'power4.out' },
-        onComplete: finishIntro,
-      })
+    // Hold the overlay in place; fade out is handled by RootLayout state
+    gsap.set(overlayNode, { autoAlpha: 1 })
 
-      timeline
-        .set(overlayNode, { autoAlpha: 1 })
-        .to(
-          boxRef.current,
-          { autoAlpha: 1, transformOrigin: "50% 50%", y: "-25%", x: "-50%", width: '100vw', height: '100vh', borderRadius: 0, duration: 2 },
-        )
-        .fromTo(
-          creativeRef.current,
-          { autoAlpha: 0, y: 20 },
-          { autoAlpha: 0.72, y: 0, duration: 0.55 },
-          0.16,
-        )
-
-      timeline
-        .to(boxRef.current, { autoAlpha: 1, y: -300, x: -600, duration: 0.5 }, '<')
-        .to(creativeRef.current, { autoAlpha: 0, y: -12, duration: 0.35 }, '+=0.45')
-        
-        .to(overlayNode, { autoAlpha: 0, duration: 0.45, ease: 'power2.inOut' }, '-=0.08')
-    }, overlayNode)
+    // Sequential looping dot animation: each dot slides out then back before the next starts
+    // 5 dots × 0.6s each = 3s per cycle — matches the minimum timer in RootLayout
+    const dots = overlayNode.querySelectorAll('.dot')
+    const dotsTimeline = gsap.timeline({ repeat: -1 })
+    dots.forEach((dot) => {
+      dotsTimeline
+        .to(dot, { x: '50%', duration: 0.3, ease: 'power2.inOut' })
+        .to(dot, { x: 0, duration: 0.3, ease: 'power2.inOut' })
+    })
 
     return () => {
       document.body.style.overflow = ''
-      ctx.revert()
+      dotsTimeline.kill()
     }
   }, [])
+
+  // Fade out when both conditions are met
+  useEffect(() => {
+    if (!shouldFadeOut || !overlayRef.current || hasStartedFadeOut.current) {
+      return
+    }
+
+    hasStartedFadeOut.current = true
+    const overlayNode = overlayRef.current
+
+    gsap.to(overlayNode, {
+      autoAlpha: 0,
+      duration: 0.45,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        onFadeOutComplete?.()
+      },
+    })
+  }, [shouldFadeOut, onFadeOutComplete])
 
   return (
     <div
       ref={overlayRef}
       className="fixed z-[10] inset-0 flex items-center justify-center overflow-hidden px-6 text-white"
+      style={{ backgroundColor: '#FFF', opacity: 1 }}
       aria-hidden="true"
     > 
-      <div
-      ref={boxRef}
-      className="fixed z-[0]" 
-      />
-      <div className="dots flex items-center gap-1">
-        <div className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-white" />
-        <div className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-white" />
-        <div className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-white" />
-        <div className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-white" />
-        <div className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-white" />
-        <div className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-white" />
-      </div>
-      <div className="relative flex max-w-[42rem] flex-col items-center gap-4 text-center">
-        <div
-          ref={creativeRef}
-          className="uppercase text-white"
-        >
-          Creative.
-        </div>
-        <div
-          ref={intelligenceRef}
-          className="uppercase text-white"
-        >
-          Intelligence.
-        </div>
-        <div
-          ref={appliedRef}
-          className="uppercase text-white"
-        >
-          Applied.
-        </div>
+      <div className="dots relative h-[1.875rem] w-[1.875rem]">
+        <div className="top-dot h-[1.875rem] w-[1.875rem] rounded-full bg-black absolute z-7 inset-0" />
+        <div className="dot-hider h-[1.875rem] w-[1.875rem] bg-white absolute z-6 inset-0" />
+        <div id="dot-1" className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-motion absolute z-5 inset-0" />
+        <div id="dot-2" className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-strategy absolute z-4 inset-0" />
+        <div id="dot-3" className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-web-design-development absolute z-3 inset-0" />
+        <div id="dot-4" className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-branding-design absolute z-2 inset-0" />
+        <div id="dot-5" className="dot h-[1.875rem] w-[1.875rem] rounded-full bg-templates absolute z-1 inset-0" />
       </div>
     </div>
   )

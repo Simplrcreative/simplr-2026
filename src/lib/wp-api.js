@@ -421,9 +421,10 @@ export async function fetchCollectionData(collectionKey) {
 }
 
 export async function fetchNavigationData() {
-  const { works } = await fetchWorksData()
-
-  return buildNavigation({ work: works.length })
+  // Return navigation immediately using static counts from routeDefinitions so
+  // the root loader never blocks the initial render on a slow GraphQL request.
+  // The WorkPage loader fetches the live count independently when that route loads.
+  return buildNavigation()
 }
 
 export async function fetchHomeData() {  const [pagePayload, workPayload] = await Promise.all([

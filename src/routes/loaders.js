@@ -9,8 +9,8 @@ export function createRootLoader() {
 }
 
 export function createHomeLoader() {
-  return async function homeLoader() {
-    return fetchHomeData()
+  return function homeLoader() {
+    return { homeData: fetchHomeData() }
   }
 }
 
