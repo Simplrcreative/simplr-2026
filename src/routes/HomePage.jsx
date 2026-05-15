@@ -3,6 +3,7 @@ import { useLoaderData, useOutletContext, Await } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
 import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation } from '../lib/animations/index.js'
+import { createSurfaceColorTransitions } from '../lib/animations/transitions.js'
 import {
   breadcrumbSchema,
   collectionSchema,
@@ -33,6 +34,13 @@ function HomePageContent({ page, featuredWork }) {
   const faqs = page.faqs ?? []
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(0)
+
+  // Set up surface colour transitions immediately — elements exist now that HomePageContent
+  // has mounted (homeData is deferred, so TransitionFrame's PAGE_TRANSITION_COMPLETE_EVENT
+  // fires before this component renders and finds nothing).
+  useEffect(() => {
+    return createSurfaceColorTransitions(document.documentElement)
+  }, [])
 
   // Run animations only after the intro loader has finished
   useEffect(() => {

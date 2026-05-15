@@ -77,7 +77,7 @@ export default function RootLayout() {
     
     const timer = setTimeout(() => {
       setShouldFadeOutIntro(true)
-    }, 3000)
+    }, 5000)
 
     return () => clearTimeout(timer)
   }, [isHomePage, isIntroVisible])

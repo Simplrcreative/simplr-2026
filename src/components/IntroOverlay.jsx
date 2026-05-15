@@ -28,8 +28,8 @@ export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete 
     const dotsTimeline = gsap.timeline({ repeat: -1 })
     dots.forEach((dot) => {
       dotsTimeline
-        .to(dot, { x: '50%', duration: 0.3, ease: 'power2.inOut' })
-        .to(dot, { x: 0, duration: 0.3, ease: 'power2.inOut' })
+        .to(dot, { x: '50.5%', duration: 0.4, ease: 'power2.in' })
+        .to(dot, { x: 0, duration: 0.5, delay: 0.1, ease: 'power2.in' })
     })
 
     return () => {
@@ -50,7 +50,7 @@ export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete 
     gsap.to(overlayNode, {
       autoAlpha: 0,
       duration: 0.45,
-      ease: 'power2.inOut',
+      ease: 'power2.in',
       onComplete: () => {
         onFadeOutComplete?.()
       },
