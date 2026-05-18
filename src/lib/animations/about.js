@@ -133,20 +133,20 @@ export function createBioAnimation(scatter, overlay, close, isOpen) {
   if (!scatter || !overlay) return () => undefined
 
   if (isOpen) {
-    const t1 = gsap.to(scatter, { x: '-60%', opacity: 0.5, duration: 1, ease: 'power4.out' })
+    const t1 = gsap.to(scatter, { x: '-60%', opacity: 0.75, duration: 0.5, ease: 'power4.out' })
     const t2 = gsap.fromTo(
       overlay,
       { opacity: 0, x: 500 },
-      { opacity: 1, x: 0, duration: 1, ease: 'power4.out', delay: 0.2, pointerEvents: 'auto' },
+      { opacity: 1, x: 0, duration: 0.75, ease: 'power4.out', delay: 0.35, pointerEvents: 'auto' },
     )
     const t3 = close
-      ? gsap.fromTo(close, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power4.out', delay: 0.5, pointerEvents: 'auto' })
+      ? gsap.fromTo(close, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power1.out', delay: 0.3, pointerEvents: 'auto' })
       : null
     return () => { t1.kill(); t2.kill(); t3?.kill() }
   } else {
-    const t1 = gsap.to(overlay, { opacity: 0, x: 500, duration: 1, ease: 'power4.out', delay: 0.2, pointerEvents: 'none' })
-    const t2 = close ? gsap.to(close, { opacity: 0, duration: 0.2, ease: 'power1.out', pointerEvents: 'none' }) : null
-    const t3 = gsap.to(scatter, { x: '0%', opacity: 1, duration: 1, ease: 'power4.out', delay: 0.3 })
+    const t1 = gsap.to(overlay, { opacity: 0, x: 500, duration: 0.75, ease: 'power4.in', delay: 0.25, pointerEvents: 'none' })
+    const t2 = close ? gsap.to(close, { opacity: 0, duration: 0.3, ease: 'power1.in', pointerEvents: 'none' }) : null
+    const t3 = gsap.to(scatter, { x: '0%', opacity: 1, duration: 0.75, ease: 'power4.in', delay: 0.4 })
     return () => { t1.kill(); t2?.kill(); t3.kill() }
   }
 }

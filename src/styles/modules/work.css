@@ -19,11 +19,29 @@
   background-color: rgba(48, 15, 29, 0.06);
 }
 
+.work-filter-btn:disabled {
+  cursor: default;
+}
+
+.work-results {
+  will-change: transform, opacity;
+}
+
 /* Individual grid card */
 .work-card {
-    flex-basis: calc(50%);
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-cards-row {
+  --work-row-cols: 2;
+  --work-row-gap: 1.25rem;
+  gap: var(--work-row-gap);
+}
+
+.work-cards-row .work-card {
+  flex: 0 0 calc((100% - (var(--work-row-cols) - 1) * var(--work-row-gap)) / var(--work-row-cols));
+  max-width: calc((100% - (var(--work-row-cols) - 1) * var(--work-row-gap)) / var(--work-row-cols));
 }
 
 .work-card__title {
