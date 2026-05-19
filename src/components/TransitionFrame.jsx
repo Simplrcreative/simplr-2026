@@ -10,6 +10,9 @@ const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
 const DARK_PATHS = new Set(['/about', '/contact', '/est-2014'])
+const WORK_SINGLE_PATH_RE = /^\/work\/[^/]+\/?$/
+const ALT_DOCK_MAX_WAIT_MS = 1600
+const ALT_DOCK_POLL_MS = 50
 
 function resolveBgFromPath(pathname) {
   return DARK_PATHS.has(pathname) ? 'dark' : 'light'
@@ -19,6 +22,7 @@ export default function TransitionFrame({ children }) {
   const layoutRef = useRef(null)
   const ref = useRef(null)
   const snapshotRef = useRef(null)
+  const altTransitionRef = useRef(null)
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
   const capturedPageBgRef = useRef(null)
@@ -52,22 +56,67 @@ export default function TransitionFrame({ children }) {
     })
   }
 
-  function animateHomeLogoIn() {
-    const timeline = gsap.timeline({
-      defaults: {
-        ease: 'power2.out',
-      },
-    })
+  function extractSameOriginLink(target) {
+    const link = target?.closest?.('a[href]')
+    if (!link) return null
 
-    timeline.to('.logo', { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
+    const href = link.getAttribute('href')
+    if (!href || href.startsWith('#') || link.hasAttribute('download') || link.target === '_blank') {
+      return null
+    }
 
-    timeline.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
+    const url = new URL(link.href, window.location.href)
+    if (url.origin !== window.location.origin) return null
 
-    timeline.to(
-      '#logo-implr g',
-      { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
-      0.15,
+    return { link, url }
+  }
+
+  function resolveAltTransitionSource(target, link) {
+    const directImageTrigger = target?.closest?.('.alt-transition-img')
+    if (directImageTrigger && directImageTrigger.closest('a[href]') === link) {
+      return directImageTrigger
+    }
+
+    const textTrigger = target?.closest?.('.alt-transition-text')
+    if (!textTrigger || textTrigger.closest('a[href]') !== link) {
+      return null
+    }
+
+    const relatedSlug = textTrigger.closest('.client-name')?.dataset?.client
+    if (!relatedSlug) return null
+
+    // Slugs are sanitized and used as IDs in HomePage.jsx.
+    return document.getElementById(relatedSlug)?.querySelector('.alt-transition-img') ?? null
+  }
+
+  function resolveDockTarget() {
+    const picture = document.querySelector('.featured-image picture')
+    if (picture) {
+      const img = picture.querySelector('img')
+      if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+        return picture
+      }
+      return null
+    }
+
+    return (
+      document.querySelector('.featured-image .ratio')
+      || document.querySelector('.featured-image')
     )
+  }
+
+  function getDockRect() {
+    const target = resolveDockTarget()
+    if (!target) return null
+
+    const rect = target.getBoundingClientRect()
+    if (target.tagName === 'IMG') {
+      if (!target.complete || target.naturalWidth === 0 || rect.width <= 0 || rect.height <= 0) return null
+    } else if (rect.width <= 0 || rect.height <= 0) {
+      return null
+    }
+
+    return { target, rect }
   }
 
   // Capture the outgoing snapshot synchronously at the moment the user triggers
@@ -78,11 +127,37 @@ export default function TransitionFrame({ children }) {
   // The footer is appended to the clone so navigating from the footer area produces
   // a complete outgoing snapshot instead of a blank lower half.
   useEffect(() => {
-    const capture = () => {
+    const capture = (target = null) => {
       if (!ref.current) return
 
       capturedPageBgRef.current = document.documentElement.dataset.pageBg || null
       capturedPathRef.current = window.location.pathname || null
+
+      altTransitionRef.current = null
+
+      if (target) {
+        const nav = extractSameOriginLink(target)
+        const altSource = nav ? resolveAltTransitionSource(target, nav.link) : null
+        const shouldUseAltTransition = Boolean(
+          nav && altSource && WORK_SINGLE_PATH_RE.test(nav.url.pathname),
+        )
+
+        if (shouldUseAltTransition) {
+          const rect = altSource.getBoundingClientRect()
+          if (rect.width > 0 && rect.height > 0) {
+            const clone = altSource.cloneNode(true)
+            altTransitionRef.current = {
+              pathname: nav.url.pathname,
+              top: rect.top,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height,
+              borderRadius: getComputedStyle(altSource).borderRadius,
+              clone,
+            }
+          }
+        }
+      }
 
       // --- Header clone ---
       const liveHeader = document.querySelector('.header')
@@ -194,22 +269,13 @@ export default function TransitionFrame({ children }) {
       snapshotRef.current = clone
     }
 
-    const canCaptureFromEventTarget = (target) => {
-      const link = target?.closest?.('a[href]')
-      if (!link) return false
-      const href = link.getAttribute('href')
-      if (!href || href.startsWith('#') || link.hasAttribute('download') || link.target === '_blank') return false
-
-      // Only capture for same-origin navigation.
-      const url = new URL(link.href, window.location.href)
-      return url.origin === window.location.origin
-    }
+    const canCaptureFromEventTarget = (target) => Boolean(extractSameOriginLink(target))
 
     const handlePointerDown = (e) => {
       // Only primary-button navigations; ignore modified clicks/new-tab gestures.
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       if (!canCaptureFromEventTarget(e.target)) return
-      capture()
+      capture(e.target)
     }
 
     const handleClick = (e) => {
@@ -217,7 +283,7 @@ export default function TransitionFrame({ children }) {
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       if (!canCaptureFromEventTarget(e.target)) return
 
-      capture()
+      capture(e.target)
     }
 
     document.addEventListener('pointerdown', handlePointerDown, { capture: true })
@@ -241,9 +307,11 @@ export default function TransitionFrame({ children }) {
 
     const el = ref.current
     const snapshot = snapshotRef.current
-    if (!el || !snapshot) return
+    const altTransition = altTransitionRef.current
+    if (!el || (!snapshot && !altTransition)) return
 
     snapshotRef.current = null
+    altTransitionRef.current = null
 
     // Child layout effects run before parent (React bottom-up order), so at
     // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
@@ -256,7 +324,9 @@ export default function TransitionFrame({ children }) {
     capturedPathRef.current = null
 
     const scrollY = window.scrollY
-    const snapshotHeight = snapshot.scrollHeight || snapshot.getBoundingClientRect().height || 0
+    const snapshotHeight = snapshot
+      ? (snapshot.scrollHeight || snapshot.getBoundingClientRect().height || 0)
+      : 0
     const minSnapshotTop = Math.min(0, window.innerHeight - snapshotHeight)
     const snapshotTop = Math.max(-scrollY, minSnapshotTop)
 
@@ -292,24 +362,44 @@ export default function TransitionFrame({ children }) {
       height: '100%',
       transformOrigin: '50% 50%',
     })
-    Object.assign(snapshot.style, {
-      position: 'absolute',
-      top: `${snapshotTop}px`,
-      left: '0',
-      width: '100%',
-      pointerEvents: 'none',
-    })
-
-    if (location.pathname === '/') {
-      snapshot.querySelectorAll('.compact-logo').forEach((node) => {
-        node.style.opacity = '0'
-        node.style.visibility = 'hidden'
+    if (snapshot) {
+      Object.assign(snapshot.style, {
+        position: 'absolute',
+        top: `${snapshotTop}px`,
+        left: '0',
+        width: '100%',
+        pointerEvents: 'none',
       })
-    }
 
-    content.appendChild(snapshot)
+      if (location.pathname === '/') {
+        snapshot.querySelectorAll('.compact-logo').forEach((node) => {
+          node.style.opacity = '0'
+          node.style.visibility = 'hidden'
+        })
+      }
+
+      content.appendChild(snapshot)
+    }
     wrapper.appendChild(content)
     document.body.appendChild(wrapper)
+
+    let altClone = null
+    if (altTransition?.pathname === location.pathname) {
+      altClone = altTransition.clone
+      Object.assign(altClone.style, {
+        position: 'fixed',
+        top: `${altTransition.top}px`,
+        left: `${altTransition.left}px`,
+        width: `${altTransition.width}px`,
+        height: `${altTransition.height}px`,
+        borderRadius: altTransition.borderRadius,
+        margin: '0',
+        zIndex: '10001',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+      })
+      document.body.appendChild(altClone)
+    }
 
     // --- Compact-logo clone (icon-only logo state) ---
     // Animate the compact-logo out when it was the active logo at capture time.
@@ -357,38 +447,39 @@ export default function TransitionFrame({ children }) {
       })
     }
 
-    // Hide the real header via CSS class before the first paint. By the time
-    // useLayoutEffect runs, React has already committed the incoming render so
-    // .header contains the new logo. The overlay's solid bgColor covers the
-    // header area so the instant hide is invisible. Class-based so it survives
-    // RootLayout's gsap.set('.header', { clearProps:'all' }).
+    const isHomePage = location.pathname === '/'
+    const shouldManageLiveHeader = !isHomePage
+
+    // Signal an in-progress route handoff so RootLayout can defer incoming
+    // home entrance animations until the overlay has finished.
     document.documentElement.classList.add('page-transitioning')
 
-    // Suppress scrollbar flash while content is translated off-screen.
-    document.documentElement.style.overflowX = 'hidden'
+    // Keep scroll behavior unchanged during transition for debugging.
 
-    // Entering page starts below the viewport at 0.85 scale.
-    gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
+    if (altClone) {
+      gsap.set(el, { y: 0, scale: 1, autoAlpha: 1 })
+    } else {
+      // Entering page starts below the viewport at 0.85 scale.
+      gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
+    }
 
     const done = () => {
-      // Remove transitioning class then immediately pin header to autoAlpha:0
-      // via GSAP so the incoming header doesn't snap visible before fade-in.
       document.documentElement.classList.remove('page-transitioning')
+
       const realHeader = document.querySelector('.header')
-      if (realHeader) gsap.set(realHeader, { autoAlpha: 0, y: -20 })
-      
-      const isHomePage = location.pathname === '/'
-
-      applyCompactLogoState()
-      gsap.set('.compact-logo', { clearProps: 'all' })
-
-      if (isHomePage) {
-        document.documentElement.classList.remove('compact-logo-active')
-        animateHomeLogoIn()
+      if (shouldManageLiveHeader && realHeader) {
+        gsap.set(realHeader, { autoAlpha: 0, y: -20 })
       }
 
+      if (!isHomePage) {
+        // Keep non-home pages in compact logo state so direct loads and routed
+        // navigations land with the same logo geometry.
+        applyCompactLogoState()
+        gsap.set('.compact-logo', { clearProps: 'all' })
+      }
+
+      altClone?.remove()
       wrapper.remove()
-      document.documentElement.style.overflowX = ''
 
       // Apply the correct nav/logo colour theme for the INCOMING page before
       // fading the header in. dataset.pageBg has now been updated by
@@ -409,25 +500,217 @@ export default function TransitionFrame({ children }) {
       requestAnimationFrame(() => ScrollTrigger.refresh())
       window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT))
 
-      // Slide the incoming header in from above. clearProps:'all' removes all
-      // GSAP inline styles afterwards so CSS fully owns the element.
       if (realHeader) {
-        gsap.to(realHeader, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out', clearProps: 'all' })
+        if (shouldManageLiveHeader) {
+          gsap.to(realHeader, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+            clearProps: 'all',
+          })
+        } else {
+          gsap.set(realHeader, { clearProps: 'all' })
+        }
       }
     }
 
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
 
-    tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
-    tl.to(wrapper, { y: -window.innerHeight * 1.5, duration: 1, ease: 'power4.in' }, 0.1)
-    tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
-    tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
+    if (altClone) {
+      const altCloneImg = altClone.querySelector('img')
+      const resolveDockImage = () => document.querySelector('.featured-image picture img')
+      const getDockImageScale = () => {
+        const dockImg = resolveDockImage()
+        if (!dockImg) return 1
+
+        const transform = getComputedStyle(dockImg).transform
+        if (!transform || transform === 'none') return 1
+
+        const matrix3dMatch = transform.match(/^matrix3d\((.+)\)$/)
+        if (matrix3dMatch) {
+          const values = matrix3dMatch[1].split(',').map((v) => Number.parseFloat(v.trim()))
+          const sx = values[0]
+          return Number.isFinite(sx) && sx > 0 ? sx : 1
+        }
+
+        const matrixMatch = transform.match(/^matrix\((.+)\)$/)
+        if (matrixMatch) {
+          const values = matrixMatch[1].split(',').map((v) => Number.parseFloat(v.trim()))
+          const sx = values[0]
+          return Number.isFinite(sx) && sx > 0 ? sx : 1
+        }
+
+        return 1
+      }
+      const dock = getDockRect()
+      const hasTargetAtStart = Boolean(dock)
+      const smoothEase = 'power3.inOut'
+      const expandDuration = 0.75
+      const pauseDuration = 0.15
+      const dockDuration = 1.5
+      const dockStart = expandDuration + pauseDuration
+
+      const crossfadeToTarget = (target) => {
+        gsap.set(target, { autoAlpha: 1 })
+        gsap.to(altClone, {
+          autoAlpha: 0,
+          delay: 0.1,
+          duration: 0.42,
+          ease: 'power4.in',
+        })
+      }
+
+      tl.to(altClone, {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        borderRadius: 0,
+        duration: expandDuration,
+        ease: smoothEase,
+      }, 0)
+
+      // Hold the full-screen state briefly before docking back down.
+      tl.to({}, { duration: pauseDuration }, expandDuration)
+
+      if (dock) {
+        const dockImageScale = getDockImageScale()
+        const peakImageScale = Math.max(dockImageScale + 0.08, 1.12)
+
+        if (altCloneImg) {
+          const dockImg = resolveDockImage()
+          if (dockImg) {
+            const dockImgStyle = getComputedStyle(dockImg)
+            altCloneImg.style.objectFit = dockImgStyle.objectFit
+            altCloneImg.style.objectPosition = dockImgStyle.objectPosition
+          }
+
+          tl.to(altCloneImg, {
+            scale: peakImageScale,
+            transformOrigin: '50% 50%',
+            duration: expandDuration,
+            ease: smoothEase,
+          }, 0)
+
+          tl.to(altCloneImg, {
+            scale: dockImageScale,
+            transformOrigin: '50% 50%',
+            duration: dockDuration,
+            ease: smoothEase,
+          }, dockStart)
+        }
+
+        tl.to(altClone, {
+          top: dock.rect.top,
+          left: dock.rect.left,
+          width: dock.rect.width,
+          height: dock.rect.height,
+          
+          borderRadius: getComputedStyle(dock.target).borderRadius || altTransition.borderRadius,
+          duration: dockDuration,
+          ease: smoothEase,
+          onComplete: () => {
+            const finalDock = getDockRect()
+            if (!finalDock) {
+              crossfadeToTarget(dock.target)
+              return
+            }
+
+            gsap.set(altClone, {
+              top: finalDock.rect.top,
+              left: finalDock.rect.left,
+              width: finalDock.rect.width,
+              height: finalDock.rect.height,
+              borderRadius: getComputedStyle(finalDock.target).borderRadius || altTransition.borderRadius,
+            })
+            crossfadeToTarget(finalDock.target)
+          },
+        }, dockStart)
+      }
+
+      tl.to(wrapper, {
+        autoAlpha: 0,
+        duration: 0.3,
+        ease: 'power4.out',
+      }, hasTargetAtStart ? dockStart + dockDuration - 0.12 : dockStart)
+
+      if (!hasTargetAtStart) {
+        tl.to({}, { duration: (ALT_DOCK_MAX_WAIT_MS + 900) / 1000 }, dockStart)
+
+        tl.add(() => {
+          const start = performance.now()
+          const poll = () => {
+            const lateDock = getDockRect()
+
+            if (lateDock) {
+              if (altCloneImg) {
+                const lateDockImg = resolveDockImage()
+                const lateDockImageScale = getDockImageScale()
+                const latePeakImageScale = Math.max(lateDockImageScale + 0.08, 1.12)
+                if (lateDockImg) {
+                  const lateDockImgStyle = getComputedStyle(lateDockImg)
+                  altCloneImg.style.objectFit = lateDockImgStyle.objectFit
+                  altCloneImg.style.objectPosition = lateDockImgStyle.objectPosition
+                }
+                gsap.to(altCloneImg, {
+                  scale: latePeakImageScale,
+                  transformOrigin: '50% 50%',
+                  duration: Math.max(0.25, expandDuration * 0.6),
+                  ease: smoothEase,
+                })
+                gsap.to(altCloneImg, {
+                  scale: lateDockImageScale,
+                  transformOrigin: '50% 50%',
+                  delay: Math.max(0.08, pauseDuration * 0.5),
+                  duration: dockDuration,
+                  ease: smoothEase,
+                })
+              }
+
+              gsap.to(altClone, {
+                top: lateDock.rect.top,
+                left: lateDock.rect.left,
+                width: lateDock.rect.width,
+                height: lateDock.rect.height,
+                borderRadius: getComputedStyle(lateDock.target).borderRadius || altTransition.borderRadius,
+                duration: dockDuration,
+                ease: smoothEase,
+                onComplete: () => {
+                  const finalLateDock = getDockRect() || lateDock
+                  gsap.set(altClone, {
+                    top: finalLateDock.rect.top,
+                    left: finalLateDock.rect.left,
+                    width: finalLateDock.rect.width,
+                    height: finalLateDock.rect.height,
+                    borderRadius: getComputedStyle(finalLateDock.target).borderRadius || altTransition.borderRadius,
+                  })
+                  crossfadeToTarget(finalLateDock.target)
+                },
+              })
+              return
+            }
+
+            if (performance.now() - start < ALT_DOCK_MAX_WAIT_MS) {
+              window.setTimeout(poll, ALT_DOCK_POLL_MS)
+            }
+          }
+
+          poll()
+        }, dockStart)
+      }
+    } else {
+      tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
+      tl.to(wrapper, { y: -window.innerHeight * 1.5, duration: 1, ease: 'power4.in' }, 0.1)
+      tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
+      tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
+    }
 
     return () => {
       tl.kill()
+      altClone?.remove()
       wrapper.remove()
       document.documentElement.classList.remove('page-transitioning')
-      document.documentElement.style.overflowX = ''
       const realHeader = document.querySelector('.header')
       if (realHeader) {
         gsap.killTweensOf(realHeader)
