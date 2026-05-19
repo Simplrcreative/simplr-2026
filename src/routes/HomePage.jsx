@@ -63,7 +63,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
 
   // Stage hero title/video while loader is active so they don't flash before intro animation.
   useLayoutEffect(() => {
-    if (!shouldRunHomeIntroAnimations || introComplete || homeIntroAnimationsPlayed) return
+     if (!shouldRunHomeIntroAnimations || introComplete || homeIntroAnimationsPlayed) return
     setIntroHeroInitialState(heroRef.current)
   }, [introComplete, shouldRunHomeIntroAnimations])
 

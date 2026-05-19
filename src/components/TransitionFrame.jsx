@@ -10,6 +10,7 @@ const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
 const DARK_PATHS = new Set(['/about', '/contact', '/est-2014'])
+const WORK_SINGLE_PATH_RE = /^\/work\/[^/]+\/?$/
 
 function resolveBgFromPath(pathname) {
   return DARK_PATHS.has(pathname) ? 'dark' : 'light'
@@ -19,6 +20,7 @@ export default function TransitionFrame({ children }) {
   const layoutRef = useRef(null)
   const ref = useRef(null)
   const snapshotRef = useRef(null)
+  const altTransitionRef = useRef(null)
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
   const capturedPageBgRef = useRef(null)
@@ -70,6 +72,28 @@ export default function TransitionFrame({ children }) {
     )
   }
 
+  function extractSameOriginLink(target) {
+    const link = target?.closest?.('a[href]')
+    if (!link) return null
+    const href = link.getAttribute('href')
+    if (!href || href.startsWith('#') || link.hasAttribute('download') || link.target === '_blank') return null
+    const url = new URL(link.href, window.location.href)
+    if (url.origin !== window.location.origin) return null
+    return { link, url }
+  }
+
+  function resolveAltTransitionSource(target, link) {
+    const directImageTrigger = target?.closest?.('.alt-transition-img')
+    if (directImageTrigger && directImageTrigger.closest('a[href]') === link) {
+      return directImageTrigger
+    }
+    const textTrigger = target?.closest?.('.alt-transition-text')
+    if (!textTrigger || textTrigger.closest('a[href]') !== link) return null
+    const relatedSlug = textTrigger.closest('.client-name')?.dataset?.client
+    if (!relatedSlug) return null
+    return document.getElementById(relatedSlug)?.querySelector('.alt-transition-img') ?? null
+  }
+
   // Capture the outgoing snapshot synchronously at the moment the user triggers
   // navigation — before React has any chance to re-render or batch state updates.
   // Using a click/popstate listener (rather than reacting to navState) avoids the
@@ -78,11 +102,31 @@ export default function TransitionFrame({ children }) {
   // The footer is appended to the clone so navigating from the footer area produces
   // a complete outgoing snapshot instead of a blank lower half.
   useEffect(() => {
-    const capture = () => {
+    const capture = (target = null) => {
       if (!ref.current) return
 
       capturedPageBgRef.current = document.documentElement.dataset.pageBg || null
       capturedPathRef.current = window.location.pathname || null
+
+      altTransitionRef.current = null
+      if (target) {
+        const nav = extractSameOriginLink(target)
+        const altSource = nav ? resolveAltTransitionSource(target, nav.link) : null
+        if (nav && altSource && WORK_SINGLE_PATH_RE.test(nav.url.pathname)) {
+          const rect = altSource.getBoundingClientRect()
+          if (rect.width > 0 && rect.height > 0) {
+            altTransitionRef.current = {
+              pathname: nav.url.pathname,
+              top: rect.top,
+              left: rect.left,
+              width: rect.width,
+              height: rect.height,
+              borderRadius: getComputedStyle(altSource).borderRadius,
+              clone: altSource.cloneNode(true),
+            }
+          }
+        }
+      }
 
       // --- Header clone ---
       const liveHeader = document.querySelector('.header')
@@ -194,30 +238,20 @@ export default function TransitionFrame({ children }) {
       snapshotRef.current = clone
     }
 
-    const canCaptureFromEventTarget = (target) => {
-      const link = target?.closest?.('a[href]')
-      if (!link) return false
-      const href = link.getAttribute('href')
-      if (!href || href.startsWith('#') || link.hasAttribute('download') || link.target === '_blank') return false
-
-      // Only capture for same-origin navigation.
-      const url = new URL(link.href, window.location.href)
-      return url.origin === window.location.origin
-    }
+    const canCaptureFromEventTarget = (target) => Boolean(extractSameOriginLink(target))
 
     const handlePointerDown = (e) => {
       // Only primary-button navigations; ignore modified clicks/new-tab gestures.
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       if (!canCaptureFromEventTarget(e.target)) return
-      capture()
+      capture(e.target)
     }
 
     const handleClick = (e) => {
       // Ignore modified clicks that open a new tab / window
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       if (!canCaptureFromEventTarget(e.target)) return
-
-      capture()
+      capture(e.target)
     }
 
     document.addEventListener('pointerdown', handlePointerDown, { capture: true })
