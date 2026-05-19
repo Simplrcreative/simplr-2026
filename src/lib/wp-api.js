@@ -668,7 +668,14 @@ export async function fetchWorkEntryData(slug) {
       throw new Response('Not found', { status: 404 })
     }
 
-    return { work }
+    const sizes = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mediaDetails?.sizes ?? []
+    const thumbnail = (
+      sizes.find((s) => s.name === 'large')
+      || sizes.find((s) => s.name === 'full')
+      || sizes[0]
+    )?.sourceUrl ?? ''
+
+    return { work: { ...work, thumbnail } }
   } catch (error) {
     if (error instanceof Response) throw error
     reportError(`Unable to load work entry for ${slug}`, error)

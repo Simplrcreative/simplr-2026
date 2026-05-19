@@ -73,8 +73,8 @@
 }
 .client-work-img:hover,
 .client-work-img.hover-active {
-    transform: scaleX(1.05);
-    transition: transform 0.3s ease-out
+    /*transform: scaleX(1.05);
+    transition: transform 0.3s ease-out*/
 }
 .client-work-img picture {
     transform-origin: center right!important;
@@ -82,8 +82,8 @@
 }
 .client-work-img:hover picture,
 .client-work-img.hover-active picture {
-    transform: scaleY(1.05)!important;
-    transition: transform 0.3s ease-out
+    /*transform: scaleY(1.05)!important;
+    transition: transform 0.3s ease-out*/
 }
 
 /* --- TESTIMONIALS --- */

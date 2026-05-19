@@ -105,8 +105,8 @@ export function createFooterAnimation(scope) {
       scrollTrigger: {
         id: 'footer-logo-reset',
         trigger: footer,
-        start: 'top 70%',
-        end: 'top 30%',
+        start: 'top 80%',
+        end: 'top 50%',
         //markers: true,
         scrub: true,
         invalidateOnRefresh: true,

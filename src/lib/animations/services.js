@@ -7,7 +7,7 @@ const FIRST_TITLE_TRIGGER_LEFT_RATIO = 0.666
 const DEFAULT_TITLE_TRIGGER_LEFT_RATIO = 0.333
 const getTitleTriggerLeft = (index) =>
   window.innerWidth * (index === 0 ? FIRST_TITLE_TRIGGER_LEFT_RATIO : DEFAULT_TITLE_TRIGGER_LEFT_RATIO)
-const INACTIVE_TITLE_OPACITY = 0.3
+const INACTIVE_TITLE_OPACITY = 0.75
 const ACTIVE_TITLE_OPACITY = 1
 
 let pluginsRegistered = false
@@ -98,12 +98,14 @@ export function createServicesScrollAnimation(scope) {
 
       gsap.to(serviceTitles, {
         opacity: INACTIVE_TITLE_OPACITY,
+        textDecorationColor: 'transparent',
         duration: 0.3
       })
 
       if (activeTitle) {
         gsap.to(activeTitle, {
           opacity: ACTIVE_TITLE_OPACITY,
+          textDecorationColor: '#000',
           duration: 0.5
         })
       }

@@ -1,6 +1,12 @@
 /* --- SERVICES --- */
 .services-title {
-    opacity: 0.3;
+    /*opacity: 0.3;*/
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: auto;
+    text-underline-offset: auto;
+    text-decoration-skip-ink: auto;
+    transition: opacity 0.3s ease, text-decoration-color 0.3s ease;
 }
 
 /* --- SERVICE CARDS --- */
