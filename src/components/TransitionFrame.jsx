@@ -279,6 +279,10 @@ export default function TransitionFrame({ children }) {
 
     snapshotRef.current = null
 
+    const altData = altTransitionRef.current
+    altTransitionRef.current = null
+    let altCloneEl = null
+
     // Child layout effects run before parent (React bottom-up order), so at
     // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
     // the OUTGOING page's value. Use it to colour the overlay background.
@@ -345,6 +349,26 @@ export default function TransitionFrame({ children }) {
     wrapper.appendChild(content)
     document.body.appendChild(wrapper)
 
+    // --- Alt transition clone (image expands to fullscreen → docks to .featured-image) ---
+    if (altData && altData.pathname === location.pathname) {
+      const { top, left, width, height, borderRadius, clone } = altData
+      Object.assign(clone.style, {
+        position: 'fixed',
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        borderRadius,
+        overflow: 'hidden',
+        zIndex: '10001',
+        pointerEvents: 'none',
+        margin: '0',
+        padding: '0',
+      })
+      document.body.appendChild(clone)
+      altCloneEl = clone
+    }
+
     // --- Compact-logo clone (icon-only logo state) ---
     // Animate the compact-logo out when it was the active logo at capture time.
     const compactLogoClone = compactLogoSnapshotRef.current
@@ -401,8 +425,13 @@ export default function TransitionFrame({ children }) {
     // Suppress scrollbar flash while content is translated off-screen.
     document.documentElement.style.overflowX = 'hidden'
 
-    // Entering page starts below the viewport at 0.85 scale.
-    gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
+    // Alt transitions keep the incoming page at its natural position (the clone
+    // covers it). Standard transitions start the page below the viewport.
+    if (altCloneEl) {
+      gsap.set(el, { y: 0, scale: 1, autoAlpha: 1 })
+    } else {
+      gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
+    }
 
     const done = () => {
       // Remove transitioning class then immediately pin header to autoAlpha:0
@@ -452,14 +481,122 @@ export default function TransitionFrame({ children }) {
 
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
 
-    tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
-    tl.to(wrapper, { y: -window.innerHeight * 1.5, duration: 1, ease: 'power4.in' }, 0.1)
-    tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
-    tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
+    if (altCloneEl) {
+      // --- Alt transition: thumbnail expands → fullscreen → docks to .featured-image ---
+      const getDockRect = () => {
+        for (const selector of ['.featured-image picture', '.featured-image .ratio', '.featured-image']) {
+          const target = el.querySelector(selector)
+          if (!target) continue
+          const rect = target.getBoundingClientRect()
+          if (rect.width > 0 && rect.height > 0) return { target, rect }
+        }
+        return null
+      }
+
+      const crossfadeToTarget = (target) => {
+        gsap.set(target, { autoAlpha: 1 })
+        gsap.to(altCloneEl, {
+          autoAlpha: 0,
+          delay: 0.1,
+          duration: 0.42,
+          ease: 'power4.in',
+          onComplete: () => { altCloneEl?.remove(); altCloneEl = null },
+        })
+      }
+
+      const altCloneImg = altCloneEl.querySelector('img')
+      const smoothEase = 'power3.inOut'
+      const expandDuration = 0.75
+      const pauseDuration = 0.15
+      const dockDuration = 1.5
+      const dockStart = expandDuration + pauseDuration
+      const dock = getDockRect()
+
+      // 1. Expand clone from thumbnail position to fullscreen
+      tl.to(altCloneEl, {
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        borderRadius: 0,
+        duration: expandDuration,
+        ease: smoothEase,
+      }, 0)
+
+      // 2. Brief hold at fullscreen before docking
+      tl.to({}, { duration: pauseDuration }, expandDuration)
+
+      if (dock) {
+        // Image zooms in slightly during expand, then settles during dock
+        if (altCloneImg) {
+          tl.to(altCloneImg, {
+            scale: 1.12,
+            transformOrigin: '50% 50%',
+            duration: expandDuration,
+            ease: smoothEase,
+          }, 0)
+          tl.to(altCloneImg, {
+            scale: 1,
+            transformOrigin: '50% 50%',
+            duration: dockDuration,
+            ease: smoothEase,
+          }, dockStart)
+        }
+
+        // 3. Dock clone from fullscreen into .featured-image position, then crossfade
+        tl.to(altCloneEl, {
+          top: dock.rect.top,
+          left: dock.rect.left,
+          width: dock.rect.width,
+          height: dock.rect.height,
+          borderRadius: getComputedStyle(dock.target).borderRadius || altData.borderRadius,
+          duration: dockDuration,
+          ease: smoothEase,
+          onComplete: () => {
+            // Re-read rect in case layout shifted during the animation
+            const finalDock = getDockRect()
+            if (finalDock) {
+              gsap.set(altCloneEl, {
+                top: finalDock.rect.top,
+                left: finalDock.rect.left,
+                width: finalDock.rect.width,
+                height: finalDock.rect.height,
+                borderRadius: getComputedStyle(finalDock.target).borderRadius || altData.borderRadius,
+              })
+              crossfadeToTarget(finalDock.target)
+            } else {
+              crossfadeToTarget(dock.target)
+            }
+          },
+        }, dockStart)
+      } else {
+        // No dock target found — fade clone out gracefully
+        tl.to(altCloneEl, { autoAlpha: 0, duration: 0.5, ease: 'power4.in' }, dockStart)
+      }
+
+      // 4. Fade the snapshot wrapper out as the clone finishes docking
+      tl.to(wrapper, {
+        autoAlpha: 0,
+        duration: 0.3,
+        ease: 'power4.out',
+      }, dock ? dockStart + dockDuration - 0.12 : dockStart)
+
+    } else {
+      // --- Standard slide transition ---
+      tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
+      tl.to(wrapper, { y: -window.innerHeight * 1.5, duration: 1, ease: 'power4.in' }, 0.1)
+      tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
+      tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
+    }
 
     return () => {
       tl.kill()
       wrapper.remove()
+      if (altCloneEl) {
+        gsap.killTweensOf(altCloneEl)
+        altCloneEl.remove()
+        altCloneEl = null
+      }
       document.documentElement.classList.remove('page-transitioning')
       document.documentElement.style.overflowX = ''
       const realHeader = document.querySelector('.header')

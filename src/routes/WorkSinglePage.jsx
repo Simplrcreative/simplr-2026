@@ -23,7 +23,14 @@ export default function WorkSinglePage() {
           </div>
           <div className="col-start-8 col-span-5">
             <div className="featured-image">
-              client-work-img rests here
+              {work?.thumbnail && (
+                <picture
+                  className="ratio overflow-hidden rounded-[10px]"
+                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                >
+                  <img src={work.thumbnail} alt={work.title} />
+                </picture>
+              )}
             </div>
           </div>
         </div>
