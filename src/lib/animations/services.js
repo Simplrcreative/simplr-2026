@@ -3,7 +3,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const SERVICES_PIN_TOP = 95
 const SERVICES_ENTRY_START = 'top bottom'
-const getTitleTriggerLeft = () => window.innerWidth * 0.333
+const FIRST_TITLE_TRIGGER_LEFT_RATIO = 0.666
+const DEFAULT_TITLE_TRIGGER_LEFT_RATIO = 0.333
+const getTitleTriggerLeft = (index) =>
+  window.innerWidth * (index === 0 ? FIRST_TITLE_TRIGGER_LEFT_RATIO : DEFAULT_TITLE_TRIGGER_LEFT_RATIO)
 const INACTIVE_TITLE_OPACITY = 0.3
 const ACTIVE_TITLE_OPACITY = 1
 
@@ -120,7 +123,7 @@ export function createServicesScrollAnimation(scope) {
       activeStatTween = gsap.to(counter, {
         value: targetValue,
         duration:1,
-        ease: 'power4.inOut',
+        ease: 'power2.out',
         onUpdate: () => {
           statNo.textContent = formatStatValue(counter.value)
         },
@@ -186,10 +189,11 @@ export function createServicesScrollAnimation(scope) {
       let currentTitle = null
       let closestLeft = -Infinity
 
-      for (const title of serviceTitles) {
+      for (const [index, title] of serviceTitles.entries()) {
         const bounds = title.getBoundingClientRect()
+        const triggerLeft = getTitleTriggerLeft(index)
 
-        if (bounds.left > getTitleTriggerLeft()) {
+        if (bounds.left > triggerLeft) {
           continue
         }
 

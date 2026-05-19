@@ -3,6 +3,7 @@ import { useLoaderData, useOutletContext, Await } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
 import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState } from '../lib/animations/index.js'
+import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
   collectionSchema,
@@ -11,12 +12,7 @@ import {
   webPageSchema,
 } from '../lib/seo.js'
 import heroVideo from '../assets/vid/simplr-showreel-loop.mp4'
-import caseStudyOne from '../assets/img/case-study-example-1.jpg'
 import caseStudyTwo from '../assets/img/case-study-example-2.jpg'
-import caseStudyThree from '../assets/img/case-study-example-3.jpg'
-import caseStudyFour from '../assets/img/case-study-example-4.jpg'
-import caseStudyFive from '../assets/img/case-study-example-5.jpg'
-import caseStudySix from '../assets/img/case-study-example-6.jpg'
 import { Link } from 'react-router-dom'
 const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 
@@ -24,7 +20,24 @@ let homeIntroAnimationsPlayed = false
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
 
-function HomePageContent({ page, featuredWork }) {
+const LIGHT_TEXT_SLUGS = new Set(['strategy', 'web-design-development'])
+
+function slugify(name = '') {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
+function CategoryBadge({ name }) {
+  const slug = slugify(name)
+  const textClass = LIGHT_TEXT_SLUGS.has(slug) ? 'text-coffee' : 'text-white'
+
+  return (
+    <div className={`category bg-${slug} ${textClass} leading-none font-medium rounded-full`}>
+      {name}
+    </div>
+  )
+}
+
+function HomePageContent({ page, featuredWork, caseStudies = [] }) {
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
   const servicesRef = useRef(null)
@@ -265,115 +278,54 @@ function HomePageContent({ page, featuredWork }) {
         
           <div className="grid grid-cols-12 items-emd slide-up pt-10">
             <div className="col-start-1 col-span-5 client-name-list text-white flex flex-col justify-center">
+              {caseStudies.map((study) => {
+                const path = buildEntryPath('work', study.slug)
 
-              <div data-client="satalia" className="client-name max-w-[55ch]">
-                <div className="text-xl">Satalia</div>
-                <div className="client-detail font-literata text-5xl font-light pb-3">The client detail goes here</div>
-              </div>
-
-              <div data-client="choreograph" className="client-name max-w-[55ch]">
-                <div className="text-xl">Choreograph</div>
-                <div className="client-detail font-literata text-5xl font-light pb-3">Fueling growth for the best brands and biggest agencies</div>
-              </div>
-
-              <div data-client="gain-theory" className="client-name max-w-[55ch]">
-                <div className="text-xl">Gain Theory</div>
-                <div className="client-detail font-literata text-5xl font-light pb-3">The client detail goes here</div>
-              </div>
-
-              <div data-client="cecilias-farm" className="client-name max-w-[55ch]">
-                <div className="text-xl">Cecilia&apos;s Farm</div>
-                <div className="client-detail font-literata text-5xl font-light pb-3">The client detail goes here</div>
-              </div>
-
-              <div data-client="hazendal" className="client-name max-w-[55ch]">
-                <div className="text-xl">Hazendal</div>
-                <div className="client-detail font-literata text-5xl font-light pb-3">The client detail goes here</div>
-              </div>
-
-              <div data-client="fairtree" className="client-name max-w-[55ch]">
-                <div className="text-xl">Fairtree</div>
-                <div className="client-detail font-literata text-5xl font-light pb-3">The client detail goes here</div>
-              </div>
+                return (
+                  <div
+                    key={`name-${study.id}`}
+                    data-client={study.slug}
+                    className="client-name max-w-[55ch]"
+                  >
+                    <Link 
+                      to={path} 
+                      className="text-xl inline-block alt-transition-text"
+                    >
+                      {study.client}
+                      <div className="client-detail font-literata text-5xl font-light pb-3">
+                        <span className="client-detail-text">{study.detail}</span>
+                      </div>
+                    </Link>
+                  </div>
+                )
+              })}
 
             </div>
 
-            <div className="col-start-8 col-span-5 client-work-list min-h-screen overflow-y-hidden rounded-[10px] flex flex-col justify-center">
+            <div className="col-start-8 col-span-5 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
+              {caseStudies.map((study) => {
+                const path = buildEntryPath('work', study.slug)
 
-              <div id="satalia" className="client-work">
-                <div className="client-work-img overflow-hidden rounded-[10px]">
-                  <picture className="ratio overflow-hidden" >
-                    <img src={caseStudyOne} title="Satalia" />
-                  </picture>
-                </div>
-                <div className="categories mt-5 flex">
-                  <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
-                  <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                  <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
-                </div>
-              </div>
-
-              <div id="choreograph" className="client-work">
-                <div className="client-work-img overflow-hidden rounded-[10px]">
-                  <picture className="ratio overflow-hidden" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={caseStudyTwo} title="Choreograph" />
-                  </picture>
-                </div>
-                <div className="categories mt-5 flex">
-                  <div className="category bg-strategy text-text-coffee leading-none font-medium rounded-full">Strategy</div>
-                  <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                  <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
-                </div>
-              </div>
-
-              <div id="gain-theory" className="client-work">
-                <div className="client-work-img overflow-hidden rounded-[10px]">
-                  <picture className="ratio overflow-hidden" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={caseStudyThree} title="Gain Theory" />
-                  </picture>
-                </div>
-                <div className="categories mt-5 flex">
-                  <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
-                  <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
-                </div>
-              </div>
-
-              <div id="cecilias-farm" className="client-work">
-                <div className="client-work-img overflow-hidden rounded-[10px]">
-                  <picture className="ratio overflow-hidden" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={caseStudyFour} title="Gain Theory" />
-                  </picture>
-                </div>
-                <div className="categories mt-5 flex">
-                  <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
-                  <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                </div>
-              </div>
-
-              <div id="hazendal" className="client-work">
-                <div className="client-work-img overflow-hidden rounded-[10px]">
-                  <picture className="ratio overflow-hidden" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={caseStudyFive} title="Hazendal" />
-                  </picture>
-                </div>
-                <div className="categories mt-5 flex">
-                  <div className="category bg-strategy text-text-coffee leading-none font-medium rounded-full">Strategy</div>
-                  <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                  <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
-                </div>
-              </div>
-
-              <div id="fairtree" className="client-work">
-                <div className="client-work-img overflow-hidden rounded-[10px]">
-                  <picture className="ratio overflow-hidden" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={caseStudySix} title="Fairtree" />
-                  </picture>
-                </div>
-                <div className="categories mt-5 flex">
-                  <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
-                  <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                </div>
-              </div>
+                return (
+                  <div key={`work-${study.id}`} id={study.slug} className="client-work">
+                    <Link
+                      to={path}
+                      className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
+                    >
+                      <picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        {study.thumbnail ? <img src={study.thumbnail} title={study.client} /> : null}
+                      </picture>
+                    </Link>
+                    {study.categories?.length > 0 && (
+                      <div className="categories mt-5 flex">
+                        {study.categories.map(({ name }) => (
+                          <CategoryBadge key={`${study.id}-${name}`} name={name} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
 
             </div>
 
@@ -489,8 +441,8 @@ export default function HomePage() {
   return (
     <Suspense fallback={<section className="min-h-screen bg-white section-light" />}>
       <Await resolve={homeData}>
-        {({ page, featuredWork }) => (
-          <HomePageContent page={page} featuredWork={featuredWork} />
+        {({ page, featuredWork, caseStudies }) => (
+          <HomePageContent page={page} featuredWork={featuredWork} caseStudies={caseStudies} />
         )}
       </Await>
     </Suspense>

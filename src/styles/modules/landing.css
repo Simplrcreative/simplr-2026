@@ -51,15 +51,42 @@
     /*text-decoration: underline;*/
     line-height: 1.2;
     opacity: 0.5;
-    transition: opacity 0.3s ease;
-}
-.client-detail:hover {
-    text-decoration: underline;
+    text-decoration-line: underline;
+    text-decoration-color: transparent; /* underline exists, just invisible */
+    text-decoration-thickness: auto;
+    text-underline-offset: auto;
+    text-decoration-skip-ink: auto;
+    transition:
+        opacity 0.3s ease,
+        text-decoration-color 0.3s ease
+    }
+.client-detail:hover,
+.client-detail.hover-active {
+    text-decoration-color: currentColor;
 }
 .client-name.active .client-detail {
-  
     opacity: 1
 }
+.client-work-img {
+    transform-origin: bottom right;
+    transition: transform 0.6s ease-out
+}
+.client-work-img:hover,
+.client-work-img.hover-active {
+    transform: scaleX(1.05);
+    transition: transform 0.3s ease-out
+}
+.client-work-img picture {
+    transform-origin: center right!important;
+    transition: transform 0.6s ease-out
+}
+.client-work-img:hover picture,
+.client-work-img.hover-active picture {
+    transform: scaleY(1.05)!important;
+    transition: transform 0.3s ease-out
+}
+
+/* --- TESTIMONIALS --- */
 .quote {
     font-size: 3.125rem;
     font-weight: 300;

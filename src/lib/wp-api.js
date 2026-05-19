@@ -234,6 +234,76 @@ const postsQuery = `
   }
 `
 
+const homeCaseStudiesQuery = `
+  query HomePageQuery {
+    page(id: "5", idType: DATABASE_ID) {
+      acfHomeBuilder {
+        acfFeaturedCaseStudies {
+          acfClient {
+            nodes {
+              name
+            }
+          }
+          acfClientDetail
+          acfCaseStudy {
+            nodes {
+              slug
+              ... on AcfWork {
+                acfWorkBuilder {
+                  acfFeaturedThumbnail {
+                    node {
+                      sourceUrl
+                    }
+                  }
+                  acfCategory {
+                    nodes {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+function normaliseHomeCaseStudy(study, index) {
+  const caseStudy = study?.acfCaseStudy?.nodes?.[0]
+  const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
+  const slug = caseStudy?.slug || `case-study-${index + 1}`
+  //const sizes = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mediaDetails?.sizes ?? []
+  const thumbnail = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.sourceUrl || ''
+  const categories = caseStudy?.acfWorkBuilder?.acfCategory?.nodes ?? []
+
+  return {
+    id: slug,
+    slug,
+    client,
+    detail: study?.acfClientDetail || '',
+    thumbnail,
+    categories,
+  }
+}
+
+async function fetchHomeCaseStudiesData() {
+  if (!wpConfig.endpoint) {
+    return []
+  }
+
+  try {
+    const data = await remember('home:case-studies', () => graphQlRequest(homeCaseStudiesQuery))
+    const studies = data.page?.acfHomeBuilder?.acfFeaturedCaseStudies ?? []
+
+    return studies.map(normaliseHomeCaseStudy).filter((study) => study.slug)
+  } catch (error) {
+    reportError('Unable to load home featured case studies', error)
+    return []
+  }
+}
+
 function remember(key, producer) {
   if (!cache.has(key)) {
     cache.set(
@@ -467,14 +537,26 @@ export async function fetchNavigationData() {
   return buildNavigation()
 }
 
-export async function fetchHomeData() {  const [pagePayload, workPayload] = await Promise.all([
+export async function fetchHomeData() {
+  const [pagePayload, workPayload, homeCaseStudies] = await Promise.all([
     fetchPageData('home'),
     fetchCollectionData('work'),
+    fetchHomeCaseStudiesData(),
   ])
+
+  const fallbackCaseStudies = (workPayload.items || []).slice(0, 6).map((item, index) => ({
+    id: item.slug || `case-study-${index + 1}`,
+    slug: item.slug,
+    client: item.title,
+    detail: item.excerpt,
+    thumbnail: item.image?.sourceUrl || '',
+    categories: [],
+  }))
 
   return {
     ...pagePayload,
     featuredWork: (workPayload.items || []).slice(0, 3),
+    caseStudies: homeCaseStudies.length ? homeCaseStudies : fallbackCaseStudies,
   }
 }
 

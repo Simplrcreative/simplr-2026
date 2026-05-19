@@ -35,6 +35,7 @@ export function createCaseStudiesScrollAnimation(scope) {
     const clientWorks = Array.from(section.querySelectorAll('.client-work'))
     const clientDetails = clientNames.map((name) => name.querySelector('.client-detail'))
     const clientWorksById = new Map(clientWorks.map((work) => [work.id, work]))
+    const cleanupHoverListeners = []
 
     if (!clientNames.length) return undefined
 
@@ -85,6 +86,51 @@ export function createCaseStudiesScrollAnimation(scope) {
     })
 
     clientNames.forEach((name) => name.classList.remove('active'))
+
+    function setHoverStateByIndex(index, isHovered) {
+      const name = clientNames[index]
+      if (!name) return
+
+      const detail = clientDetails[index]
+      const work = clientWorksById.get(name.dataset.client)
+      const workImage = work?.querySelector('.client-work-img')
+
+      workImage?.classList.toggle('hover-active', isHovered)
+      detail?.classList.toggle('hover-active', isHovered)
+    }
+
+    // Keep hover states in sync between the left client list and right work images.
+    clientNames.forEach((name, index) => {
+      const handleNameEnter = () => setHoverStateByIndex(index, true)
+      const handleNameLeave = () => setHoverStateByIndex(index, false)
+
+      name.addEventListener('mouseenter', handleNameEnter)
+      name.addEventListener('mouseleave', handleNameLeave)
+
+      cleanupHoverListeners.push(() => {
+        name.removeEventListener('mouseenter', handleNameEnter)
+        name.removeEventListener('mouseleave', handleNameLeave)
+      })
+    })
+
+    clientWorks.forEach((work) => {
+      const workImage = work.querySelector('.client-work-img')
+      if (!workImage) return
+
+      const index = clientNames.findIndex((name) => name.dataset.client === work.id)
+      if (index < 0) return
+
+      const handleImageEnter = () => setHoverStateByIndex(index, true)
+      const handleImageLeave = () => setHoverStateByIndex(index, false)
+
+      workImage.addEventListener('mouseenter', handleImageEnter)
+      workImage.addEventListener('mouseleave', handleImageLeave)
+
+      cleanupHoverListeners.push(() => {
+        workImage.removeEventListener('mouseenter', handleImageEnter)
+        workImage.removeEventListener('mouseleave', handleImageLeave)
+      })
+    })
 
     function setActiveClient(index, direction = 1) {
       if (index === currentIndex) return
@@ -238,6 +284,12 @@ export function createCaseStudiesScrollAnimation(scope) {
     return () => {
       trigger.kill()
       ro?.disconnect()
+      cleanupHoverListeners.forEach((cleanup) => cleanup())
+      clientWorks.forEach((work) => {
+        const workImage = work.querySelector('.client-work-img')
+        workImage?.classList.remove('hover-active')
+      })
+      clientDetails.forEach((detail) => detail?.classList.remove('hover-active'))
     }
   })
 
