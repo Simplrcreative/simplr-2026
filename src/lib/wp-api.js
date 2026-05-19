@@ -194,6 +194,46 @@ const testimonialQuery = `
   }
 `
 
+const postsQuery = `
+  query PostQuery {
+    posts(first: 100, where: { status: PUBLISH }) {
+      nodes {
+        databaseId
+        slug
+        title(format: RENDERED)
+        date
+        acfClients {
+          nodes {
+            name
+          }
+        }
+        categories {
+          nodes {
+            name
+            link
+            slug
+          }
+        }
+        acfPostBuilder {
+          acfFeaturedImage {
+            node {
+                sourceUrl(size: LARGE)
+                altText
+                title
+                mediaDetails {
+                  sizes {
+                    name
+                    sourceUrl
+                  }
+                }
+              }
+            }
+        }
+      }
+    }
+  }
+`
+
 function remember(key, producer) {
   if (!cache.has(key)) {
     cache.set(
@@ -550,6 +590,82 @@ export async function fetchWorkEntryData(slug) {
   } catch (error) {
     if (error instanceof Response) throw error
     reportError(`Unable to load work entry for ${slug}`, error)
+    throw new Response('Not found', { status: 404 })
+  }
+}
+
+export async function fetchThinkingPostsData() {
+  if (!wpConfig.endpoint) {
+    return {
+      posts: fallbackCollections.thinking.map((item) => ({
+        databaseId: item.id,
+        slug: item.slug,
+        title: item.title,
+        date: item.date,
+        acfClients: { nodes: [] },
+        categories: { nodes: [] },
+        featuredImage: {
+          node: item.image
+            ? {
+                sourceUrl: item.image.sourceUrl,
+                altText: item.image.altText,
+                title: item.title,
+                mediaDetails: { sizes: [] },
+              }
+            : null,
+        },
+      })),
+    }
+  }
+
+  try {
+    const data = await remember('thinking-posts', () => graphQlRequest(postsQuery))
+    const posts = data.posts?.nodes ?? []
+
+    return { posts }
+  } catch (error) {
+    reportError('Unable to load thinking posts', error)
+
+    return {
+      posts: fallbackCollections.thinking.map((item) => ({
+        databaseId: item.id,
+        slug: item.slug,
+        title: item.title,
+        date: item.date,
+        acfClients: { nodes: [] },
+        categories: { nodes: [] },
+        featuredImage: {
+          node: item.image
+            ? {
+                sourceUrl: item.image.sourceUrl,
+                altText: item.image.altText,
+                title: item.title,
+                mediaDetails: { sizes: [] },
+              }
+            : null,
+        },
+      })),
+    }
+  }
+}
+
+export async function fetchThinkingEntryData(slug) {
+  if (!slug) {
+    throw new Response('Not found', { status: 404 })
+  }
+
+  try {
+    const { posts } = await fetchThinkingPostsData()
+    const post = posts.find((p) => p.slug === slug) ?? null
+
+    if (!post) {
+      throw new Response('Not found', { status: 404 })
+    }
+
+    return { slug, page: post }
+  } catch (error) {
+    if (error instanceof Response) throw error
+    reportError(`Unable to load thinking entry for ${slug}`, error)
     throw new Response('Not found', { status: 404 })
   }
 }

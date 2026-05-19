@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState, lazy, Suspense } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 'react'
 import { useLoaderData, useOutletContext, Await } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation } from '../lib/animations/index.js'
-import { createSurfaceColorTransitions } from '../lib/animations/transitions.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState } from '../lib/animations/index.js'
 import {
   breadcrumbSchema,
   collectionSchema,
@@ -21,6 +20,10 @@ import caseStudySix from '../assets/img/case-study-example-6.jpg'
 import { Link } from 'react-router-dom'
 const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 
+let homeIntroAnimationsPlayed = false
+const HOME_SCROLL_INIT_DELAY_MS = 200
+const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
+
 function HomePageContent({ page, featuredWork }) {
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
@@ -30,7 +33,10 @@ function HomePageContent({ page, featuredWork }) {
   const btnRef = useRef(null)
   const faqSliderRef = useRef(null)
   const faqButtonRefs = useRef([])
-  const { introComplete = false } = useOutletContext() || {}
+  const {
+    introComplete = false,
+    shouldRunHomeIntroAnimations = false,
+  } = useOutletContext() || {}
   const faqs = page.faqs ?? []
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(0)
@@ -42,22 +48,43 @@ function HomePageContent({ page, featuredWork }) {
     return createSurfaceColorTransitions(document.documentElement)
   }, [])
 
+  // Stage hero title/video while loader is active so they don't flash before intro animation.
+  useLayoutEffect(() => {
+    if (!shouldRunHomeIntroAnimations || introComplete || homeIntroAnimationsPlayed) return
+    setIntroHeroInitialState(heroRef.current)
+  }, [introComplete, shouldRunHomeIntroAnimations])
+
   // Run animations only after the intro loader has finished
   useEffect(() => {
     if (!introComplete) return
     let destroyHeroAnimation = () => {}
+    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !homeIntroAnimationsPlayed
     const timer = setTimeout(() => {
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
       createServicesScrollAnimation(servicesRef.current)
       createCaseStudiesScrollAnimation(caseStudiesRef.current)
       createClientsScrollAnimation(clientsRef.current)
       createBtnHoverAnimation(btnRef.current)
-    }, 200)
+    }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
     return () => {
       clearTimeout(timer)
       destroyHeroAnimation()
     }
-  }, [introComplete])
+  }, [introComplete, shouldRunHomeIntroAnimations])
+
+  // Run hero entrance animations exactly once after the intro sequence.
+  useEffect(() => {
+    if (!introComplete || !shouldRunHomeIntroAnimations || homeIntroAnimationsPlayed) return
+
+    const destroyHeroTitleIntro = createIntroHeroTitleAnimation(heroRef.current)
+    const destroyVideoIntro = createIntroVideoAnimation(heroRef.current)
+    homeIntroAnimationsPlayed = true
+
+    return () => {
+      destroyHeroTitleIntro?.()
+      destroyVideoIntro?.()
+    }
+  }, [introComplete, shouldRunHomeIntroAnimations])
 
   // SplitText animations — wait for intro to complete
   useEffect(() => {
@@ -68,9 +95,13 @@ function HomePageContent({ page, featuredWork }) {
   // Refresh scroll triggers after animations initialize
   useEffect(() => {
     if (!introComplete) return
-    const timer = setTimeout(() => refreshScrollTriggers(), 250)
+    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !homeIntroAnimationsPlayed
+    const timer = setTimeout(
+      () => refreshScrollTriggers(),
+      shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS + 200 : 250,
+    )
     return () => clearTimeout(timer)
-  }, [introComplete])
+  }, [introComplete, shouldRunHomeIntroAnimations])
 
   // Video pause/play on visibility change
   useEffect(() => {
@@ -456,7 +487,7 @@ function HomePageContent({ page, featuredWork }) {
 export default function HomePage() {
   const { homeData } = useLoaderData()
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<section className="min-h-screen bg-white section-light" />}>
       <Await resolve={homeData}>
         {({ page, featuredWork }) => (
           <HomePageContent page={page} featuredWork={featuredWork} />

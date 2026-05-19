@@ -1,4 +1,4 @@
-import { fetchHomeData, fetchNavigationData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
+import { fetchHomeData, fetchNavigationData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -63,11 +63,13 @@ export function createServicesSinglePageLoader() {
 
 export function createThinkingPageLoader() {
   return async function ThinkingPageLoader() {
+    return fetchThinkingPostsData()
   }
 }
 
 export function createThinkingSinglePageLoader() {
-  return async function ThinkingSinglePageLoader() {
+  return async function ThinkingSinglePageLoader({ params }) {
+    return fetchThinkingEntryData(params.slug)
   }
 }
 

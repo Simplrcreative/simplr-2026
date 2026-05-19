@@ -7,6 +7,12 @@ import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
 import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
 
+const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
+
+function requestTransitionCapture() {
+  window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_EVENT))
+}
+
 function setNavLinkPointer(target, clientX, clientY) {
   const bounds = target.getBoundingClientRect()
   const pointerX = clientX ?? bounds.left + bounds.width / 2
@@ -43,7 +49,12 @@ function NavLinkLabel({ label, count, inverted = false }) {
 }
 
 function handleTransitionLinkClick(event) {
+  requestTransitionCapture()
   hideNavLinkOrb(event)
+}
+
+function handleFooterTransitionLinkClick() {
+  requestTransitionCapture()
 }
 
 export default function RootLayout() {
@@ -57,6 +68,7 @@ export default function RootLayout() {
   const [isIntroVisible, setIsIntroVisible] = useState(true)
   const [introComplete, setIntroComplete] = useState(false)
   const [shouldFadeOutIntro, setShouldFadeOutIntro] = useState(false)
+  const [shouldRunHomeIntroAnimations, setShouldRunHomeIntroAnimations] = useState(false)
   const navigationState = useNavigation().state
   const deferredNavigationState = useDeferredValue(navigationState)
   const isNavigating = deferredNavigationState !== 'idle'
@@ -68,8 +80,24 @@ export default function RootLayout() {
     if (!isHomePage) {
       setIsIntroVisible(false)
       setShouldFadeOutIntro(false)
+      setShouldRunHomeIntroAnimations(false)
     }
   }, [isHomePage])
+
+  // Latch whether the current Home visit actually includes the intro overlay flow.
+  useEffect(() => {
+    if (isHomePage && isIntroVisible) {
+      setShouldRunHomeIntroAnimations(true)
+    }
+  }, [isHomePage, isIntroVisible])
+
+  // When landing on Home from a non-home start, there is no intro overlay.
+  // Mark intro as complete so HomePage animation effects can initialize.
+  useEffect(() => {
+    if (isHomePage && !isIntroVisible && !introComplete) {
+      setIntroComplete(true)
+    }
+  }, [isHomePage, isIntroVisible, introComplete])
 
   // Start 3-second minimum timer for intro, then dismiss
   useEffect(() => {
@@ -127,6 +155,18 @@ export default function RootLayout() {
       transformOrigin: 'left top',
       willChange: 'transform',
     })
+    if (isHomePage) {
+      gsap.set(layout?.querySelector('nav.main'), {
+        autoAlpha: 0,
+        y: -30,
+      })
+    } else {
+      gsap.set(layout?.querySelector('nav.main'), {
+        autoAlpha: 1,
+        y: 0,
+        clearProps: 'opacity,visibility,transform',
+      })
+    }
   }, [location.pathname, isHomePage])
 
   useEffect(() => {
@@ -160,6 +200,7 @@ export default function RootLayout() {
     // then hand off to the scroll animation.
     const logo = layoutRef.current?.querySelector('.logo')
     const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
+    const mainNav = layoutRef.current?.querySelectorAll('nav.main')
 
     const entranceTl = gsap.timeline({
       onComplete: () => {
@@ -174,6 +215,7 @@ export default function RootLayout() {
       { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
       0.15,
     )
+    entranceTl.to(mainNav, { y: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
 
     return () => {
       entranceTl.kill()
@@ -259,6 +301,7 @@ export default function RootLayout() {
                   key={item.key}
                   to={item.path}
                   className={navLinkClassName}
+                  onPointerDown={requestTransitionCapture}
                   onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
                   onPointerMove={showNavLinkOrb}
                   onPointerLeave={hideNavLinkOrb}
@@ -280,7 +323,7 @@ export default function RootLayout() {
 
       <main>
         <TransitionFrame>
-          <Outlet context={{ introComplete }} />
+          <Outlet context={{ introComplete, shouldRunHomeIntroAnimations }} />
         </TransitionFrame>
       </main>
 
@@ -296,6 +339,8 @@ export default function RootLayout() {
                 to="contact"
                 ref={btnRef}
                 className="btn relative mt-10"
+                onPointerDown={requestTransitionCapture}
+                onClick={handleFooterTransitionLinkClick}
               >
                 <span className="btn-fill" aria-hidden="true" />
                 <span className="btn-inner">
@@ -309,7 +354,13 @@ export default function RootLayout() {
             <div className="flex flex-col items-end gap-6 pt-[0.875rem] text-right text-coffee">
               <nav className="flex flex-wrap justify-end gap-x-8 gap-y-3 font-medium text-[1.375rem] leading-[0.875rem]">
                 {footerNavigation.map((item) => (
-                  <Link key={item.key} to={item.path} className="inline-flex items-start gap-[0.125rem] transition-opacity duration-200 hover:opacity-70">
+                  <Link
+                    key={item.key}
+                    to={item.path}
+                    className="inline-flex items-start gap-[0.125rem] transition-opacity duration-200 hover:opacity-70"
+                    onPointerDown={requestTransitionCapture}
+                    onClick={handleFooterTransitionLinkClick}
+                  >
                     <span>{item.label}</span>
                     {Number(item.count) > 0 ? <sup className="font-normal text-[0.75rem] leading-[0.875rem]">{item.count}</sup> : null}
                   </Link>

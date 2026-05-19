@@ -3,12 +3,17 @@ import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { siteConfig } from '../config/site.js'
-import { createSurfaceColorTransitions } from '../lib/animations/transitions.js'
-import { createSlideUpAnimations } from '../lib/animations/slide-up.js'
+import { createSurfaceColorTransitions, createSlideUpAnimations } from '../lib/animations/index.js'
 
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
+const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
+const DARK_PATHS = new Set(['/about', '/contact', '/est-2014'])
+
+function resolveBgFromPath(pathname) {
+  return DARK_PATHS.has(pathname) ? 'dark' : 'light'
+}
 
 export default function TransitionFrame({ children }) {
   const layoutRef = useRef(null)
@@ -16,6 +21,8 @@ export default function TransitionFrame({ children }) {
   const snapshotRef = useRef(null)
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
+  const capturedPageBgRef = useRef(null)
+  const capturedPathRef = useRef(null)
   const isFirstMount = useRef(true)
   // Separate ref so we can detect the first useEffect run independently of
   // useLayoutEffect (which runs before effects and would already have cleared isFirstMount).
@@ -73,6 +80,9 @@ export default function TransitionFrame({ children }) {
   useEffect(() => {
     const capture = () => {
       if (!ref.current) return
+
+      capturedPageBgRef.current = document.documentElement.dataset.pageBg || null
+      capturedPathRef.current = window.location.pathname || null
 
       // --- Header clone ---
       const liveHeader = document.querySelector('.header')
@@ -173,9 +183,13 @@ export default function TransitionFrame({ children }) {
         }
       })
 
-      const footerOff = document.querySelector('.footer-off')
+      const footerOffItems = Array.from(document.querySelectorAll('.footer-off')).filter(
+        (node) => !ref.current.contains(node),
+      )
       const footer = document.querySelector('footer')
-      if (footerOff) clone.appendChild(footerOff.cloneNode(true))
+      footerOffItems.forEach((item) => {
+        clone.appendChild(item.cloneNode(true))
+      })
       if (footer) clone.appendChild(footer.cloneNode(true))
       snapshotRef.current = clone
     }
@@ -208,10 +222,12 @@ export default function TransitionFrame({ children }) {
 
     document.addEventListener('pointerdown', handlePointerDown, { capture: true })
     document.addEventListener('click', handleClick, { capture: true })
+    window.addEventListener(PAGE_TRANSITION_CAPTURE_EVENT, capture)
     window.addEventListener('popstate', capture)
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown, { capture: true })
       document.removeEventListener('click', handleClick, { capture: true })
+      window.removeEventListener(PAGE_TRANSITION_CAPTURE_EVENT, capture)
       window.removeEventListener('popstate', capture)
     }
   }, [])
@@ -232,10 +248,17 @@ export default function TransitionFrame({ children }) {
     // Child layout effects run before parent (React bottom-up order), so at
     // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
     // the OUTGOING page's value. Use it to colour the overlay background.
-    const outgoingPageBg = document.documentElement.dataset.pageBg
+    const outgoingPageBg = capturedPageBgRef.current
+      || resolveBgFromPath(capturedPathRef.current || '')
+      || document.documentElement.dataset.pageBg
     const bgColor = outgoingPageBg === 'dark' ? COFFEE : WHITE
+    capturedPageBgRef.current = null
+    capturedPathRef.current = null
 
     const scrollY = window.scrollY
+    const snapshotHeight = snapshot.scrollHeight || snapshot.getBoundingClientRect().height || 0
+    const minSnapshotTop = Math.min(0, window.innerHeight - snapshotHeight)
+    const snapshotTop = Math.max(-scrollY, minSnapshotTop)
 
     // Two-layer overlay:
     //   wrapper  — full-screen, z-9999, overflow:hidden, solid background.
@@ -271,7 +294,7 @@ export default function TransitionFrame({ children }) {
     })
     Object.assign(snapshot.style, {
       position: 'absolute',
-      top: `${-scrollY}px`,
+      top: `${snapshotTop}px`,
       left: '0',
       width: '100%',
       pointerEvents: 'none',

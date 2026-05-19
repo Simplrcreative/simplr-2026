@@ -101,7 +101,7 @@ export function createBulletsAnimation(section) {
       //pin: true,
       //pinSpacing: true,
       //scrub: 2,
-      markers: true,
+      //markers: true,
     }
   })
 

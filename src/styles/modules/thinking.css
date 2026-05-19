@@ -1,0 +1,59 @@
+.posts-results {
+  will-change: transform, opacity;
+}
+
+.thinking-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8.75rem 1.125rem;
+}
+
+.thinking-post-card {
+  min-width: 0;
+}
+
+.thinking-post-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.thinking-post__image-frame {
+  height: clamp(13.75rem, 34vw, 32.8125rem);
+  overflow: hidden;
+  border-radius: 0.625rem;
+  background: #f0ecef;
+}
+
+.thinking-post__image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thinking-post__title {
+  font-family: var(--font-aeonik);
+  font-size: 1.125rem;
+  line-height: 1.55;
+  font-weight: 500;
+  color: var(--color-coffee);
+}
+
+@media (max-width: 1200px) {
+  .thinking-posts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4rem 1.125rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .thinking-posts-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.75rem;
+  }
+
+  .thinking-post__image-frame {
+    height: clamp(13.75rem, 56vw, 25rem);
+  }
+}

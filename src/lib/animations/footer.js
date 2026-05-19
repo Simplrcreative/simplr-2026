@@ -100,13 +100,14 @@ export function createFooterAnimation(scope) {
 
     const timeline = gsap.timeline({
       defaults: {
-        ease: 'none',
+        ease: 'power4.out',
       },
       scrollTrigger: {
         id: 'footer-logo-reset',
         trigger: footer,
         start: 'top 70%',
-        end: 'top 50%',
+        end: 'top 30%',
+        //markers: true,
         scrub: true,
         invalidateOnRefresh: true,
         refreshPriority: -30,
@@ -220,7 +221,7 @@ export function createFooterAnimation(scope) {
         filter: 'blur(0px)',
         autoAlpha: 1,
          stagger: {
-            each: 0.1,
+            each: 0.2,
             from: 'end',
             },
         duration: 1,
@@ -305,7 +306,7 @@ export function createFooterAnimation(scope) {
     const trigger = ScrollTrigger.create({
       id: 'footer-logo-reset-reduced',
       trigger: footer,
-      start: 'top 60%',
+      start: 'top 70%',
       end: 'bottom bottom',
       invalidateOnRefresh: true,
       refreshPriority: -30,
