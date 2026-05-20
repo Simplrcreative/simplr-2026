@@ -148,6 +148,13 @@ const worksQuery = `
               guid
             }
           }
+          acfIntroduction
+          acfSwag {
+            acfPreUnit
+            acfPostUnit
+            acfNumber
+            acfDetail
+          }
           acfSections {
             acfLayout
             acfAlignment
