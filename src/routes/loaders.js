@@ -1,4 +1,4 @@
-import { fetchHomeData, fetchNavigationData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
+import { fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -39,7 +39,14 @@ export function createWorkLoader() {
 
 export function createWorkSingleLoader() {
   return async function workEntryLoader({ params }) {
-    return fetchWorkEntryData(params.slug)
+    const result = await fetchWorkEntryData(params.slug)
+    const testimonialId = result.work?.acfWorkBuilder?.acfTestimonial?.nodes?.[0]?.databaseId
+    const [testimonial, nextWork] = await Promise.all([
+      testimonialId ? fetchTestimonialData(testimonialId) : Promise.resolve(null),
+      fetchNextWorkData(params.slug),
+    ])
+
+    return { ...result, testimonial, nextWork }
   }
 }
 

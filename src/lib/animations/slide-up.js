@@ -73,7 +73,8 @@ export function createSlideUpAnimations(scope) {
 
   const slideUpFromLeftTargets = Array.from(scope.querySelectorAll('.slide-up-from-left'))
   const slideUpTargets = Array.from(scope.querySelectorAll('.slide-up'))
-  const targets = [...slideUpFromLeftTargets, ...slideUpTargets]
+  const slideUpSubtleTargets = Array.from(scope.querySelectorAll('.slide-up-subtle'))
+  const targets = [...slideUpFromLeftTargets, ...slideUpTargets, ...slideUpSubtleTargets]
 
   if (!targets.length) {
     return () => undefined
@@ -98,6 +99,7 @@ export function createSlideUpAnimations(scope) {
           start: 'top 100%',
           end: 'top 50%',
           scrub: true,
+          stagger: 0.01,
           invalidateOnRefresh: true,
           refreshPriority: -15,
           //markers: true,
@@ -128,6 +130,19 @@ export function createSlideUpAnimations(scope) {
         },
         {
           y: 0,
+          duration: 1,
+          ease: 'none',
+        },
+      ),
+      ...createAnimations(
+        slideUpSubtleTargets,
+        {
+          y: 50,
+          autoAlpha: 0.2
+        },
+        {
+          y: 0,
+          autoAlpha: 1,
           duration: 1,
           ease: 'none',
         },

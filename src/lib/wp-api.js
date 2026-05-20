@@ -194,6 +194,7 @@ const worksQuery = `
 const testimonialQuery = `
   query TestimonialQuery($id: ID!) {
     acfTestimonial(id: $id, idType: DATABASE_ID) {
+      title
       acfClients {
         nodes {
           name
@@ -664,6 +665,36 @@ export async function fetchTestimonialData(databaseId) {
   } catch (error) {
     reportError(`Unable to load testimonial ${databaseId}`, error)
 
+    return null
+  }
+}
+
+export async function fetchNextWorkData(currentSlug) {
+  if (!wpConfig.endpoint) return null
+
+  try {
+    const { works } = await fetchWorksData()
+    const others = works.filter((w) => w.slug !== currentSlug)
+
+    if (!others.length) return null
+
+    const pick = others[Math.floor(Math.random() * others.length)]
+    const sizes = pick?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mediaDetails?.sizes ?? []
+    const thumbnail = (
+      sizes.find((s) => s.name === 'large')
+      || sizes.find((s) => s.name === 'full')
+      || sizes[0]
+    )?.sourceUrl ?? ''
+
+    return {
+      slug: pick.slug,
+      title: pick.title,
+      thumbnail,
+      client: pick.acfWorkBuilder?.acfClient?.nodes?.[0]?.name ?? '',
+      categories: pick.acfWorkBuilder?.acfCategory?.nodes ?? [],
+    }
+  } catch (error) {
+    reportError('Unable to load next work', error)
     return null
   }
 }

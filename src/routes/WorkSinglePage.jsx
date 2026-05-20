@@ -3,7 +3,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
-import { createSplitTextAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations } from '../lib/animations/index.js'
 
 
 export default function WorkSinglePage() {
@@ -16,8 +16,13 @@ export default function WorkSinglePage() {
   const introduction = work?.acfWorkBuilder?.acfIntroduction ?? []
   const swags = work?.acfWorkBuilder?.acfSwag ?? []
   const sections = work?.acfWorkBuilder?.acfSections || []
+  const testimonial = useLoaderData()?.testimonial ?? null
+  const nextWork = useLoaderData()?.nextWork ?? null
 
-  useEffect(() => { createSplitTextAnimation() }, [])
+  useEffect(() => {
+    createSplitTextAnimation()
+    createWorkImagesAnimation()
+  }, [])
 
   return (
     <>
@@ -58,7 +63,7 @@ export default function WorkSinglePage() {
 
       <section className="work-intro px-5 py-20">
         <div className="grid grid-cols-12">
-          <div className="work-types col-start-1 col-span-5">
+          <div className="work-types col-start-1 col-span-5 slide-up-subtle">
              {types.map(({ name }, index) => {
               const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
               return (
@@ -74,7 +79,7 @@ export default function WorkSinglePage() {
           <div className="col-start-8 col-span-5 trigger-split-text-coffee">
             <RichText html={introduction} className="split-text-coffee"/>
             {swags && (
-              <div className="swags mt-20">
+              <div className="swags my-20">
               {swags.map((swag, index) => {
                 const preUnit = swag.acfPreUnit ?? ''
                 const postUnit = swag.acfPostUnit ?? ''
@@ -84,11 +89,11 @@ export default function WorkSinglePage() {
                 return (
                   <div 
                     key={`swag-${index}`}
-                    className="swag flex gap-[1.875rem]"
+                    className="swag flex slide-up-subtle"
                   >
                     <div className="flex items-start">
                       {preUnit && (
-                        <span className="swag-unit">{preUnit}</span>
+                        <span className="swag-unit pre">{preUnit}</span>
                       )}
                       {number && (
                         <span className="swag-number">{number}</span>
@@ -134,8 +139,8 @@ export default function WorkSinglePage() {
           <section key={`section-${index}`} className="work-content px-5 pb-5">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
-                <div className="col-span-12 section-light pt-18 pb-20 trigger-split-text-coffee">
-                  <RichText html={content} className="text-only-section split-text-coffee" />
+                <div className="col-start-2 col-span-10 section-light pt-18 pb-20 trigger-split-text-coffee">
+                  <RichText html={content} className="text-only-section split-text-coffee text-center" />
                 </div>
               )}
               {layout === 'Image & Text' && (
@@ -175,6 +180,66 @@ export default function WorkSinglePage() {
           </section>
         )
       })}
+
+      {testimonial && (
+        <section className="work-testimonial px-5 py-40 section-light">
+          <div className="grid grid-cols-12">
+            <div className="col-start-7 col-span-4 ps-2 slide-up-subtle">
+              {testimonial.acfTestimonials?.acfTestimonial && (
+                <blockquote
+                  className="testimonial-quote mb-10"
+                  dangerouslySetInnerHTML={{ __html: testimonial.acfTestimonials.acfTestimonial }}
+                />
+              )}
+              <cite className="testimonial-cite">
+                {testimonial.title}
+                {testimonial.acfTestimonials?.acfRole && (
+                  <>
+                  <br/><span className="testimonial-role">{testimonial.acfTestimonials.acfRole}</span>
+                  </>
+                )}
+              </cite>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {nextWork && (
+      <section className="next-work px-5 py-20 min-h-screen relative overflow-hidden slide-up">
+        <div className="grid grid-cols-12 relative z-1">
+            <div className="col-start-4 col-span-6">
+              <div className="client-work">
+                <Link
+                  to={`/work/${nextWork.slug}`}
+                  className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
+                  data-card-key={nextWork.slug}
+                >
+                  <picture
+                    className="ratio overflow-hidden"
+                    style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                  >
+                    {nextWork.thumbnail && <img src={nextWork.thumbnail} alt={nextWork.title} />}
+                  </picture>
+                  
+                </Link>
+              </div>
+              <div className="work-featured__meta mt-3">
+                  <h3 className="work-card__title alt-transition-txt">{nextWork.client}</h3>
+                  {nextWork.categories.length > 0 && (
+                    <div className="work-card__categories mt-3 flex flex-wrap gap-2">
+                      {nextWork.categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
+                    </div>
+                  )}
+                </div>
+            </div>
+        </div>
+        <div className="next-title-wrapper">
+          <div className="next-title text-coffee">
+            Next Case Study
+          </div>
+        </div>
+      </section>
+      )}
     </>
   )
 }

@@ -26,6 +26,11 @@
 }
 
 /* --- CASE STUDIES --- */
+.case-studies--unpinned .alt-transition-img,
+.case-studies--unpinned .alt-transition-text {
+    pointer-events: none;
+}
+
 .client-name {
     margin-top: 0.5rem;
     opacity: 0.5;

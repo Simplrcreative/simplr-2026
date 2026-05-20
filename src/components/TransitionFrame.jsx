@@ -476,7 +476,7 @@ export default function TransitionFrame({ children }) {
     document.documentElement.style.overflowX = 'hidden'
 
     if (altClone) {
-      gsap.set(el, { y: 0, scale: 1, autoAlpha: 1 })
+      gsap.set(el, { y: 0, autoAlpha: 1 })
     } else {
       // Entering page starts below the viewport at 0.85 scale.
       gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
@@ -566,35 +566,42 @@ export default function TransitionFrame({ children }) {
       const dock = getDockRect()
       const hasTargetAtStart = Boolean(dock)
       const smoothEase = 'power4.in'
-      const expandDuration = 0.75
-      const pauseDuration = 0
+      const expandDuration = 1
+      const pauseDuration = 0.25
       const dockDuration = 1.5
       const dockStart = expandDuration + pauseDuration
+      const width = window.innerWidth * 1.1
 
       const crossfadeToTarget = (target) => {
         gsap.set(target, { autoAlpha: 1 })
         gsap.to(altClone, {
           autoAlpha: 0,
           delay: 0.1,
-          duration: 0.42,
-          ease: 'power4.in',
+          duration: 0.25,
+          ease: 'none',
         })
       }
-
+      console.log(altClone)
       tl.to(altClone, {
-        top: -15,
-        left: -15,
-        width: window.innerWidth + 30,
-        height: window.innerHeight + 30,
-        filter: 'blur(5px)',
+        top: '-10%',
+        left: 0,
+        width: width,
+        height: width * 0.9,
         borderRadius: 0,
         duration: expandDuration,
         ease: smoothEase,
+        
       }, 0)
+      
+      tl.to(altClone, {
+        x: -30,
+        duration: 0.35,
+        ease: smoothEase,
+      }, 0.65)
 
       // Hold the full-screen state briefly before docking back down.
      
-      //tl.to({}, { duration: pauseDuration }, expandDuration)
+      tl.to({}, { duration: pauseDuration }, expandDuration)
 
       if (dock) {
         const dockImageScale = getDockImageScale()
@@ -609,7 +616,6 @@ export default function TransitionFrame({ children }) {
           }
 
           tl.to(altCloneImg, {
-            filter: 'blur(0px)',
             scale: peakImageScale,
             transformOrigin: '50% 50%',
             duration: expandDuration,
@@ -625,11 +631,12 @@ export default function TransitionFrame({ children }) {
         }
 
         tl.to(altClone, {
+          x: 0,
           top: dock.rect.top,
           left: dock.rect.left,
           width: dock.rect.width,
           height: dock.rect.height,
-          
+          rotate: 0,
           borderRadius: getComputedStyle(dock.target).borderRadius || altTransition.borderRadius,
           duration: dockDuration,
           ease: smoothEase,

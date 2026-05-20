@@ -257,6 +257,10 @@ export function createCaseStudiesScrollAnimation(scope) {
     // Show the first client immediately
     setActiveClient(0)
 
+    // Links are only interactive once the section is pinned at the viewport top.
+    // Before that, .alt-transition-img / .alt-transition-text get pointer-events:none via CSS.
+    section.classList.add('case-studies--unpinned')
+
     const totalScrollLength = SCROLL_HEIGHT_FIRST_CHANGE + (clientNames.length - 1) * SCROLL_HEIGHT_PER_CLIENT
 
     const trigger = ScrollTrigger.create({
@@ -266,6 +270,8 @@ export function createCaseStudiesScrollAnimation(scope) {
       pin: true,
       refreshPriority: -2,
       invalidateOnRefresh: true,
+      onEnter: () => section.classList.remove('case-studies--unpinned'),
+      onLeaveBack: () => section.classList.add('case-studies--unpinned'),
       onUpdate: (self) => {
         const scrolled = self.progress * totalScrollLength
         let index
@@ -283,6 +289,7 @@ export function createCaseStudiesScrollAnimation(scope) {
 
     return () => {
       trigger.kill()
+      section.classList.remove('case-studies--unpinned')
       ro?.disconnect()
       cleanupHoverListeners.forEach((cleanup) => cleanup())
       clientWorks.forEach((work) => {

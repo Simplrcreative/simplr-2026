@@ -69,6 +69,22 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
 
+  // Lock scroll for the full duration of the intro sequence so the user can't
+  // scroll past the hero before animations have initialised.
+  useEffect(() => {
+    if (!introComplete || !shouldRunHomeIntroAnimations || homeIntroAnimationsPlayed) return
+
+    document.documentElement.style.overflow = 'hidden'
+    const timer = setTimeout(() => {
+      document.documentElement.style.overflow = ''
+    }, HOME_SCROLL_INIT_AFTER_INTRO_MS)
+
+    return () => {
+      clearTimeout(timer)
+      document.documentElement.style.overflow = ''
+    }
+  }, [introComplete, shouldRunHomeIntroAnimations])
+
   // Run hero entrance animations exactly once after the intro sequence.
   useEffect(() => {
     if (!introComplete || !shouldRunHomeIntroAnimations || homeIntroAnimationsPlayed) return

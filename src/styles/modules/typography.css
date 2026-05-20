@@ -3,6 +3,9 @@ h1, h2, h3, h4, h5 {
     line-height: 1.2;
 }
 
+.no-break {
+    white-space: nowrap;
+}
 h1 {
     font-size: clamp(2.5rem, 4vw, 3.125rem);
     font-optical-sizing: auto;
@@ -29,4 +32,22 @@ h1.large {
 .hero-title span {
     font-family: var(--font-literata);
     font-weight: 400;
+}
+.next-title-wrapper {
+    position:absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center
+}
+.next-title {
+    font-size: clamp(18.75rem, 4vw, 24rem);
+    white-space: nowrap;
+    font-weight: 300;
+    line-height: 1;
+    text-align: center;
+    
 }
