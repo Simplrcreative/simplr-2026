@@ -8,6 +8,7 @@ import { gsap } from 'gsap'
 import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
+const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 
 function requestTransitionCapture() {
   window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_EVENT))
@@ -62,6 +63,7 @@ export default function RootLayout() {
   const footerRef = useRef(null)
   const destroyLogoRef = useRef(null)
   const destroyNavSectionThemeRef = useRef(null)
+  const previousPathRef = useRef(null)
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
@@ -74,6 +76,11 @@ export default function RootLayout() {
   const isNavigating = deferredNavigationState !== 'idle'
   const btnRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
+  const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
+
+  useEffect(() => {
+    previousPathRef.current = location.pathname
+  }, [location.pathname])
 
   // Reset intro state when leaving home page
   useEffect(() => {
@@ -183,47 +190,60 @@ export default function RootLayout() {
     // Home page: wait for the loader to finish before revealing the logo.
     if (!introComplete) return () => { destroyNavSectionThemeRef.current?.() }
 
-    // If a page transition is in progress, TransitionFrame's animateHomeLogoIn()
-    // already handles the logo reveal. Just schedule the scroll animation to start
-    // after the transition animation completes (~650ms covers the full transition).
-    if (document.documentElement.classList.contains('page-transitioning')) {
-      const timer = setTimeout(() => {
-        destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
-      }, 650)
+    const playHomeEntranceAnimation = () => {
+      const logo = layoutRef.current?.querySelector('.logo')
+      const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
+      const mainNav = layoutRef.current?.querySelectorAll('nav.main')
+
+      const entranceTl = gsap.timeline({
+        onComplete: () => {
+          destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
+        },
+      })
+
+      entranceTl.to(logo, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
+      entranceTl.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
+      entranceTl.to(
+        Array.from(implrPaths),
+        { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
+        0.15,
+      )
+      entranceTl.to(mainNav, { y: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
+
+      return () => {
+        entranceTl.kill()
+        destroyLogoRef.current?.()
+        destroyLogoRef.current = null
+      }
+    }
+
+    // Returning to Home should always animate from the compact previous state
+    // after the route handoff finishes, not while the transition overlay is up.
+    if (cameFromNonHome) {
+      let hasStarted = false
+      const startEntrance = () => {
+        if (hasStarted) return
+        hasStarted = true
+        playHomeEntranceAnimation()
+      }
+
+      // Start when TransitionFrame signals completion.
+      window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
+
+      // Fallback if the event is missed.
+      const timer = setTimeout(startEntrance, 2200)
+
       return () => {
         clearTimeout(timer)
+        window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance)
         destroyNavSectionThemeRef.current?.()
       }
     }
 
     // Initial load after intro overlay — animate logo from compact → full,
     // then hand off to the scroll animation.
-    const logo = layoutRef.current?.querySelector('.logo')
-    const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
-    const mainNav = layoutRef.current?.querySelectorAll('nav.main')
-
-    const entranceTl = gsap.timeline({
-      onComplete: () => {
-        destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
-      },
-    })
-
-    entranceTl.to(logo, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
-    entranceTl.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
-    entranceTl.to(
-      Array.from(implrPaths),
-      { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
-      0.15,
-    )
-    entranceTl.to(mainNav, { y: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
-
-    return () => {
-      entranceTl.kill()
-      destroyLogoRef.current?.()
-      destroyLogoRef.current = null
-      destroyNavSectionThemeRef.current?.()
-    }
-  }, [location.pathname, isHomePage, introComplete])
+    return playHomeEntranceAnimation()
+  }, [location.pathname, isHomePage, introComplete, cameFromNonHome])
 
   useEffect(() => {
     refreshSmoothScroll()
