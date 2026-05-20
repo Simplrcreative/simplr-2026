@@ -72,3 +72,31 @@
     width: 100%;
   }
 }
+
+.work-type {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  padding: 0 1.5rem 0 0;
+  position: relative;
+}
+.work-type::after {
+  content: '';
+  position: absolute;
+  right: 0.625rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.3125rem;
+  height: 0.3125rem;
+  border-radius: 100%;
+  background: var(--color-coffee)
+}
+.work-type--line-end::after {
+  display: none;
+}
+.work-type:last-of-type {
+  padding: 0;
+}
+.work-type:last-of-type::after {
+  display: none;
+}

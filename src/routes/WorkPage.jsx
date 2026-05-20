@@ -3,6 +3,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
+import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation } from '../lib/animations/index.js'
 
@@ -16,22 +17,6 @@ const FILTERS = [
   { id: 'motion',                 label: 'Motion',                   bg: 'var(--color-motion)',                 text: '#fff' },
   { id: 'templates',              label: 'Templates',                bg: 'var(--color-templates)',              text: '#fff' },
 ]
-
-const LIGHT_TEXT_SLUGS = new Set(['strategy', 'web-design-development'])
-
-function slugify(name = '') {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
-
-function CategoryBadge({ name }) {
-  const slug = slugify(name)
-  const textClass = LIGHT_TEXT_SLUGS.has(slug) ? 'text-coffee' : 'text-white'
-  return (
-    <span className={`category bg-${slug} ${textClass} text-leading-none font-medium rounded-full`}>
-      {name}
-    </span>
-  )
-}
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large') {
   const sizes = acfFeaturedThumbnail?.node?.mediaDetails?.sizes

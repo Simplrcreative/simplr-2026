@@ -14,28 +14,12 @@ import {
 import heroVideo from '../assets/vid/simplr-showreel-loop.mp4'
 import caseStudyTwo from '../assets/img/case-study-example-2.jpg'
 import { Link } from 'react-router-dom'
+import CategoryBadge from '../components/CategoryBadge.jsx'
 const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 
 let homeIntroAnimationsPlayed = false
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
-
-const LIGHT_TEXT_SLUGS = new Set(['strategy', 'web-design-development'])
-
-function slugify(name = '') {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
-
-function CategoryBadge({ name }) {
-  const slug = slugify(name)
-  const textClass = LIGHT_TEXT_SLUGS.has(slug) ? 'text-coffee' : 'text-white'
-
-  return (
-    <div className={`category bg-${slug} ${textClass} leading-none font-medium rounded-full`}>
-      {name}
-    </div>
-  )
-}
 
 function HomePageContent({ page, featuredWork, caseStudies = [] }) {
   const heroRef = useRef(null)

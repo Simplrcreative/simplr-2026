@@ -128,6 +128,11 @@ const worksQuery = `
               name
             }
           }
+          acfType {
+            nodes {
+              name
+            }
+          }
           acfFeaturedThumbnail {
             node {
               mediaDetails {
@@ -144,6 +149,7 @@ const worksQuery = `
             }
           }
           acfSections {
+            acfLayout
             acfAlignment
             acfContent
             acfImage1 {
