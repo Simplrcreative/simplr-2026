@@ -10,6 +10,10 @@ export function createRootLoader() {
 
 export function createHomeLoader() {
   return function homeLoader() {
+    // Fire-and-forget to warm the works cache so the first alt-transition
+    // to a /work/:slug page resolves instantly instead of waiting for a
+    // cold GraphQL round-trip.
+    fetchWorksData()
     return { homeData: fetchHomeData() }
   }
 }

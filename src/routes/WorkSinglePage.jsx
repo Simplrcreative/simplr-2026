@@ -207,7 +207,7 @@ export default function WorkSinglePage() {
       {nextWork && (
       <section className="next-work px-5 py-20 min-h-screen relative overflow-hidden slide-up">
         <div className="grid grid-cols-12 relative z-1">
-            <div className="col-start-4 col-span-6">
+            <div className="col-start-5 col-span-4">
               <div className="client-work">
                 <Link
                   to={`/work/${nextWork.slug}`}

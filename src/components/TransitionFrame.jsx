@@ -565,9 +565,9 @@ export default function TransitionFrame({ children }) {
       }
       const dock = getDockRect()
       const hasTargetAtStart = Boolean(dock)
-      const smoothEase = 'power4.in'
+      const smoothEase = 'power3.inOut'
       const expandDuration = 1
-      const pauseDuration = 0.25
+      const pauseDuration = 0
       const dockDuration = 1.5
       const dockStart = expandDuration + pauseDuration
       const width = window.innerWidth * 1.1
@@ -581,9 +581,9 @@ export default function TransitionFrame({ children }) {
           ease: 'none',
         })
       }
-      console.log(altClone)
+
       tl.to(altClone, {
-        top: '-10%',
+        top: 0,
         left: 0,
         width: width,
         height: width * 0.9,
@@ -593,11 +593,12 @@ export default function TransitionFrame({ children }) {
         
       }, 0)
       
-      tl.to(altClone, {
+      /*tl.to(altClone, {
         x: -30,
         duration: 0.35,
         ease: smoothEase,
       }, 0.65)
+      */
 
       // Hold the full-screen state briefly before docking back down.
      
@@ -631,7 +632,7 @@ export default function TransitionFrame({ children }) {
         }
 
         tl.to(altClone, {
-          x: 0,
+          //x: 0,
           top: dock.rect.top,
           left: dock.rect.left,
           width: dock.rect.width,
