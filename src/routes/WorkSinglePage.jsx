@@ -3,7 +3,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
-import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation } from '../lib/animations/index.js'
 
 
 export default function WorkSinglePage() {
@@ -20,8 +20,27 @@ export default function WorkSinglePage() {
   const nextWork = useLoaderData()?.nextWork ?? null
 
   useEffect(() => {
-    createSplitTextAnimation()
-    createWorkImagesAnimation()
+    // Lock scroll during the featured-image dock transition; unlock on completion.
+    if (document.documentElement.classList.contains('page-transitioning')) {
+      document.documentElement.style.overflowY = 'hidden'
+      const unlock = () => { document.documentElement.style.overflowY = '' }
+      window.addEventListener('page-transition:complete', unlock, { once: true })
+      return () => {
+        window.removeEventListener('page-transition:complete', unlock)
+        document.documentElement.style.overflowY = ''
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const cleanupSplitText = createSplitTextAnimation()
+    const cleanupWorkImages = createWorkImagesAnimation()
+    const cleanupNextWork = createNextWorkAnimation()
+    return () => {
+      cleanupSplitText?.()
+      cleanupWorkImages?.()
+      cleanupNextWork?.()
+    }
   }, [])
 
   return (
@@ -61,7 +80,7 @@ export default function WorkSinglePage() {
         </div>
       </section>
 
-      <section className="work-intro px-5 py-20">
+      <section className="work-intro px-5 py-20 bg-white section-light">
         <div className="grid grid-cols-12">
           <div className="work-types col-start-1 col-span-5 slide-up-subtle">
              {types.map(({ name }, index) => {
@@ -182,7 +201,7 @@ export default function WorkSinglePage() {
       })}
 
       {testimonial && (
-        <section className="work-testimonial px-5 py-40 section-light">
+        <section className="work-testimonial px-5 pt-40 pb-20 section-light">
           <div className="grid grid-cols-12">
             <div className="col-start-7 col-span-4 ps-2 slide-up-subtle">
               {testimonial.acfTestimonials?.acfTestimonial && (
@@ -205,14 +224,15 @@ export default function WorkSinglePage() {
       )}
 
       {nextWork && (
-      <section className="next-work px-5 py-20 min-h-screen relative overflow-hidden slide-up">
+      <section className="next-work px-5 py-20 bg-white section-light relative overflow-hidden__">
         <div className="grid grid-cols-12 relative z-1">
-            <div className="col-start-5 col-span-4">
+            <div className="col-start-5 col-span-4 pt-20">
               <div className="client-work">
                 <Link
                   to={`/work/${nextWork.slug}`}
                   className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                   data-card-key={nextWork.slug}
+                  data-transition-variant="work-next"
                 >
                   <picture
                     className="ratio overflow-hidden"
@@ -234,7 +254,7 @@ export default function WorkSinglePage() {
             </div>
         </div>
         <div className="next-title-wrapper">
-          <div className="next-title text-coffee">
+          <div className="next-title text-coffee min-h-[600px]" >
             Next Case Study
           </div>
         </div>

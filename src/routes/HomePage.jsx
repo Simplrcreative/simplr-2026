@@ -55,17 +55,25 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
   useEffect(() => {
     if (!introComplete) return
     let destroyHeroAnimation = () => {}
+    let destroyServicesAnimation = () => {}
+    let destroyCaseStudiesAnimation = () => {}
+    let destroyClientsAnimation = () => {}
+    let destroyBtnAnimation = () => {}
     const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !homeIntroAnimationsPlayed
     const timer = setTimeout(() => {
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
-      createServicesScrollAnimation(servicesRef.current)
-      createCaseStudiesScrollAnimation(caseStudiesRef.current)
-      createClientsScrollAnimation(clientsRef.current)
-      createBtnHoverAnimation(btnRef.current)
+      destroyServicesAnimation = createServicesScrollAnimation(servicesRef.current) ?? (() => {})
+      destroyCaseStudiesAnimation = createCaseStudiesScrollAnimation(caseStudiesRef.current) ?? (() => {})
+      destroyClientsAnimation = createClientsScrollAnimation(clientsRef.current) ?? (() => {})
+      destroyBtnAnimation = createBtnHoverAnimation(btnRef.current) ?? (() => {})
     }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
     return () => {
       clearTimeout(timer)
       destroyHeroAnimation()
+      destroyServicesAnimation()
+      destroyCaseStudiesAnimation()
+      destroyClientsAnimation()
+      destroyBtnAnimation()
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
 
@@ -195,7 +203,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
         ]}
       />
       <div className="play-icon text-white bg-branding-design fixed z-[9999] w-[100px] h-[100px] rounded-full flex items-center justify-center pointer-events-none">
-        <svg xmlns="http://www.w3.org/2000/svg" className="ms-2" width="22px" height="auto" viewBox="0 0 18 20" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="ms-2" width="22" height="20" viewBox="0 0 18 20" fill="currentColor">
           <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
         </svg>
       </div>

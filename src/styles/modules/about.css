@@ -12,12 +12,17 @@
   font-size: clamp(3.5rem, 5vw, 5.5rem);
   line-height: 1;
   color: #fff;
-  transition: color 0.4s ease;
+  text-decoration: underline;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: color 0.4s ease, text-decoration-color 0.75s ease;
 }
 
 .person-item.is-hovered .person-name {
-  text-decoration: underline;
-  text-underline-offset: 0.1em;
+  text-decoration-color: inherit;
+  transition: color 0.4s ease, text-decoration-color 0.75s ease;
 }
 
 .person-item.is-hovered .person-name.branding-design {

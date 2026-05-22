@@ -8,9 +8,7 @@ import { createSplitTextAnimation } from '../lib/animations/index.js'
 gsap.registerPlugin(ScrollTrigger)
 
 export default function ContactPage() {
-  useEffect(() => {
-    createSplitTextAnimation()
-  })
+  useEffect(() => createSplitTextAnimation(), [])
 
   const pathname = '/contact'
   const title = 'Contact'

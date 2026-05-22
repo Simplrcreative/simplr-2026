@@ -25,10 +25,11 @@ export function refreshScrollTriggers() {
 /**
  * Initialize SplitText animation for a single element.
  * Prevents double initialization via WeakSet tracking.
+ * Returns the created tween so the caller can clean it up.
  */
 function initializeSplitTextForElement(element, triggerSelector, fromColor, toColor) {
   if (initializedElements.has(element)) {
-    return
+    return null
   }
 
   const customTriggerSelector = element.dataset.splitTrigger
@@ -37,13 +38,13 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
     : element.closest(triggerSelector)
 
   if (!trigger) {
-    return
+    return null
   }
 
   const split = SplitText.create(element, { type: 'words' })
   gsap.set(split.words, { color: fromColor })
 
-  gsap.fromTo(
+  const tween = gsap.fromTo(
     split.words,
     { color: fromColor },
     {
@@ -61,36 +62,42 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
   )
 
   initializedElements.add(element)
-}
-
-/**
- * Create Intersection Observer for lazy initialization of SplitText animations.
- * Animations only initialize when elements enter viewport, reducing main thread load.
- */
-function createLazySplitTextObserver(elementSelector, triggerSelector, fromColor, toColor) {
-  const elements = Array.from(document.querySelectorAll(elementSelector))
-
-  if (elements.length === 0) {
-    return
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          initializeSplitTextForElement(entry.target, triggerSelector, fromColor, toColor)
-          observer.unobserve(entry.target)
-        }
-      })
-    },
-    { rootMargin: '100px' } // Start loading 100px before element enters viewport
-  )
-
-  elements.forEach((el) => observer.observe(el))
+  return tween
 }
 
 export function createSplitTextAnimation() {
   registerPlugins()
+
+  const observers = []
+  const tweens = []
+
+  /**
+   * Create Intersection Observer for lazy initialization of SplitText animations.
+   * Animations only initialize when elements enter viewport, reducing main thread load.
+   */
+  function createLazySplitTextObserver(elementSelector, triggerSelector, fromColor, toColor) {
+    const elements = Array.from(document.querySelectorAll(elementSelector))
+
+    if (elements.length === 0) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const tween = initializeSplitTextForElement(entry.target, triggerSelector, fromColor, toColor)
+            if (tween) tweens.push(tween)
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { rootMargin: '100px' }
+    )
+
+    elements.forEach((el) => observer.observe(el))
+    observers.push(observer)
+  }
 
   createLazySplitTextObserver(
     '.split-text',
@@ -105,5 +112,13 @@ export function createSplitTextAnimation() {
     'rgba(48, 15, 29, 0.1)',
     'rgba(48, 15, 29, 1)'
   )
+
+  return () => {
+    observers.forEach((obs) => obs.disconnect())
+    tweens.forEach((tween) => {
+      tween.scrollTrigger?.kill()
+      tween.kill()
+    })
+  }
 }
 

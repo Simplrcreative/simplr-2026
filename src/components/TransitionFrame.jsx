@@ -25,6 +25,8 @@ export default function TransitionFrame({ children }) {
   const altTransitionRef = useRef(null)
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
+  const capturedScrollYRef = useRef(0)
+  const hasCapturedRef = useRef(false)
   const capturedPageBgRef = useRef(null)
   const capturedPathRef = useRef(null)
   const isFirstMount = useRef(true)
@@ -149,6 +151,17 @@ export default function TransitionFrame({ children }) {
     const capture = (target = null) => {
       if (!ref.current) return
 
+      // Guard: pointerdown fires before React Router processes the click and
+      // (with instant/cached loaders) before React commits the new route.
+      // Subsequent calls from the click event or PAGE_TRANSITION_CAPTURE_EVENT
+      // would run AFTER the commit, when ref.current is the new page — skip them.
+      if (hasCapturedRef.current) return
+      hasCapturedRef.current = true
+
+      // Record scroll position at click time. window.scrollY at useLayoutEffect
+      // time may already be 0 (browser clamps scroll for new page DOM).
+      capturedScrollYRef.current = window.scrollY
+
       capturedPageBgRef.current = document.documentElement.dataset.pageBg || null
       capturedPathRef.current = window.location.pathname || null
 
@@ -165,14 +178,56 @@ export default function TransitionFrame({ children }) {
           const rect = altSource.getBoundingClientRect()
           if (rect.width > 0 && rect.height > 0) {
             const clone = altSource.cloneNode(true)
+            const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant ?? null
+
+            // Read the source aspect ratio from the card's picture element so we can
+            // fix the altClone dimensions for non-90% cards (e.g. WorkCard at 64%).
+            const sourcePicture = altSource.querySelector('picture')
+            const sourceAspectRatio = sourcePicture
+              ? sourcePicture.style.getPropertyValue('--aspect-ratio-desktop').trim() || null
+              : null
+
             altTransitionRef.current = {
               pathname: nav.url.pathname,
+              variant,
               top: rect.top,
               left: rect.left,
               width: rect.width,
               height: rect.height,
               borderRadius: getComputedStyle(altSource).borderRadius,
               clone,
+              sourceAspectRatio,
+            }
+
+            // For work-card: capture the parent work section so it can animate out
+            // independently while the snapshot is hidden.
+            if (variant === 'work-card') {
+              const workSection = altSource.closest('section')
+              if (workSection) {
+                const sRect = workSection.getBoundingClientRect()
+                altTransitionRef.current.workSectionClone = workSection.cloneNode(true)
+                altTransitionRef.current.workSectionRect = {
+                  top: sRect.top,
+                  left: sRect.left,
+                  width: sRect.width,
+                }
+              }
+            }
+
+            // For work-next: capture the 'Next Case Study' title separately so it
+            // can animate out independently without showing the scrolled snapshot.
+            if (variant === 'work-next') {
+              const nextWorkSection = altSource.closest('.next-work')
+              const titleWrapper = nextWorkSection?.querySelector('.next-title-wrapper')
+              if (titleWrapper) {
+                const titleRect = titleWrapper.getBoundingClientRect()
+                // Only capture if the wrapper is at least partially visible in the viewport.
+                if (titleRect.bottom > 0 && titleRect.top < window.innerHeight) {
+                  altTransitionRef.current.nextTitleClone = titleWrapper.cloneNode(true)
+                  altTransitionRef.current.nextTitleTop = titleRect.top
+                  altTransitionRef.current.nextTitleHeight = titleRect.height
+                }
+              }
             }
           }
         }
@@ -319,6 +374,9 @@ export default function TransitionFrame({ children }) {
 
   // MAIN TRANSITION — synchronous before browser paint on every route change.
   useLayoutEffect(() => {
+    // Reset the capture guard so the next navigation can take a fresh snapshot.
+    hasCapturedRef.current = false
+
     const isFirst = isFirstMount.current
     if (isFirst) isFirstMount.current = false
 
@@ -342,7 +400,15 @@ export default function TransitionFrame({ children }) {
     capturedPageBgRef.current = null
     capturedPathRef.current = null
 
-    const scrollY = window.scrollY
+    // Whether this is a work → next-work transition (card at bottom of WorkSinglePage).
+    const isWorkNext = altTransition?.variant === 'work-next'
+    // Whether this is a work-page → work-single transition (WorkCard / WorkFeatured).
+    const isWorkCard = altTransition?.variant === 'work-card'
+
+    // Use the scroll position captured at click time — window.scrollY at
+    // useLayoutEffect time may already be 0 (clamped by browser for the new page).
+    const scrollY = capturedScrollYRef.current
+    capturedScrollYRef.current = 0
     const snapshotHeight = snapshot
       ? (snapshot.scrollHeight || snapshot.getBoundingClientRect().height || 0)
       : 0
@@ -395,6 +461,13 @@ export default function TransitionFrame({ children }) {
           node.style.opacity = '0'
           node.style.visibility = 'hidden'
         })
+      }
+
+      // For work-next / work-card the altClone expands to cover the screen
+      // immediately — hide the outgoing snapshot to keep the transition clean.
+      if (isWorkNext || isWorkCard) {
+        snapshot.style.opacity = '0'
+        snapshot.style.visibility = 'hidden'
       }
 
       content.appendChild(snapshot)
@@ -500,6 +573,8 @@ export default function TransitionFrame({ children }) {
       }
 
       altClone?.remove()
+      nextTitleEl?.remove()
+      workSectionEl?.remove()
       wrapper.remove()
       document.documentElement.style.overflowX = ''
 
@@ -528,6 +603,8 @@ export default function TransitionFrame({ children }) {
       }
     }
 
+    let nextTitleEl = null
+    let workSectionEl = null
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
 
     if (altClone) {
@@ -537,6 +614,24 @@ export default function TransitionFrame({ children }) {
       // negative, sending the clone off-screen. This runs in useLayoutEffect
       // (before paint) so there is no visible jump.
       window.scrollTo(0, 0)
+
+      // For non-90% source cards (WorkCard at 64%), override the picture's padding-top
+      // ratio trick so the picture fills the altClone's explicitly-animated dimensions.
+      // This lets the card expand cleanly from 64% to 90% without letterboxing.
+      const sourceAspectRatio = altTransition?.sourceAspectRatio
+      if (sourceAspectRatio && sourceAspectRatio !== '90%') {
+        const clonePicture = altClone.querySelector('picture')
+        if (clonePicture) {
+          Object.assign(clonePicture.style, {
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            paddingTop: '0',
+          })
+        }
+      }
 
       const altCloneImg = altClone.querySelector('img')
       const resolveDockImage = () => document.querySelector('.featured-image picture img')
@@ -583,16 +678,65 @@ export default function TransitionFrame({ children }) {
       }
 
       tl.to(altClone, {
-        top: 0,
+        top: '-30%',
         left: 0,
         width: width,
         height: width * 0.9,
         borderRadius: 0,
         duration: expandDuration,
         ease: smoothEase,
-        
       }, 0)
-      
+
+      // For work-next: animate the captured 'Next Case Study' title clone upward
+      // so it swipes off-screen with the transition rather than snapping away.
+      if (isWorkNext && altTransition.nextTitleClone) {
+        nextTitleEl = altTransition.nextTitleClone
+        const titleTop = altTransition.nextTitleTop
+        const titleHeight = altTransition.nextTitleHeight
+        Object.assign(nextTitleEl.style, {
+          position: 'fixed',
+          top: `${titleTop}px`,
+          left: '0',
+          width: '100%',
+          height: `${titleHeight}px`,
+          overflow: 'hidden',
+          pointerEvents: 'none',
+          zIndex: '10000',
+          margin: '0',
+        })
+        document.body.appendChild(nextTitleEl)
+        // Translate up until bottom edge clears the viewport top, then fade.
+        tl.to(nextTitleEl, {
+          y: -(titleTop + titleHeight + 20),
+          autoAlpha: 0,
+          duration: expandDuration * 0.7,
+          ease: smoothEase,
+        }, 0)
+      }
+
+      // For work-card: animate the captured work section clone upward so the
+      // grid of cards exits smoothly rather than snapping away instantly.
+      if (isWorkCard && altTransition.workSectionClone) {
+        workSectionEl = altTransition.workSectionClone
+        const sRect = altTransition.workSectionRect
+        Object.assign(workSectionEl.style, {
+          position: 'fixed',
+          top: `${sRect.top}px`,
+          left: `${sRect.left}px`,
+          width: `${sRect.width}px`,
+          pointerEvents: 'none',
+          zIndex: '10000',
+          margin: '0',
+        })
+        document.body.appendChild(workSectionEl)
+        tl.to(workSectionEl, {
+          y: -80,
+          autoAlpha: 0,
+          duration: expandDuration * 0.6,
+          ease: 'power2.in',
+        }, 0)
+      }
+
       /*tl.to(altClone, {
         x: -30,
         duration: 0.35,
@@ -760,15 +904,23 @@ export default function TransitionFrame({ children }) {
   // React guarantees useEffects run in definition order, so these two are
   // registered before the "fire immediately" effect that follows.
   useEffect(() => {
-    const handler = () => createSurfaceColorTransitions(ref.current)
+    let cleanup = null
+    const handler = () => { cleanup = createSurfaceColorTransitions(ref.current) }
     window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler, { once: true })
-    return () => window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
+    return () => {
+      window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
+      cleanup?.()
+    }
   }, [location.pathname])
 
   useEffect(() => {
-    const handler = () => createSlideUpAnimations(ref.current)
+    let cleanup = null
+    const handler = () => { cleanup = createSlideUpAnimations(ref.current) }
     window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler, { once: true })
-    return () => window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
+    return () => {
+      window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
+      cleanup?.()
+    }
   }, [location.pathname])
 
   // For first page load and when transitions are disabled, dispatch the event

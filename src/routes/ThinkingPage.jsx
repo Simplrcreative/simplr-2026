@@ -193,7 +193,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section ref={postsResultsRef} className="posts-results px-5 pb-20 bg-white section-light">
+      <section ref={postsResultsRef} className="posts-results px-5 pb-20 bg-white section-dark">
         <div className="thinking-posts-grid">
           {filteredPosts.map((post) => {
             const thumb = getThumbnail(post.acfPostBuilder?.acfFeaturedImage)

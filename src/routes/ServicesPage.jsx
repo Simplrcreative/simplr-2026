@@ -153,12 +153,15 @@ export default function ServicesPage() {
 
 
   useEffect(() => {
+    let cleanupSplitText = null
+    let cardTweens = []
+
     // Defer heavy animations until after page transition completes
     const timer = setTimeout(() => {
-      createSplitTextAnimation()
+      cleanupSplitText = createSplitTextAnimation()
 
       const cards = document.querySelectorAll('.service-card')
-      const tweens = Array.from(cards).map((card) => {
+      cardTweens = Array.from(cards).map((card) => {
         const circle = card.querySelector('.service-label-icon__circle--right')
         if (!circle) return null
         gsap.set(circle, { x: -15 })
@@ -175,11 +178,13 @@ export default function ServicesPage() {
       })
 
       ScrollTrigger.refresh()
-
-      return () => tweens.forEach((t) => t?.scrollTrigger?.kill())
     }, 400)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      cleanupSplitText?.()
+      cardTweens.forEach((t) => t?.scrollTrigger?.kill())
+    }
   }, [])
   const pathname = '/services'
   const title = 'Services'

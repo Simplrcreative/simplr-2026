@@ -210,11 +210,12 @@ const testimonialQuery = `
 
 const postsQuery = `
   query PostQuery {
-    posts(first: 100, where: { status: PUBLISH }) {
+    posts(first: 10, where: { status: PUBLISH }) {
       nodes {
         databaseId
         slug
         title(format: RENDERED)
+        content
         date
         acfClients {
           nodes {
@@ -794,7 +795,6 @@ export async function fetchThinkingEntryData(slug) {
     if (!post) {
       throw new Response('Not found', { status: 404 })
     }
-
     return { slug, page: post }
   } catch (error) {
     if (error instanceof Response) throw error

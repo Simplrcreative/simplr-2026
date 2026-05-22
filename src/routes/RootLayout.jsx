@@ -305,9 +305,9 @@ export default function RootLayout() {
               <BrandLogo />
               
                 <div className="tagline">
-                  Creative.<br/>
-                  Intelligence.<br/>
-                  Applied.
+                  <span>Creative.</span><br/>
+                  Applied.<br/>
+                  Intelligence.
                 </div>
               </Link>
             

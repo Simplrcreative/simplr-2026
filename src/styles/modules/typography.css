@@ -35,16 +35,17 @@ h1.large {
 }
 .next-title-wrapper {
     position:absolute;
-    top: 0;
+    top: 3rem;
     left: 0;
     right: 0;
     z-index: 0;
     overflow: hidden;
     display: flex;
-    justify-content: center
+    justify-content: center;
+    padding-bottom: 3rem
 }
 .next-title {
-    font-size: clamp(18.75rem, 4vw, 24rem);
+    font-size: clamp(12.5rem, 21vw, 18.75rem);
     white-space: nowrap;
     font-weight: 300;
     line-height: 1;

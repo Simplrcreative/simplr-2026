@@ -118,22 +118,25 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   const clients = builder.acfClient?.nodes ?? []
 
   return (
-    <Link to={`/work/${work.slug}`} className="work-card block" data-card-key={cardKey}>
+    <div className="work-card">
+    <Link to={`/work/${work.slug}`} className="block alt-transition-img" data-card-key={cardKey} data-transition-variant="work-card">
       <picture
         className="ratio overflow-hidden rounded-[10px] block"
         style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': aspectRatio }}
       >
         {thumb && <img src={thumb} alt={work.title} />}
       </picture>
-      <div className="work-card__meta mt-3">
-        <h3 className="work-card__title">{clients[0].name}</h3>
-        {categories.length > 0 && (
-          <div className="work-card__categories mt-3 flex flex-wrap gap-2">
-            {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
-          </div>
-        )}
-      </div>
+      
     </Link>
+    <div className="work-card__meta mt-3">
+      <h3 className="work-card__title">{clients[0].name}</h3>
+      {categories.length > 0 && (
+        <div className="work-card__categories mt-3 flex flex-wrap gap-2">
+          {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
+        </div>
+      )}
+    </div>
+    </div>
   )
 }
 
@@ -146,8 +149,9 @@ function WorkFeatured({ work, cardKey }) {
   return (
     <Link
       to={`/work/${work.slug}`}
-      className="work-featured col-start-1 col-span-6 block"
+      className="work-featured col-start-1 col-span-6 block alt-transition-img"
       data-card-key={cardKey}
+      data-transition-variant="work-card"
     >
       <picture
         className="ratio overflow-hidden rounded-[10px] block"
@@ -227,9 +231,7 @@ export default function WorkPage() {
 
   const groups = useMemo(() => groupWorks(filteredWorks), [filteredWorks])
 
-  useEffect(() => {
-    createSplitTextAnimation()
-  })
+  useEffect(() => createSplitTextAnimation(), [])
 
   useEffect(() => {
     if (!isFilterAnimating) return

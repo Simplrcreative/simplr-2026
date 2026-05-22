@@ -218,6 +218,11 @@ nav a:focus-visible .nav-link__orb {
 .tagline {
     font-size: 1.375rem;
     line-height: 1.625rem;
+    font-weight: 400;
+}
+.tagline span {
+    font-family: var(--font-literata);
+    font-style: italic;
 }
 .spacer {
     height: 520px;
