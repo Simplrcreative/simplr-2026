@@ -162,9 +162,12 @@ export default function TransitionFrame({ children }) {
       // Record scroll position at click time. window.scrollY at useLayoutEffect
       // time may already be 0 (browser clamps scroll for new page DOM).
       capturedScrollYRef.current = window.scrollY
-      // scrollHeight on a detached clone is always 0 (no layout). Capture the
-      // live element's scrollHeight now so the snapshot can be positioned correctly.
-      capturedScrollHeightRef.current = ref.current?.scrollHeight ?? 0
+      // Use the full document scrollHeight (not just ref.current) so the
+      // minSnapshotTop clamp is correct when the user is scrolled into the
+      // footer area. ref.current.scrollHeight excludes the footer-off spacer
+      // and footer, causing snapshotTop to be clamped too high and pushing
+      // absolutely-positioned footer clones outside the 150vh wrapper.
+      capturedScrollHeightRef.current = document.documentElement.scrollHeight
 
       capturedPageBgRef.current = document.documentElement.dataset.pageBg || null
       capturedPathRef.current = window.location.pathname || null
@@ -340,10 +343,37 @@ export default function TransitionFrame({ children }) {
         (node) => !ref.current.contains(node),
       )
       const footer = document.querySelector('footer')
+      // Absolutely position footer-off and footer clones at their exact
+      // document-space coordinates so they appear at the right place in the
+      // snapshot regardless of how the detached clone's height compares to the
+      // live page height.
+      // Math: snapshot is placed at top = -scrollY; an absolute child at
+      // top = rect.top + scrollY appears at snapshotTop + docTop = rect.top ✓
+      const currentScrollY = window.scrollY
       footerOffItems.forEach((item) => {
-        clone.appendChild(item.cloneNode(true))
+        const itemClone = item.cloneNode(true)
+        const rect = item.getBoundingClientRect()
+        Object.assign(itemClone.style, {
+          position: 'absolute',
+          top: `${rect.top + currentScrollY}px`,
+          left: '0',
+          width: '100%',
+          margin: '0',
+        })
+        clone.appendChild(itemClone)
       })
-      if (footer) clone.appendChild(footer.cloneNode(true))
+      if (footer) {
+        const footerClone = footer.cloneNode(true)
+        const rect = footer.getBoundingClientRect()
+        Object.assign(footerClone.style, {
+          position: 'absolute',
+          top: `${rect.top + currentScrollY}px`,
+          left: '0',
+          width: '100%',
+          margin: '0',
+        })
+        clone.appendChild(footerClone)
+      }
       snapshotRef.current = clone
     }
 

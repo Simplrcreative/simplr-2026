@@ -280,9 +280,74 @@ export function createFooterAnimation(scope) {
       )
     }
 
+    // Footer logo: circle text spins in, pauses, spins out; icon fades in.
+    // The wrapper uses `items-end` — the SVG sits at the bottom of the div, but
+    // its overall height is set by the taller left column. `start: 'top …'` fires
+    // against the div's top edge, long before the SVG is visible. Switching to
+    // `bottom 95%` fires when the div's bottom (= the SVG) enters the viewport.
+    const footerLogoTrigger = footer.querySelector('.footer-logo-trigger')
+    const circleText = footer.querySelector('.footer-logo-circle-text')
+    const logoIcon = footer.querySelector('.footer-logo-icon')
+
+    let circleTimeline = null
+    let iconTween = null
+
+    if (circleText) {
+      gsap.set(circleText, { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%' })
+      circleTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: footerLogoTrigger,
+          start: 'top 95%',
+          toggleActions: 'play none none none',
+          invalidateOnRefresh: true,
+          refreshPriority: -30,
+          //markers: true
+        },
+      })
+      circleTimeline
+        .to(circleText, {
+          scale: 1,
+          rotation: 360,
+          autoAlpha: 1,
+          duration: 1.6,
+          ease: 'power3.out',
+          transformOrigin: '50% 50%',
+        })
+        .to(circleText, {
+          rotation: 720,
+          scale: 0,
+          autoAlpha: 0,
+          duration: 1.2,
+          ease: 'power3.in',
+          delay: 0.5,
+          transformOrigin: '50% 50%',
+        })
+    }
+
+    if (logoIcon) {
+      gsap.set(logoIcon, { autoAlpha: 0 })
+      iconTween = gsap.to(logoIcon, {
+        autoAlpha: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+        delay: 0.4,
+        scrollTrigger: {
+          trigger: footerLogoTrigger,
+          start: 'top 95%',
+          toggleActions: 'play none none none',
+          invalidateOnRefresh: true,
+          refreshPriority: -30,
+        },
+      })
+    }
+
     return () => {
       timeline.kill()
-      gsap.set([logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock].filter(Boolean), { clearProps: 'all' })
+      circleTimeline?.scrollTrigger?.kill()
+      circleTimeline?.kill()
+      iconTween?.scrollTrigger?.kill()
+      iconTween?.kill()
+      gsap.set([logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock, circleText, logoIcon].filter(Boolean), { clearProps: 'all' })
       gsap.set(document.body, { clearProps: 'backgroundColor' })
       nav?.classList.remove(FOOTER_LIGHT_CLASS)
       logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
