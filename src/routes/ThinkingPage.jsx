@@ -18,7 +18,7 @@ const FILTER_COLOR_MAP = {
 }
 
 const LIGHT_BG_SLUGS = new Set(['strategy', 'web-design-development'])
-const HERO_PREVIEW_HEIGHTS = [12, 332, 525]
+const CARD_START_HEIGHT = 12
 
 function getFilterColor(slug) {
   const entry = Object.entries(FILTER_COLOR_MAP).find(([key]) => slug.includes(key))
@@ -108,9 +108,7 @@ export default function ThinkingPage() {
         if (!imageFrame) return
 
         const finalHeight = imageFrame.getBoundingClientRect().height
-        const startHeight = index < HERO_PREVIEW_HEIGHTS.length
-          ? Math.min(HERO_PREVIEW_HEIGHTS[index], finalHeight)
-          : Math.max(Math.round(finalHeight * 0.35), 120)
+        const startHeight = CARD_START_HEIGHT
 
         gsap.fromTo(
           imageFrame,

@@ -47,7 +47,7 @@ export function createNextWorkAnimation() {
     if (st) { st.kill(); st = null }
     gsap.set(title, { clearProps: 'x' })
 
-    tween = gsap.fromTo(title, { x: startX, y: 0 }, { x: endX, y: 150, ease: 'none', paused: true })
+    tween = gsap.fromTo(title, { x: startX, y: 0 }, { x: endX, y: 150, duration: 5, ease: 'none', paused: true })
     st = ScrollTrigger.create({
       trigger: section,
       //start: 'top top',

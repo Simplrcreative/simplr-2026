@@ -119,7 +119,12 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
 
   return (
     <div className="work-card">
-    <Link to={`/work/${work.slug}`} className="block alt-transition-img" data-card-key={cardKey} data-transition-variant="work-card">
+    <Link 
+      to={`/work/${work.slug}`} 
+      className="block alt-transition-img" 
+      data-card-key={cardKey} 
+      data-transition-variant="work-card"
+    >
       <picture
         className="ratio overflow-hidden rounded-[10px] block"
         style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': aspectRatio }}
@@ -196,7 +201,12 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
           </div>
         </div>
         <div className="col-start-7 col-span-6 slide-up-from-left">
-          <Link to={`/work/${work.slug}`} className="client-work block" data-card-key={cardKey}>
+          <Link 
+            to={`/work/${work.slug}`} 
+            className="client-work block alt-transition-img" 
+            data-card-key={cardKey}
+            data-transition-variant="work-card"
+          >
             <picture
               className="ratio overflow-hidden rounded-[10px] block"
               style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}

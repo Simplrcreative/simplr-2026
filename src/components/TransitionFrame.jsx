@@ -26,6 +26,7 @@ export default function TransitionFrame({ children }) {
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
   const capturedScrollYRef = useRef(0)
+  const capturedScrollHeightRef = useRef(0)
   const hasCapturedRef = useRef(false)
   const capturedPageBgRef = useRef(null)
   const capturedPathRef = useRef(null)
@@ -161,6 +162,9 @@ export default function TransitionFrame({ children }) {
       // Record scroll position at click time. window.scrollY at useLayoutEffect
       // time may already be 0 (browser clamps scroll for new page DOM).
       capturedScrollYRef.current = window.scrollY
+      // scrollHeight on a detached clone is always 0 (no layout). Capture the
+      // live element's scrollHeight now so the snapshot can be positioned correctly.
+      capturedScrollHeightRef.current = ref.current?.scrollHeight ?? 0
 
       capturedPageBgRef.current = document.documentElement.dataset.pageBg || null
       capturedPathRef.current = window.location.pathname || null
@@ -409,9 +413,8 @@ export default function TransitionFrame({ children }) {
     // useLayoutEffect time may already be 0 (clamped by browser for the new page).
     const scrollY = capturedScrollYRef.current
     capturedScrollYRef.current = 0
-    const snapshotHeight = snapshot
-      ? (snapshot.scrollHeight || snapshot.getBoundingClientRect().height || 0)
-      : 0
+    const snapshotHeight = capturedScrollHeightRef.current || 0
+    capturedScrollHeightRef.current = 0
     const minSnapshotTop = Math.min(0, window.innerHeight - snapshotHeight)
     const snapshotTop = Math.max(-scrollY, minSnapshotTop)
 
@@ -433,7 +436,7 @@ export default function TransitionFrame({ children }) {
       top: '0',
       left: '0',
       width: '100%',
-      height: '100vh',
+      height: '150vh',
       overflow: 'hidden',
       pointerEvents: 'none',
       zIndex: '9999',
