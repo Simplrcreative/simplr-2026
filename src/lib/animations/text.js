@@ -102,14 +102,14 @@ export function createSplitTextAnimation() {
   createLazySplitTextObserver(
     '.split-text',
     '.trigger-split-text',
-    'rgba(255, 255, 255, 0.1)',
+    'rgba(255, 255, 255, 0.05)',
     'rgba(255, 255, 255, 1)'
   )
 
   createLazySplitTextObserver(
     '.split-text-coffee',
     '.trigger-split-text-coffee',
-    'rgba(48, 15, 29, 0.1)',
+    'rgba(48, 15, 29, 0.05)',
     'rgba(48, 15, 29, 1)'
   )
 

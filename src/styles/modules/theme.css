@@ -100,3 +100,31 @@
   font-size: 0.75rem;
   padding: 7px 14px 7.5px 14px
 }
+
+.footer-details-meta {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 0.875rem
+}
+
+.socials a,
+.footer-details-meta a {
+    line-height: 1;
+    text-decoration-line: underline;
+    text-decoration-color: var(--color-coffee);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.3s ease;
+}
+.socials a:hover,
+.footer-details-meta a:hover {
+    text-decoration-color: transparent;
+}
+.socials a {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.footer-details-meta a {
+  font-size: 0.75rem;
+  font-weight: 400;
+}

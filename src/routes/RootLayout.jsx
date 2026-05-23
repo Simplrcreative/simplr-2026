@@ -5,7 +5,7 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, createSplitTextAnimation } from '../lib/animations/index.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
@@ -56,6 +56,14 @@ function handleTransitionLinkClick(event) {
 
 function handleFooterTransitionLinkClick() {
   requestTransitionCapture()
+}
+
+const socials = {
+  linkedin: 'https://www.linkedin.com/simplr',
+  instagram: 'https://www.instagram.com/simplr',
+  awwwards: 'https://www.awwwards.com/simplr',
+  vimeo: 'https://vimeo.com/simplr',
+  facebook: 'https://www.facebook.com/simplr',
 }
 
 export default function RootLayout() {
@@ -260,6 +268,7 @@ export default function RootLayout() {
   }, [pageBg])
 
   useEffect(() => createBtnHoverAnimation(btnRef.current), [])
+  useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => createFooterAnimation(footerRef.current), [location.pathname])
 
   return (
@@ -349,11 +358,11 @@ export default function RootLayout() {
 
       <div className="bg-white section-light footer-off"></div>
 
-      <footer ref={footerRef} className="px-5 bg-white min-h-[50vh]">
+      <footer ref={footerRef} className="px-5 bg-white min-h-[50vh] ">
         
         <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-6">
-            <h1>Let&apos;s build something that works.</h1>
+          <div className="col-start-1 col-span-6 trigger-split-text-coffee">
+            <h1 className="split-text-coffee">Let&apos;s build something that works.</h1>
             <div className="button-wrapper">
               <Link 
                 to="contact"
@@ -391,9 +400,30 @@ export default function RootLayout() {
         </div>
 
         <div className="mt-32 grid grid-cols-1 gap-14 lg:grid-cols-12">
-          <div className="footer-details lg:col-start-1 lg:col-span-6" />
+          <div className="footer-details lg:col-start-1 lg:col-span-6">
+                <div className="socials flex gap-[2.5rem] mb-[3.75rem]">
+                  {Object.entries(socials).map(([title, url]) => (
+                    <a
+                      key={title}
+                      href={url}
+                      title={title}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {title}
+                    </a>
+                  ))}
+                </div>
+                <div className="footer-details-meta max-w-[20rem]">
+                  <div>Unit AS02, The Forum, Lifestyle House,<br/>Northbank Lane, Century City,<br/>South Africa</div>
+                  <div className="my-[3.75rem]">
+                    Simplr © 2026<br/>
+                    <a href="/privacy-policy/" title="Privacy policy">Privacy policy</a> | <a href="/site-map/" title="Sitemap">Sitemap</a>
+                  </div>
+                </div>
+          </div>
 
-          <div className="hidden flex items-end text-coffee lg:col-start-7 lg:col-span-6 lg:justify-end">
+          <div className="flex items-end text-coffee lg:col-start-7 lg:col-span-6 lg:justify-end pb-5">
               <svg width="154" height="150" viewBox="0 0 154 150" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                   <path d="M33.1358 25.2879C33.0194 26.0637 32.6242 26.7639 31.95 27.3884C31.3882 27.9088 30.7906 28.2328 30.1459 28.3707C29.49 28.519 28.8519 28.4838 28.2109 28.2425C27.5586 28.0117 26.9779 27.6102 26.4367 27.0259C25.9058 26.4529 25.5498 25.8432 25.3694 25.1752C25.1995 24.5185 25.2243 23.8691 25.4223 23.2264C25.6202 22.5838 25.9889 22.0126 26.5507 21.4922C27.2248 20.8677 27.9419 20.5375 28.7131 20.4911C29.4844 20.4447 30.2232 20.6789 30.9184 21.204L29.9859 22.0679C29.5629 21.7916 29.1013 21.6764 28.6123 21.7119C28.1224 21.769 27.6812 21.9689 27.2768 22.3436C26.7262 22.8536 26.4641 23.4722 26.4809 24.1664C26.5082 24.8719 26.808 25.5337 27.3804 26.1516C27.9633 26.7808 28.6106 27.1415 29.312 27.2225C30.0133 27.3035 30.6397 27.0782 31.1902 26.5682C31.6059 26.1831 31.8606 25.7593 31.9445 25.264C32.0277 24.7903 31.9264 24.3204 31.6624 23.8551L32.5837 23.0017C33.0534 23.7566 33.2409 24.5224 33.1358 25.2879Z" />
                   <path d="M40.9823 11.0342L41.6111 12.0858L41.0721 12.408C40.428 12.7931 40.1015 13.2917 40.0769 13.8774C40.0602 14.4762 40.2431 15.0806 40.6203 15.7116L42.6636 19.1294L41.5857 19.7739L37.5776 13.0696L38.511 12.5117L39.2607 13.4374C39.264 13.025 39.3644 12.626 39.5699 12.2533C39.7622 11.8885 40.1279 11.545 40.68 11.2149L40.9823 11.0342Z" />

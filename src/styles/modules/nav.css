@@ -184,10 +184,11 @@ nav a.is-active {
 nav.light a.is-active,
 nav.footer-light a.is-active {
     color: white;
+    
 }
 
-nav a.is-active .nav-link__orb {
-    background: var(--color-coffee);
+nav a.is-active .nav-link__content span {
+    text-decoration: underline;
 }
 
 nav.light .nav-link__orb,

@@ -19,6 +19,7 @@ export const siteConfig = {
     phone: '+44 20 7946 0958',
     city: 'Cape Town',
     country: 'South Africa',
+    address: 'Unit AS02, The Forum, Lifestyle House, Northbank Lane, Century City, South Africa'
   },
   transitions: {
     enabled: true,
