@@ -52,9 +52,10 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
       stagger: 0.1,
       scrollTrigger: {
         trigger,
-        start: 'top 70%',
-        end: 'bottom 60%',
+        start: 'top 80%',
+        end: 'top 40%',
         scrub: true,
+        //markers: true,
         invalidateOnRefresh: true,
         refreshPriority: -10,
       },

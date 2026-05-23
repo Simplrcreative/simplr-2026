@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 're
 import { useLoaderData, useOutletContext, Await } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations } from '../lib/animations/index.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -111,6 +111,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
   useEffect(() => {
     if (!introComplete) return
     return createSplitTextAnimation()
+  }, [introComplete])
+
+  // Slide-up / slide-from-left animations — content is deferred so TransitionFrame's
+  // PAGE_TRANSITION_COMPLETE_EVENT fires before these elements exist. Re-run here.
+  useEffect(() => {
+    if (!introComplete) return
+    return createSlideUpAnimations(document.body)
   }, [introComplete])
 
   // Refresh scroll triggers after animations initialize

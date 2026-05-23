@@ -358,10 +358,10 @@ export default function RootLayout() {
 
       <div className="bg-white section-light footer-off"></div>
 
-      <footer ref={footerRef} className="px-5 bg-white min-h-[50vh] ">
+      <footer ref={footerRef} className="px-5 min-h-[50vh] trigger-split-text-coffee ">
         
         <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-6 trigger-split-text-coffee">
+          <div className="col-start-1 col-span-6 ">
             <h1 className="split-text-coffee">Let&apos;s build something that works.</h1>
             <div className="button-wrapper">
               <Link 
