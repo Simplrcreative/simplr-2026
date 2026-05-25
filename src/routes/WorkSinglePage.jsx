@@ -310,7 +310,7 @@ export default function WorkSinglePage() {
             </div>
         </div>
         <div className="next-title-wrapper ">
-          <div className="next-title fixed top-[72%] text-coffee min-h-[600px]" >
+          <div className="next-title text-coffee min-h-[600px]" >
             Next Case Study
           </div>
         </div>

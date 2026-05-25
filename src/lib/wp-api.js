@@ -244,17 +244,42 @@ const postsQuery = `
         acfPostBuilder {
           acfFeaturedImage {
             node {
-                altText
+              altText
+              title
+              guid
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
+          acfLinkedWork {
+            nodes {
+              ... on AcfWork {
+                slug
                 title
-                guid
-                mediaDetails {
-                  sizes {
-                    name
-                    sourceUrl
+                acfWorkBuilder {
+                  acfCategory {
+                    nodes {
+                      name
+                    }
+                  }
+                  acfClient {
+                    nodes {
+                      name
+                    }
+                  }
+                  acfFeaturedThumbnail {
+                    node {
+                      guid
+                    }
                   }
                 }
               }
             }
+          }
         }
       }
     }
@@ -792,6 +817,28 @@ export async function fetchThinkingPostsData() {
         },
       })),
     }
+  }
+}
+
+export async function fetchDefaultPageData(slug) {
+  if (!wpConfig.endpoint) {
+    return { slug, page: null }
+  }
+
+  try {
+    const uri = `/${slug}/`
+    const data = await remember(`default-page:${slug}`, () =>
+      graphQlRequest(pageByUriQuery, { uri }),
+    )
+
+    const node = data.nodeByUri
+    return {
+      slug,
+      page: node ? { title: node.title || slug, content: node.content || '' } : null,
+    }
+  } catch (error) {
+    reportError(`Unable to load default page for ${slug}`, error)
+    return { slug, page: null }
   }
 }
 

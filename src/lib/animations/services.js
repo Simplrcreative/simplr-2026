@@ -253,7 +253,7 @@ export function createServicesScrollAnimation(scope) {
         trigger: section,
         start: SERVICES_ENTRY_START,
         end: () => `top ${SERVICES_PIN_TOP}`,
-        scrub: true,
+        scrub: 1,
         invalidateOnRefresh: true,
         onUpdate: syncActiveTitleState,
         onRefresh: syncActiveTitleState,

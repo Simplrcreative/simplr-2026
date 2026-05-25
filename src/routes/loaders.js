@@ -1,4 +1,4 @@
-import { fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
+import { fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -80,7 +80,11 @@ export function createThinkingPageLoader() {
 
 export function createThinkingSinglePageLoader() {
   return async function ThinkingSinglePageLoader({ params }) {
-    return fetchThinkingEntryData(params.slug)
+    const [entry, { posts }] = await Promise.all([
+      fetchThinkingEntryData(params.slug),
+      fetchThinkingPostsData(),
+    ])
+    return { ...entry, posts }
   }
 }
 
@@ -91,5 +95,12 @@ export function createContactPageLoader() {
 
 export function createEst2014PageLoader() {
   return async function Est2014PageLoader() {
+  }
+}
+
+export function createDefaultPageLoader() {
+  return async function defaultPageLoader({ request }) {
+    const slug = new URL(request.url).pathname.replace(/^\/|\/$/g, '')
+    return fetchDefaultPageData(slug)
   }
 }
