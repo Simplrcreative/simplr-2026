@@ -128,7 +128,7 @@ export default function ThinkingSinglePage() {
         </div>
         <div className="next-title-wrapper ">
           <div className="next-title text-coffee min-h-[600px]" >
-            {linkedWork[0].title}
+            View Case Study
           </div>
         </div>
       </section>
