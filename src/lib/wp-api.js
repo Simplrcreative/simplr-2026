@@ -182,14 +182,15 @@ const worksQuery = `
               }
             }
             acfVideo1 {
-            node {
-              guid
+              node {
+                guid
+              }
             }
             acfVideo2 {
-            node {
-              guid
+              node {
+                guid
+              }
             }
-          }
           }
           acfTestimonial {
             nodes {

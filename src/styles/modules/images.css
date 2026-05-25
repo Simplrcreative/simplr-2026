@@ -1,12 +1,12 @@
-picture {
+picture, video {
     display: block;
-    position: relative;
 }
 .ratio > * {
     position: absolute;
     inset: 0;
 }
-.ratio img, .ratio video {
+.ratio img, 
+.ratio video {
     object-fit: cover;
     width: 100%;
     height: 100%;
@@ -14,6 +14,7 @@ picture {
     top: auto;
 }
 .ratio {
+    position: relative;
     background: #efefef;
     padding-top: var(--aspect-ratio-mobile);
 }
