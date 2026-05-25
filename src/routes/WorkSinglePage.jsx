@@ -147,12 +147,16 @@ export default function WorkSinglePage() {
           imgOrder = 'order-1 col-start-1 pe-2'
         }
         const content = section?.acfContent || ''
+        const video1 = section?.acfVideo1.node?.guid || ''
+        const video2 = section?.acfVideo2.node?.guid || ''
         const getSizeUrl = (field) =>
           field?.node?.mediaDetails?.sizes?.find((s) => s.name === 'large')?.sourceUrl
-          || field?.node?.mediaDetails?.sizes?.[0]?.sourceUrl
+          || field?.node?.guid
           || ''
         const image1 = getSizeUrl(section?.acfImage1)
         const image2 = getSizeUrl(section?.acfImage2)
+     
+
 
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
@@ -168,31 +172,83 @@ export default function WorkSinglePage() {
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
                   <div className={`col-span-6 ${imgOrder}`}>
-                    <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
-                      {image1 && <img src={image1} alt="" />}
-                    </picture>
+                    {video1 ? (
+                      <video
+                        className="ratio overflow-hidden rounded-[10px]"
+                        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                        src={video1}
+                        poster={image1 || undefined}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    ) : (
+                      <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        {image1 && <img src={image1} alt="" />}
+                      </picture>
+                    )}
                   </div>
                 </>
               )}
               {layout === 'Two Images' && (
                 <>
                   <div className="col-start-1 col-span-6 pe-2">
-                    <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
-                      {image1 && <img src={image1} alt="" />}
-                    </picture>
+                    {video1 ? (
+                      <video
+                        className="ratio overflow-hidden rounded-[10px]"
+                        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                        src={video1}
+                        poster={image1 || undefined}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    ) : (
+                      <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        {image1 && <img src={image1} alt="" />}
+                      </picture>
+                    )}
                   </div>
                   <div className="col-start-7 col-span-6 ps-2 section-dark">
-                    <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
-                      {image2 && <img src={image2} alt="" />}
-                    </picture>
+                    {video2 ? (
+                      <video
+                        className="ratio overflow-hidden rounded-[10px]"
+                        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                        src={video2}
+                        poster={image2 || undefined}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    ) : (
+                      <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        {image2 && <img src={image2} alt="" />}
+                      </picture>
+                    )}
                   </div>
                 </>
               )}
               {layout === 'Full Image' && (
                 <div className="col-span-12 section-dark">
-                  <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
-                    {image1 && <img src={image1} alt="" />}
-                  </picture>
+                  {video1 ? (
+                    <video
+                      className="ratio overflow-hidden rounded-[10px]"
+                      style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                      src={video1}
+                      poster={image1 || undefined}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  ) : (
+                    <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
+                      {image1 && <img src={image1} alt="" />}
+                    </picture>
+                  )}
                 </div>
               )}
             </div>

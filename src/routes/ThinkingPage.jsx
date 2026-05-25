@@ -203,7 +203,7 @@ export default function ThinkingPage() {
                   <picture className="thinking-post__image-frame" data-post-image-frame>
                     {thumb ? <img src={thumb} alt={post.featuredImage?.node?.altText || postTitle} /> : null}
                   </picture>
-                  <h2 className="thinking-post__title" data-post-title>{postTitle}</h2>
+                  <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
                 </Link>
               </article>
             )

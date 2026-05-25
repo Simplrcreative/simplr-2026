@@ -161,6 +161,7 @@ const worksQuery = `
             acfContent
             acfImage1 {
               node {
+                guid
                 mediaDetails {
                   sizes {
                     name
@@ -171,6 +172,7 @@ const worksQuery = `
             }
             acfImage2 {
               node {
+                guid
                 mediaDetails {
                   sizes {
                     name
@@ -179,6 +181,15 @@ const worksQuery = `
                 }
               }
             }
+            acfVideo1 {
+            node {
+              guid
+            }
+            acfVideo2 {
+            node {
+              guid
+            }
+          }
           }
           acfTestimonial {
             nodes {
@@ -232,9 +243,9 @@ const postsQuery = `
         acfPostBuilder {
           acfFeaturedImage {
             node {
-                sourceUrl(size: LARGE)
                 altText
                 title
+                guid
                 mediaDetails {
                   sizes {
                     name

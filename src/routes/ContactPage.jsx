@@ -95,6 +95,7 @@ export default function ContactPage() {
         { publicKey: EMAILJS_PUBLIC_KEY },
       )
       setStatus('success')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
       console.error('EmailJS error:', err)
       setStatus('error')
@@ -141,8 +142,8 @@ export default function ContactPage() {
           <div className="contact-form col-start-8 col-span-5 pt-20">
             {status === 'success' ? (
               <div className="flex flex-col gap-6 text-white py-10">
-                <p className="text-[22px] leading-6 font-medium">Thank you — we&apos;ll be in touch soon.</p>
-                <p className="opacity-60">Your enquiry has been received. Someone from the Simplr team will reach out to you shortly.</p>
+                <p className="text-[22px] leading-6 font-medium">Thank you — we&apos;ll be in touch shortly.</p>
+                <p className="opacity-60 max-w-[48ch]">Your enquiry has been received. Someone from the Simplr team will reach out to you shortly.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-9 text-white">
