@@ -713,6 +713,7 @@ export default function TransitionFrame({ children }) {
       tl.to(altClone, {
         top: '-30%',
         left: 0,
+        filter: 'blur(10px)',
         width: width,
         height: width * 0.9,
         borderRadius: 0,
@@ -809,7 +810,7 @@ export default function TransitionFrame({ children }) {
         }
 
         tl.to(altClone, {
-          //x: 0,
+          filter: 'blur(0px)',
           top: dock.rect.top,
           left: dock.rect.left,
           width: dock.rect.width,
