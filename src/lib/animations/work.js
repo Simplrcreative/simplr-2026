@@ -40,20 +40,20 @@ export function createNextWorkAnimation() {
     const titleWidth = title.offsetWidth
     const vw = window.innerWidth
     const pinDuration = window.innerHeight
-    const startX = (vw + titleWidth) / 2
+    const startX = (vw + titleWidth) / 3
     const endX = -startX
 
     if (tween) { tween.kill(); tween = null }
     if (st) { st.kill(); st = null }
     gsap.set(title, { clearProps: 'x', autoAlpha: 1 })
 
-    tween = gsap.fromTo(title, { x: startX, autoAlpha: 1 }, { x: endX, autoAlpha: 1, duration: 5, ease: 'none', paused: true })
+    tween = gsap.fromTo(title, { x: startX, autoAlpha: 1 }, { x: endX, autoAlpha: 1, ease: 'none', paused: true })
     st = ScrollTrigger.create({
       trigger: section,
       //start: 'top top',
-      start: 'top 72%',
+      start: 'top 98%',
       //end: `+=${pinDuration}`,
-      end: `bottom bottom`,
+      end: `top 0`,
       //pin: true,
       scrub: 2,
       //markers: true,
