@@ -7,6 +7,7 @@
   --color-web-design-development: #c8bbff;
   --color-motion: #705f07;
   --color-templates: #596bf0;
+  --color-creative-ai: #e3c5b6;
 }
 
 @utility container {
@@ -40,7 +41,8 @@
     padding-left: 40px!important;
     line-height: 30px;
     margin-bottom: 3.25rem!important;
-    @apply text-[1,375rem] font-semibold relative;
+    font-size: 22px;
+    @apply font-semibold relative;
   }
   .eyebrow::before {
     content:'';
