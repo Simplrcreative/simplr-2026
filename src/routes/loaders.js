@@ -2,8 +2,15 @@ import { fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWork
 
 export function createRootLoader() {
   return async function rootLoader() {
+    const [navigation, { works }] = await Promise.all([
+      fetchNavigationData(),
+      fetchWorksData().catch(() => ({ works: [] })),
+    ])
+    const workCount = works.length
     return {
-      navigation: await fetchNavigationData(),
+      navigation: workCount > 0
+        ? navigation.map((item) => item.key === 'work' ? { ...item, count: String(workCount) } : item)
+        : navigation,
     }
   }
 }
@@ -36,6 +43,7 @@ export function createWorkLoader() {
 
     return {
       works,
+      workCount: works.length,
       testimonials: Object.fromEntries(testimonialEntries),
     }
   }

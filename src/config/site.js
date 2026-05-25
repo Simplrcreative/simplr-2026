@@ -63,7 +63,6 @@ export const routeDefinitions = {
     path: '/work',
     uri: '/work/',
     schemaType: 'CollectionPage',
-    count: '45',
   },
   about: {
     key: 'about',
