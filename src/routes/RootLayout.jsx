@@ -59,11 +59,11 @@ function handleFooterTransitionLinkClick() {
 }
 
 const socials = {
-  linkedin: 'https://www.linkedin.com/simplr',
-  instagram: 'https://www.instagram.com/simplr',
-  awwwards: 'https://www.awwwards.com/simplr',
-  vimeo: 'https://vimeo.com/simplr',
-  facebook: 'https://www.facebook.com/simplr',
+  linkedin: 'https://www.linkedin.com/company/simplrcreative/',
+  instagram: 'https://www.instagram.com/simplrcreative',
+  awwwards: 'https://www.awwwards.com/Simplr-Creative',
+  vimeo: 'https://vimeo.com/simplrcreative',
+  facebook: 'https://www.facebook.com/simplrcreative',
 }
 
 export default function RootLayout() {
