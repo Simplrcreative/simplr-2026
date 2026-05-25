@@ -93,7 +93,7 @@ export function createWorkImagesAnimation() {
   const media = gsap.matchMedia()
 
   media.add('(prefers-reduced-motion: no-preference)', () => {
-    const pictures = gsap.utils.toArray('.work-content picture.ratio')
+    const pictures = gsap.utils.toArray('.work-content .ratio')
 
     if (!pictures.length) return undefined
 
