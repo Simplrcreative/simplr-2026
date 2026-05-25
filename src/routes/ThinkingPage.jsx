@@ -47,7 +47,6 @@ function postMatchesFilter(post, filterId) {
 
 export default function ThinkingPage() {
   const { posts = [] } = useLoaderData() ?? {}
-  console.log(posts)
   const [activeFilter, setActiveFilter] = useState('all')
   const postsResultsRef = useRef(null)
 

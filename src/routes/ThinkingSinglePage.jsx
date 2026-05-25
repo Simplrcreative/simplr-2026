@@ -51,7 +51,7 @@ export default function ThinkingSinglePage() {
   let linkedWorkThumbnail = ''
   let linkedWorkCategories = ''
   let linkedWorkClient = ''
-  if(linkedWork) {
+  if(linkedWork.length > 0) {
     linkedWorkThumbnail = linkedWork[0].acfWorkBuilder?.acfFeaturedThumbnail?.node?.guid || ''
     linkedWorkCategories = linkedWork[0].acfWorkBuilder?.acfCategory?.nodes || []
     linkedWorkClient = linkedWork[0].acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''
@@ -95,7 +95,7 @@ export default function ThinkingSinglePage() {
         </div>
       </section>
 
-      {linkedWork && (
+      {linkedWork.length > 0 && (
         
       <section className="next-work px-5 py-20 bg-white section-light relative overflow-hidden__">
         <div className="grid grid-cols-12 relative z-1">
