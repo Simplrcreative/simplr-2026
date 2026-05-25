@@ -45,17 +45,17 @@ export function createNextWorkAnimation() {
 
     if (tween) { tween.kill(); tween = null }
     if (st) { st.kill(); st = null }
-    gsap.set(title, { clearProps: 'x' })
+    gsap.set(title, { clearProps: 'x', autoAlpha: 1 })
 
-    tween = gsap.fromTo(title, { x: startX, y: 0 }, { x: endX, y: 150, duration: 5, ease: 'none', paused: true })
+    tween = gsap.fromTo(title, { x: startX, autoAlpha: 1 }, { x: endX, autoAlpha: 1, duration: 5, ease: 'none', paused: true })
     st = ScrollTrigger.create({
       trigger: section,
       //start: 'top top',
-      start: 'top 75%',
+      start: 'top 72%',
       //end: `+=${pinDuration}`,
-      end: `top 5%`,
+      end: `bottom bottom`,
       //pin: true,
-      scrub: true,
+      scrub: 2,
       //markers: true,
       anticipatePin: 1,
       animation: tween,
