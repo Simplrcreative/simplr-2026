@@ -199,7 +199,7 @@ export default function WorkSinglePage() {
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
                   
-                  <div className={`col-start-1 md:col-start-8 col-span-12 md:col-span-4 flex flex-col justify-end`}>
+                  <div className={`col-start-1 md:col-start-9 col-span-12 md:col-span-4 flex flex-col justify-end`}>
                     <RichText html={content2} className="split-text-coffee"/>
                   </div>
                 </>
