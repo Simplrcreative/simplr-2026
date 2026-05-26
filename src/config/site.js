@@ -76,14 +76,14 @@ export const routeDefinitions = {
     label: 'Services',
     path: '/services',
     uri: '/services/',
-    schemaType: 'AboutPage',
+    schemaType: 'ServicesPage',
   },
   thinking: {
     key: 'thinking',
     label: 'Thinking',
     path: '/thinking',
     uri: '/thinking/',
-    schemaType: 'CollectionPage',
+    schemaType: 'ArticlePage',
   },
   contact: {
     key: 'contact',
