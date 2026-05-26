@@ -194,15 +194,15 @@ export default function WorkSinglePage() {
                 </>
               )}
               {layout === 'Two Text Boxes' && (
-                <div className="trigger-split-text-coffee">
-                  <div className={`col-span-12 md:col-span-4 flex flex-col justify-end`}>
+                <>
+                  <div className={`col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
                   
                   <div className={`col-start-1 md:col-start-8 col-span-12 md:col-span-4 flex flex-col justify-end`}>
                     <RichText html={content2} className="split-text-coffee"/>
                   </div>
-                </div>
+                </>
               )}
               {layout === 'Two Images' && (
                 <>
