@@ -247,7 +247,7 @@ export default function WorkSinglePage() {
               {layout === 'Full Image' && (
                 <div className="col-span-12 section-dark">
                   {video1 ? (
-                    <div className="full-image overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
+                    <div className="full-image overflow-hidden rounded-[10px]">
                       <video
                         src={video1}
                         poster={image1 || undefined}
@@ -258,7 +258,7 @@ export default function WorkSinglePage() {
                       />
                     </div>
                   ) : (
-                    <picture className="full-image overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
+                    <picture className="full-image overflow-hidden rounded-[10px]">
                       {image1 && <img src={image1} alt="" />}
                     </picture>
                   )}
