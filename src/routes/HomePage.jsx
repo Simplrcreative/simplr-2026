@@ -328,7 +328,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
                       className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                     >
                       <picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
-                        {study.thumbnail ? <img src={study.thumbnail} title={study.client} /> : null}
+                        {study.thumbnail ? <img src={study.thumbnail + '.webp'} title={study.client} /> : null}
                       </picture>
                     </Link>
                     {study.categories?.length > 0 && (

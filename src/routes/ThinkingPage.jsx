@@ -200,7 +200,7 @@ export default function ThinkingPage() {
               <article key={post.databaseId ?? post.slug} className="thinking-post-card" data-post-card>
                 <Link to={buildEntryPath('thinking', post.slug)} className="thinking-post-link">
                   <picture className="thinking-post__image-frame" data-post-image-frame>
-                    {thumb ? <img src={thumb} alt={post.featuredImage?.node?.altText || postTitle} /> : null}
+                    {thumb ? <img src={thumb + '.webp'} alt={post.featuredImage?.node?.altText || postTitle} /> : null}
                   </picture>
                   <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
                 </Link>

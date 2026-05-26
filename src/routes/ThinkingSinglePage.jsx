@@ -77,7 +77,7 @@ export default function ThinkingSinglePage() {
           {thumb && ( 
           <div className="col-start-4 col-span-6 pt-20">
             <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
-              <img src={thumb} alt={title} />
+              <img src={thumb + '.webp'} alt={title} />
             </picture>
           </div>
           )}
@@ -111,7 +111,7 @@ export default function ThinkingSinglePage() {
                     className="ratio overflow-hidden"
                     style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
                   >
-                    {linkedWorkThumbnail && <img src={linkedWorkThumbnail} alt={linkedWork[0].title} />}
+                    {linkedWorkThumbnail && <img src={linkedWorkThumbnail + '.webp'} alt={linkedWork[0].title} />}
                   </picture>
                   
                 </Link>
@@ -144,7 +144,7 @@ export default function ThinkingSinglePage() {
                 <article key={post.databaseId ?? post.slug} className="thinking-post-card" data-post-card>
                   <Link to={buildEntryPath('thinking', post.slug)} className="thinking-post-link">
                     <picture className="thinking-post__image-frame" data-post-image-frame>
-                      {postThumb ? <img src={postThumb} alt={postTitle} /> : null}
+                      {postThumb ? <img src={postThumb + '.webp'} alt={postTitle} /> : null}
                     </picture>
                     <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
                   </Link>

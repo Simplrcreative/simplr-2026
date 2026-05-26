@@ -129,7 +129,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
         className="ratio overflow-hidden rounded-[10px] block"
         style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': aspectRatio }}
       >
-        {thumb && <img src={thumb} alt={work.title} />}
+        {thumb && <img src={thumb + '.webp'} alt={work.title} />}
       </picture>
       
     </Link>
@@ -162,7 +162,7 @@ function WorkFeatured({ work, cardKey }) {
         className="ratio overflow-hidden rounded-[10px] block"
         style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
       >
-        {thumb && <img src={thumb} alt={work.title} />}
+        {thumb && <img src={thumb + '.webp'} alt={work.title} />}
       </picture>
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{clients[0].name}</h3>
@@ -211,7 +211,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
               className="ratio overflow-hidden rounded-[10px] block"
               style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
             >
-              {thumb && <img src={thumb} alt={work.title} title={client} />}
+              {thumb && <img src={thumb + '.webp'} alt={work.title} title={client} />}
             </picture>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (

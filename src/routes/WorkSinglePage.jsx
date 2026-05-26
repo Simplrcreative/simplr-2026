@@ -12,12 +12,14 @@ export default function WorkSinglePage() {
   const pathname = work?.slug ? `/work/${work.slug}` : '/work'
   const categories = work?.acfWorkBuilder?.acfCategory?.nodes ?? []
   const thumbnail = work?.thumbnail || ''
+  const fthumbnail = thumbnail + '.webp' ? thumbnail : ''
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
   const introduction = work?.acfWorkBuilder?.acfIntroduction ?? []
   const swags = work?.acfWorkBuilder?.acfSwag ?? []
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
   const nextWork = useLoaderData()?.nextWork ?? null
+  
 
   useEffect(() => {
     // Lock scroll during the featured-image dock transition; unlock on completion.
@@ -67,12 +69,12 @@ export default function WorkSinglePage() {
           </div>
           <div className="col-start-8 col-span-5 change-logo">
             <div className="featured-image section-dark">
-              {thumbnail && (
+              {fthumbnail && (
                 <picture
                   className="ratio overflow-hidden rounded-[10px]"
                   style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
                 >
-                  <img src={thumbnail} alt={title} />
+                  <img src={fthumbnail} alt={title} />
                 </picture>
               )}
             </div>
@@ -157,8 +159,9 @@ export default function WorkSinglePage() {
           || ''
         const image1 = getSizeUrl(section?.acfImage1)
         const image2 = getSizeUrl(section?.acfImage2)
-     
 
+        const fImage1 = image1 + '.webp' ? image1 : ''
+        const fImage2 = image2 + '.webp' ? image2 : ''
 
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
@@ -178,7 +181,7 @@ export default function WorkSinglePage() {
                       <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
                         <video
                           src={video1}
-                          poster={image1 || undefined}
+                          poster={fImage1 || undefined}
                           autoPlay
                           muted
                           loop
@@ -187,6 +190,7 @@ export default function WorkSinglePage() {
                       </div>
                     ) : (
                       <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        {fImage1 && <source srcSet={fImage1} type="image/webp" />}
                         {image1 && <img src={image1} alt="" />}
                       </picture>
                     )}
@@ -211,7 +215,7 @@ export default function WorkSinglePage() {
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video1}
-                          poster={image1 || undefined}
+                          poster={fImage1 || undefined}
                           autoPlay
                           muted
                           loop
@@ -220,6 +224,7 @@ export default function WorkSinglePage() {
                       </div>
                     ) : (
                       <picture className="full-image overflow-hidden rounded-[10px]">
+                        {fImage1 && <source srcSet={fImage1} type="image/webp" />}
                         {image1 && <img src={image1} alt="" />}
                       </picture>
                     )}
@@ -229,7 +234,7 @@ export default function WorkSinglePage() {
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video2}
-                          poster={image2 || undefined}
+                          poster={fImage2 || undefined}
                           autoPlay
                           muted
                           loop
@@ -238,6 +243,7 @@ export default function WorkSinglePage() {
                       </div>
                     ) : (
                       <picture className="full-image overflow-hidden rounded-[10px]">
+                        {fImage2 && <source srcSet={fImage2} type="image/webp" />}
                         {image2 && <img src={image2} alt="" />}
                       </picture>
                     )}
@@ -250,7 +256,7 @@ export default function WorkSinglePage() {
                     <div className="full-image overflow-hidden rounded-[10px]">
                       <video
                         src={video1}
-                        poster={image1 || undefined}
+                        poster={fImage1 || undefined}
                         autoPlay
                         muted
                         loop
@@ -259,6 +265,7 @@ export default function WorkSinglePage() {
                     </div>
                   ) : (
                     <picture className="full-image overflow-hidden rounded-[10px]">
+                      {fImage1 && <source srcSet={fImage1} type="image/webp" />}
                       {image1 && <img src={image1} alt="" />}
                     </picture>
                   )}
@@ -293,6 +300,7 @@ export default function WorkSinglePage() {
       )}
 
       {nextWork && (
+        
       <section className="next-work px-5 py-20 bg-white section-light relative overflow-hidden__">
         <div className="grid grid-cols-12 relative z-1">
             <div className="col-start-5 col-span-4 pt-20">
@@ -307,7 +315,7 @@ export default function WorkSinglePage() {
                     className="ratio overflow-hidden"
                     style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
                   >
-                    {nextWork.thumbnail && <img src={nextWork.thumbnail} alt={nextWork.title} />}
+                    {nextWork.thumbnail && <img src={nextWork.thumbnail + '.webp'} alt={nextWork.title} />}
                   </picture>
                   
                 </Link>
