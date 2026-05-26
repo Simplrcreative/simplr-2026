@@ -65,6 +65,29 @@ nav a:focus-visible .nav-link__orb {
     transform: translate(-50%, -50%) scale(1);
 }
 
+ nav.light a,
+.logo-holder.light,
+.logo-holder.footer-light {
+    color: white;
+}
+
+nav.light .nav-link__content--inverted {
+    color: var(--color-coffee);
+}
+
+nav a.is-active {
+    color: var(--color-coffee);
+}
+
+nav.light a.is-active {
+    color: white;
+}
+
+nav.light .nav-link__orb,
+nav.light a.is-active .nav-link__orb {
+    background: white;
+}
+
 @media (max-width: 767.9px) {
     nav.main {
        position: fixed;
@@ -174,29 +197,6 @@ nav a:focus-visible .nav-link__orb {
         pointer-events: none;
         transition: opacity 220ms ease, clip-path 380ms cubic-bezier(0.22, 1, 0.36, 1), color 220ms ease;
         z-index: 2;
-    }
-
-    nav.light a,
-    .logo-holder.light,
-    .logo-holder.footer-light {
-        color: white;
-    }
-
-    nav.light .nav-link__content--inverted {
-        color: var(--color-coffee);
-    }
-
-    nav a.is-active {
-        color: var(--color-coffee);
-    }
-
-    nav.light a.is-active {
-        color: white;
-    }
-
-    nav.light .nav-link__orb,
-    nav.light a.is-active .nav-link__orb {
-        background: white;
     }
 
     nav a sup {

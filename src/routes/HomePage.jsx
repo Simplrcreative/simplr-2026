@@ -271,7 +271,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
           <div className="stat-item flex flex-col md:flex-row gap-5 md:justify-between md:w-[65%] relative">
             <div data-initial="62" className="stat-no text-strategy">0</div>
             <div className="flex flex-col">
-              <div className="stat-plus absolute top-0 right-[1.25rem] md:static mb-40 text-strategy text-[5rem]">+</div>
+              <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-40 text-strategy text-[5rem]">+</div>
               <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-10 md:mt-0">Successfully launched brands since 2015 </div>
             </div>
           </div>

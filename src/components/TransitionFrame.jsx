@@ -37,11 +37,31 @@ export default function TransitionFrame({ children }) {
   const location = useLocation()
   const logo = layoutRef.current?.querySelector('.logo')
   const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
+  const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
+  //RESPONSIVE VALUES
+    let logoScale = 1
+    let logoY = 0
+    let logoDuration = 0
+
+    let taglineScale = 0.65
+    let taglineY = -88
+    let taglineX = 65
+
+    if (isDesktop) {
+      logoY = -10
+      logoScale = 0.35
+      logoDuration = 0.5
+
+      taglineScale = 0.68
+      taglineY = -213
+      taglineX = 65
+    }
 
   function applyCompactLogoState() {
     gsap.set('.logo', {
-      scale: 0.35,
-      y: -10,
+      scale: logoScale,
+      y: logoY,
       transformOrigin: 'left top',
       willChange: 'transform',
     })
@@ -51,9 +71,9 @@ export default function TransitionFrame({ children }) {
       autoAlpha: 0,
     })
     gsap.set('.tagline', {
-      y: -213,
-      x: 65,
-      scale: 0.68,
+      y: taglineY,
+      x: taglineX,
+      scale: taglineScale,
       transformOrigin: 'left top',
       willChange: 'transform',
     })

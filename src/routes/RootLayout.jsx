@@ -89,6 +89,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     previousPathRef.current = location.pathname
+    setIsNavOpen(false)
   }, [location.pathname])
 
   // Reset intro state when leaving home page
@@ -144,6 +145,7 @@ export default function RootLayout() {
 
     // Scope all GSAP targets to layoutRef.current so body-appended header/compact-logo
     // clones (used for the outgoing animation) aren't clobbered by these sets.
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches
     const layout = layoutRef.current
     gsap.set(layout?.querySelector('.compact-logo'), { clearProps: 'all' })
 
@@ -151,10 +153,30 @@ export default function RootLayout() {
     // Non-home pages: logo is permanently in its compact end-state and visible.
     // This matches what TransitionFrame's applyCompactLogoState() does on routing,
     // so direct loads and client-side navigations behave identically.
+    
+    //RESPONSIVE VALUES
+    let logoScale = 1
+    let logoY = 0
+    let logoDuration = 0
+
+    let taglineScale = 0.65
+    let taglineY = -88
+    let taglineX = 65
+
+    if (isDesktop) {
+      logoY = -10
+      logoScale = 0.35
+      logoDuration = 0.5
+
+      taglineScale = 0.68
+      taglineY = -213
+      taglineX = 65
+    }
+
     gsap.set(layout?.querySelector('.logo'), {
       autoAlpha: isHomePage ? 0 : 1,
-      scale: 0.35,
-      y: -10,
+      scale: logoScale,
+      y: logoY,
       transformOrigin: 'left top',
       willChange: 'transform',
     })
