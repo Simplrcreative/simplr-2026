@@ -65,7 +65,7 @@ function getHeroStart() {
 function getHeroEndDistance() {
   return `+=${window.innerHeight}`
 }
-
+const isDesktop = window.matchMedia('(min-width: 768px)').matches
 const NAV_LIGHT_TOP = 95
 const LOGO_LIGHT_LEFT = 130
 const LIGHT_RELEASE_OFFSET = 12
@@ -279,18 +279,31 @@ function createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, get
 
 function updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSections, sectionThreshold) {
   const bounds = heroImage.getBoundingClientRect()
-  const sectionThemeLightState = getSectionThemeLightState(themedSections, sectionThreshold)
 
-  lightState.nav = resolveLightState(lightState.nav, bounds.top, NAV_LIGHT_TOP)
-  lightState.logo = resolveLightState(lightState.logo, bounds.left, LOGO_LIGHT_LEFT)
+  if (isDesktop) {
+    const sectionThemeLightState = getSectionThemeLightState(themedSections, sectionThreshold)
+    lightState.nav = resolveLightState(lightState.nav, bounds.top, NAV_LIGHT_TOP)
+    lightState.logo = resolveLightState(lightState.logo, bounds.left, LOGO_LIGHT_LEFT)
 
-  if (sectionThemeLightState !== null) {
-    applySectionLightState(nav, logo, lightState, sectionThemeLightState)
-    return
+    if (sectionThemeLightState !== null) {
+      applySectionLightState(nav, logo, lightState, sectionThemeLightState)
+      return
+    }
+
+    nav?.classList.toggle('light', lightState.nav)
+    logo?.classList.toggle('light', lightState.logo)
+  } else {
+    // Mobile: nav never gets .light (menu uses mix-blend-mode instead).
+    // Logo light state driven by hero image top position vs logo-holder's actual
+    // bottom edge — fires exactly when the expanding image begins to overlap the logo.
+    lightState.nav = false
+    const logoBounds = logo?.getBoundingClientRect()
+    const mobileLogoThreshold = (logoBounds && logoBounds.height > 0)
+      ? Math.round(logoBounds.bottom)
+      : NAV_LIGHT_TOP
+    lightState.logo = resolveLightState(lightState.logo, bounds.top, mobileLogoThreshold)
+    logo?.classList.toggle('light', lightState.logo)
   }
-
-  nav?.classList.toggle('light', lightState.nav)
-  logo?.classList.toggle('light', lightState.logo)
 }
 
 export function createHeroScrollAnimation(scope) {
@@ -469,8 +482,13 @@ export function createHeroScrollAnimation(scope) {
       }
     }
 
-    sectionThemeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
-  changeLogoWatcher = createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, getSectionThreshold)
+    // Section theme watcher is desktop-only: on mobile the sectionThemeLightState
+    // early-return in updateHeaderLightClasses would override the bounds-based
+    // logo check on every scroll tick, making the threshold value irrelevant.
+    if (isDesktop) {
+      sectionThemeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
+    }
+    changeLogoWatcher = createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, getSectionThreshold)
 
     gsap.set(heroTitle, {
       willChange: 'opacity',

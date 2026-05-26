@@ -18,6 +18,11 @@ picture, video {
     background: #efefef;
     padding-top: var(--aspect-ratio-mobile);
 }
+.full-image img, 
+.full-image video {
+    width: 100%;
+    height: auto;
+}
 
 @media (min-width: 48rem) {
     .ratio {

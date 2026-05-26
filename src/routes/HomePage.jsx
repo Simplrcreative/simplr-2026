@@ -217,10 +217,10 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-screen flex flex-col justify-end change-logo-back">
           <div className="grid grid-cols-12 items-start gap-x-5">
-            <div className="col-start-1 col-span-6 pb-8 max-w-[85ch]"> 
+            <div className="col-start-1 col-span-10 md:col-span-6 pb-8 max-w-[85ch]"> 
               <h1 className="hero-title">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
-            <div className="hero-video-holder col-start-8 col-span-5 section-dark flex items-end justify-end pb-5"> 
+            <div className="hero-video-holder col-start-1 md:col-start-8 col-span-12 md:col-span-5 section-dark flex items-end justify-end pb-5"> 
               <video ref={heroVideoRef} className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden" autoPlay muted playsInline>
                 <source src={heroVideo} type="video/mp4"/>
               </video>
@@ -230,7 +230,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
 
       <section className="brands-grow px-5 bg-white py-20 section-light relative z-1 change-logo">
         <div className="grid grid-cols-12">
-          <div className="trigger-split-text-coffee col-start-4 col-span-5 lead max-w-[47ch] "> 
+          <div className="trigger-split-text-coffee col-start-1 md:col-start-4 col-span-12 md:col-span-5 lead max-w-[47ch] "> 
               <div className="split-text-coffee">We help brands grow through creativity, craft, and intelligent design. From strategy and branding to digital experiences, motion, and presentation systems, we create work that connects purpose with performance.</div>
           </div>
         </div>
@@ -268,18 +268,18 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-20">
-          <div className="stat-item flex gap-5 justify-between w-[65%]">
-            <div data-initial="62" className="stat-no text-strategy text-[37.5rem]">0</div>
+          <div className="stat-item flex flex-col md:flex-row gap-5 md:justify-between md:w-[65%] relative">
+            <div data-initial="62" className="stat-no text-strategy">0</div>
             <div className="flex flex-col">
-              <div className="stat-plus mb-40 text-strategy text-[5rem]">+</div>
-              <div className="stat-detail lead max-w-[22ch]">Successfully launched brands since 2015 </div>
+              <div className="stat-plus absolute top-0 right-[1.25rem] md:static mb-40 text-strategy text-[5rem]">+</div>
+              <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-10 md:mt-0">Successfully launched brands since 2015 </div>
             </div>
           </div>
         </div>
         <Link 
           to="services"
           ref={btnRef}
-          className="btn absolute right-[1.25rem] bottom-[5rem]"
+          className="btn md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
         >
           <span className="btn-fill" aria-hidden="true" />
           <span className="btn-inner">
@@ -292,7 +292,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
       <section ref={caseStudiesRef} className="case-studies px-5 py-30 section-dark light-to-coffee-incoming min-h-screen">
         
           <div className="grid grid-cols-12 items-emd slide-up pt-10">
-            <div className="col-start-1 col-span-5 client-name-list text-white flex flex-col justify-center">
+            <div className="col-start-1 col-span-12 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 
@@ -317,7 +317,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
 
             </div>
 
-            <div className="col-start-8 col-span-5 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
+            <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 order-1 md:order-2 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 
@@ -353,7 +353,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
 
       <section className="testimonials p-5 section-light bg-white footer-off">
         <div id="testimonial-1" className="grid grid-cols-12">
-          <div className="col-start-1 col-span-6 slide-up-from-left">
+          <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
               <div className="client-work">
                   <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
                     <img src={caseStudyTwo} title="Satalia" />
@@ -369,7 +369,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
               </div>
 
           </div>
-          <div className="col-start-8 col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
+          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee">
             <div className="testimonial lead max-w-[38ch]">
               <div className="split-text-coffee">
                 <p className="mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>

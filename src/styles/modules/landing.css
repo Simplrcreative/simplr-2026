@@ -15,14 +15,21 @@
 
 .stat-no {
     line-height: 0.69;
-     color: var(--color-strategy)
+    color: var(--color-strategy);
+    font-size: 16rem;
 }
+
 .stat-plus {
     line-height: 0.28;
 }
 .stat-detail {
     line-height: 1.2;
     font-weight: 500
+}
+@media (min-width: 768px) {
+    .stat-no {
+        font-size: clamp(30rem, 21.43rem + 17.86vw, 37.5rem);
+    }
 }
 
 /* --- CASE STUDIES --- */

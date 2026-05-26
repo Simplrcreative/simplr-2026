@@ -57,12 +57,33 @@ export function createLogoScrollAnimation(scope) {
     },
   })
 
+  const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
+  //RESPONSIVE VALUES
+  let logoScale = 1
+  let logoY = 0
+  let logoDuration = 0
+
+  let taglineScale = 0.65
+  let taglineY = -88
+  let taglineX = 65
+
+  if (isDesktop) {
+    logoY = -10
+    logoScale = 0.35
+    logoDuration = 0.5
+
+    taglineScale = 0.68
+    taglineY = -213
+    taglineX = 65
+  }
+
   timeline.to(
     logo,
     {
-      scale: 0.35,
-      y: -10,
-      duration: 0.5,
+      scale: logoScale,
+      y: logoY,
+      duration: logoDuration
     },
     0,
   )
@@ -82,42 +103,43 @@ export function createLogoScrollAnimation(scope) {
   timeline.to(
     '.tagline',
     {
-      y: -213,
-      x: 65,
-      scale: 0.68,
+      scale: taglineScale,
+      y: taglineY,
+      x: taglineX,
       stagger: 0.02,
       duration: 0.5,
     },
     0.3,
   )
 
-  timeline.to(
-    '.header',
-    {
-      y: -20,
-      //height: '130px',
-      duration: 0.5,
-    },
-    0.3,
-  )
+  if (isDesktop) {
+    timeline.to(
+      '.header',
+      {
+        y: -20,
+        duration: 0.5,
+      },
+      0.3,
+    )
 
-  timeline.to(
-    'nav.main',
-    {
-      y: -20,
-      duration: 0.5,
-    },
-    0.3,
-  )
+    timeline.to(
+      'nav.main',
+      {
+        y: -20,
+        duration: 0.5,
+      },
+      0.3,
+    )
 
-  timeline.to(
-    '.nav-holder',
-    {
-      height: '30px',
-      duration: 0.1,
-    },
-    0,
-  )
+    timeline.to(
+      '.nav-holder',
+      {
+        height: '30px',
+        duration: 0.1,
+      },
+      0,
+    )
+  }
 
   return () => {
     timeline.kill()
@@ -135,6 +157,8 @@ export function createLogoPageAnimation(scope) {
     return () => undefined
   }
 
+  const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
   const timeline = gsap.timeline({
     defaults: {
       ease: 'none',
@@ -147,33 +171,34 @@ export function createLogoPageAnimation(scope) {
     },
   })
 
-  timeline.to(
-    '.header',
-    {
-      y: -20,
-      //height: '130px',
-      duration: 0.5,
-    },
-    0.3,
-  )
+  if (isDesktop) {
+    timeline.to(
+      '.header',
+      {
+        y: -20,
+        duration: 0.5,
+      },
+      0.3,
+    )
 
-  timeline.to(
-    'nav.main',
-    {
-      y: -20,
-      duration: 0.5,
-    },
-    0.3,
-  )
+    timeline.to(
+      'nav.main',
+      {
+        y: -20,
+        duration: 0.5,
+      },
+      0.3,
+    )
 
-  timeline.to(
-    '.nav-holder',
-    {
-      height: '30px',
-      duration: 0.1,
-    },
-    0,
-  )
+    timeline.to(
+      '.nav-holder',
+      {
+        height: '30px',
+        duration: 0.1,
+      },
+      0,
+    )
+  }
 
   return () => {
     timeline.kill()
