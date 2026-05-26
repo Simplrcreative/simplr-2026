@@ -76,6 +76,7 @@ export default function RootLayout() {
   const location = useLocation()
   const isHomePage = location.pathname === '/'
   const [isIntroVisible, setIsIntroVisible] = useState(true)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
   const [shouldFadeOutIntro, setShouldFadeOutIntro] = useState(false)
   const [shouldRunHomeIntroAnimations, setShouldRunHomeIntroAnimations] = useState(false)
@@ -88,6 +89,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     previousPathRef.current = location.pathname
+    setIsNavOpen(false)
   }, [location.pathname])
 
   // Reset intro state when leaving home page
@@ -143,6 +145,7 @@ export default function RootLayout() {
 
     // Scope all GSAP targets to layoutRef.current so body-appended header/compact-logo
     // clones (used for the outgoing animation) aren't clobbered by these sets.
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches
     const layout = layoutRef.current
     gsap.set(layout?.querySelector('.compact-logo'), { clearProps: 'all' })
 
@@ -150,10 +153,30 @@ export default function RootLayout() {
     // Non-home pages: logo is permanently in its compact end-state and visible.
     // This matches what TransitionFrame's applyCompactLogoState() does on routing,
     // so direct loads and client-side navigations behave identically.
+    
+    //RESPONSIVE VALUES
+    let logoScale = 1
+    let logoY = 0
+    let logoDuration = 0
+
+    let taglineScale = 0.65
+    let taglineY = -88
+    let taglineX = 65
+
+    if (isDesktop) {
+      logoY = -10
+      logoScale = 0.35
+      logoDuration = 0.5
+
+      taglineScale = 0.68
+      taglineY = -213
+      taglineX = 65
+    }
+
     gsap.set(layout?.querySelector('.logo'), {
       autoAlpha: isHomePage ? 0 : 1,
-      scale: 0.35,
-      y: -10,
+      scale: logoScale,
+      y: logoY,
       transformOrigin: 'left top',
       willChange: 'transform',
     })
@@ -175,10 +198,19 @@ export default function RootLayout() {
         autoAlpha: 0,
         y: -30,
       })
+      gsap.set(layout?.querySelector('.menu-icon'), {
+        autoAlpha: 0,
+        x: 30,
+      })
     } else {
       gsap.set(layout?.querySelector('nav.main'), {
         autoAlpha: 1,
         y: 0,
+        clearProps: 'opacity,visibility,transform',
+      })
+      gsap.set(layout?.querySelector('.menu-icon'), {
+        autoAlpha: 1,
+        x: 0,
         clearProps: 'opacity,visibility,transform',
       })
     }
@@ -202,6 +234,7 @@ export default function RootLayout() {
       const logo = layoutRef.current?.querySelector('.logo')
       const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
       const mainNav = layoutRef.current?.querySelectorAll('nav.main')
+      const menuIcon = layoutRef.current?.querySelectorAll('.menu-icon')
 
       const entranceTl = gsap.timeline({
         onComplete: () => {
@@ -217,6 +250,8 @@ export default function RootLayout() {
         0.15,
       )
       entranceTl.to(mainNav, { y: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
+
+      entranceTl.to(menuIcon, { x: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
 
       return () => {
         entranceTl.kill()
@@ -295,7 +330,7 @@ export default function RootLayout() {
         />
       </div>
 
-      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-[1000]">
+      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-5">
         <Link id="compact-logo-link" to="/" title="Simplr">
           <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
             <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
@@ -306,8 +341,14 @@ export default function RootLayout() {
         </Link>
       </div>
 
+      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2 md:hidden${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((o) => !o)}>
+        <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+        <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+        <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+      </div>
+
       <header className={`header fixed z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
-        <div className="nav-holder flex flex-col px-5 pt-[3.125rem] md:flex-row md:items-start md:justify-between">
+        <div className="nav-holder flex px-5 pt-[1.25rem] md:pt-[3.125rem] flex-row items-start justify-between">
           
           <div className="logo-holder">
               <Link id="logo-link" to="/">
@@ -321,8 +362,8 @@ export default function RootLayout() {
               </Link>
             
           </div>
-          
-          <nav className="main flex flex-wrap gap-[2.5rem] pt-[1.875rem]">
+
+          <nav className={`main flex flex-col md:flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
             {navigation.map((item) => {
               const prefetch = useRoutePrefetch(item.path)
               return (
@@ -361,7 +402,7 @@ export default function RootLayout() {
       <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white">
         
         <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-6 ">
+          <div className="col-start-1 col-span-12 md:col-span-6">
             <h1>Let&apos;s build something that works.</h1>
             <div className="button-wrapper">
               <Link 
@@ -401,7 +442,7 @@ export default function RootLayout() {
 
         <div className="mt-32 grid grid-cols-1 gap-14 lg:grid-cols-12">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
-                <div className="socials flex gap-[2.5rem] mb-[3.75rem]">
+                <div className="socials flex flex-col md:flex-row gap-[1.25rem] md:gap-[2.5rem] mb-[3.75rem]">
                   {Object.entries(socials).map(([title, url]) => (
                     <a
                       key={title}

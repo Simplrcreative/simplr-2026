@@ -147,11 +147,13 @@ export default function WorkSinglePage() {
           imgOrder = 'order-1 col-start-1 pe-2'
         }
         const content = section?.acfContent || ''
+        const content2 = section?.acfContent2 || ''
         const video1 = section?.acfVideo1?.node?.guid || ''
         const video2 = section?.acfVideo2?.node?.guid || ''
         const getSizeUrl = (field) =>
-          field?.node?.mediaDetails?.sizes?.find((s) => s.name === 'large')?.sourceUrl
-          || field?.node?.guid
+          //field?.node?.mediaDetails?.sizes?.find((s) => s.name === 'large')?.sourceUrl
+          //|| field?.node?.guid
+          field?.node?.guid
           || ''
         const image1 = getSizeUrl(section?.acfImage1)
         const image2 = getSizeUrl(section?.acfImage2)
@@ -191,11 +193,22 @@ export default function WorkSinglePage() {
                   </div>
                 </>
               )}
+              {layout === 'Two Text Boxes' && (
+                <div className="trigger-split-text-coffee">
+                  <div className={`col-span-12 md:col-span-4 flex flex-col justify-end`}>
+                    <RichText html={content} className="split-text-coffee"/>
+                  </div>
+                  
+                  <div className={`col-start-1 md:col-start-8 col-span-12 md:col-span-4 flex flex-col justify-end`}>
+                    <RichText html={content2} className="split-text-coffee"/>
+                  </div>
+                </div>
+              )}
               {layout === 'Two Images' && (
                 <>
                   <div className="col-start-1 col-span-6 pe-2">
                     {video1 ? (
-                      <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video1}
                           poster={image1 || undefined}
@@ -206,14 +219,14 @@ export default function WorkSinglePage() {
                         />
                       </div>
                     ) : (
-                      <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <picture className="full-image overflow-hidden rounded-[10px]">
                         {image1 && <img src={image1} alt="" />}
                       </picture>
                     )}
                   </div>
                   <div className="col-start-7 col-span-6 ps-2 section-dark">
                     {video2 ? (
-                      <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video2}
                           poster={image2 || undefined}
@@ -224,7 +237,7 @@ export default function WorkSinglePage() {
                         />
                       </div>
                     ) : (
-                      <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <picture className="full-image overflow-hidden rounded-[10px]">
                         {image2 && <img src={image2} alt="" />}
                       </picture>
                     )}

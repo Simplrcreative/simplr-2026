@@ -8,7 +8,7 @@ export default function CategoryBadge({ name }) {
   const slug = slugify(name)
   const textClass = LIGHT_TEXT_SLUGS.has(slug) ? 'text-coffee' : 'text-white'
   return (
-    <span className={`category bg-${slug} ${textClass} leading-none font-medium rounded-full`}>
+    <span className={`category bg-${slug} ${textClass} leading-none font-medium rounded-full mb-1 md:mb-0`}>
       {name}
     </span>
   )

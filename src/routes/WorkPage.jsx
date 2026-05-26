@@ -118,7 +118,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   const clients = builder.acfClient?.nodes ?? []
 
   return (
-    <div className="work-card">
+    <div className="work-card mb-5 md:mb-0">
     <Link 
       to={`/work/${work.slug}`} 
       className="block alt-transition-img" 
@@ -154,13 +154,13 @@ function WorkFeatured({ work, cardKey }) {
   return (
     <Link
       to={`/work/${work.slug}`}
-      className="work-featured col-start-1 col-span-6 block alt-transition-img"
+      className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img"
       data-card-key={cardKey}
       data-transition-variant="work-card"
     >
       <picture
         className="ratio overflow-hidden rounded-[10px] block"
-        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
       >
         {thumb && <img src={thumb} alt={work.title} />}
       </picture>
@@ -189,7 +189,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
   return (
     <section id={`testimonial-${index}`} className="testimonial px-5 py-20 bg-white section-light">
       <div className="grid grid-cols-12">
-        <div className="col-start-2 col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
+        <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
           <div className="testimonial lead max-w-[38ch]">
             <div className="split-text-coffee">
               {quote && <div className="mb-20" dangerouslySetInnerHTML={{ __html: `${quote}` }} />}
@@ -200,7 +200,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
             </div>
           </div>
         </div>
-        <div className="col-start-7 col-span-6 slide-up-from-left">
+        <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 slide-up-from-left">
           <Link 
             to={`/work/${work.slug}`} 
             className="client-work block alt-transition-img" 
@@ -384,7 +384,7 @@ export default function WorkPage() {
         {groups.map((group, i) => {
           const n = i + 1
           const hasFeatured = !!group.featured
-          const gridCols = hasFeatured ? 'col-start-7 col-span-6' : 'col-start-1 col-span-12'
+          const gridCols = hasFeatured ? 'col-start-1 md:col-start-7 col-span-12 md:col-span-6' : 'col-start-1 col-span-12'
           const rowCols = hasFeatured ? 2 : 4
           const rowStyle = { '--work-row-cols': rowCols }
           const testimonialId = group.testimonialWork
@@ -404,7 +404,7 @@ export default function WorkPage() {
                   )}
 
                   <div id={`work-grid-${n}`} className={`work-grid ${gridCols} flex flex-col justify-between`}>
-                    <div className="work-cards-top work-cards-row flex justify-between" style={rowStyle}>
+                    <div className="work-cards-top work-cards-row md:flex justify-between" style={rowStyle}>
                       {group.gridItems.slice(0, hasFeatured ? 2 : 4).map((work) => (
                         <WorkCard
                           key={work.databaseId}
@@ -413,7 +413,7 @@ export default function WorkPage() {
                         />
                       ))}
                     </div>
-                    <div className="work-cards-bottom work-cards-row flex justify-between" style={rowStyle}>
+                    <div className="work-cards-bottom work-cards-row md:flex justify-between" style={rowStyle}>
                       {group.gridItems.slice(hasFeatured ? 2 : 4, hasFeatured ? 4 : 8).map((work) => (
                         <WorkCard
                           key={work.databaseId}

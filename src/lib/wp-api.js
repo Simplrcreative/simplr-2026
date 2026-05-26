@@ -159,6 +159,7 @@ const worksQuery = `
             acfLayout
             acfAlignment
             acfContent
+            acfContent2
             acfImage1 {
               node {
                 guid
