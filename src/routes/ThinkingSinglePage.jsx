@@ -67,7 +67,7 @@ export default function ThinkingSinglePage() {
 
       <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-3 col-span-8 text-coffee mt-40 flex flex-col items-center change-logo-back">
+          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-40 flex flex-col items-center change-logo-back">
               <div className="eyebrow">Thinking {categories.length > 0 && ( categories.map(({ name }) => <CategoryBadge key={name} name={name} />) )}</div>
               <h1 className="hero-title text-center"><span>{title}</span></h1>
               {date && (
@@ -75,7 +75,7 @@ export default function ThinkingSinglePage() {
               )}
           </div>
           {thumb && ( 
-          <div className="col-start-4 col-span-6 pt-20">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20">
             <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
               <img src={thumb + '.webp'} alt={title} />
             </picture>
@@ -86,7 +86,7 @@ export default function ThinkingSinglePage() {
 
       <section className="post-content px-5 pb-20 bg-white section-light">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-4 col-span-6">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6">
             
             {content && (
             <RichText html={content} />
@@ -99,7 +99,7 @@ export default function ThinkingSinglePage() {
         
       <section className="next-work px-5 py-20 bg-white section-light relative overflow-hidden__">
         <div className="grid grid-cols-12 relative z-1">
-            <div className="col-start-5 col-span-4 pt-20">
+            <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">
                 <Link
                   to={`/work/${linkedWork[0].slug}`}

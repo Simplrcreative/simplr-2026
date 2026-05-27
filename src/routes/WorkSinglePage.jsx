@@ -67,8 +67,8 @@ export default function WorkSinglePage() {
               </div>
             )}
           </div>
-          <div className="col-start-8 col-span-5 change-logo">
-            <div className="featured-image section-dark">
+          <div className="col-start-8 col-span-5 ">
+            <div className="featured-image section-dark__">
               {fthumbnail && (
                 <picture
                   className="ratio overflow-hidden rounded-[10px]"
@@ -82,7 +82,7 @@ export default function WorkSinglePage() {
         </div>
       </section>
 
-      <section className="work-intro px-5 py-20 bg-white section-light">
+      <section className="work-intro px-5 py-20 bg-white change-logo section-light__">
         <div className="grid grid-cols-12">
           <div className="work-types col-start-1 col-span-5 slide-up-subtle">
              {types.map(({ name }, index) => {
@@ -143,9 +143,9 @@ export default function WorkSinglePage() {
         let txtOrder, imgOrder
         if (alignment === 'right') {
           txtOrder = 'order-1 col-start-1'
-          imgOrder = 'order-2 col-start-7 ps-2 section-dark'
+          imgOrder = 'order-2 col-start-7 ps-2 section-dark__'
         } else {
-          txtOrder = 'order-2 col-start-9 section-light'
+          txtOrder = 'order-2 col-start-9 section-light__'
           imgOrder = 'order-1 col-start-1 pe-2'
         }
         const content = section?.acfContent || ''
@@ -167,7 +167,7 @@ export default function WorkSinglePage() {
           <section key={`section-${index}`} className="work-content px-5 pb-5">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
-                <div className="col-start-2 col-span-10 section-light pt-18 pb-20 trigger-split-text-coffee">
+                <div className="col-start-2 col-span-10 section-light__ pt-18 pb-20 trigger-split-text-coffee">
                   <RichText html={content} className="text-only-section split-text-coffee text-center" />
                 </div>
               )}
@@ -229,7 +229,7 @@ export default function WorkSinglePage() {
                       </picture>
                     )}
                   </div>
-                  <div className="col-start-7 col-span-6 ps-2 section-dark">
+                  <div className="col-start-7 col-span-6 ps-2 section-dark__">
                     {video2 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
@@ -251,7 +251,7 @@ export default function WorkSinglePage() {
                 </>
               )}
               {layout === 'Full Image' && (
-                <div className="col-span-12 section-dark">
+                <div className="col-span-12 section-dark__">
                   {video1 ? (
                     <div className="full-image overflow-hidden rounded-[10px]">
                       <video
@@ -277,7 +277,7 @@ export default function WorkSinglePage() {
       })}
 
       {testimonial && (
-        <section className="work-testimonial px-5 pt-40 pb-20 section-light">
+        <section className="work-testimonial px-5 pt-40 pb-20 section-light__">
           <div className="grid grid-cols-12">
             <div className="col-start-7 col-span-4 ps-2 slide-up-subtle">
               {testimonial.acfTestimonials?.acfTestimonial && (
@@ -301,7 +301,7 @@ export default function WorkSinglePage() {
 
       {nextWork && (
         
-      <section className="next-work px-5 py-20 bg-white section-light relative overflow-hidden__">
+      <section className="next-work px-5 py-20 bg-white section-light__ relative overflow-hidden__">
         <div className="grid grid-cols-12 relative z-1">
             <div className="col-start-5 col-span-4 pt-20">
               <div className="client-work">

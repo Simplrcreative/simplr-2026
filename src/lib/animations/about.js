@@ -132,8 +132,14 @@ export function createBulletsAnimation(section) {
 export function createBioAnimation(scatter, overlay, close, isOpen) {
   if (!scatter || !overlay) return () => undefined
 
+   const isDesktop = window.matchMedia('(min-width: 768px)').matches
+   let scatterX = '-101%';
+   if(isDesktop){
+      scatterX = '-60%';
+   }
+
   if (isOpen) {
-    const t1 = gsap.to(scatter, { x: '-60%', opacity: 0.75, duration: 0.5, ease: 'power4.out' })
+    const t1 = gsap.to(scatter, { x: scatterX, opacity: 0.75, duration: 0.5, ease: 'power4.out' })
     const t2 = gsap.fromTo(
       overlay,
       { opacity: 0, x: 500 },

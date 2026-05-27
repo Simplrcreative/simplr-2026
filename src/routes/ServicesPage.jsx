@@ -90,7 +90,7 @@ function ServiceVideo({ src, poster, title }) {
   }, [src])
 
   return (
-    <div className="service-card__video col-start-8 col-span-5">
+    <div className="service-card__video col-start-1 md:col-start-8 col-span-9 md:col-span-5">
       <video
         ref={videoRef}
         src={src}
@@ -115,7 +115,7 @@ function ServiceCard({ service }) {
 
   return (
     <article className="service-card bg-white flex flex-col justify-end">
-        <div className="service-card-inner pt-40">
+        <div className="service-card-inner pt-20 md:pt-40">
             <div className="service-card__header">
                 <div className="service-card__label">
                     <ServiceLabelIcon color={accentColor} />
@@ -125,7 +125,7 @@ function ServiceCard({ service }) {
             </div>
 
             <div className="service-card__body grid grid-cols-12">
-              <div className="service-card__content col-start-4 col-span-3">
+              <div className="service-card__content col-start-1 md:col-start-4 col-span-9 md:col-span-3">
                   <div className="service-card__description">{acfDescription}</div>
                   <div className="button-wrapper mt-10">
                       <Link 
@@ -210,19 +210,19 @@ export default function ServicesPage() {
         ]}
       />
 
-      <section className="page-hero px-5 pb-40 bg-white section-light min-h-screen flex items-end">
+      <section className="page-hero px-5 pb:20 md:pb-40 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-9 text-coffee change-logo mt-40 max-w-[90ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[90ch]">
             <div className="eyebrow">Brand and digital design services</div>
             <h1 className="hero-title">As a Cape Town-based <span>brand and digital design agency</span>, Simplr helps organisations <span><i>define</i></span> their brand, <span><i>design</i></span> enterprise websites, and <span><i>build</i></span> digital experiences that scale.</h1>
           </div>
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-white section-light trigger-split-text-coffee">
+      <section className="px-5 pb-20 md:pt-20 bg-white section-light trigger-split-text-coffee">
         <div className="grid grid-cols-12">
-          <div className="col-start-4 col-span-4 text-coffee pt-20">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-coffee pt-20">
             <div className="lead split-text-coffee">Whether you&apos;re building a new brand, refining a digital experience, or bringing your story to life through motion, we apply creative intelligence to create work that connects with audiences and delivers measurable results.</div>
           </div>
         </div>

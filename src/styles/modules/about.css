@@ -1,15 +1,12 @@
 /* ─── People scatter section ─────────────────────────────── */
 
-.person-item.align-end  { margin-left: auto; }
-.person-item.align-start { margin-right: auto; }
-
 /* Individual person name + meta group */
 .person-item {
   cursor: pointer;
 }
 
 .person-name {
-  font-size: clamp(3.5rem, 5vw, 5.5rem);
+  font-size: clamp(2.2rem, 5vw, 5.5rem);
   line-height: 1;
   color: #fff;
   text-decoration: underline;
@@ -46,10 +43,7 @@
 }
 
 .person-meta {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 1rem 0.25rem 0 0.5rem;
+  display: none
 }
 
 .person-exp,
@@ -67,10 +61,10 @@
 
 .person-hover-img {
   position: absolute;
-  top: 90px;
+  top: 0;
   left: 0;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 3 / 2;
   height: auto;
   object-fit: cover;
   border-radius: 10px;
@@ -97,14 +91,15 @@
 .people-grid {
   top: 50%;
   transform: translateY(-50%);
-  height: clamp(510px, 50vh, 600px);
+  height: 90vh;
   overflow: hidden
 }
 .bio-close {
   position: absolute;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
+  left: auto;
+  transform: translateX(0);
   color: #fff;
   cursor: pointer;
   background: none;
@@ -154,6 +149,31 @@
 
 .bio-text p + p {
   margin-top: 1.5rem;
+}
+@media (min-width: 768px) {
+  .person-item.align-end  { margin-left: auto; }
+  .person-item.align-start { margin-right: auto; }
+  .person-meta {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 0.25rem 0 0.5rem;
+  }
+  .people-grid {
+    top: 50%;
+    transform: translateY(-50%);
+    height: clamp(510px, 50vh, 600px);
+  }
+  .bio-close {
+    top: 0;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .person-hover-img {
+    top: 90px;
+    aspect-ratio: 3 / 4;
+  }
 }
 
 

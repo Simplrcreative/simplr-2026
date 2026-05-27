@@ -86,10 +86,10 @@ export default function AboutPage() {
         ]}
       />
 
-      <section className="page-hero px-5 pb-40 bg-coffee section-dark min-h-screen flex items-end">
+      <section className="page-hero px-5 pb-20 md:pb-40 bg-coffee section-dark min-h-screen flex items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-11 md:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
+          <div className="col-span-12 md:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
             <h1 className="hero-title">A <span>brand and digital design agency</span> partnering with <span><i>forward-thinking</i></span> clients around the world</h1>
           </div>
@@ -105,14 +105,14 @@ export default function AboutPage() {
       </section>
 
       {/* People section */}
-      <section ref={peopleSectionRef} className="people py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
+      <section ref={peopleSectionRef} className="people py-20 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
         <div ref={scatterRef} className="people-scatter relative z-3 max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
           {people.map((person) => (
             <div
               key={person.acfName}
-              className={`person-item flex${hoveredPerson === person.acfName ? ' is-hovered' : ''}${person.acfAlign ? ` align-${person.acfAlign}` : ''}`}
+              className={`person-item mb-5 md:mb-0 flex${hoveredPerson === person.acfName ? ' is-hovered' : ''}${person.acfAlign ? ` align-${person.acfAlign}` : ''}`}
               onMouseEnter={() => handlePersonEnter(person)}
               onMouseLeave={() => setHoveredPerson(null)}
               onClick={() => handlePersonClick(person.acfName)}
@@ -120,7 +120,7 @@ export default function AboutPage() {
               <span className={`person-name ${person.acfFont ?? ''} ${person.acfDivision ?? ''}`}>
                 {person.acfName}
               </span>
-              <span className="person-meta">
+              <span className="hidden md:block person-meta">
                 {person.acfExperience && <span className="person-exp">{person.acfExperience} years exp.</span>}
                 {person.acfLinkedIn && (
                   <a
@@ -141,7 +141,7 @@ export default function AboutPage() {
         <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-5">
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
-          <div className="col-start-6 col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
+          <div className="col-start-2 md:col-start-6 col-span-10 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
             <button
               ref={closeRef}
               className="bio-close"
@@ -171,7 +171,7 @@ export default function AboutPage() {
           {/* Bio column — single panel, GSAP drives opacity + y; starts hidden */}
           <div
             ref={overlayRef}
-            className="col-start-9 col-span-3 flex flex-col justify-start"
+            className="col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-start"
             style={{ zIndex: 10, opacity: 0, pointerEvents: 'none' }}
           >
             {displayPerson && (
