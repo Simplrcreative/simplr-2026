@@ -19,11 +19,13 @@ const FILTERS = [
 ]
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large') {
-  const sizes = acfFeaturedThumbnail?.node?.mediaDetails?.sizes
-  if (!sizes?.length) return ''
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
+
   return (
     sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
-    sizes[sizes.length - 1]?.sourceUrl ??
+    sizes.find((s) => s.name === 'full')?.sourceUrl ??
+    thumbnailNode?.guid ??
     ''
   )
 }

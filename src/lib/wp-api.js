@@ -135,6 +135,7 @@ const worksQuery = `
           }
           acfFeaturedThumbnail {
             node {
+              guid
               mediaDetails {
                 sizes {
                   name
@@ -305,7 +306,14 @@ const homeCaseStudiesQuery = `
                 acfWorkBuilder {
                   acfFeaturedThumbnail {
                     node {
+                      guid
                       sourceUrl
+                      mediaDetails {
+                        sizes {
+                          name
+                          sourceUrl
+                        }
+                      }
                     }
                   }
                   acfCategory {
@@ -327,8 +335,12 @@ function normaliseHomeCaseStudy(study, index) {
   const caseStudy = study?.acfCaseStudy?.nodes?.[0]
   const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
   const slug = caseStudy?.slug || `case-study-${index + 1}`
-  //const sizes = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mediaDetails?.sizes ?? []
-  const thumbnail = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.sourceUrl || ''
+  const featuredThumbnailNode = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node
+  const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
+  const thumbnail = (
+    sizes.find((s) => s.name === 'large')
+    || sizes.find((s) => s.name === 'full')
+  )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
   const categories = caseStudy?.acfWorkBuilder?.acfCategory?.nodes ?? []
 
   return {
@@ -718,12 +730,12 @@ export async function fetchNextWorkData(currentSlug) {
     if (!others.length) return null
 
     const pick = others[Math.floor(Math.random() * others.length)]
-    const sizes = pick?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mediaDetails?.sizes ?? []
+    const featuredThumbnailNode = pick?.acfWorkBuilder?.acfFeaturedThumbnail?.node
+    const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
     const thumbnail = (
       sizes.find((s) => s.name === 'large')
       || sizes.find((s) => s.name === 'full')
-      || sizes[0]
-    )?.sourceUrl ?? ''
+    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
 
     return {
       slug: pick.slug,
@@ -751,12 +763,12 @@ export async function fetchWorkEntryData(slug) {
       throw new Response('Not found', { status: 404 })
     }
 
-    const sizes = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mediaDetails?.sizes ?? []
+    const featuredThumbnailNode = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node
+    const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
     const thumbnail = (
       sizes.find((s) => s.name === 'large')
       || sizes.find((s) => s.name === 'full')
-      || sizes[0]
-    )?.sourceUrl ?? ''
+    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
 
     return { work: { ...work, thumbnail } }
   } catch (error) {

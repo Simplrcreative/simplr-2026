@@ -12,7 +12,7 @@ export default function WorkSinglePage() {
   const pathname = work?.slug ? `/work/${work.slug}` : '/work'
   const categories = work?.acfWorkBuilder?.acfCategory?.nodes ?? []
   const thumbnail = work?.thumbnail || ''
-  const fthumbnail = thumbnail + '.webp' ? thumbnail : ''
+  //const fthumbnail = thumbnail + '.webp' ? thumbnail : ''
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
   const introduction = work?.acfWorkBuilder?.acfIntroduction ?? []
   const swags = work?.acfWorkBuilder?.acfSwag ?? []
@@ -71,12 +71,12 @@ export default function WorkSinglePage() {
           </div>
           <div className="col-start-8 col-span-5 ">
             <div className="featured-image section-dark__">
-              {fthumbnail && (
+              {thumbnail && (
                 <picture
                   className="ratio overflow-hidden rounded-[10px]"
                   style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
                 >
-                  <img src={fthumbnail} alt={title} />
+                  <img src={thumbnail + '.webp'} alt={title} />
                 </picture>
               )}
             </div>
