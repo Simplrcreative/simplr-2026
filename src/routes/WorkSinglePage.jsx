@@ -19,6 +19,8 @@ export default function WorkSinglePage() {
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
   const nextWork = useLoaderData()?.nextWork ?? null
+
+  console.log(work)
   
 
   useEffect(() => {
