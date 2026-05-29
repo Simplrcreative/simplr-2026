@@ -110,8 +110,8 @@ const peopleQuery = `
 `
 
 const worksQuery = `
-  query WorksQuery {
-    acfWorks {
+  query WorksQuery($first: Int = 100) {
+    acfWorks(first: $first) {
       nodes {
         databaseId
         slug
@@ -679,7 +679,7 @@ export async function fetchWorksData() {
   }
 
   try {
-    const data = await remember('works', () => graphQlRequest(worksQuery))
+    const data = await remember('works', () => graphQlRequest(worksQuery, { first: 100 }))
     const works = data.acfWorks?.nodes ?? []
 
     return { works }
