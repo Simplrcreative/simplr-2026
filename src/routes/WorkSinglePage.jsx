@@ -155,9 +155,8 @@ export default function WorkSinglePage() {
         const video1 = section?.acfVideo1?.node?.guid || ''
         const video2 = section?.acfVideo2?.node?.guid || ''
         const getSizeUrl = (field) =>
-          //field?.node?.mediaDetails?.sizes?.find((s) => s.name === 'large')?.sourceUrl
-          //|| field?.node?.guid
-          field?.node?.guid
+          field?.node?.mediaDetails?.sizes?.find((s) => s.name === 'large')?.sourceUrl
+          || field?.node?.guid
           || ''
         const image1 = getSizeUrl(section?.acfImage1)
         const image2 = getSizeUrl(section?.acfImage2)
