@@ -57,14 +57,12 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
     let destroyHeroAnimation = () => {}
     let destroyServicesAnimation = () => {}
     let destroyCaseStudiesAnimation = () => {}
-    let destroyClientsAnimation = () => {}
     let destroyBtnAnimation = () => {}
     const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !homeIntroAnimationsPlayed
     const timer = setTimeout(() => {
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
       destroyServicesAnimation = createServicesScrollAnimation(servicesRef.current) ?? (() => {})
       destroyCaseStudiesAnimation = createCaseStudiesScrollAnimation(caseStudiesRef.current) ?? (() => {})
-      destroyClientsAnimation = createClientsScrollAnimation(clientsRef.current) ?? (() => {})
       destroyBtnAnimation = createBtnHoverAnimation(btnRef.current) ?? (() => {})
     }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
     return () => {
@@ -72,10 +70,41 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
       destroyHeroAnimation()
       destroyServicesAnimation()
       destroyCaseStudiesAnimation()
-      destroyClientsAnimation()
       destroyBtnAnimation()
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
+
+  // Client logos mount lazily; initialize ticker only after the logos exist.
+  useEffect(() => {
+    if (!introComplete) return
+
+    let rafId = 0
+    let cleanupClientsAnimation = () => {}
+
+    const initClientsAnimation = () => {
+      cleanupClientsAnimation()
+      cleanupClientsAnimation = createClientsScrollAnimation(clientsRef.current) ?? (() => {})
+      refreshScrollTriggers()
+    }
+
+    const waitForClientLogos = () => {
+      const hasClientLogos = Boolean(clientsRef.current?.querySelector('.client-logos .client-logo'))
+
+      if (hasClientLogos) {
+        initClientsAnimation()
+        return
+      }
+
+      rafId = requestAnimationFrame(waitForClientLogos)
+    }
+
+    waitForClientLogos()
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      cleanupClientsAnimation()
+    }
+  }, [introComplete])
 
   // Lock scroll for the full duration of the intro sequence so the user can't
   // scroll past the hero before animations have initialised.
@@ -371,7 +400,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
           </div>
           <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee">
             <div className="testimonial lead max-w-[38ch]">
-              <div className="split-text-coffee">
+              <div className="split-text-coffee trigger-split-text-coffee">
                 <p className="mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
                 <p><b>Daniel Hulme</b><br/>CEO Satalia</p>
               </div>

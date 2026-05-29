@@ -58,6 +58,10 @@ function handleFooterTransitionLinkClick() {
   requestTransitionCapture()
 }
 
+function handleLogoTransitionClick() {
+  requestTransitionCapture()
+}
+
 const socials = {
   linkedin: 'https://www.linkedin.com/company/simplrcreative/',
   instagram: 'https://www.instagram.com/simplrcreative',
@@ -95,8 +99,6 @@ export default function RootLayout() {
   // Reset intro state when leaving home page
   useEffect(() => {
     if (!isHomePage) {
-      setIsIntroVisible(false)
-      setShouldFadeOutIntro(false)
       setShouldRunHomeIntroAnimations(false)
     }
   }, [isHomePage])
@@ -118,7 +120,7 @@ export default function RootLayout() {
 
   // Start 3-second minimum timer for intro, then dismiss
   useEffect(() => {
-    if (!isHomePage || !isIntroVisible) return
+    if (!isIntroVisible) return
     
     const timer = setTimeout(() => {
       setShouldFadeOutIntro(true)
@@ -187,9 +189,9 @@ export default function RootLayout() {
     })
     gsap.set(layout?.querySelector('.tagline'), {
       autoAlpha: isHomePage ? 0 : 1,
-      y: -213,
-      x: 65,
-      scale: 0.68,
+      y: taglineY,
+      x: taglineX,
+      scale: taglineScale,
       transformOrigin: 'left top',
       willChange: 'transform',
     })
@@ -232,6 +234,7 @@ export default function RootLayout() {
 
     const playHomeEntranceAnimation = () => {
       const logo = layoutRef.current?.querySelector('.logo')
+      const tagline = layoutRef.current?.querySelector('.tagline')
       const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
       const mainNav = layoutRef.current?.querySelectorAll('nav.main')
       const menuIcon = layoutRef.current?.querySelectorAll('.menu-icon')
@@ -243,7 +246,7 @@ export default function RootLayout() {
       })
 
       entranceTl.to(logo, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
-      entranceTl.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
+      entranceTl.to(tagline, { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
       entranceTl.to(
         Array.from(implrPaths),
         { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
@@ -310,14 +313,16 @@ export default function RootLayout() {
     <div 
       ref={layoutRef} 
       className="relative min-h-screen"
-      data-intro-visible={isHomePage && isIntroVisible ? 'true' : 'false'}
+      data-intro-visible={isIntroVisible ? 'true' : 'false'}
     >
-      {isHomePage && isIntroVisible ? (
+      {isIntroVisible ? (
         <IntroOverlay 
           shouldFadeOut={shouldFadeOutIntro}
           onFadeOutComplete={() => {
             setIsIntroVisible(false)
-            setTimeout(() => setIntroComplete(true), 100)
+            if (isHomePage) {
+              setTimeout(() => setIntroComplete(true), 100)
+            }
           }}
         />
       ) : null}
@@ -331,7 +336,13 @@ export default function RootLayout() {
       </div>
 
       <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-5">
-        <Link id="compact-logo-link" to="/" title="Simplr">
+        <Link
+          id="compact-logo-link"
+          to="/"
+          title="Simplr"
+          onPointerDown={requestTransitionCapture}
+          onClick={handleLogoTransitionClick}
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
             <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
             <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
@@ -351,7 +362,12 @@ export default function RootLayout() {
         <div className="nav-holder flex px-5 pt-[1.25rem] md:pt-[3.125rem] flex-row items-start justify-between">
           
           <div className="logo-holder">
-              <Link id="logo-link" to="/">
+              <Link
+                id="logo-link"
+                to="/"
+                onPointerDown={requestTransitionCapture}
+                onClick={handleLogoTransitionClick}
+              >
               <BrandLogo />
               
                 <div className="tagline">
