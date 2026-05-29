@@ -178,7 +178,7 @@ export default function WorkSinglePage() {
                   </div>
                   <div className={`col-span-6 ${imgOrder}`}>
                     {video1 ? (
-                      <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video1}
                           poster={fImage1 || undefined}
@@ -189,7 +189,7 @@ export default function WorkSinglePage() {
                         />
                       </div>
                     ) : (
-                      <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <picture className="full-image overflow-hidden rounded-[10px]">
                         {fImage1 && <source srcSet={fImage1} type="image/webp" />}
                         {image1 && <img src={image1} alt="" />}
                       </picture>
