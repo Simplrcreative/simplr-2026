@@ -74,9 +74,87 @@ const servicesQuery = `
           acfDescription
           acfService
           acfTitle
-          acfVideo {
-            node {
-              guid
+          acfLinkToService {
+            nodes {
+              ... on Page {
+                acfServiceBuilder {
+                 acfFeaturedVideo {
+                    node {
+                      guid
+                    }
+                  }
+                  acfFeaturedImage {
+                    node {
+                      guid
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+const serviceSinglePageQuery = `
+  query ServiceSinglePage($id: ID!) {
+    page(id: $id, idType: URI) {
+      slug
+      uri
+      title(format: RENDERED)
+      acfServiceBuilder {
+        acfHeading
+        acfFeaturedVideo {
+          node {
+            guid
+          }
+        }
+        acfFeaturedImage {
+          node {
+            guid
+          }
+        }
+        acfSections {
+          acfSectionHeading
+          acfSectionContent
+          acfAccordion {
+            acfTitle
+            acfContent
+          }
+        }
+        acfTestimonial {
+          nodes {
+            ... on AcfTestimonial {
+              title
+              acfTestimonials {
+                acfRole
+                acfTestimonial
+              }
+            }
+          }
+        }
+        acfCaseStudy {
+          nodes {
+            ... on AcfWork {
+              acfWorkBuilder {
+                acfClient {
+                  nodes {
+                    name
+                  }
+                }
+                acfCategory {
+                  nodes {
+                    name
+                  }
+                }
+                acfFeaturedThumbnail {
+                  node {
+                    guid
+                  }
+                }
+              }
             }
           }
         }
@@ -326,6 +404,48 @@ const homeCaseStudiesQuery = `
             }
           }
         }
+        acfTestimonial {
+          nodes {
+            ... on AcfTestimonial {
+              title
+              acfTestimonials {
+                acfRole
+                acfTestimonial
+              }
+            }
+          }
+        }
+        acfCaseStudy {
+          nodes {
+            slug
+            ... on AcfWork {
+              acfWorkBuilder {
+                acfClient {
+                  nodes {
+                    name
+                  }
+                }
+                acfCategory {
+                  nodes {
+                    name
+                  }
+                }
+                acfFeaturedThumbnail {
+                  node {
+                    guid
+                    sourceUrl
+                    mediaDetails {
+                      sizes {
+                        name
+                        sourceUrl
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -353,19 +473,49 @@ function normaliseHomeCaseStudy(study, index) {
   }
 }
 
+function normaliseHomeTestimonial(acfHomeBuilder) {
+  const testimonial = acfHomeBuilder?.acfTestimonial?.nodes?.[0] ?? null
+  const testimonialData = testimonial?.acfTestimonials ?? null
+  const caseStudy = acfHomeBuilder?.acfCaseStudy?.nodes?.[0] ?? null
+  const caseStudyBuilder = caseStudy?.acfWorkBuilder
+  const featuredThumbnailNode = caseStudyBuilder?.acfFeaturedThumbnail?.node
+  const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
+  const thumbnail = (
+    sizes.find((s) => s.name === 'large')
+    || sizes.find((s) => s.name === 'full')
+  )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+
+  if (!testimonial && !caseStudy) {
+    return null
+  }
+
+  return {
+    testimonial,
+    testimonialData,
+    caseStudy,
+    caseStudyClient: caseStudyBuilder?.acfClient?.nodes?.[0]?.name ?? '',
+    caseStudyCategories: caseStudyBuilder?.acfCategory?.nodes ?? [],
+    caseStudyImage: thumbnail,
+  }
+}
+
 async function fetchHomeCaseStudiesData() {
   if (!wpConfig.endpoint) {
-    return []
+    return { caseStudies: [], testimonialBlock: null }
   }
 
   try {
     const data = await remember('home:case-studies', () => graphQlRequest(homeCaseStudiesQuery))
-    const studies = data.page?.acfHomeBuilder?.acfFeaturedCaseStudies ?? []
+    const acfHomeBuilder = data.page?.acfHomeBuilder
+    const studies = acfHomeBuilder?.acfFeaturedCaseStudies ?? []
 
-    return studies.map(normaliseHomeCaseStudy).filter((study) => study.slug)
+    return {
+      caseStudies: studies.map(normaliseHomeCaseStudy).filter((study) => study.slug),
+      testimonialBlock: normaliseHomeTestimonial(acfHomeBuilder),
+    }
   } catch (error) {
     reportError('Unable to load home featured case studies', error)
-    return []
+    return { caseStudies: [], testimonialBlock: null }
   }
 }
 
@@ -603,7 +753,7 @@ export async function fetchNavigationData() {
 }
 
 export async function fetchHomeData() {
-  const [pagePayload, workPayload, homeCaseStudies] = await Promise.all([
+  const [pagePayload, workPayload, homeFeatureData] = await Promise.all([
     fetchPageData('home'),
     fetchCollectionData('work'),
     fetchHomeCaseStudiesData(),
@@ -621,7 +771,8 @@ export async function fetchHomeData() {
   return {
     ...pagePayload,
     featuredWork: (workPayload.items || []).slice(0, 3),
-    caseStudies: homeCaseStudies.length ? homeCaseStudies : fallbackCaseStudies,
+    caseStudies: homeFeatureData.caseStudies.length ? homeFeatureData.caseStudies : fallbackCaseStudies,
+    testimonialBlock: homeFeatureData.testimonialBlock,
   }
 }
 
@@ -647,21 +798,38 @@ export async function fetchServicesSinglePageData(slug) {
     return { slug, page: null }
   }
 
-  try {
-    const uri = `/services/${slug}/`
-    const data = await remember(`service-page:${slug}`, () =>
-      graphQlRequest(pageByUriQuery, { uri }),
-    )
+  const cleanSlug = String(slug || '')
+    .trim()
+    .replace(/^\/+|\/+$/g, '')
+    .replace(/^services\//, '')
 
-    const node = data.nodeByUri
-    return {
-      slug,
-      page: node ? { title: node.title || slug, description: '' } : null,
-    }
-  } catch (error) {
-    reportError(`Unable to load service page for ${slug}`, error)
+  if (!cleanSlug) {
     return { slug, page: null }
   }
+
+  const uriCandidates = [
+    cleanSlug,
+    `/${cleanSlug}/`,
+    `services/${cleanSlug}`,
+    `/services/${cleanSlug}/`,
+  ]
+
+  for (const uriId of uriCandidates) {
+    try {
+      const data = await remember(`service-page:${uriId}`, () =>
+        graphQlRequest(serviceSinglePageQuery, { id: uriId }),
+      )
+      const page = data.page ?? null
+
+      if (page) {
+        return { slug, page}
+      }
+    } catch (error) {
+      reportError(`Unable to load service page for URI id "${uriId}"`, error)
+    }
+  }
+
+  return { slug, page: null }
 }
 
 export async function fetchServicesData() {

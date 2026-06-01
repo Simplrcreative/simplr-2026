@@ -1,18 +1,22 @@
 h1, h2, h3, h4, h5 {
     font-family: var(--font-literata);
     line-height: 1.2;
+    font-optical-sizing: auto;
 }
 
 .no-break {
     white-space: nowrap;
 }
-h1 {
+h1, 
+h2.service-section-heading {
     font-size: clamp(2.5rem, 4vw, 3.125rem);
-    font-optical-sizing: auto;
 }
 h1.large {
     font-size: clamp(4rem, 4vw, 5.3rem);
     line-height: 1;
+}
+h2 {
+    font-size: clamp(2rem, 4vw, 2.5rem);
 }
 .lead {
     font-size: 1.375rem;
@@ -25,11 +29,13 @@ h1.large {
 .split-text-coffee {
     color: rgba(48, 15, 29, 0)
 }
-.hero-title {
+.hero-title,
+h2.service-section-heading {
     font-family: var(--font-aeonik);
     font-weight: 300;
 }
-.hero-title span {
+.hero-title span,
+h2.service-section-heading span {
     font-family: var(--font-literata);
     font-weight: 400;
 }

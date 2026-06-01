@@ -106,9 +106,10 @@ function ServiceVideo({ src, poster, title }) {
 }
 
 function ServiceCard({ service }) {
-  const { acfService, acfTitle, acfDescription, acfVideo, acfPoster } = service
-  const videoGuid = acfVideo?.node?.guid
-  const posterUrl = acfPoster?.node?.sourceUrl ?? acfPoster?.node?.guid
+  const { acfService, acfTitle, acfDescription, acfLinkToService } = service
+  const linkedServicePage = acfLinkToService?.nodes?.[0] ?? null
+  const videoUrl = linkedServicePage?.acfServiceBuilder?.acfFeaturedVideo?.node?.guid ?? ''
+  const posterUrl = linkedServicePage?.acfServiceBuilder?.acfFeaturedImage?.node?.guid ?? ''
   const accentColor = getServiceColor(acfService)
   const btnRef = useRef(null)
   useEffect(() => createBtnHoverAnimation(btnRef.current), [])
@@ -141,7 +142,7 @@ function ServiceCard({ service }) {
                       </Link>
                   </div>
                 </div>
-                {videoGuid && <ServiceVideo src={videoGuid} poster={posterUrl} title={acfTitle} />}
+                {videoUrl && <ServiceVideo src={videoUrl} poster={posterUrl} title={acfTitle} />}
             </div>
       </div>
     </article>

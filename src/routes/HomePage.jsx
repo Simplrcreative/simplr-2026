@@ -15,13 +15,14 @@ import heroVideo from '../assets/vid/simplr-showreel-loop.mp4'
 import caseStudyTwo from '../assets/img/case-study-example-2.jpg'
 import { Link } from 'react-router-dom'
 import CategoryBadge from '../components/CategoryBadge.jsx'
+import RichText from '../components/RichText.jsx'
 const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 
 let homeIntroAnimationsPlayed = false
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
 
-function HomePageContent({ page, featuredWork, caseStudies = [] }) {
+function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
   const servicesRef = useRef(null)
@@ -192,6 +193,12 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
   }, [activeFaqIndex])
 
   const activeFaq = faqs[activeFaqIndex]
+  const testimonial = testimonialBlock?.testimonial ?? null
+  const testimonialData = testimonialBlock?.testimonialData ?? null
+  const linkedCaseStudy = testimonialBlock?.caseStudy ?? null
+  const linkedCaseStudyImage = testimonialBlock?.caseStudyImage || caseStudyTwo
+  const linkedCaseStudyClient = testimonialBlock?.caseStudyClient || 'Satalia'
+  const linkedCaseStudyCategories = testimonialBlock?.caseStudyCategories ?? []
 
   function showPreviousFaq() {
     if (!faqs.length) {
@@ -385,24 +392,36 @@ function HomePageContent({ page, featuredWork, caseStudies = [] }) {
           <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
               <div className="client-work">
                   <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={caseStudyTwo} title="Satalia" />
+                    <img src={linkedCaseStudyImage} title={linkedCaseStudyClient} />
                   </picture>
                   <div className="mt-3 flex">
-                  Satalia
+                  {linkedCaseStudyClient}
                   </div>
-                  <div className="categories mt-3 flex">
-                    <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
-                    <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                    <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
-                  </div>
+                  {linkedCaseStudy && linkedCaseStudyCategories.length > 0 ? (
+                    <div className="categories mt-3 flex">
+                      {linkedCaseStudyCategories.map(({ name }) => (
+                        <CategoryBadge key={name} name={name} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="categories mt-3 flex">
+                      <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
+                      <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
+                      <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
+                    </div>
+                  )}
               </div>
 
           </div>
           <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee">
             <div className="testimonial lead max-w-[38ch]">
               <div className="split-text-coffee trigger-split-text-coffee">
-                <p className="mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
-                <p><b>Daniel Hulme</b><br/>CEO Satalia</p>
+                {testimonialData?.acfTestimonial ? (
+                  <div className="mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
+                ) : (
+                  <p className="mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
+                )}
+                <p><b>{testimonial?.title || 'Daniel Hulme'}</b><br/>{testimonialData?.acfRole || 'CEO Satalia'}</p>
               </div>
             </div>
           </div>
@@ -485,8 +504,13 @@ export default function HomePage() {
   return (
     <Suspense fallback={<section className="min-h-screen bg-white section-light" />}>
       <Await resolve={homeData}>
-        {({ page, featuredWork, caseStudies }) => (
-          <HomePageContent page={page} featuredWork={featuredWork} caseStudies={caseStudies} />
+        {({ page, featuredWork, caseStudies, testimonialBlock }) => (
+          <HomePageContent
+            page={page}
+            featuredWork={featuredWork}
+            caseStudies={caseStudies}
+            testimonialBlock={testimonialBlock}
+          />
         )}
       </Await>
     </Suspense>

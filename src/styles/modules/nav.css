@@ -269,6 +269,10 @@ nav.light a.is-active .nav-link__orb {
     .logo-holder {
         max-width: 16.5rem;
     }
+    .logo-holder a {
+        max-height: 60px;
+        display: inline-block;
+    }
 }
 
 @media (min-width: 1024px) {
