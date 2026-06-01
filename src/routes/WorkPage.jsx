@@ -406,7 +406,7 @@ export default function WorkPage() {
                   )}
 
                   <div id={`work-grid-${n}`} className={`work-grid ${gridCols} flex flex-col justify-between`}>
-                    <div className="work-cards-top work-cards-row md:flex justify-between" style={rowStyle}>
+                    <div className="work-cards-top work-cards-row md:flex justify-between mb-20" style={rowStyle}>
                       {group.gridItems.slice(0, hasFeatured ? 2 : 4).map((work) => (
                         <WorkCard
                           key={work.databaseId}
