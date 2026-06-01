@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
@@ -49,6 +49,17 @@ export default function ServicesSinglePage() {
   const caseStudyImage = caseStudyData?.acfFeaturedThumbnail?.node?.guid || ''
   const caseStudyClient = caseStudyData?.acfClient?.nodes?.[0]?.name || ''
   const caseStudyCategories = caseStudyData?.acfCategory?.nodes ?? []
+
+  useEffect(() => {
+    const cleanupSlideUp = createSlideUpAnimations(document.body)
+    const cleanupSplitText = createSplitTextAnimation()
+    refreshScrollTriggers()
+
+    return () => {
+      cleanupSlideUp?.()
+      cleanupSplitText?.()
+    }
+  }, [acfSections, testimonial])
 
   function isAccordionOpen(sectionIndex, accordionIndex) {
     const openIndex = openAccordions[sectionIndex]
@@ -150,14 +161,14 @@ export default function ServicesSinglePage() {
 
         return (
           <section key={`section-${sectionIndex}`} className="px-5 py-20 bg-white section-light">
-            <div className="grid grid-cols-12">
+            <div className="grid grid-cols-12 ">
               {sectionHeading && (
-                <div className="col-span-9 pe-40">
+                <div className="col-span-9 pe-40 slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="service-section-heading" />
                 </div>
               )}
               {sectionContent && (
-                <div className="col-start-4 col-span-5">
+                <div className="col-start-4 col-span-5 slide-up-subtle">
                   <RichText html={sectionContent} className="service-richtext pt-20" />
                 </div>
               )}
@@ -174,7 +185,7 @@ export default function ServicesSinglePage() {
                     }
 
                     return (
-                      <div key={accordionKey} className={`service-accordion-item ${isOpen ? 'is-open' : ''}`}>
+                      <div key={accordionKey} className={`service-accordion-item slide-up-subtle ${isOpen ? 'is-open' : ''}`}>
                         <button
                           type="button"
                           className="service-accordion-trigger"
