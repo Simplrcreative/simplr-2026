@@ -17,10 +17,10 @@
 .service-card {
   position: sticky;
   top: 0;
-  min-height: 120vh;
+  min-height: 130vh;
   padding-left: 1.25rem;
   padding-right: 1.25rem;
-  padding-bottom: calc(1.25rem + 20vh);
+  padding-bottom: calc(1.25rem + 30vh);
   border-top: 1px solid rgba(48, 15, 29, 0.12);
   box-shadow: 0 -8px 32px rgba(48, 15, 29, 0.06);
 }
@@ -125,13 +125,27 @@
   justify-self: end;
   align-self: start;
   width: 100%;
-  max-width: 638px;
+  /*max-width: 638px;*/
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 0.5rem;
 }
 
 .service-card__video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.service-featured-media {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.service-featured-media video,
+.service-featured-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;

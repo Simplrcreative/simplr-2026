@@ -11,6 +11,7 @@ const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
 const DARK_PATHS = new Set(['/about', '/contact', '/est-2014'])
 const WORK_SINGLE_PATH_RE = /^\/work\/[^/]+\/?$/
+const SERVICE_SINGLE_PATH_RE = /^\/services\/[^/]+\/?$/
 const ALT_DOCK_MAX_WAIT_MS = 1600
 const ALT_DOCK_POLL_MS = 50
 
@@ -124,13 +125,30 @@ export default function TransitionFrame({ children }) {
     }
 
     const relatedSlug = textTrigger.closest('.client-name')?.dataset?.client
-    if (!relatedSlug) return null
+    if (relatedSlug) {
+      // Slugs are sanitized and used as IDs in HomePage.jsx.
+      return document.getElementById(relatedSlug)?.querySelector('.alt-transition-img') ?? null
+    }
 
-    // Slugs are sanitized and used as IDs in HomePage.jsx.
-    return document.getElementById(relatedSlug)?.querySelector('.alt-transition-img') ?? null
+    // Services cards: use the media trigger in the same card when the CTA text is clicked.
+    return textTrigger.closest('.service-card')?.querySelector('.alt-transition-img') ?? null
   }
 
-  function resolveDockTarget() {
+  function resolveDockTarget(preferredSelector = null) {
+    if (preferredSelector) {
+      const explicitTarget = document.querySelector(preferredSelector)
+      if (explicitTarget) {
+        const rect = explicitTarget.getBoundingClientRect()
+        if (rect.width > 0 && rect.height > 0) return explicitTarget
+      }
+    }
+
+    const mediaContainer = document.querySelector('.featured-image .full-image')
+    if (mediaContainer) {
+      const rect = mediaContainer.getBoundingClientRect()
+      if (rect.width > 0 && rect.height > 0) return mediaContainer
+    }
+
     const picture = document.querySelector('.featured-image picture')
     if (picture) {
       // Use the picture element as soon as it has CSS dimensions — the image
@@ -147,8 +165,8 @@ export default function TransitionFrame({ children }) {
     )
   }
 
-  function getDockRect() {
-    const target = resolveDockTarget()
+  function getDockRect(preferredSelector = null) {
+    const target = resolveDockTarget(preferredSelector)
     if (!target) return null
 
     const rect = target.getBoundingClientRect()
@@ -198,7 +216,9 @@ export default function TransitionFrame({ children }) {
         const nav = extractSameOriginLink(target)
         const altSource = nav ? resolveAltTransitionSource(target, nav.link) : null
         const shouldUseAltTransition = Boolean(
-          nav && altSource && WORK_SINGLE_PATH_RE.test(nav.url.pathname),
+          nav
+          && altSource
+          && (WORK_SINGLE_PATH_RE.test(nav.url.pathname) || SERVICE_SINGLE_PATH_RE.test(nav.url.pathname)),
         )
 
         if (shouldUseAltTransition) {
@@ -217,6 +237,7 @@ export default function TransitionFrame({ children }) {
             altTransitionRef.current = {
               pathname: nav.url.pathname,
               variant,
+              dockSelector: nav.link?.dataset?.transitionDockSelector || null,
               top: rect.top,
               left: rect.left,
               width: rect.width,
@@ -516,7 +537,8 @@ export default function TransitionFrame({ children }) {
         })
       }
 
-      // For work-next / work-card the altClone expands to cover the screen
+      // For variants that replace the outgoing page visual immediately,
+      // hide the snapshot so only the transitioning clone is visible.
       // immediately — hide the outgoing snapshot to keep the transition clean.
       if (isWorkNext || isWorkCard) {
         snapshot.style.opacity = '0'
@@ -602,7 +624,8 @@ export default function TransitionFrame({ children }) {
     document.documentElement.style.overflowX = 'hidden'
 
     if (altClone) {
-      gsap.set(el, { y: 0, autoAlpha: 1 })
+      // Alt transitions should not inherit any previous page transform state.
+      gsap.set(el, { y: 0, scale: 1, autoAlpha: 1 })
     } else {
       // Entering page starts below the viewport at 0.85 scale.
       gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
@@ -630,6 +653,9 @@ export default function TransitionFrame({ children }) {
       workSectionEl?.remove()
       wrapper.remove()
       document.documentElement.style.overflowX = ''
+
+      // Ensure the incoming page is fully reset after transition teardown.
+      gsap.set(el, { clearProps: 'transform,opacity,visibility' })
 
       // Apply the correct nav/logo colour theme for the INCOMING page before
       // fading the header in. dataset.pageBg has now been updated by
@@ -711,7 +737,9 @@ export default function TransitionFrame({ children }) {
 
         return 1
       }
-      const dock = getDockRect()
+      const dockSelector = altTransition?.dockSelector || null
+      const isServiceDockTransition = Boolean(dockSelector?.includes('service-featured-media'))
+      const dock = getDockRect(dockSelector)
       const hasTargetAtStart = Boolean(dock)
       const smoothEase = 'power3.inOut'
       const expandDuration = 1
@@ -719,6 +747,25 @@ export default function TransitionFrame({ children }) {
       const dockDuration = 1.5
       const dockStart = expandDuration + pauseDuration
       const width = window.innerWidth * 1.1
+
+      const servicesSourceAspectRatio = altTransition?.width && altTransition?.height
+        ? altTransition.width / altTransition.height
+        : 16 / 9
+
+      // For services, expand to a centered cover box that fills at least the
+      // viewport height and width while preserving the source media ratio.
+      const expandedWidth = isServiceDockTransition
+        ? Math.max(width, window.innerHeight * servicesSourceAspectRatio)
+        : width
+      const expandedHeight = isServiceDockTransition
+        ? expandedWidth / servicesSourceAspectRatio
+        : width * 0.9
+      const expandedTop = isServiceDockTransition
+        ? (window.innerHeight - expandedHeight) / 2
+        : '-30%'
+      const expandedLeft = isServiceDockTransition
+        ? (window.innerWidth - expandedWidth) / 2
+        : 0
 
       const crossfadeToTarget = (target) => {
         gsap.set(target, { autoAlpha: 1 })
@@ -731,11 +778,11 @@ export default function TransitionFrame({ children }) {
       }
 
       tl.to(altClone, {
-        top: '-30%',
-        left: 0,
+        top: expandedTop,
+        left: expandedLeft,
         filter: 'blur(10px)',
-        width: width,
-        height: width * 0.9,
+        width: expandedWidth,
+        height: expandedHeight,
         borderRadius: 0,
         duration: expandDuration,
         ease: smoothEase,
@@ -840,7 +887,7 @@ export default function TransitionFrame({ children }) {
           duration: dockDuration,
           ease: smoothEase,
           onComplete: () => {
-            const finalDock = getDockRect()
+            const finalDock = getDockRect(dockSelector)
             if (!finalDock) {
               crossfadeToTarget(dock.target)
               return
@@ -872,7 +919,7 @@ export default function TransitionFrame({ children }) {
         tl.add(() => {
           const start = performance.now()
           const poll = () => {
-            const lateDock = getDockRect()
+            const lateDock = getDockRect(dockSelector)
 
             if (lateDock) {
               if (altCloneImg) {
@@ -908,7 +955,7 @@ export default function TransitionFrame({ children }) {
                 duration: dockDuration,
                 ease: smoothEase,
                 onComplete: () => {
-                  const finalLateDock = getDockRect() || lateDock
+                  const finalLateDock = getDockRect(dockSelector) || lateDock
                   gsap.set(altClone, {
                     top: finalLateDock.rect.top,
                     left: finalLateDock.rect.left,

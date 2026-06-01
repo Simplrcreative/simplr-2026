@@ -40,7 +40,7 @@ function ServiceLabelIcon({ color }) {
   )
 }
 
-function ServiceVideo({ src, poster, title }) {
+function ServiceVideo({ src, poster, title, to }) {
   const videoRef = useRef(null)
 
   useEffect(() => {
@@ -90,18 +90,25 @@ function ServiceVideo({ src, poster, title }) {
   }, [src])
 
   return (
-    <div className="service-card__video col-start-1 md:col-start-8 col-span-9 md:col-span-5">
-      <video
-        ref={videoRef}
-        src={src}
-        poster={poster}
-        title={title}
-        //loop
-        muted
-        playsInline
-        preload="none"
-      />
-    </div>
+    <Link
+      to={to}
+      className="service-card__video col-start-1 md:col-start-8 col-span-9 md:col-span-5"
+      data-transition-dock-selector="[data-transition-dock='service-featured-media']"
+      aria-label={`View ${title}`}
+    >
+      <div className="service-card__media full-image overflow-hidden rounded-[10px] alt-transition-img">
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          title={title}
+          //loop
+          muted
+          playsInline
+          preload="none"
+        />
+      </div>
+    </Link>
   )
 }
 
@@ -110,6 +117,7 @@ function ServiceCard({ service }) {
   const linkedServicePage = acfLinkToService?.nodes?.[0] ?? null
   const videoUrl = linkedServicePage?.acfServiceBuilder?.acfFeaturedVideo?.node?.guid ?? ''
   const posterUrl = linkedServicePage?.acfServiceBuilder?.acfFeaturedImage?.node?.guid ?? ''
+  const servicePath = `/services/${toSlug(acfService)}`
   const accentColor = getServiceColor(acfService)
   const btnRef = useRef(null)
   useEffect(() => createBtnHoverAnimation(btnRef.current), [])
@@ -130,9 +138,10 @@ function ServiceCard({ service }) {
                   <div className="service-card__description">{acfDescription}</div>
                   <div className="button-wrapper mt-10">
                       <Link 
-                          to={`/services/${toSlug(acfService)}`}
+                          to={servicePath}
                           ref={btnRef}
                           className="btn relative alt-transition-text"
+                          data-transition-dock-selector="[data-transition-dock='service-featured-media']"
                           >
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
@@ -142,7 +151,7 @@ function ServiceCard({ service }) {
                       </Link>
                   </div>
                 </div>
-                {videoUrl && <ServiceVideo src={videoUrl} poster={posterUrl} title={acfTitle} />}
+                {videoUrl && <ServiceVideo src={videoUrl} poster={posterUrl} title={acfTitle} to={servicePath} />}
             </div>
       </div>
     </article>

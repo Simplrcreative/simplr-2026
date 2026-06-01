@@ -98,7 +98,7 @@ export default function ServicesSinglePage() {
       />
 
       <section className="page-hero px-5 pb-5 mb-15 bg-white section-light min-h-screen flex items-end">
-        <div className="grid grid-cols-12">
+        <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-6 text-coffee change-logo">
             <div className="service-card__label mb-5">
@@ -110,7 +110,11 @@ export default function ServicesSinglePage() {
           <div className="col-start-8 col-span-5">
             <div className="featured-image">
               {featuredVideo ? (
-                  <div className="full-image overflow-hidden rounded-[10px]">
+                  <div
+                    className="ratio service-featured-media overflow-hidden rounded-[10px]"
+                    style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                    data-transition-dock="service-featured-media"
+                  >
                     <video
                       src={featuredVideo}
                       poster={featuredImage + '.webp' || undefined}
@@ -121,7 +125,11 @@ export default function ServicesSinglePage() {
                     />
                   </div>
                 ) : (
-                  <picture className="full-image overflow-hidden rounded-[10px]">
+                  <picture
+                    className="ratio service-featured-media overflow-hidden rounded-[10px]"
+                    style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                    data-transition-dock="service-featured-media"
+                  >
                     {featuredImage && <source srcSet={featuredImage + '.webp'} type="image/webp" />}
                     {featuredImage && <img src={featuredImage + '.webp'} alt={title} />}
                   </picture>
