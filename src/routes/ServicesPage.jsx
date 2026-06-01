@@ -132,7 +132,7 @@ function ServiceCard({ service }) {
                       <Link 
                           to={`/services/${toSlug(acfService)}`}
                           ref={btnRef}
-                          className="btn relative"
+                          className="btn relative alt-transition-text"
                           >
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
