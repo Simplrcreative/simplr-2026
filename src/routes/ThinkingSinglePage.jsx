@@ -22,7 +22,7 @@ export default function ThinkingSinglePage() {
     : ''
   const content = page?.content || ''
   const pathname = page?.slug ? `/thinking/${page?.slug}` : '/thinking'
-  const categories = page?.categories?.nodes ?? []
+  const categories = page?.topics?.nodes ?? []
 
   function getThumbnail(featuredImage, preferredSize = 'large') {
   const sizes = featuredImage?.node?.mediaDetails?.sizes

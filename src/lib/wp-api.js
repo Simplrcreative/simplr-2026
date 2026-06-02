@@ -335,6 +335,13 @@ const postsQuery = `
             slug
           }
         }
+        topics {
+          nodes {
+            name
+            link
+            slug
+          }
+        }
         acfPostBuilder {
           acfFeaturedImage {
             node {
@@ -1091,6 +1098,7 @@ export async function fetchThinkingPostsData() {
         date: item.date,
         acfClients: { nodes: [] },
         categories: { nodes: [] },
+        topics: { nodes: [] },
         featuredImage: {
           node: item.image
             ? {
@@ -1121,6 +1129,7 @@ export async function fetchThinkingPostsData() {
         date: item.date,
         acfClients: { nodes: [] },
         categories: { nodes: [] },
+        topics: { nodes: [] },
         featuredImage: {
           node: item.image
             ? {
