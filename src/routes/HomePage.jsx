@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 're
 import { useLoaderData, useOutletContext, Await, Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, createShowreelScrollAnimation} from '../lib/animations/index.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -442,13 +442,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </button>
             </div>
           </div>
-          {/*
+          
           <div className="show-title-wrapper">
             <div className="show-title text-white" >
               Watch Our Showreel
             </div>
           </div>
-          */}
+          
       </section>
 
       {isHeroModalVisible && hasHeroFullVideo ? (

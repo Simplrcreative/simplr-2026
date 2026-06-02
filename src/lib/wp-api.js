@@ -316,7 +316,7 @@ const testimonialQuery = `
 
 const postsQuery = `
   query PostQuery {
-    posts(first: 10, where: { status: PUBLISH }) {
+    posts(first: 50, where: { status: PUBLISH }) {
       nodes {
         databaseId
         slug

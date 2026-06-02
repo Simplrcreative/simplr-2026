@@ -113,25 +113,25 @@ export function createShowreelScrollAnimation(scope) {
     function setup() {
         const titleWidth = title.offsetWidth
         const viewportWidth = window.innerWidth
-        const startX = (viewportWidth + titleWidth)
-        const endX = -startX
+        const startX = (viewportWidth + titleWidth) / 1.5
+        const endX = -startX / 1.5
 
         tween?.kill()
         st?.kill()
 
-        gsap.set(title, { clearProps: 'x', startX, autoAlpha: 0.5 })
+        gsap.set(title, { clearProps: 'x', startX })
 
         tween = gsap.fromTo(
             title,
-            { x: startX, autoAlpha: 0.5 },
-            { x: endX, autoAlpha: 0.5, ease: 'none', paused: true },
+            { x: startX },
+            { x: endX, ease: 'none', paused: true },
         )
 
         st = ScrollTrigger.create({
             trigger: section,
-            start: 'top 5%',
-            end: () => `+=${Math.round(Math.max(window.innerHeight, 480))}`,
-            scrub: 2,
+            start: 'top 20%',
+            end: () => `+=${Math.round(Math.max(window.innerHeight * 1.8, 480))}`,
+            scrub: 4,
             animation: tween,
             invalidateOnRefresh: true,
             markers: true

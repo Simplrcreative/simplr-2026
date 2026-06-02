@@ -52,7 +52,7 @@ h2.service-section-heading span {
 }
 .show-title-wrapper {
     position:absolute;
-    bottom: -60px;
+    bottom: -40px;
     left: 0;
     right: 0;
     z-index: 0;
@@ -69,5 +69,6 @@ h2.service-section-heading span {
     text-align: center;
 }
 .show-title {
-    transform: translateX(100vw)
+    transform: translateX(200vw);
+    opacity: 1
 }

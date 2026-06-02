@@ -41,7 +41,7 @@ function getThumbnail(featuredImage, preferredSize = 'large') {
 
 function postMatchesFilter(post, filterId) {
   if (filterId === 'all') return true
-  const categories = post.categories?.nodes ?? []
+  const categories = post.topics?.nodes ?? []
   return categories.some((category) => category.slug === filterId)
 }
 
@@ -54,7 +54,7 @@ export default function ThinkingPage() {
     const categoriesBySlug = new Map()
 
     posts.forEach((post) => {
-      ;(post.categories?.nodes ?? []).forEach((category) => {
+      ;(post.topics?.nodes ?? []).forEach((category) => {
         if (!category?.slug) return
         if (!categoriesBySlug.has(category.slug)) {
           categoriesBySlug.set(category.slug, category)
