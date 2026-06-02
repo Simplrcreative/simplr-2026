@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 'react'
 import { useLoaderData, useOutletContext, Await, Link } from 'react-router-dom'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, createShowreelScrollAnimation} from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, createShowreelScrollAnimation } from '../lib/animations/index.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -19,16 +20,18 @@ const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 let homeIntroAnimationsPlayed = false
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
-const HERO_MODAL_FADE_DURATION_MS = 220
-const HERO_MODAL_OPEN_DELAY_MS = 170
-const HERO_MODAL_ENTER_FRAME_DELAY_MS = 16
-const HERO_MODAL_SCROLL_DURATION_S = 0.42
+const HERO_MODAL_FADE_DURATION_MS = 1000
+const HERO_MODAL_POST_SCROLL_DELAY_MS = 200
+const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
+const HERO_MODAL_SCROLL_DURATION_MS = 1200
+const HERO_MODAL_CONTENT_FADE_DURATION_MS = 1000
 
 function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
   const heroVideoModalRef = useRef(null)
   const openHeroModalTimeoutRef = useRef(null)
+  const openHeroModalPlaybackTimeoutRef = useRef(null)
   const closeHeroModalTimeoutRef = useRef(null)
   const openHeroModalScrollCleanupRef = useRef(null)
   const servicesRef = useRef(null)
@@ -51,6 +54,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const [activeFaqIndex, setActiveFaqIndex] = useState(0)
   const [isHeroModalMounted, setIsHeroModalMounted] = useState(false)
   const [isHeroModalOpen, setIsHeroModalOpen] = useState(false)
+  const [isHeroModalPlaybackReady, setIsHeroModalPlaybackReady] = useState(false)
   const isHeroModalVisible = isHeroModalMounted
 
   // Set up surface colour transitions immediately — elements exist now that HomePageContent
@@ -225,6 +229,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       openHeroModalTimeoutRef.current = null
     }
 
+    if (openHeroModalPlaybackTimeoutRef.current) {
+      clearTimeout(openHeroModalPlaybackTimeoutRef.current)
+      openHeroModalPlaybackTimeoutRef.current = null
+    }
+
     if (openHeroModalScrollCleanupRef.current) {
       openHeroModalScrollCleanupRef.current()
       openHeroModalScrollCleanupRef.current = null
@@ -241,8 +250,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   function openHeroVideoModal() {
     if (!hasHeroFullVideo) return
     clearPendingHeroModalClose()
-    setIsHeroModalMounted(true)
-    setIsHeroModalOpen(false)
+    clearPendingHeroModalOpen()
+    setIsHeroModalPlaybackReady(false)
 
     // Recalculate pin/spacer positions before deriving the unpin target.
     refreshScrollTriggers()
@@ -255,82 +264,99 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       ? Math.max(0, Math.floor(currentScrollY + markerRectTop - window.innerHeight))
       : null
 
-    const scrollTriggerFromWindow = window.ScrollTrigger
-    const scrollTriggerFromGsap = window.gsap?.core?.globals?.()?.ScrollTrigger
-    const heroScrollTrigger = scrollTriggerFromWindow?.getById?.('hero-scroll')
-      ?? scrollTriggerFromGsap?.getById?.('hero-scroll')
+    const heroScrollTrigger = ScrollTrigger.getById('hero-scroll')
     const triggerThreshold = Number.isFinite(heroScrollTrigger?.end)
       ? Math.max(0, Math.floor(heroScrollTrigger.end - 8))
       : null
-    const unpinThreshold = markerThreshold ?? triggerThreshold ?? 0
+    const heroSectionThreshold = Number.isFinite(heroRef.current?.offsetHeight)
+      ? Math.max(0, Math.floor((heroRef.current?.offsetTop ?? 0) + heroRef.current.offsetHeight - window.innerHeight - 8))
+      : null
+    // Prefer the pin end position (hero at max scale), then safe fallbacks.
+    const unpinThreshold = triggerThreshold ?? heroSectionThreshold ?? markerThreshold ?? 0
 
-    if (Math.abs(currentScrollY - unpinThreshold) <= 4) {
-      clearPendingHeroModalOpen()
-      openHeroModalTimeoutRef.current = setTimeout(() => {
-        openHeroModalTimeoutRef.current = setTimeout(() => {
-          clearPendingHeroModalOpen()
-          setIsHeroModalOpen(true)
-        }, HERO_MODAL_ENTER_FRAME_DELAY_MS)
-      }, HERO_MODAL_OPEN_DELAY_MS)
-      return
-    }
-
-    clearPendingHeroModalOpen()
-
-    const gsapInstance = window.gsap
-    const scrollSetter =
-      typeof scrollTriggerFromWindow?.scroll === 'function'
-        ? (value) => scrollTriggerFromWindow.scroll(value)
-        : typeof scrollTriggerFromGsap?.scroll === 'function'
-          ? (value) => scrollTriggerFromGsap.scroll(value)
-          : (value) => window.scrollTo({ top: value, behavior: 'auto' })
-
-    if (typeof gsapInstance?.to === 'function') {
-      const tweenState = { value: currentScrollY }
-      const tween = gsapInstance.to(tweenState, {
-        value: unpinThreshold,
-        duration: HERO_MODAL_SCROLL_DURATION_S,
-        ease: 'power2.out',
-        overwrite: true,
-        onUpdate: () => scrollSetter(Math.round(tweenState.value)),
-      })
-
-      openHeroModalScrollCleanupRef.current = () => {
-        tween.kill()
-      }
+    const revealHeroModal = () => {
+      setIsHeroModalMounted(true)
+      setIsHeroModalOpen(false)
 
       openHeroModalTimeoutRef.current = setTimeout(() => {
-        scrollSetter(unpinThreshold)
-        openHeroModalTimeoutRef.current = setTimeout(() => {
-          clearPendingHeroModalOpen()
-          setIsHeroModalOpen(true)
-        }, HERO_MODAL_ENTER_FRAME_DELAY_MS)
-      }, Math.max(HERO_MODAL_OPEN_DELAY_MS, Math.ceil(HERO_MODAL_SCROLL_DURATION_S * 1000)))
-      return
-    }
-
-    // Fallback to native smooth scrolling if GSAP is unavailable.
-    window.scrollTo({ top: unpinThreshold, behavior: 'smooth' })
-
-    openHeroModalTimeoutRef.current = setTimeout(() => {
-      window.scrollTo({ top: unpinThreshold, behavior: 'auto' })
-      openHeroModalTimeoutRef.current = setTimeout(() => {
-        clearPendingHeroModalOpen()
         setIsHeroModalOpen(true)
       }, HERO_MODAL_ENTER_FRAME_DELAY_MS)
-    }, HERO_MODAL_OPEN_DELAY_MS + 260)
+
+      openHeroModalPlaybackTimeoutRef.current = setTimeout(() => {
+        setIsHeroModalPlaybackReady(true)
+      }, Math.max(HERO_MODAL_FADE_DURATION_MS, HERO_MODAL_CONTENT_FADE_DURATION_MS) + HERO_MODAL_ENTER_FRAME_DELAY_MS)
+    }
+
+    const scheduleHeroModalReveal = () => {
+      clearPendingHeroModalOpen()
+      openHeroModalTimeoutRef.current = setTimeout(() => {
+        revealHeroModal()
+      }, HERO_MODAL_POST_SCROLL_DELAY_MS)
+    }
+
+    if (Math.abs(currentScrollY - unpinThreshold) <= 4) {
+      scheduleHeroModalReveal()
+      return
+    }
+
+    const scrollStart = performance.now()
+    const scrollDelta = unpinThreshold - currentScrollY
+
+    const easeInOutCubic = (progress) => (
+      progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2
+    )
+
+    let rafId = 0
+    let isScrollCancelled = false
+
+    const step = (timestamp) => {
+      if (isScrollCancelled) return
+
+      const elapsed = timestamp - scrollStart
+      const progress = Math.min(1, elapsed / HERO_MODAL_SCROLL_DURATION_MS)
+      const easedProgress = easeInOutCubic(progress)
+      const nextScrollY = currentScrollY + (scrollDelta * easedProgress)
+
+      window.scrollTo({ top: Math.round(nextScrollY), behavior: 'auto' })
+
+      if (progress < 1) {
+        openHeroModalScrollCleanupRef.current = () => {
+          isScrollCancelled = true
+          if (rafId) cancelAnimationFrame(rafId)
+          openHeroModalScrollCleanupRef.current = null
+        }
+        rafId = requestAnimationFrame(step)
+        return
+      }
+
+      window.scrollTo({ top: unpinThreshold, behavior: 'auto' })
+      openHeroModalScrollCleanupRef.current = null
+      scheduleHeroModalReveal()
+    }
+
+    rafId = requestAnimationFrame(step)
   }
 
-  function closeHeroVideoModal() {
+  function closeHeroVideoModal({ scrollToNextSection = false } = {}) {
     clearPendingHeroModalOpen()
     if (!isHeroModalVisible) return
 
     clearPendingHeroModalClose()
     setIsHeroModalOpen(false)
+    setIsHeroModalPlaybackReady(false)
 
     closeHeroModalTimeoutRef.current = window.setTimeout(() => {
       setIsHeroModalMounted(false)
       closeHeroModalTimeoutRef.current = null
+
+      if (scrollToNextSection) {
+        window.setTimeout(() => {
+          const nextSection = document.querySelector('section.brands-grow')
+          nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 0)
+      }
     }, HERO_MODAL_FADE_DURATION_MS)
   }
 
@@ -430,7 +456,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               >
                 <video
                   ref={heroVideoRef}
-                  className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden"
+                  className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden rounded-[10px]"
                   autoPlay
                   muted
                   playsInline
@@ -453,7 +479,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       {isHeroModalVisible && hasHeroFullVideo ? (
         <div
-          className={`hero-video-modal fixed inset-0 z-[10000] flex items-center justify-center bg-black transition-opacity duration-[220ms] ${isHeroModalOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`hero-video-modal fixed inset-0 z-[10000] flex items-center justify-center bg-black transition-opacity ease-out ${isHeroModalOpen ? 'opacity-100' : 'opacity-0'}`}
+          style={{ transitionDuration: `${HERO_MODAL_FADE_DURATION_MS}ms` }}
           role="dialog"
           aria-modal="true"
           aria-label="Full hero video"
@@ -462,25 +489,33 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <button
               type="button"
               className="hero-video-modal-close absolute right-3 top-3 z-10 rounded-full bg-branding-design text-sm text-white w-[30px] h-[30px]"
-              onClick={closeHeroVideoModal}
+              onClick={(event) => {
+                event.stopPropagation()
+                closeHeroVideoModal({ scrollToNextSection: true })
+              }}
               aria-label="Close full hero video"
             >
               X
           </button>
           <div
-            className={`hero-video-modal-inner w-full transition-all duration-[220ms] p-5 ${isHeroModalOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.8]'}`}
+            className={`hero-video-modal-inner w-full transition-all ease-out p-5 ${isHeroModalOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.96]'}`}
+            style={{
+              transitionDuration: `${HERO_MODAL_CONTENT_FADE_DURATION_MS}ms`,
+              transitionDelay: isHeroModalOpen ? `${HERO_MODAL_ENTER_FRAME_DELAY_MS}ms` : '0ms',
+            }}
             onClick={(event) => event.stopPropagation()}
             ref={heroVideoModalRef}
           >
             
             <video
-              className="hero-video-modal-player block w-full bg-black"
+              className={`hero-video-modal-player block w-full bg-black transition-opacity ease-out ${isHeroModalOpen ? 'opacity-100' : 'opacity-0'}`}
+              style={{ transitionDuration: `${HERO_MODAL_CONTENT_FADE_DURATION_MS}ms` }}
               controls
-              autoPlay
+              autoPlay={isHeroModalPlaybackReady}
               playsInline
               poster={heroVideoPoster || undefined}
             >
-              <source src={heroVideoFull} type="video/mp4" />
+              {isHeroModalPlaybackReady ? <source src={heroVideoFull} type="video/mp4" /> : null}
               {heroVideoPoster ? <img src={heroVideoPoster} alt={heroVideoPosterAlt} /> : null}
             </video>
           </div>
