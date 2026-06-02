@@ -134,7 +134,7 @@ export function createShowreelScrollAnimation(scope) {
             scrub: 4,
             animation: tween,
             invalidateOnRefresh: true,
-            markers: true
+            //markers: true
         })
     }
 
