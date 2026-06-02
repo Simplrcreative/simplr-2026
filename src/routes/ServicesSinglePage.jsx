@@ -4,7 +4,7 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations } from '../lib/animations/index.js'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 
 const SERVICE_COLORS = {
@@ -52,12 +52,14 @@ export default function ServicesSinglePage() {
 
   useEffect(() => {
     const cleanupSlideUp = createSlideUpAnimations(document.body)
+    const cleanupParallax = createParallaxAnimations(document.body)
     const cleanupSplitText = createSplitTextAnimation()
     refreshScrollTriggers()
 
     return () => {
       cleanupSlideUp?.()
       cleanupSplitText?.()
+      cleanupParallax?.()
     }
   }, [acfSections, testimonial])
 
@@ -118,7 +120,7 @@ export default function ServicesSinglePage() {
             </div>
             <h1 className="hero-title">{acfHeading}</h1>
           </div>
-          <div className="col-start-8 col-span-5">
+          <div className="col-start-8 col-span-5 parallax">
             <div className="featured-image">
               {featuredVideo ? (
                   <div

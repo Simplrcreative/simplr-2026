@@ -125,6 +125,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
       to={`/work/${work.slug}`} 
       className="block alt-transition-img" 
       data-card-key={cardKey} 
+      data-transition-source="media"
       data-transition-variant="work-card"
     >
       <picture
@@ -158,6 +159,7 @@ function WorkFeatured({ work, cardKey }) {
       to={`/work/${work.slug}`}
       className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img"
       data-card-key={cardKey}
+      data-transition-source="media"
       data-transition-variant="work-card"
     >
       <picture
@@ -207,6 +209,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
             to={`/work/${work.slug}`} 
             className="client-work block alt-transition-img" 
             data-card-key={cardKey}
+            data-transition-source="media"
             data-transition-variant="work-card"
           >
             <picture

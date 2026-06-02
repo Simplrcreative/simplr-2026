@@ -140,7 +140,7 @@ nav.light a.is-active .nav-link__orb {
 }
 @media (min-width: 768px) {
     nav.main {
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px) brightness(10);
         position: relative;
         padding: 1rem 1.5rem;
         border-radius: 999px;

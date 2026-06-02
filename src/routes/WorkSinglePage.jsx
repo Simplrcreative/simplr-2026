@@ -12,16 +12,14 @@ export default function WorkSinglePage() {
   const pathname = work?.slug ? `/work/${work.slug}` : '/work'
   const categories = work?.acfWorkBuilder?.acfCategory?.nodes ?? []
   const thumbnail = work?.thumbnail || ''
-  //const fthumbnail = thumbnail + '.webp' ? thumbnail : ''
+  const mimeType = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mimeType || ''
+  const altText = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.altText || title || 'Untitled'
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
   const introduction = work?.acfWorkBuilder?.acfIntroduction ?? []
   const swags = work?.acfWorkBuilder?.acfSwag ?? []
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
   const nextWork = useLoaderData()?.nextWork ?? null
-
-  console.log(work)
-  
 
   useEffect(() => {
     // Lock scroll during the featured-image dock transition; unlock on completion.
@@ -75,7 +73,7 @@ export default function WorkSinglePage() {
                 <picture
                   className="ratio overflow-hidden rounded-[10px]"
                   style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
-                >
+                > 
                   <img src={thumbnail + '.webp'} alt={title} />
                 </picture>
               )}
@@ -160,9 +158,22 @@ export default function WorkSinglePage() {
           || ''
         const image1 = getSizeUrl(section?.acfImage1)
         const image2 = getSizeUrl(section?.acfImage2)
-
-        const fImage1 = image1 + '.webp' ? image1 : ''
-        const fImage2 = image2 + '.webp' ? image2 : ''
+        const mimeType1 = section?.acfImage1?.node?.mimeType || ''
+        const mimeType2 = section?.acfImage2?.node?.mimeType || ''
+        let fImage1 = image1
+        let fMimeType1 = mimeType1
+        if(mimeType1 != 'image/gif') {
+          fImage1 = image1 + '.webp'
+          fMimeType1 = 'image/webp'
+        }
+        let fImage2 = image2
+        let fMimeType2 = mimeType2
+        if(mimeType2 != 'image/gif') {
+          fImage2 = image2 + '.webp'
+          fMimeType2 = 'image/webp'
+        }
+        const altText1 = section?.acfImage1?.node?.altText || 'Untitled'
+        const altText2 = section?.acfImage2?.node?.altText || 'Untitled'
 
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
@@ -191,8 +202,12 @@ export default function WorkSinglePage() {
                       </div>
                     ) : (
                       <picture className="full-image overflow-hidden rounded-[10px]">
-                        {fImage1 && <source srcSet={fImage1} type="image/webp" />}
-                        {image1 && <img src={image1} alt="" />}
+                        {fImage1 && (
+                          <>
+                            <source srcSet={fImage1} type={fMimeType1} />
+                            <img src={fImage1} alt={altText1} />
+                          </>
+                        )}
                       </picture>
                     )}
                   </div>
@@ -225,8 +240,12 @@ export default function WorkSinglePage() {
                       </div>
                     ) : (
                       <picture className="full-image overflow-hidden rounded-[10px]">
-                        {fImage1 && <source srcSet={fImage1} type="image/webp" />}
-                        {image1 && <img src={image1} alt="" />}
+                        {fImage1 && (
+                          <>
+                            <source srcSet={fImage1} type={fMimeType1} />
+                            <img src={fImage1} alt={altText1} />
+                          </>
+                        )}
                       </picture>
                     )}
                   </div>
@@ -244,8 +263,12 @@ export default function WorkSinglePage() {
                       </div>
                     ) : (
                       <picture className="full-image overflow-hidden rounded-[10px]">
-                        {fImage2 && <source srcSet={fImage2} type="image/webp" />}
-                        {image2 && <img src={image2} alt="" />}
+                        {fImage2 && (
+                          <>
+                            <source srcSet={fImage2} type={fMimeType2} />
+                            <img src={fImage2} alt={altText2} />
+                          </>
+                        )}
                       </picture>
                     )}
                   </div>
@@ -266,8 +289,12 @@ export default function WorkSinglePage() {
                     </div>
                   ) : (
                     <picture className="full-image overflow-hidden rounded-[10px]">
-                      {fImage1 && <source srcSet={fImage1} type="image/webp" />}
-                      {image1 && <img src={image1} alt="" />}
+                      {fImage1 && (
+                        <>
+                          <source srcSet={fImage1} type="image/webp" />
+                          <img src={fImage1} alt={altText1} />
+                        </>
+                      )}
                     </picture>
                   )}
                 </div>
@@ -310,6 +337,7 @@ export default function WorkSinglePage() {
                   to={`/work/${nextWork.slug}`}
                   className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                   data-card-key={nextWork.slug}
+                  data-transition-source="media"
                   data-transition-variant="work-next"
                 >
                   <picture

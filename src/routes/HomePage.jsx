@@ -341,6 +341,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                     <Link 
                       to={path} 
                       className="text-xl inline-block alt-transition-text"
+                      data-transition-source-key={study.slug}
                     >
                       {study.client}
                       <div className="client-detail font-literata text-5xl font-light pb-3">
@@ -362,6 +363,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                     <Link
                       to={path}
                       className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
+                      data-transition-source="media"
+                      data-transition-source-key={study.slug}
                     >
                       <picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
                         {study.thumbnail ? <img src={study.thumbnail + '.webp'} title={study.client} /> : null}

@@ -86,6 +86,10 @@ const servicesQuery = `
                   acfFeaturedImage {
                     node {
                       guid
+                      altText
+                      mimeType
+                      altText
+                      mimeType
                     }
                   }
                 }
@@ -114,6 +118,8 @@ const serviceSinglePageQuery = `
         acfFeaturedImage {
           node {
             guid
+            altText
+            mimeType
           }
         }
         acfSections {
@@ -152,6 +158,8 @@ const serviceSinglePageQuery = `
                 acfFeaturedThumbnail {
                   node {
                     guid
+                    altText
+                    mimeType
                   }
                 }
               }
@@ -214,6 +222,8 @@ const worksQuery = `
           acfFeaturedThumbnail {
             node {
               guid
+              altText
+              mimeType
               mediaDetails {
                 sizes {
                   name
@@ -242,6 +252,8 @@ const worksQuery = `
             acfImage1 {
               node {
                 guid
+                altText
+                mimeType
                 mediaDetails {
                   sizes {
                     name
@@ -253,6 +265,8 @@ const worksQuery = `
             acfImage2 {
               node {
                 guid
+                altText
+                mimeType
                 mediaDetails {
                   sizes {
                     name
@@ -327,6 +341,8 @@ const postsQuery = `
               altText
               title
               guid
+              altText
+              mimeType
               mediaDetails {
                 sizes {
                   name
@@ -354,6 +370,8 @@ const postsQuery = `
                   acfFeaturedThumbnail {
                     node {
                       guid
+                      altText
+                      mimeType
                     }
                   }
                 }
@@ -385,6 +403,8 @@ const homeCaseStudiesQuery = `
                   acfFeaturedThumbnail {
                     node {
                       guid
+                      altText
+                      mimeType
                       sourceUrl
                       mediaDetails {
                         sizes {
@@ -433,6 +453,8 @@ const homeCaseStudiesQuery = `
                 acfFeaturedThumbnail {
                   node {
                     guid
+                    altText
+                    mimeType
                     sourceUrl
                     mediaDetails {
                       sizes {
@@ -909,6 +931,7 @@ export async function fetchNextWorkData(currentSlug) {
       slug: pick.slug,
       title: pick.title,
       thumbnail,
+      featuredThumbnailNode,
       client: pick.acfWorkBuilder?.acfClient?.nodes?.[0]?.name ?? '',
       categories: pick.acfWorkBuilder?.acfCategory?.nodes ?? [],
     }

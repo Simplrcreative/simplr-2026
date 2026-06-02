@@ -93,10 +93,16 @@ function ServiceVideo({ src, poster, title, to }) {
     <Link
       to={to}
       className="service-card__video col-start-1 md:col-start-8 col-span-9 md:col-span-5"
+      data-transition-source-key={to}
       data-transition-dock-selector="[data-transition-dock='service-featured-media']"
       aria-label={`View ${title}`}
     >
-      <div className="service-card__media full-image overflow-hidden rounded-[10px] alt-transition-img">
+      <div
+        className="service-card__media full-image overflow-hidden rounded-[10px] alt-transition-img"
+        data-transition-source="media"
+        data-transition-source-key={to}
+        data-transition-variant="service-card"
+      >
         <video
           ref={videoRef}
           src={src}
@@ -141,6 +147,7 @@ function ServiceCard({ service }) {
                           to={servicePath}
                           ref={btnRef}
                           className="btn relative alt-transition-text"
+                          data-transition-source-key={servicePath}
                           data-transition-dock-selector="[data-transition-dock='service-featured-media']"
                           >
                           <span className="btn-fill" aria-hidden="true" />

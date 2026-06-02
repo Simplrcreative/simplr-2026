@@ -19,6 +19,104 @@ function resolveBgFromPath(pathname) {
   return DARK_PATHS.has(pathname) ? 'dark' : 'light'
 }
 
+function escapeAttributeValue(value) {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+    return CSS.escape(value)
+  }
+
+  return value.replace(/(["\\])/g, '\\$1')
+}
+
+function createFrozenVideoNode(video, options = {}) {
+  const { fillContainer = false } = options
+
+  if (!video) return null
+
+  const rect = video.getBoundingClientRect()
+  const width = Math.round(rect.width)
+  const height = Math.round(rect.height)
+  const computed = getComputedStyle(video)
+
+  const applySharedStyles = (node) => {
+    node.className = video.className
+    if (video.style.cssText) {
+      node.style.cssText = video.style.cssText
+    }
+
+    node.style.width = fillContainer
+      ? '100%'
+      : (computed.width && computed.width !== 'auto' ? computed.width : `${width}px`)
+    node.style.height = fillContainer
+      ? '100%'
+      : (computed.height && computed.height !== 'auto' ? computed.height : `${height}px`)
+    node.style.display = 'block'
+    node.style.objectFit = computed.objectFit
+    node.style.objectPosition = computed.objectPosition
+
+    if (!node.style.borderRadius) {
+      node.style.borderRadius = computed.borderRadius
+    }
+  }
+
+  if (width > 0 && height > 0 && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
+    try {
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+
+      const scale = Math.max(width / video.videoWidth, height / video.videoHeight)
+      const sourceWidth = width / scale
+      const sourceHeight = height / scale
+      const sourceX = (video.videoWidth - sourceWidth) / 2
+      const sourceY = (video.videoHeight - sourceHeight) / 2
+
+      canvas.getContext('2d')?.drawImage(
+        video,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        0,
+        0,
+        width,
+        height,
+      )
+
+      applySharedStyles(canvas)
+      return canvas
+    } catch {
+      // Cross-origin or unavailable frame capture; fall back to poster below.
+    }
+  }
+
+  const poster = video.getAttribute('poster')
+  if (!poster) return null
+
+  const image = document.createElement('img')
+  image.src = poster
+  image.alt = video.getAttribute('title') || ''
+  applySharedStyles(image)
+  return image
+}
+
+function createTransitionClone(source) {
+  const clone = source.cloneNode(true)
+  const liveVideos = source.matches('video') ? [source] : Array.from(source.querySelectorAll('video'))
+  const clonedVideos = clone.matches('video') ? [clone] : Array.from(clone.querySelectorAll('video'))
+
+  liveVideos.forEach((video, index) => {
+    const clonedVideo = clonedVideos[index]
+    if (!clonedVideo) return
+
+    const frozenNode = createFrozenVideoNode(video, { fillContainer: true })
+    if (frozenNode) {
+      clonedVideo.replaceWith(frozenNode)
+    }
+  })
+
+  return clone
+}
+
 export default function TransitionFrame({ children }) {
   const layoutRef = useRef(null)
   const ref = useRef(null)
@@ -113,10 +211,30 @@ export default function TransitionFrame({ children }) {
     return { link, url }
   }
 
+  function resolveSourceByKey(sourceKey) {
+    if (!sourceKey) return null
+
+    const escapedKey = escapeAttributeValue(sourceKey)
+
+    return document.querySelector(
+      `[data-transition-source="media"][data-transition-source-key="${escapedKey}"]`,
+    )
+  }
+
   function resolveAltTransitionSource(target, link) {
-    const directImageTrigger = target?.closest?.('.alt-transition-img')
+    const directImageTrigger = target?.closest?.('[data-transition-source="media"], .alt-transition-img')
     if (directImageTrigger && directImageTrigger.closest('a[href]') === link) {
       return directImageTrigger
+    }
+
+    const explicitSourceKey = link?.dataset?.transitionSourceKey
+      || target?.closest?.('[data-transition-source-key]')?.dataset?.transitionSourceKey
+
+    if (explicitSourceKey) {
+      const keyedSource = resolveSourceByKey(explicitSourceKey)
+      if (keyedSource) {
+        return keyedSource
+      }
     }
 
     const textTrigger = target?.closest?.('.alt-transition-text')
@@ -224,8 +342,11 @@ export default function TransitionFrame({ children }) {
         if (shouldUseAltTransition) {
           const rect = altSource.getBoundingClientRect()
           if (rect.width > 0 && rect.height > 0) {
-            const clone = altSource.cloneNode(true)
-            const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant ?? null
+            const clone = createTransitionClone(altSource)
+            const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant
+              ?? nav.link?.dataset?.transitionVariant
+              ?? null
+            const hasVideoSource = altSource.matches('video') || Boolean(altSource.querySelector('video'))
 
             // Read the source aspect ratio from the card's picture element so we can
             // fix the altClone dimensions for non-90% cards (e.g. WorkCard at 64%).
@@ -237,6 +358,7 @@ export default function TransitionFrame({ children }) {
             altTransitionRef.current = {
               pathname: nav.url.pathname,
               variant,
+              mediaKind: hasVideoSource ? 'video' : 'image',
               dockSelector: nav.link?.dataset?.transitionDockSelector || null,
               top: rect.top,
               left: rect.left,
@@ -712,13 +834,19 @@ export default function TransitionFrame({ children }) {
         }
       }
 
-      const altCloneImg = altClone.querySelector('img')
-      const resolveDockImage = () => document.querySelector('.featured-image picture img')
-      const getDockImageScale = () => {
-        const dockImg = resolveDockImage()
-        if (!dockImg) return 1
+      const altCloneMedia = altClone.querySelector('img, canvas, video')
+      const resolveDockMedia = (target = null) => {
+        const dockTarget = target || resolveDockTarget(dockSelector)
+        if (!dockTarget) return null
+        if (dockTarget.matches?.('img, canvas, video')) return dockTarget
 
-        const transform = getComputedStyle(dockImg).transform
+        return dockTarget.querySelector('img, canvas, video')
+      }
+      const getDockMediaScale = (target = null) => {
+        const dockMedia = resolveDockMedia(target)
+        if (!dockMedia) return 1
+
+        const transform = getComputedStyle(dockMedia).transform
         if (!transform || transform === 'none') return 1
 
         const matrix3dMatch = transform.match(/^matrix3d\((.+)\)$/)
@@ -741,6 +869,7 @@ export default function TransitionFrame({ children }) {
       const isServiceDockTransition = Boolean(dockSelector?.includes('service-featured-media'))
       const dock = getDockRect(dockSelector)
       const hasTargetAtStart = Boolean(dock)
+      const isVideoTransition = altTransition?.mediaKind === 'video'
       const smoothEase = 'power3.inOut'
       const expandDuration = 1
       const pauseDuration = 0
@@ -850,26 +979,26 @@ export default function TransitionFrame({ children }) {
       tl.to({}, { duration: pauseDuration }, expandDuration)
 
       if (dock) {
-        const dockImageScale = getDockImageScale()
-        const peakImageScale = Math.max(dockImageScale + 0.08, 1.12)
+        const dockMediaScale = getDockMediaScale(dock.target)
+        const peakMediaScale = Math.max(dockMediaScale + 0.08, 1.12)
 
-        if (altCloneImg) {
-          const dockImg = resolveDockImage()
-          if (dockImg) {
-            const dockImgStyle = getComputedStyle(dockImg)
-            altCloneImg.style.objectFit = dockImgStyle.objectFit
-            altCloneImg.style.objectPosition = dockImgStyle.objectPosition
+        if (altCloneMedia) {
+          const dockMedia = resolveDockMedia(dock.target)
+          if (dockMedia) {
+            const dockMediaStyle = getComputedStyle(dockMedia)
+            altCloneMedia.style.objectFit = dockMediaStyle.objectFit
+            altCloneMedia.style.objectPosition = dockMediaStyle.objectPosition
           }
 
-          tl.to(altCloneImg, {
-            scale: peakImageScale,
+          tl.to(altCloneMedia, {
+            scale: peakMediaScale,
             transformOrigin: '50% 50%',
             duration: expandDuration,
             ease: smoothEase,
           }, 0)
 
-          tl.to(altCloneImg, {
-            scale: dockImageScale,
+          tl.to(altCloneMedia, {
+            scale: dockMediaScale,
             transformOrigin: '50% 50%',
             duration: dockDuration,
             ease: smoothEase,
@@ -907,11 +1036,12 @@ export default function TransitionFrame({ children }) {
 
       // Fade the snapshot wrapper as soon as the dock animation begins so the
       // real incoming page is revealed while the clone is still shrinking.
+      const wrapperFadeStart = isVideoTransition ? dockStart + dockDuration * 0.4 : dockStart
       tl.to(wrapper, {
         autoAlpha: 0,
         duration: 0.3,
         ease: 'power4.out',
-      }, dockStart)
+      }, wrapperFadeStart)
 
       if (!hasTargetAtStart) {
         tl.to({}, { duration: (ALT_DOCK_MAX_WAIT_MS + 900) / 1000 }, dockStart)
@@ -922,23 +1052,23 @@ export default function TransitionFrame({ children }) {
             const lateDock = getDockRect(dockSelector)
 
             if (lateDock) {
-              if (altCloneImg) {
-                const lateDockImg = resolveDockImage()
-                const lateDockImageScale = getDockImageScale()
-                const latePeakImageScale = Math.max(lateDockImageScale + 0.08, 1.12)
-                if (lateDockImg) {
-                  const lateDockImgStyle = getComputedStyle(lateDockImg)
-                  altCloneImg.style.objectFit = lateDockImgStyle.objectFit
-                  altCloneImg.style.objectPosition = lateDockImgStyle.objectPosition
+              if (altCloneMedia) {
+                const lateDockMedia = resolveDockMedia(lateDock.target)
+                const lateDockMediaScale = getDockMediaScale(lateDock.target)
+                const latePeakMediaScale = Math.max(lateDockMediaScale + 0.08, 1.12)
+                if (lateDockMedia) {
+                  const lateDockMediaStyle = getComputedStyle(lateDockMedia)
+                  altCloneMedia.style.objectFit = lateDockMediaStyle.objectFit
+                  altCloneMedia.style.objectPosition = lateDockMediaStyle.objectPosition
                 }
-                gsap.to(altCloneImg, {
-                  scale: latePeakImageScale,
+                gsap.to(altCloneMedia, {
+                  scale: latePeakMediaScale,
                   transformOrigin: '50% 50%',
                   duration: Math.max(0.25, expandDuration * 0.6),
                   ease: smoothEase,
                 })
-                gsap.to(altCloneImg, {
-                  scale: lateDockImageScale,
+                gsap.to(altCloneMedia, {
+                  scale: lateDockMediaScale,
                   transformOrigin: '50% 50%',
                   delay: Math.max(0.08, pauseDuration * 0.5),
                   duration: dockDuration,
