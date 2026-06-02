@@ -118,7 +118,7 @@ export default function ServicesSinglePage() {
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
             </div>
-            <h1 className="hero-title">{acfHeading}</h1>
+            <h1 className="service-card__title">{acfHeading}</h1>
           </div>
           <div className="col-start-8 col-span-5 parallax">
             <div className="featured-image">
