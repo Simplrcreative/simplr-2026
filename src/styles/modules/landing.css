@@ -151,3 +151,11 @@
         animation: none;
     }
 }
+.hero-video-modal-close {
+    cursor: pointer;
+    transform: scale(1);
+    transition: transform 0.3s ease
+}
+.hero-video-modal-close:hover {
+    transform: scale(1.1);
+}

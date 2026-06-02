@@ -59,6 +59,7 @@ h2.service-section-heading span {
     overflow: hidden;
     display: flex;
     justify-content: center;
+    pointer-events: none
 }
 .next-title,
 .show-title {

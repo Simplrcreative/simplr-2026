@@ -601,6 +601,7 @@ export default function TransitionFrame({ children }) {
     const isWorkNext = altTransition?.variant === 'work-next'
     // Whether this is a work-page → work-single transition (WorkCard / WorkFeatured).
     const isWorkCard = altTransition?.variant === 'work-card'
+    const isServiceDockTransition = Boolean(altTransition?.dockSelector?.includes('service-featured-media'))
 
     // Use the scroll position captured at click time — window.scrollY at
     // useLayoutEffect time may already be 0 (clamped by browser for the new page).
@@ -662,7 +663,7 @@ export default function TransitionFrame({ children }) {
       // For variants that replace the outgoing page visual immediately,
       // hide the snapshot so only the transitioning clone is visible.
       // immediately — hide the outgoing snapshot to keep the transition clean.
-      if (isWorkNext || isWorkCard) {
+      if (isWorkNext || isWorkCard || isServiceDockTransition) {
         snapshot.style.opacity = '0'
         snapshot.style.visibility = 'hidden'
       }
@@ -866,7 +867,6 @@ export default function TransitionFrame({ children }) {
         return 1
       }
       const dockSelector = altTransition?.dockSelector || null
-      const isServiceDockTransition = Boolean(dockSelector?.includes('service-featured-media'))
       const dock = getDockRect(dockSelector)
       const hasTargetAtStart = Boolean(dock)
       const isVideoTransition = altTransition?.mediaKind === 'video'

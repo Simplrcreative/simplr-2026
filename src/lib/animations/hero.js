@@ -392,7 +392,9 @@ export function createHeroScrollAnimation(scope) {
       }
 
       const syncPlayIconState = () => {
-        if (hiddenBySection || !hasPointer) {
+        const playIconDisabled = document.documentElement.hasAttribute('data-play-icon-disabled')
+
+        if (playIconDisabled || hiddenBySection || !hasPointer) {
           updatePlayIconVisibility(false)
           return
         }

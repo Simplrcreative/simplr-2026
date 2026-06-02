@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext, Await, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, createShowreelScrollAnimation } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations } from '../lib/animations/index.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -25,6 +25,7 @@ const HERO_MODAL_POST_SCROLL_DELAY_MS = 200
 const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
 const HERO_MODAL_SCROLL_DURATION_MS = 1200
 const HERO_MODAL_CONTENT_FADE_DURATION_MS = 1000
+const PLAY_ICON_DISABLE_ATTR = 'data-play-icon-disabled'
 
 function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
   const heroRef = useRef(null)
@@ -83,7 +84,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
       destroyServicesAnimation = createServicesScrollAnimation(servicesRef.current) ?? (() => {})
       destroyCaseStudiesAnimation = createCaseStudiesScrollAnimation(caseStudiesRef.current) ?? (() => {})
-      destroyShowreelAnimation = createShowreelScrollAnimation(heroRef.current) ?? (() => {})
+      //destroyShowreelAnimation = createShowreelScrollAnimation(heroRef.current) ?? (() => {})
       destroyBtnAnimation = createBtnHoverAnimation(btnRef.current) ?? (() => {})
     }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
     return () => {
@@ -91,7 +92,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       destroyHeroAnimation()
       destroyServicesAnimation()
       destroyCaseStudiesAnimation()
-      destroyShowreelAnimation()
+      //destroyShowreelAnimation()
       destroyBtnAnimation()
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
@@ -247,6 +248,44 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     }
   }
 
+  function disablePlayIconDuringScrollToNextSection() {
+    const root = document.documentElement
+    const nextSection = document.querySelector('section.brands-grow')
+
+    if (!nextSection) return
+
+    root.setAttribute(PLAY_ICON_DISABLE_ATTR, 'true')
+
+    const targetTop = Math.max(0, Math.floor(nextSection.getBoundingClientRect().top + window.scrollY))
+    let settleFrames = 0
+    let rafId = 0
+
+    const checkScrollCompletion = () => {
+      const remainingDistance = Math.abs(window.scrollY - targetTop)
+
+      if (remainingDistance <= 2) {
+        settleFrames += 1
+      } else {
+        settleFrames = 0
+      }
+
+      if (settleFrames >= 2) {
+        root.removeAttribute(PLAY_ICON_DISABLE_ATTR)
+        return
+      }
+
+      rafId = requestAnimationFrame(checkScrollCompletion)
+    }
+
+    window.scrollTo({ top: targetTop, behavior: 'smooth' })
+    rafId = requestAnimationFrame(checkScrollCompletion)
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      root.removeAttribute(PLAY_ICON_DISABLE_ATTR)
+    }
+  }
+
   function openHeroVideoModal() {
     if (!hasHeroFullVideo) return
     clearPendingHeroModalClose()
@@ -352,10 +391,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       closeHeroModalTimeoutRef.current = null
 
       if (scrollToNextSection) {
-        window.setTimeout(() => {
-          const nextSection = document.querySelector('section.brands-grow')
-          nextSection?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 0)
+        disablePlayIconDuringScrollToNextSection()
       }
     }, HERO_MODAL_FADE_DURATION_MS)
   }
@@ -468,12 +504,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </button>
             </div>
           </div>
-          
+          {/*
           <div className="show-title-wrapper">
             <div className="show-title text-white" >
               Watch Our Showreel
             </div>
           </div>
+          */}
           
       </section>
 
