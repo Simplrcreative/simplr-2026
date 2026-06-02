@@ -473,6 +473,48 @@ const homeCaseStudiesQuery = `
   }
 `
 
+const homeHeroVideoLoopQuery = `
+  query HomeHeroVideoLoopQuery {
+    page(id: "5", idType: DATABASE_ID) {
+      acfHomeBuilder {
+        acfHeroVideoLoop {
+          node {
+            guid
+          }
+        }
+      }
+    }
+  }
+`
+
+const homeHeroVideoPosterQuery = `
+  query HomeHeroVideoPosterQuery {
+    page(id: "5", idType: DATABASE_ID) {
+      acfHomeBuilder {
+        acfHeroVideoPoster {
+          node {
+            guid
+          }
+        }
+      }
+    }
+  }
+`
+
+const homeHeroVideoFullQuery = `
+  query HomeHeroVideoFullQuery {
+    page(id: "5", idType: DATABASE_ID) {
+      acfHomeBuilder {
+        acfHeroVideoFull {
+          node {
+            guid
+          }
+        }
+      }
+    }
+  }
+`
+
 function normaliseHomeCaseStudy(study, index) {
   const caseStudy = study?.acfCaseStudy?.nodes?.[0]
   const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
@@ -521,9 +563,28 @@ function normaliseHomeTestimonial(acfHomeBuilder) {
   }
 }
 
+function normaliseHomeHeroMedia(acfHomeBuilder) {
+  const posterNode = acfHomeBuilder?.acfHeroVideoPoster?.node
+  const poster = posterNode?.guid ?? ''
+  const loopVideo = acfHomeBuilder?.acfHeroVideoLoop?.node?.guid
+    ?? ''
+  const fullVideo = acfHomeBuilder?.acfHeroVideoFull?.node?.guid
+    ?? ''
+
+  return {
+    heroVideoPoster: poster,
+    heroVideoPosterAlt: '',
+    heroVideoLoop,
+    heroVideoFull,
+  }
+}
+
 async function fetchHomeCaseStudiesData() {
   if (!wpConfig.endpoint) {
-    return { caseStudies: [], testimonialBlock: null }
+    return {
+      caseStudies: [],
+      testimonialBlock: null,
+    }
   }
 
   try {
@@ -537,7 +598,53 @@ async function fetchHomeCaseStudiesData() {
     }
   } catch (error) {
     reportError('Unable to load home featured case studies', error)
-    return { caseStudies: [], testimonialBlock: null }
+    return {
+      caseStudies: [],
+      testimonialBlock: null,
+    }
+  }
+}
+
+async function fetchHomeHeroMediaData() {
+  if (!wpConfig.endpoint) {
+    return {
+      heroVideoPoster: '',
+      heroVideoPosterAlt: '',
+      heroVideoLoop: '',
+      heroVideoFull: '',
+    }
+  }
+
+  try {
+    const [loopResult, posterResult, fullResult] = await Promise.all([
+      remember('home:hero-media:loop', () => graphQlRequest(homeHeroVideoLoopQuery)).catch((error) => {
+        reportError('Unable to load home hero loop video', error)
+        return null
+      }),
+      remember('home:hero-media:poster', () => graphQlRequest(homeHeroVideoPosterQuery)).catch((error) => {
+        reportError('Unable to load home hero poster image', error)
+        return null
+      }),
+      remember('home:hero-media:full', () => graphQlRequest(homeHeroVideoFullQuery)).catch((error) => {
+        reportError('Unable to load home hero full video', error)
+        return null
+      }),
+    ])
+
+    return {
+      heroVideoLoop: loopResult?.page?.acfHomeBuilder?.acfHeroVideoLoop?.node?.guid ?? '',
+      heroVideoPoster: posterResult?.page?.acfHomeBuilder?.acfHeroVideoPoster?.node?.guid ?? '',
+      heroVideoPosterAlt: '',
+      heroVideoFull: fullResult?.page?.acfHomeBuilder?.acfHeroVideoFull?.node?.guid ?? '',
+    }
+  } catch (error) {
+    reportError('Unable to load home hero media', error)
+    return {
+      heroVideoPoster: '',
+      heroVideoPosterAlt: '',
+      heroVideoLoop: '',
+      heroVideoFull: '',
+    }
   }
 }
 
@@ -775,10 +882,11 @@ export async function fetchNavigationData() {
 }
 
 export async function fetchHomeData() {
-  const [pagePayload, workPayload, homeFeatureData] = await Promise.all([
+  const [pagePayload, workPayload, homeFeatureData, homeHeroMedia] = await Promise.all([
     fetchPageData('home'),
     fetchCollectionData('work'),
     fetchHomeCaseStudiesData(),
+    fetchHomeHeroMediaData(),
   ])
 
   const fallbackCaseStudies = (workPayload.items || []).slice(0, 6).map((item, index) => ({
@@ -792,6 +900,10 @@ export async function fetchHomeData() {
 
   return {
     ...pagePayload,
+    page: {
+      ...pagePayload.page,
+      ...homeHeroMedia,
+    },
     featuredWork: (workPayload.items || []).slice(0, 3),
     caseStudies: homeFeatureData.caseStudies.length ? homeFeatureData.caseStudies : fallbackCaseStudies,
     testimonialBlock: homeFeatureData.testimonialBlock,

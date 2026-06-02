@@ -39,7 +39,7 @@ h2.service-section-heading span {
     font-family: var(--font-literata);
     font-weight: 400;
 }
-.next-title-wrapper {
+.next-title-wrappe {
     position:absolute;
     top: 3rem;
     left: 0;
@@ -50,11 +50,24 @@ h2.service-section-heading span {
     justify-content: center;
     padding-bottom: 3rem
 }
-.next-title {
+.show-title-wrapper {
+    position:absolute;
+    bottom: -60px;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+.next-title,
+.show-title {
     font-size: clamp(12.5rem, 21vw, 18.75rem);
     white-space: nowrap;
     font-weight: 300;
     line-height: 1;
     text-align: center;
-    
+}
+.show-title {
+    transform: translateX(100vw)
 }

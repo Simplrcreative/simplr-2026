@@ -14,4 +14,5 @@ export { createBulletsAnimation, createPeopleScatterAnimation, createPeopleSecti
 export { createSurfaceColorTransitions } from './transitions.js'
 export { createIntroHeroTitleAnimation, createIntroVideoAnimation } from './home.js'
 export { setIntroHeroInitialState } from './home.js'
+export { createShowreelScrollAnimation } from './home.js'
 export { createWorkImagesAnimation, createNextWorkAnimation } from './work.js'

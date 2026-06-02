@@ -1,4 +1,14 @@
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+let pluginsRegistered = false
+
+function registerPlugins() {
+    if (!pluginsRegistered) {
+        gsap.registerPlugin(ScrollTrigger)
+        pluginsRegistered = true
+    }
+}
 
 export function setIntroHeroInitialState(section) {
     if (!section) return
@@ -80,5 +90,64 @@ export function createIntroHeroTitleAnimation(section) {
     return () => {
         heroTitleIntro.kill()
         gsap.set(heroTitle, { clearProps: 'opacity,visibility,transform,willChange' })
+    }
+}
+
+/**
+ * Scrubs the home showreel title from right to left while the landing section
+ * enters the viewport, matching the "Next Case Study" movement pattern.
+ */
+export function createShowreelScrollAnimation(scope) {
+    registerPlugins()
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => {}
+
+    const section = scope?.matches?.('section.landing') ? scope : scope?.querySelector?.('section.landing')
+    const title = section?.querySelector('.show-title')
+
+    if (!section || !title) return () => {}
+
+    let st = null
+    let tween = null
+
+    function setup() {
+        const titleWidth = title.offsetWidth
+        const viewportWidth = window.innerWidth
+        const startX = (viewportWidth + titleWidth)
+        const endX = -startX
+
+        tween?.kill()
+        st?.kill()
+
+        gsap.set(title, { clearProps: 'x', startX, autoAlpha: 0.5 })
+
+        tween = gsap.fromTo(
+            title,
+            { x: startX, autoAlpha: 0.5 },
+            { x: endX, autoAlpha: 0.5, ease: 'none', paused: true },
+        )
+
+        st = ScrollTrigger.create({
+            trigger: section,
+            start: 'top 5%',
+            end: () => `+=${Math.round(Math.max(window.innerHeight, 480))}`,
+            scrub: 2,
+            animation: tween,
+            invalidateOnRefresh: true,
+            markers: true
+        })
+    }
+
+    if (document.documentElement.classList.contains('page-transitioning')) {
+        window.addEventListener('page-transition:complete', setup, { once: true })
+    } else {
+        setup()
+    }
+
+    return () => {
+        window.removeEventListener('page-transition:complete', setup)
+        st?.kill()
+        tween?.kill()
+        gsap.set(title, { clearProps: 'x' })
     }
 }
