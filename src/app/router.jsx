@@ -78,6 +78,12 @@ export const router = createBrowserRouter([
         handle: { pageBg: 'light' },
       },
       {
+        path: 'thinking/:topic/:slug',
+        element: <ThinkingSinglePage />,
+        loader: createThinkingSinglePageLoader(),
+        handle: { pageBg: 'light' },
+      },
+      {
         path: 'thinking/:slug',
         element: <ThinkingSinglePage />,
         loader: createThinkingSinglePageLoader(),

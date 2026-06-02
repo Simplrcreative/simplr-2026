@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation } from '../lib/animations/index.js'
-import { buildEntryPath } from '../lib/wp-api.js'
+import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
 
 const FILTER_COLOR_MAP = {
   strategy: 'var(--color-strategy)',
@@ -198,7 +198,10 @@ export default function ThinkingPage() {
 
             return (
               <article key={post.databaseId ?? post.slug} className="thinking-post-card" data-post-card>
-                <Link to={buildEntryPath('thinking', post.slug)} className="thinking-post-link">
+                <Link
+                  to={buildEntryPath('thinking', post.slug, { topicSlug: getThinkingTopicSlug(post) })}
+                  className="thinking-post-link"
+                >
                   <picture className="thinking-post__image-frame" data-post-image-frame>
                     {thumb ? <img src={thumb + '.webp'} alt={post.featuredImage?.node?.altText || postTitle} /> : null}
                   </picture>

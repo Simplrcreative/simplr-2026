@@ -4,7 +4,7 @@ import Seo from '../components/Seo.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import { createNextWorkAnimation } from '../lib/animations/index.js'
-import { buildEntryPath } from '../lib/wp-api.js'
+import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
 
 export default function ThinkingSinglePage() {
 
@@ -21,7 +21,10 @@ export default function ThinkingSinglePage() {
     ? new Date(page.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')
     : ''
   const content = page?.content || ''
-  const pathname = page?.slug ? `/thinking/${page?.slug}` : '/thinking'
+  const topicSlug = getThinkingTopicSlug(page)
+  const pathname = page?.slug
+    ? buildEntryPath('thinking', page.slug, { topicSlug })
+    : '/thinking'
   const categories = page?.topics?.nodes ?? []
 
   function getThumbnail(featuredImage, preferredSize = 'large') {
@@ -142,7 +145,10 @@ export default function ThinkingSinglePage() {
               const postTitle = post.title ?? 'Thinking post'
               return (
                 <article key={post.databaseId ?? post.slug} className="thinking-post-card" data-post-card>
-                  <Link to={buildEntryPath('thinking', post.slug)} className="thinking-post-link">
+                  <Link
+                    to={buildEntryPath('thinking', post.slug, { topicSlug: getThinkingTopicSlug(post) })}
+                    className="thinking-post-link"
+                  >
                     <picture className="thinking-post__image-frame" data-post-image-frame>
                       {postThumb ? <img src={postThumb + '.webp'} alt={postTitle} /> : null}
                     </picture>

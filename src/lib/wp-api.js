@@ -990,8 +990,26 @@ export async function fetchServicesData() {
   }
 }
 
-export function buildEntryPath(collectionKey, slug) {
-  return `${routeDefinitions[collectionKey].path}/${slug}`
+export function getThinkingTopicSlug(entry) {
+  const rawTopicSlug = entry?.topics?.nodes?.[0]?.slug
+  const normalizedTopicSlug = String(rawTopicSlug || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return normalizedTopicSlug || 'news'
+}
+
+export function buildEntryPath(collectionKey, slug, options = {}) {
+  const basePath = routeDefinitions[collectionKey].path
+
+  if (collectionKey === 'thinking') {
+    const topicSlug = String(options.topicSlug || 'news')
+    return `${basePath}/${topicSlug}/${slug}`
+  }
+
+  return `${basePath}/${slug}`
 }
 
 export async function fetchWorksData() {

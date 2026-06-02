@@ -1,4 +1,4 @@
-import { fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
+import { buildEntryPath, fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -87,12 +87,28 @@ export function createThinkingPageLoader() {
 }
 
 export function createThinkingSinglePageLoader() {
-  return async function ThinkingSinglePageLoader({ params }) {
+  return async function ThinkingSinglePageLoader({ params, request }) {
     const [entry, { posts }] = await Promise.all([
       fetchThinkingEntryData(params.slug),
       fetchThinkingPostsData(),
     ])
-    return { ...entry, posts }
+
+    const canonicalTopicSlug = getThinkingTopicSlug(entry.page)
+    const canonicalPath = buildEntryPath('thinking', params.slug, { topicSlug: canonicalTopicSlug })
+    const requestedTopicSlug = params.topic
+    const requestUrl = new URL(request.url)
+    const search = requestUrl.search || ''
+
+    if (requestedTopicSlug !== canonicalTopicSlug) {
+      throw new Response(null, {
+        status: 302,
+        headers: {
+          Location: `${canonicalPath}${search}`,
+        },
+      })
+    }
+
+    return { ...entry, posts, topicSlug: canonicalTopicSlug }
   }
 }
 
