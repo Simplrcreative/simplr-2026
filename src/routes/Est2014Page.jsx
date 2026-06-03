@@ -179,35 +179,41 @@ export default function Est2014Page() {
           <div ref={galleryRef} className="beyond-grid ">
             {galleryRows.map((row) => (
               <div key={row.id} className="beyond-row slide-up-subtle" style={{ '--beyond-row-height': `${row.height}px` }}>
-                {row.items.map((item) => (
-                  <figure key={item.id} className="beyond-card" style={{ width: `${item.width}px` }}>
-                    {item.type === 'video' ? (
-                      <video
-                        className="beyond-card__media"
-                        src={item.source}
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                        preload="metadata"
-                        onLoadedMetadata={(event) => {
-                          setMeasuredRatio(item.id, event.currentTarget.videoWidth, event.currentTarget.videoHeight)
-                        }}
-                      />
-                    ) : (
-                      <img
-                        className="beyond-card__media"
-                        src={item.source}
-                        alt={item.caption || 'Beyond item'}
-                        loading="lazy"
-                        onLoad={(event) => {
-                          setMeasuredRatio(item.id, event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)
-                        }}
-                      />
-                    )}
-                    {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
-                  </figure>
-                ))}
+                {row.items.map((item) => {
+                  const imageSource = item.mimeType && item.mimeType !== 'image/gif'
+                    ? `${item.source}.webp`
+                    : item.source
+
+                  return (
+                    <figure key={item.id} className="beyond-card" style={{ width: `${item.width}px` }}>
+                      {item.type === 'video' ? (
+                        <video
+                          className="beyond-card__media"
+                          src={item.source}
+                          muted
+                          loop
+                          playsInline
+                          autoPlay
+                          preload="metadata"
+                          onLoadedMetadata={(event) => {
+                            setMeasuredRatio(item.id, event.currentTarget.videoWidth, event.currentTarget.videoHeight)
+                          }}
+                        />
+                      ) : (
+                        <img
+                          className="beyond-card__media"
+                          src={imageSource}
+                          alt={item.caption || 'Beyond item'}
+                          loading="lazy"
+                          onLoad={(event) => {
+                            setMeasuredRatio(item.id, event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)
+                          }}
+                        />
+                      )}
+                      {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
+                    </figure>
+                  )
+                })}
               </div>
             ))}
           </div>

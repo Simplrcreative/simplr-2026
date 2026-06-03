@@ -205,6 +205,7 @@ const beyondQuery = `
             acfImage {
               node {
                 guid
+                mimeType
                 mediaDetails {
                   width
                   height
@@ -1004,6 +1005,7 @@ export async function fetchBeyondData() {
 
           const width = Number(mediaNode?.mediaDetails?.width) || null
           const height = Number(mediaNode?.mediaDetails?.height) || null
+          const mimeType = item?.acfImage?.node?.mimeType || null
 
           return {
             id: `beyond-${entryIndex}-${imageIndex}`,
@@ -1012,6 +1014,7 @@ export async function fetchBeyondData() {
             caption: item?.acfCaption || '',
             width,
             height,
+            mimeType,
             ratio: width && height ? width / height : null,
           }
         })
