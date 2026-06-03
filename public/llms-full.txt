@@ -12,7 +12,7 @@ This website is a headless WordPress front end built with Vite and React.
 
 ## Dynamic content
 - Work singles are resolved from /work/:slug
-- Thinking singles are resolved from /thinking/:slug
+- Thinking singles are resolved from /thinking/:topic/:slug
 
 ## Content model guidance
 - Work should map to a custom post type exposed through WPGraphQL.

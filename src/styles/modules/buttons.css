@@ -30,15 +30,14 @@
     left: 50%;
     width: 160%;
     aspect-ratio: 1;
-    translate: -50% -50%;
     transform-origin: center;
-    transform: scale(0);
+    transform: translate(-50%, -50%) scale(0);
     border-radius: 999px;
     transition: transform 0.5s ease-out;
     background-color: white;
 }
 .btn:hover .btn-fill::before {
-    transform: scale(1);
+    transform: translate(-50%, -50%) scale(1);
 }
 .btn-inner {
     position: relative;

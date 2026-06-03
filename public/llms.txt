@@ -1,6 +1,6 @@
 # http://localhost:5173
 
 - Primary routes: /work, /about, /services, /thinking, /contact, /est-2014
-- Dynamic editorial routes: /work/:slug and /thinking/:slug
+- Dynamic editorial routes: /work/:slug and /thinking/:topic/:slug
 - Content source: WordPress via WPGraphQL
 - SEO/GEO assets: structured data, canonical URLs, sitemap.xml, robots.txt, llms-full.txt
