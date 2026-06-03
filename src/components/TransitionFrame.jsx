@@ -394,6 +394,21 @@ export default function TransitionFrame({ children }) {
               }
             }
 
+            // For service-card: capture the service card container so it can
+            // animate out independently while the snapshot is hidden.
+            if (variant === 'service-card') {
+              const serviceCard = altSource.closest('.service-card')
+              if (serviceCard) {
+                const sRect = serviceCard.getBoundingClientRect()
+                altTransitionRef.current.serviceCardClone = serviceCard.cloneNode(true)
+                altTransitionRef.current.serviceCardRect = {
+                  top: sRect.top,
+                  left: sRect.left,
+                  width: sRect.width,
+                }
+              }
+            }
+
             // For work-next: capture the 'Next Case Study' title separately so it
             // can animate out independently without showing the scrolled snapshot.
             if (variant === 'work-next') {
@@ -621,6 +636,8 @@ export default function TransitionFrame({ children }) {
     const isWorkNext = altTransition?.variant === 'work-next'
     // Whether this is a work-page → work-single transition (WorkCard / WorkFeatured).
     const isWorkCard = altTransition?.variant === 'work-card'
+    // Whether this is a services-page → service-single transition from a card.
+    const isServiceCard = altTransition?.variant === 'service-card'
     const isServiceDockTransition = Boolean(altTransition?.dockSelector?.includes('service-featured-media'))
 
     // Use the scroll position captured at click time — window.scrollY at
@@ -827,6 +844,7 @@ export default function TransitionFrame({ children }) {
 
     let nextTitleEl = null
     let workSectionEl = null
+    let serviceCardEl = null
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
 
     if (altClone) {
@@ -980,6 +998,29 @@ export default function TransitionFrame({ children }) {
         })
         document.body.appendChild(workSectionEl)
         tl.to(workSectionEl, {
+          y: -80,
+          autoAlpha: 0,
+          duration: expandDuration * 0.6,
+          ease: 'power2.in',
+        }, 0)
+      }
+
+      // For service-card: animate the captured service card upward so the
+      // outgoing page has the same subtle Y exit feel as work transitions.
+      if (isServiceCard && altTransition.serviceCardClone) {
+        serviceCardEl = altTransition.serviceCardClone
+        const sRect = altTransition.serviceCardRect
+        Object.assign(serviceCardEl.style, {
+          position: 'fixed',
+          top: `${sRect.top}px`,
+          left: `${sRect.left}px`,
+          width: `${sRect.width}px`,
+          pointerEvents: 'none',
+          zIndex: '10000',
+          margin: '0',
+        })
+        document.body.appendChild(serviceCardEl)
+        tl.to(serviceCardEl, {
           y: -80,
           autoAlpha: 0,
           duration: expandDuration * 0.6,
@@ -1141,6 +1182,7 @@ export default function TransitionFrame({ children }) {
         altClone.remove()
       }
       wrapper.remove()
+        serviceCardEl?.remove()
       document.documentElement.classList.remove('page-transitioning')
       document.documentElement.style.overflowX = ''
       const realHeader = document.querySelector('.header')
