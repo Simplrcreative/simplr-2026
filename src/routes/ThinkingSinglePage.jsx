@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Link, useLoaderData} from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
@@ -17,14 +17,7 @@ function categoryToFilterSlug(category) {
 }
 
 export default function ThinkingSinglePage() {
-
-  useEffect(() => {
-    const cleanupNextWork = createNextWorkAnimation()
-    return () => {
-      cleanupNextWork?.()
-    }
-  }, [])
-
+  const postContentRef = useRef(null)
   const { slug, page, posts = [] } = useLoaderData() ?? {}
   const title = page?.title || 'Untitled'
   const date = page?.date
@@ -38,7 +31,82 @@ export default function ThinkingSinglePage() {
   const categories = page?.topics?.nodes ?? []
   const author = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.name || page?.author?.node?.name || ''
 
-  console.log(page?.acfPostBuilder)
+  useEffect(() => {
+    const cleanupNextWork = createNextWorkAnimation()
+    return () => {
+      cleanupNextWork?.()
+    }
+  }, [])
+
+  useEffect(() => {
+    const root = postContentRef.current
+    if (!root) return undefined
+
+    const listeners = []
+    const groups = root.querySelectorAll('.service-accordion-list, [data-accordion-group]')
+
+    function setupGroup(group) {
+      const items = Array.from(group.querySelectorAll('.service-accordion-item'))
+      if (items.length === 0) return
+
+      items.forEach((item) => {
+        const trigger = item.querySelector('.service-accordion-trigger')
+        const panel = item.querySelector('.service-accordion-panel')
+        const symbol = item.querySelector('.service-accordion-symbol')
+        const initialOpen = item.classList.contains('is-open')
+
+        if (!trigger || !panel) {
+          return
+        }
+
+        trigger.setAttribute('aria-expanded', String(initialOpen))
+        panel.setAttribute('aria-hidden', String(!initialOpen))
+        if (symbol) {
+          symbol.textContent = initialOpen ? '-' : '+'
+        }
+
+        const onClick = () => {
+          const isOpen = item.classList.contains('is-open')
+
+          items.forEach((candidate) => {
+            const candidateTrigger = candidate.querySelector('.service-accordion-trigger')
+            const candidatePanel = candidate.querySelector('.service-accordion-panel')
+            const candidateSymbol = candidate.querySelector('.service-accordion-symbol')
+            candidate.classList.remove('is-open')
+            candidateTrigger?.setAttribute('aria-expanded', 'false')
+            candidatePanel?.setAttribute('aria-hidden', 'true')
+            if (candidateSymbol) {
+              candidateSymbol.textContent = '+'
+            }
+          })
+
+          if (isOpen) {
+            return
+          }
+
+          item.classList.add('is-open')
+          trigger.setAttribute('aria-expanded', 'true')
+          panel.setAttribute('aria-hidden', 'false')
+          if (symbol) {
+            symbol.textContent = '-'
+          }
+        }
+
+        trigger.addEventListener('click', onClick)
+        listeners.push(() => trigger.removeEventListener('click', onClick))
+      })
+    }
+
+    if (groups.length > 0) {
+      groups.forEach(setupGroup)
+    } else {
+      setupGroup(root)
+    }
+
+    return () => {
+      listeners.forEach((removeListener) => removeListener())
+    }
+  }, [content])
 
   function getThumbnail(featuredImage, preferredSize = 'large') {
   const sizes = featuredImage?.node?.mediaDetails?.sizes
@@ -113,7 +181,7 @@ export default function ThinkingSinglePage() {
 
       <section className="post-content px-5 pb-20 bg-white section-light">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6">
+          <div ref={postContentRef} className="col-start-1 md:col-start-4 col-span-12 md:col-span-6">
             
             {content && (
             <RichText html={content} />
