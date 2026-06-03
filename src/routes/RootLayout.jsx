@@ -335,7 +335,7 @@ export default function RootLayout() {
         />
       </div>
 
-      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-5">
+      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-[1000]">
         <Link
           id="compact-logo-link"
           to="/"
