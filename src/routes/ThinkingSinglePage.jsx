@@ -26,6 +26,9 @@ export default function ThinkingSinglePage() {
     ? buildEntryPath('thinking', page.slug, { topicSlug })
     : '/thinking'
   const categories = page?.topics?.nodes ?? []
+  const author = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.name || page?.author?.nodes[0]?.name || ''
+
+  console.log(page?.acfPostBuilder)
 
   function getThumbnail(featuredImage, preferredSize = 'large') {
   const sizes = featuredImage?.node?.mediaDetails?.sizes
@@ -74,7 +77,7 @@ export default function ThinkingSinglePage() {
               <div className="eyebrow">Thinking {categories.length > 0 && ( categories.map(({ name }) => <CategoryBadge key={name} name={name} />) )}</div>
               <h1 className="hero-title text-center"><span>{title}</span></h1>
               {date && (
-                <p className="mt-10 text-[0.875rem]">{date}</p>
+                <p className="mt-10 text-[0.875rem]">{date} • {author}</p>
               )}
           </div>
           {thumb && ( 

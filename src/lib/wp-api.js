@@ -318,11 +318,15 @@ const postsQuery = `
   query PostQuery {
     posts(first: 50, where: { status: PUBLISH }) {
       nodes {
-        databaseId
         slug
         title(format: RENDERED)
         content
         date
+        author {
+          node {
+            name
+          }
+        }
         acfClients {
           nodes {
             name
@@ -343,6 +347,11 @@ const postsQuery = `
           }
         }
         acfPostBuilder {
+          acfAuthor {
+            nodes {
+              name
+            }
+          }
           acfFeaturedImage {
             node {
               altText

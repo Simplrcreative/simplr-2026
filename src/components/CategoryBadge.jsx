@@ -1,4 +1,5 @@
 const DARK_TEXT_SLUGS = new Set(['strategy', 'web-design-development'])
+const LIGHT_TEXT_SLUGS = new Set(['motion', 'branding-design', 'templates'])
 
 const CATEGORY_BG_CLASS_BY_SLUG = {
   strategy: 'bg-strategy',
@@ -25,7 +26,7 @@ export function slugify(name = '') {
 export default function CategoryBadge({ name }) {
   const slug = slugify(name)
   const bgClass = CATEGORY_BG_CLASS_BY_SLUG[slug] ?? 'bg-white'
-  const textClass = DARK_TEXT_SLUGS.has(slug) ? 'text-coffee' : 'text-white'
+  const textClass = LIGHT_TEXT_SLUGS.has(slug) ? 'text-white' : 'text-coffee'
   const borderColor = CATEGORY_BORDER_COLOR_BY_SLUG[slug] ?? 'var(--color-coffee)'
 
   return (
