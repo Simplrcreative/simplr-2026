@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData, useParams } from 'react-router-dom'
 import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
@@ -47,7 +47,7 @@ function postMatchesFilter(post, filterId) {
 
 export default function ThinkingPage() {
   const { posts = [] } = useLoaderData() ?? {}
-  const [activeFilter, setActiveFilter] = useState('all')
+  const { filterSlug } = useParams()
   const postsResultsRef = useRef(null)
 
   const filters = useMemo(() => {
@@ -84,6 +84,19 @@ export default function ThinkingPage() {
         }),
     ]
   }, [posts])
+
+  const filterIds = useMemo(() => new Set(filters.map((filter) => filter.id)), [filters])
+  const [activeFilter, setActiveFilter] = useState('all')
+
+  useEffect(() => {
+    const nextFilter = filterSlug && filterIds.has(filterSlug) ? filterSlug : 'all'
+    setActiveFilter(nextFilter)
+  }, [filterIds, filterSlug])
+
+  const activeFilterLabel = useMemo(() => {
+    if (activeFilter === 'all') return ''
+    return filters.find((filter) => filter.id === activeFilter)?.label ?? ''
+  }, [activeFilter, filters])
 
   const filteredPosts = useMemo(
     () => posts.filter((post) => postMatchesFilter(post, activeFilter)),
@@ -165,8 +178,15 @@ export default function ThinkingPage() {
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
-            <div className="eyebrow">Thinking</div>
-            <h1 className="hero-title">Our latest thinking on <span>strategy, design, and building brands</span> that connect <span><i>purpose</i></span> with <span><i>performance.</i></span></h1>
+            <div className="eyebrow">
+              Thinking
+              {activeFilterLabel ? (
+                <span className="category bg-white text-coffee border leading-none font-medium rounded-full mb-1 md:mb-0">{activeFilterLabel}</span>
+              ) : null}
+            </div>
+            {/* {!activeFilterLabel ? ( */}
+              <h1 className="hero-title">Our latest thinking on <span>strategy, design, and building brands</span> that connect <span><i>purpose</i></span> with <span><i>performance.</i></span></h1>
+            {/* ) : null} */}
           </div>
         </div>
       </section>

@@ -44,6 +44,10 @@
     font-size: 22px;
     @apply font-semibold relative;
   }
+  .eyebrow span.category {
+    display: inline-block;
+    transform: translate(10px, -3.5px)!important;
+  }
   .eyebrow::before {
     content:'';
     position: absolute;

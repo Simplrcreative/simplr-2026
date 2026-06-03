@@ -6,6 +6,16 @@ import RichText from '../components/RichText.jsx'
 import { createNextWorkAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
 
+function categoryToFilterSlug(category) {
+  const bySlug = String(category?.slug || '').trim().toLowerCase()
+  if (bySlug) return bySlug
+
+  return String(category?.name || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
 export default function ThinkingSinglePage() {
 
   useEffect(() => {
@@ -26,7 +36,7 @@ export default function ThinkingSinglePage() {
     ? buildEntryPath('thinking', page.slug, { topicSlug })
     : '/thinking'
   const categories = page?.topics?.nodes ?? []
-  const author = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.name || page?.author?.nodes[0]?.name || ''
+  const author = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.name || page?.author?.node?.name || ''
 
   console.log(page?.acfPostBuilder)
 
@@ -74,7 +84,18 @@ export default function ThinkingSinglePage() {
       <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-40 flex flex-col items-center change-logo-back">
-              <div className="eyebrow">Thinking {categories.length > 0 && ( categories.map(({ name }) => <CategoryBadge key={name} name={name} />) )}</div>
+              <div className="eyebrow">Thinking {categories.length > 0 && (
+                categories.map((category) => {
+                  const filterSlug = categoryToFilterSlug(category)
+                  if (!filterSlug) return null
+
+                  return (
+                    <Link key={category.slug ?? category.name} to={`/thinking/${filterSlug}`} title={category.name}>
+                      <CategoryBadge name={category.name} />
+                    </Link>
+                  )
+                })
+              )}</div>
               <h1 className="hero-title text-center"><span>{title}</span></h1>
               {date && (
                 <p className="mt-10 text-[0.875rem]">{date} • {author}</p>
