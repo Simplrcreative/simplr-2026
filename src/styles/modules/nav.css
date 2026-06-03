@@ -139,6 +139,9 @@ nav.light a.is-active .nav-link__orb {
     }
 }
 @media (min-width: 768px) {
+    .menu-icon {
+        display: none;
+    }
     nav.main {
         backdrop-filter: blur(10px);
         position: relative;

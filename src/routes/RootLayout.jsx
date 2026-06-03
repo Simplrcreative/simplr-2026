@@ -356,7 +356,7 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2 md:hidden${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((o) => !o)}>
+      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2 ${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((o) => !o)}>
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
