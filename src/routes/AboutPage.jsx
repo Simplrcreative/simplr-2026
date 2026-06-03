@@ -105,7 +105,7 @@ export default function AboutPage() {
       </section>
 
       {/* People section */}
-      <section ref={peopleSectionRef} className="people py-20 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
+      <section id="our-people" ref={peopleSectionRef} className="people py-20 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
         <div ref={scatterRef} className="people-scatter relative z-3 max-w-[98vw] flex flex-wrap items-center justify-center gap-1">

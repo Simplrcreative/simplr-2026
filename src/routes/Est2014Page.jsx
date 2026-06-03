@@ -160,7 +160,7 @@ export default function Est2014Page() {
           </div>
           <div className="col-start-10 col-span-3 text-white flex justify-end items-end">
             <Link 
-              to="/about"
+              to="/about#our-people"
               ref={btnRef}
               className="btn relative bg-white text-coffee md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
             >
@@ -186,6 +186,7 @@ export default function Est2014Page() {
                         className="beyond-card__media"
                         src={item.source}
                         muted
+                        defaultMuted
                         loop
                         playsInline
                         autoPlay
