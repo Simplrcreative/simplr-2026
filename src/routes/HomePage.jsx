@@ -20,11 +20,11 @@ const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 let homeIntroAnimationsPlayed = false
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
-const HERO_MODAL_FADE_DURATION_MS = 1000
-const HERO_MODAL_POST_SCROLL_DELAY_MS = 200
+const HERO_MODAL_FADE_DURATION_MS = 600
+const HERO_MODAL_POST_SCROLL_DELAY_MS = 100
 const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
-const HERO_MODAL_SCROLL_DURATION_MS = 1200
-const HERO_MODAL_CONTENT_FADE_DURATION_MS = 1000
+const HERO_MODAL_SCROLL_DURATION_MS = 800
+const HERO_MODAL_CONTENT_FADE_DURATION_MS = 600
 const PLAY_ICON_DISABLE_ATTR = 'data-play-icon-disabled'
 
 function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
@@ -252,13 +252,21 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     const root = document.documentElement
     const nextSection = document.querySelector('section.brands-grow')
 
-    if (!nextSection) return
+    if (!nextSection) {
+      root.removeAttribute(PLAY_ICON_DISABLE_ATTR)
+      return
+    }
 
     root.setAttribute(PLAY_ICON_DISABLE_ATTR, 'true')
+    window.dispatchEvent(new Event('scroll'))
 
     const targetTop = Math.max(0, Math.floor(nextSection.getBoundingClientRect().top + window.scrollY))
     let settleFrames = 0
     let rafId = 0
+    const fallbackTimer = window.setTimeout(() => {
+      if (rafId) cancelAnimationFrame(rafId)
+      root.removeAttribute(PLAY_ICON_DISABLE_ATTR)
+    }, 2200)
 
     const checkScrollCompletion = () => {
       const remainingDistance = Math.abs(window.scrollY - targetTop)
@@ -270,6 +278,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       }
 
       if (settleFrames >= 2) {
+        window.clearTimeout(fallbackTimer)
         root.removeAttribute(PLAY_ICON_DISABLE_ATTR)
         return
       }
@@ -282,12 +291,14 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId)
+      window.clearTimeout(fallbackTimer)
       root.removeAttribute(PLAY_ICON_DISABLE_ATTR)
     }
   }
 
   function openHeroVideoModal() {
     if (!hasHeroFullVideo) return
+    heroVideoRef.current?.pause()
     clearPendingHeroModalClose()
     clearPendingHeroModalOpen()
     setIsHeroModalPlaybackReady(false)
@@ -381,6 +392,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   function closeHeroVideoModal({ scrollToNextSection = false } = {}) {
     clearPendingHeroModalOpen()
     if (!isHeroModalVisible) return
+
+    if (scrollToNextSection) {
+      document.documentElement.setAttribute(PLAY_ICON_DISABLE_ATTR, 'true')
+      window.dispatchEvent(new Event('scroll'))
+    } else {
+      document.documentElement.removeAttribute(PLAY_ICON_DISABLE_ATTR)
+    }
 
     clearPendingHeroModalClose()
     setIsHeroModalOpen(false)
@@ -535,7 +553,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               X
           </button>
           <div
-            className={`hero-video-modal-inner w-full transition-all ease-out p-5 ${isHeroModalOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.96]'}`}
+            className={`hero-video-modal-inner w-full transition-all ease-out  ${isHeroModalOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.75]'}`}
             style={{
               transitionDuration: `${HERO_MODAL_CONTENT_FADE_DURATION_MS}ms`,
               transitionDelay: isHeroModalOpen ? `${HERO_MODAL_ENTER_FRAME_DELAY_MS}ms` : '0ms',
@@ -550,7 +568,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               controls
               autoPlay={isHeroModalPlaybackReady}
               playsInline
-              poster={heroVideoPoster || undefined}
+              poster=''
             >
               {isHeroModalPlaybackReady ? <source src={heroVideoFull} type="video/mp4" /> : null}
               {heroVideoPoster ? <img src={heroVideoPoster} alt={heroVideoPosterAlt} /> : null}

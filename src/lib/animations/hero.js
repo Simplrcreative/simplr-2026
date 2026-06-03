@@ -379,14 +379,17 @@ export function createHeroScrollAnimation(scope) {
       let pointerY = 0
 
       const updatePlayIconVisibility = (visible) => {
-        if (visible === isOver) return
+        const playIconDisabled = document.documentElement.hasAttribute('data-play-icon-disabled')
+        const nextVisible = playIconDisabled ? false : visible
 
-        isOver = visible
+        if (nextVisible === isOver) return
+
+        isOver = nextVisible
         gsap.to(playIcon, {
-          autoAlpha: visible ? 1 : 0,
-          scale: visible ? 1 : 0.92,
-          duration: visible ? 0.22 : 0.16,
-          ease: visible ? 'power2.out' : 'power2.in',
+          autoAlpha: nextVisible ? 1 : 0,
+          scale: nextVisible ? 1 : 0.92,
+          duration: nextVisible ? 0.22 : 0.16,
+          ease: nextVisible ? 'power2.out' : 'power2.in',
           overwrite: 'auto',
         })
       }
