@@ -1,0 +1,72 @@
+.beyond-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 100%;
+  overflow-x: clip;
+}
+
+.beyond-row {
+  display: flex;
+  gap: 0.625rem;
+  height: var(--beyond-row-height, 220px);
+  width: 100%;
+  overflow: hidden;
+}
+
+.beyond-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.625rem;
+  background: rgba(255, 255, 255, 0.05);
+  flex: 0 0 auto;
+  height: 100%;
+  min-width: 0;
+}
+
+.beyond-card__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.0001);
+}
+
+.beyond-card__caption {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 1;
+  max-width: calc(100% - 1rem);
+  border-radius: 100px;
+  background: rgba(48, 15, 29, 0.9);
+  color: white;
+  font-family: var(--font-aeonik);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 10px 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+  .beyond-grid {
+    gap: 0.75rem;
+  }
+
+  .beyond-row {
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .beyond-grid {
+    gap: 1.25rem;
+  }
+
+  .beyond-row {
+    gap: 1.25rem;
+  }
+}

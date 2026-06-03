@@ -195,6 +195,38 @@ const peopleQuery = `
   }
 `
 
+const beyondQuery = `
+  query beyondQuery {
+    acfBeyonds {
+      nodes {
+        acfBeyondBuilder {
+          acfImages {
+            acfCaption
+            acfImage {
+              node {
+                guid
+                mediaDetails {
+                  width
+                  height
+                }
+              }
+            }
+            acfVideo {
+              node {
+                guid
+                mediaDetails {
+                  width
+                  height
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 const worksQuery = `
   query WorksQuery($first: Int = 100) {
     acfWorks(first: $first) {
@@ -940,6 +972,56 @@ export async function fetchPeopleData() {
     reportError('Unable to load people data', error)
 
     return { people: [] }
+  }
+}
+
+export async function fetchBeyondData() {
+  if (!wpConfig.endpoint) {
+    return { beyondItems: [] }
+  }
+
+  try {
+    // Do not memoize this endpoint with a static key; we want new CMS entries
+    // to appear immediately while content is being edited.
+    const data = await graphQlRequest(beyondQuery)
+    const nodes = data.acfBeyonds?.nodes
+      ?? data.acfBeyonds
+      ?? data.beyonds?.nodes
+      ?? []
+
+    const beyondItems = nodes
+      .flatMap((entry, entryIndex) => {
+        const images = entry?.acfBeyondBuilder?.acfImages ?? []
+
+        return images.map((item, imageIndex) => {
+          const videoNode = item?.acfVideo?.node
+          const imageNode = item?.acfImage?.node
+          const mediaNode = videoNode?.guid ? videoNode : imageNode
+
+          if (!mediaNode?.guid) {
+            return null
+          }
+
+          const width = Number(mediaNode?.mediaDetails?.width) || null
+          const height = Number(mediaNode?.mediaDetails?.height) || null
+
+          return {
+            id: `beyond-${entryIndex}-${imageIndex}`,
+            type: videoNode?.guid ? 'video' : 'image',
+            source: mediaNode.guid,
+            caption: item?.acfCaption || '',
+            width,
+            height,
+            ratio: width && height ? width / height : null,
+          }
+        })
+      })
+      .filter(Boolean)
+
+    return { beyondItems }
+  } catch (error) {
+    reportError('Unable to load beyond data', error)
+    return { beyondItems: [] }
   }
 }
 
