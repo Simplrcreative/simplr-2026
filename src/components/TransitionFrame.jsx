@@ -104,6 +104,16 @@ function createTransitionClone(source) {
   const liveVideos = source.matches('video') ? [source] : Array.from(source.querySelectorAll('video'))
   const clonedVideos = clone.matches('video') ? [clone] : Array.from(clone.querySelectorAll('video'))
 
+  clonedVideos.forEach((video) => {
+    video.muted = true
+    video.defaultMuted = true
+    video.volume = 0
+    video.autoplay = false
+    video.pause()
+    video.setAttribute('muted', '')
+    video.removeAttribute('autoplay')
+  })
+
   liveVideos.forEach((video, index) => {
     const clonedVideo = clonedVideos[index]
     if (!clonedVideo) return
@@ -443,6 +453,16 @@ export default function TransitionFrame({ children }) {
       }
 
       const clone = ref.current.cloneNode(true)
+
+      Array.from(clone.querySelectorAll('video')).forEach((video) => {
+        video.muted = true
+        video.defaultMuted = true
+        video.volume = 0
+        video.autoplay = false
+        video.pause()
+        video.setAttribute('muted', '')
+        video.removeAttribute('autoplay')
+      })
 
       // Replace each cloned <video> with a canvas snapshot of the live frame
       // so the outgoing snapshot shows what was visible, not a blank element.

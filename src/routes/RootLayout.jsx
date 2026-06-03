@@ -305,8 +305,12 @@ export default function RootLayout() {
     document.documentElement.dataset.pageBg = pageBg
   }, [pageBg])
 
-  useEffect(() => createBtnHoverAnimation(btnRef.current), [])
+  useEffect(() => {
+    if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
+  }, [])
+
   useEffect(() => createSplitTextAnimation(), [])
+
   useEffect(() => createFooterAnimation(footerRef.current), [location.pathname])
 
   return (

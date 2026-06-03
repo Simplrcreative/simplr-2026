@@ -28,6 +28,7 @@ const HERO_MODAL_CONTENT_FADE_DURATION_MS = 600
 const PLAY_ICON_DISABLE_ATTR = 'data-play-icon-disabled'
 
 function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
+  const pageRef = useRef(null)
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
   const heroVideoModalRef = useRef(null)
@@ -169,7 +170,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   // PAGE_TRANSITION_COMPLETE_EVENT fires before these elements exist. Re-run here.
   useEffect(() => {
     if (!introComplete) return
-    return createSlideUpAnimations(document.body)
+    return createSlideUpAnimations(pageRef.current)
   }, [introComplete])
 
   // Refresh scroll triggers after animations initialize
@@ -466,7 +467,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   }
 
   return (
-    <>
+    <div ref={pageRef}>
       <Seo
         title="Home"
         description={page.intro}
@@ -811,7 +812,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           )}
         </div>
       </section>
-    </>
+    </div>
   )
 }
 

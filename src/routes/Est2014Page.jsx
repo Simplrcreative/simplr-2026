@@ -4,7 +4,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
-import { createSplitTextAnimation, createBtnHoverAnimation, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 
 
 gsap.registerPlugin(ScrollTrigger)
@@ -91,9 +91,32 @@ export default function Est2014Page() {
   const [measuredRatios, setMeasuredRatios] = useState({})
   const [galleryWidth, setGalleryWidth] = useState(0)
   useEffect(() => createSplitTextAnimation(), [])
-  useEffect(() => createSlideUpAnimations(document.body), [])
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
+  }, [])
+
+  useEffect(() => {
+    const muteAndPauseAllGalleryVideos = () => {
+      const videos = Array.from(galleryRef.current?.querySelectorAll('video') ?? [])
+      videos.forEach((video) => {
+        video.muted = true
+        video.defaultMuted = true
+        video.volume = 0
+        video.pause()
+      })
+    }
+
+    const handlePointerDown = (event) => {
+      const link = event.target?.closest?.('a[href]')
+      if (!link) return
+      muteAndPauseAllGalleryVideos()
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown, { capture: true })
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown, { capture: true })
+      muteAndPauseAllGalleryVideos()
+    }
   }, [])
 
   useEffect(() => {

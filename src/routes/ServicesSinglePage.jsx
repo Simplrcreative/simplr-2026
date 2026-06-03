@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
@@ -31,6 +31,7 @@ function ServiceLabelIcon({ color }) {
 }
 
 export default function ServicesSinglePage() {
+  const pageRef = useRef(null)
   const { slug, page } = useLoaderData() ?? {}
   const service = page?.acfServiceBuilder ?? null
   const { acfHeading, acfSections } = service ?? {}
@@ -51,8 +52,8 @@ export default function ServicesSinglePage() {
   const caseStudyCategories = caseStudyData?.acfCategory?.nodes ?? []
 
   useEffect(() => {
-    const cleanupSlideUp = createSlideUpAnimations(document.body)
-    const cleanupParallax = createParallaxAnimations(document.body)
+    const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
+    const cleanupParallax = createParallaxAnimations(pageRef.current)
     const cleanupSplitText = createSplitTextAnimation()
     refreshScrollTriggers()
 
@@ -90,7 +91,7 @@ export default function ServicesSinglePage() {
 
 
   return (
-    <>
+    <div ref={pageRef}>
       <Seo
         title={title}
         description={description}
@@ -246,6 +247,6 @@ export default function ServicesSinglePage() {
           </div>
         </section>
       )}
-    </>
+    </div>
   )
 }
