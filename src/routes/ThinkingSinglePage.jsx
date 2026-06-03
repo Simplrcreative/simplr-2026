@@ -183,9 +183,9 @@ export default function ThinkingSinglePage() {
                   )
                 })
               )}</div>
-              <h1 className="hero-title text-center slide-up-subtle"><span>{title}</span></h1>
+              <h1 className="hero-title text-center"><span>{title}</span></h1>
               {date && (
-                <div className="mt-10 text-[0.875rem] flex justify-center items-center gap-5 slide-up-subtle">
+                <div className="mt-10 text-[0.875rem] flex justify-center items-center gap-5">
                   <div>{date}</div>
                   {profileImage ? (
                     <img
@@ -200,7 +200,7 @@ export default function ThinkingSinglePage() {
               )}
           </div>
           {thumb && ( 
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20 slide-up-subtle">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20">
             <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
               <img src={thumb + '.webp'} alt={title} />
             </picture>
@@ -222,7 +222,7 @@ export default function ThinkingSinglePage() {
 
       {linkedWork.length > 0 && (
         
-      <section className="next-work px-5 py-20 bg-white section-light relative overflow-hidden__">
+      <section className="next-work px-5 py-20 bg-white section-light relative">
         <div className="grid grid-cols-12 relative z-1">
             <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">

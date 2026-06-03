@@ -39,7 +39,7 @@ h2.service-section-heading span {
     font-family: var(--font-literata);
     font-weight: 400;
 }
-.next-title-wrappe {
+.next-title-wrapper {
     position:absolute;
     top: 3rem;
     left: 0;
