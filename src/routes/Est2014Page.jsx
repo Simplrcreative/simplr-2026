@@ -186,7 +186,6 @@ export default function Est2014Page() {
                         className="beyond-card__media"
                         src={item.source}
                         muted
-                        defaultMuted
                         loop
                         playsInline
                         autoPlay
