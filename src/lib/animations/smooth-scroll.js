@@ -26,6 +26,7 @@ function ensureLenis() {
     duration: 1.05,
     smoothWheel: true,
     syncTouch: false,
+    stopInertiaOnNavigate: true,
     wheelMultiplier: 0.9,
     touchMultiplier: 1,
   })
@@ -79,4 +80,21 @@ export function refreshSmoothScroll() {
     lenisInstance?.resize()
     ScrollTrigger.refresh()
   })
+}
+
+export function scrollToTopImmediate() {
+  if (lenisInstance) {
+    lenisInstance.stop()
+    lenisInstance.scrollTo(0, { immediate: true, force: true })
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+    window.scrollTo(0, 0)
+    lenisInstance.start()
+    ScrollTrigger.update()
+    return
+  }
+
+  document.documentElement.scrollTop = 0
+  document.body.scrollTop = 0
+  window.scrollTo(0, 0)
 }

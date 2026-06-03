@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { siteConfig } from '../config/site.js'
-import { createSurfaceColorTransitions, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createSurfaceColorTransitions, createSlideUpAnimations, scrollToTopImmediate } from '../lib/animations/index.js'
 
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -835,7 +835,7 @@ export default function TransitionFrame({ children }) {
       // featured-image rect.top would be (offsetTop − scrollY) which can be
       // negative, sending the clone off-screen. This runs in useLayoutEffect
       // (before paint) so there is no visible jump.
-      window.scrollTo(0, 0)
+      scrollToTopImmediate()
 
       // For non-90% source cards (WorkCard at 64%), override the picture's padding-top
       // ratio trick so the picture fills the altClone's explicitly-animated dimensions.

@@ -5,7 +5,7 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, createSplitTextAnimation } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, createSplitTextAnimation, scrollToTopImmediate } from '../lib/animations/index.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -141,7 +141,7 @@ export default function RootLayout() {
     destroyNavSectionThemeRef.current?.()
     destroyNavSectionThemeRef.current = null
     
-    window.scrollTo(0, 0)
+    scrollToTopImmediate()
     document.querySelector('nav.main')?.classList.remove('light')
     document.querySelector('.logo-holder')?.classList.remove('light')
     document.documentElement.classList.remove('compact-logo-active')
