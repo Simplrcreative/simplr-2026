@@ -5,7 +5,7 @@
     },
     {
       "src": "/graphql",
-      "dest": "https://stg-simplragency-dashboard.kinsta.cloud/graphql"
+      "dest": "/api/graphql"
     },
     {
       "src": "/(.*)",
