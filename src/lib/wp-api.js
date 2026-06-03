@@ -358,6 +358,18 @@ const postsQuery = `
         author {
           node {
             name
+            acfUserBuilder {
+              acfProfileImage {
+                node {
+                  mediaDetails {
+                    sizes {
+                      name
+                      sourceUrl
+                    }
+                  }
+                }
+              }
+            }
           }
         }
         acfClients {
@@ -383,6 +395,18 @@ const postsQuery = `
           acfAuthor {
             nodes {
               name
+              acfUserBuilder {
+                acfProfileImage {
+                  node {
+                    mediaDetails {
+                      sizes {
+                        name
+                        sourceUrl
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
           acfFeaturedImage {

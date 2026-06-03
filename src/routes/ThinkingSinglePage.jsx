@@ -3,7 +3,7 @@ import { Link, useLoaderData} from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
-import { createNextWorkAnimation } from '../lib/animations/index.js'
+import { createNextWorkAnimation, createSlideUpAnimations, refreshScrollTriggers } from '../lib/animations/index.js'
 import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
 
 function categoryToFilterSlug(category) {
@@ -17,6 +17,7 @@ function categoryToFilterSlug(category) {
 }
 
 export default function ThinkingSinglePage() {
+  const pageRef = useRef(null)
   const postContentRef = useRef(null)
   const { slug, page, posts = [] } = useLoaderData() ?? {}
   const title = page?.title || 'Untitled'
@@ -30,6 +31,13 @@ export default function ThinkingSinglePage() {
     : '/thinking'
   const categories = page?.topics?.nodes ?? []
   const author = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.name || page?.author?.node?.name || ''
+  const profileImageSizes = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.acfUserBuilder?.acfProfileImage?.node?.mediaDetails?.sizes
+    || page?.author?.node?.acfUserBuilder?.acfProfileImage?.node?.mediaDetails?.sizes
+    || []
+  const profileImage = profileImageSizes.find((size) => size?.name === 'thumbnail')?.sourceUrl
+    || profileImageSizes.find((size) => size?.name === 'medium')?.sourceUrl
+    || profileImageSizes[0]?.sourceUrl
+    || ''
 
   useEffect(() => {
     const cleanupNextWork = createNextWorkAnimation()
@@ -37,6 +45,16 @@ export default function ThinkingSinglePage() {
       cleanupNextWork?.()
     }
   }, [])
+
+  useEffect(() => {
+    const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
+    const timer = setTimeout(() => refreshScrollTriggers(), 250)
+
+    return () => {
+      clearTimeout(timer)
+      cleanupSlideUp?.()
+    }
+  }, [content, page, posts, slug])
 
   useEffect(() => {
     const root = postContentRef.current
@@ -143,6 +161,7 @@ export default function ThinkingSinglePage() {
 
   return (
     <>
+      <div ref={pageRef}>
       <Seo
         title={title || 'Thinking'}
         description=""
@@ -164,13 +183,24 @@ export default function ThinkingSinglePage() {
                   )
                 })
               )}</div>
-              <h1 className="hero-title text-center"><span>{title}</span></h1>
+              <h1 className="hero-title text-center slide-up-subtle"><span>{title}</span></h1>
               {date && (
-                <p className="mt-10 text-[0.875rem]">{date} • {author}</p>
+                <div className="mt-10 text-[0.875rem] flex justify-center items-center gap-5 slide-up-subtle">
+                  <div>{date}</div>
+                  {profileImage ? (
+                    <img
+                        src={profileImage}
+                        alt={author || 'Author profile image'}
+                        className="w-[5.625rem] h-[5.625rem] rounded-full object-cover"
+                        loading="lazy"
+                      />
+                  ) : null}
+                  <div>{author}</div>
+                </div>
               )}
           </div>
           {thumb && ( 
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20 slide-up-subtle">
             <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
               <img src={thumb + '.webp'} alt={title} />
             </picture>
@@ -179,7 +209,7 @@ export default function ThinkingSinglePage() {
         </div>
       </section>
 
-      <section className="post-content px-5 pb-20 bg-white section-light">
+      <section className="post-content px-5 pb-20 bg-white section-light slide-up-subtle">
         <div className="grid grid-cols-12 w-full">
           <div ref={postContentRef} className="col-start-1 md:col-start-4 col-span-12 md:col-span-6">
             
@@ -252,6 +282,7 @@ export default function ThinkingSinglePage() {
           </div>
         </section>
       )}
+      </div>
     </>
   )
 }
