@@ -1,12 +1,15 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/graphql",
-      "destination": "https://stg-simplragency-dashboard.kinsta.cloud/graphql"
+      "handle": "filesystem"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/graphql",
+      "dest": "https://stg-simplragency-dashboard.kinsta.cloud/graphql"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }

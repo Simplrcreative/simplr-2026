@@ -6,6 +6,7 @@ import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
 import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, createSplitTextAnimation } from '../lib/animations/index.js'
+import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
@@ -293,6 +294,40 @@ export default function RootLayout() {
 
   useEffect(() => {
     refreshSmoothScroll()
+  }, [location.pathname])
+
+  useEffect(() => {
+    if (!isScrollTriggerDebugEnabled()) return
+
+    let rafId = 0
+    let shortDelayTimer = 0
+    let longDelayTimer = 0
+
+    const route = location.pathname
+    const logTransitionComplete = () => {
+      logRouteScrollTriggerState(route, 'transition-complete')
+    }
+
+    rafId = requestAnimationFrame(() => {
+      logRouteScrollTriggerState(route, 'post-nav-raf')
+    })
+
+    shortDelayTimer = window.setTimeout(() => {
+      logRouteScrollTriggerState(route, 'post-nav-600ms')
+    }, 600)
+
+    longDelayTimer = window.setTimeout(() => {
+      logRouteScrollTriggerState(route, 'post-nav-1800ms')
+    }, 1800)
+
+    window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, logTransitionComplete)
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      window.clearTimeout(shortDelayTimer)
+      window.clearTimeout(longDelayTimer)
+      window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, logTransitionComplete)
+    }
   }, [location.pathname])
 
   // Derive pageBg from the matched route's handle, falling back to 'light'.
