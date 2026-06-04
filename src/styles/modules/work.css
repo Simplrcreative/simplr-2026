@@ -137,7 +137,7 @@
 .text-only-section {
   font-family: var(--font-literata);
   font-size: clamp(2.5rem, 4vw, 3.125rem);
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.2;
 }
 

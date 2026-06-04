@@ -592,6 +592,18 @@ const homeHeroVideoFullQuery = `
   }
 `
 
+const homeWorkCountQuery = `
+  query HomeWorkCountQuery {
+    nodeByUri(uri: "/") {
+      ... on Page {
+        acfHomeBuilder {
+          acfWorkCount
+        }
+      }
+    }
+  }
+`
+
 function normaliseHomeCaseStudy(study, index) {
   const caseStudy = study?.acfCaseStudy?.nodes?.[0]
   const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
@@ -838,6 +850,25 @@ function reportError(label, error) {
   }
 }
 
+function toPositiveInt(value) {
+  const parsed = Number.parseInt(value, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0
+}
+
+async function fetchHomeWorkCount() {
+  if (!wpConfig.endpoint) {
+    return 0
+  }
+
+  try {
+    const data = await remember('home:work-count', () => graphQlRequest(homeWorkCountQuery))
+    return toPositiveInt(data.nodeByUri?.acfHomeBuilder?.acfWorkCount)
+  } catch (error) {
+    reportError('Unable to load home work count', error)
+    return 0
+  }
+}
+
 function getCollectionContentType(collectionKey) {
   return collectionKey === 'work' ? wpConfig.workContentType : wpConfig.thinkingContentType
 }
@@ -966,10 +997,10 @@ export async function fetchCollectionData(collectionKey) {
 }
 
 export async function fetchNavigationData() {
-  // Return navigation immediately using static counts from routeDefinitions so
-  // the root loader never blocks the initial render on a slow GraphQL request.
-  // The WorkPage loader fetches the live count independently when that route loads.
-  return buildNavigation()
+  // Use a tiny home-only query for the Work count instead of fetching the
+  // full work collection in the root loader.
+  const workCount = await fetchHomeWorkCount()
+  return buildNavigation({ work: workCount })
 }
 
 export async function fetchHomeData() {

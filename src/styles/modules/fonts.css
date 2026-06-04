@@ -22,6 +22,38 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Literata';
+  src: url('../../fonts/literata/Literata-ExtraLight.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Literata';
+  src: url('../../fonts/literata/Literata-Light.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Literata';
+  src: url('../../fonts/literata/Literata-LightItalic.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Literata';
+  src: url('../../fonts/literata/Literata-Regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 .font-aeonik {
   font-family: 'Aeonik Pro';
   src: url('../../fonts/AeonikPro-Regular.woff') format('woff');
@@ -41,20 +73,20 @@
 .font-literata {
   font-family: "Literata", serif;
   font-optical-sizing: auto;
-  font-weight: 400;
+  font-weight: 300;
   font-style: normal;
 }
 
 .font-literata-italic {
   font-family: "Literata", serif;
   font-optical-sizing: auto;
-  font-weight: 400;
+  font-weight: 300;
   font-style: italic;
 }
 
 .font-literata-medium {
   font-family: "Literata", serif;
   font-optical-sizing: auto;
-  font-weight: 500;
+  font-weight: 400;
   font-style: normal;
 }

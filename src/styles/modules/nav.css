@@ -50,7 +50,7 @@ nav a sup {
     font-family: var(--font-literata);
     text-align: right;
     font-size: 1rem;
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1;
     padding: 0 0 0 1px;
     top: -1em;
@@ -267,6 +267,7 @@ nav.light a.is-active .nav-link__orb {
 .tagline span {
     font-family: var(--font-literata);
     font-style: italic;
+    font-weight: 300;
 }
 @media (min-width: 768px) {
     .logo-holder {

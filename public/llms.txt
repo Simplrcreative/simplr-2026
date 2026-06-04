@@ -1,4 +1,4 @@
-# https://simplr.co.za
+# http://localhost:5173
 
 - Primary routes: /work, /about, /services, /thinking, /contact, /est-2014
 - Dynamic editorial routes: /work/:slug and /thinking/:topic/:slug

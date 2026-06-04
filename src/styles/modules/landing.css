@@ -34,7 +34,7 @@
 }
 .stat-detail {
     line-height: 1.2;
-    font-weight: 500
+    font-weight: 400
 }
 @media (min-width: 768px) {
     .stat-no {
@@ -111,12 +111,12 @@
 /* --- TESTIMONIALS --- */
 .quote {
     font-size: 3.125rem;
-    font-weight: 300;
+    font-weight: 200;
     line-height: 1.2; 
 }
 .quote span {
     font-family: var(--font-literata);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 /* --- FAQS --- */

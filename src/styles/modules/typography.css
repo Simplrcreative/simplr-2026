@@ -2,6 +2,7 @@ h1, h2, h3, h4, h5 {
     font-family: var(--font-literata);
     line-height: 1.2;
     font-optical-sizing: auto;
+    font-weight: 300
 }
 
 .no-break {
@@ -37,7 +38,7 @@ h2.service-section-heading {
 .hero-title span,
 h2.service-section-heading span {
     font-family: var(--font-literata);
-    font-weight: 400;
+    font-weight: 200;
 }
 .next-title-wrapper {
     position:absolute;
