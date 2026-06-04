@@ -102,7 +102,7 @@ export function createParallaxAnimations(scope) {
           stagger: 0.01,
           invalidateOnRefresh: true,
           refreshPriority: -15,
-          markers: true,
+          //markers: true,
         },
       })
     })
