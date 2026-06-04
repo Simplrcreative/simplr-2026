@@ -134,3 +134,7 @@
   font-size: 0.75rem;
   font-weight: 400;
 }
+.parallax-subtle {
+  transform-origin: 'bottom center';
+  transform: scale(1.2) translateY(-40px)
+}

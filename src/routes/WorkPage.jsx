@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
-import { createSplitTextAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations } from '../lib/animations/index.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -195,7 +195,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
       <div className="grid grid-cols-12">
         <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
           <div className="testimonial lead max-w-[38ch]">
-            <div className="split-text-coffee">
+            <div className="split-text-coffee trigger-split-text-coffee">
               {quote && <div className="mb-20" dangerouslySetInnerHTML={{ __html: `${quote}` }} />}
               <div>
                 {client && <b>{client}</b>}
@@ -232,6 +232,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
 }
 
 export default function WorkPage() {
+  const pageRef = useRef(null)
   const { works = [], testimonials = {} } = useLoaderData() ?? {}
   const [activeFilter, setActiveFilter] = useState('all')
   const [displayedFilter, setDisplayedFilter] = useState('all')
@@ -246,7 +247,25 @@ export default function WorkPage() {
 
   const groups = useMemo(() => groupWorks(filteredWorks), [filteredWorks])
 
-  useEffect(() => createSplitTextAnimation(), [])
+  useEffect(() => {
+    const cleanupSlideUpAnimations = createSlideUpAnimations(pageRef.current)
+
+    return () => {
+      cleanupSlideUpAnimations?.()
+    }
+  }, [])
+
+  useEffect(() => {
+    const cleanupSplitText = createSplitTextAnimation()
+    const rafId = requestAnimationFrame(() => {
+      refreshScrollTriggers()
+    })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      cleanupSplitText?.()
+    }
+  }, [displayedFilter, groups.length])
 
   useEffect(() => {
     if (!isFilterAnimating) return
@@ -341,7 +360,7 @@ export default function WorkPage() {
   const description = 'Work Page'
 
   return (
-    <>
+    <div ref={pageRef}>
       <Seo
         title={title}
         description={description}
@@ -365,7 +384,7 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end">
+      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end slide-up-subtle">
         <div className="flex flex-wrap gap-0">
           {FILTERS.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
@@ -385,7 +404,7 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <div ref={workResultsRef} className="work-results">
+      <div ref={workResultsRef} className="work-results slide-up-subtle">
         {groups.map((group, i) => {
           const n = i + 1
           const hasFeatured = !!group.featured
@@ -446,6 +465,6 @@ export default function WorkPage() {
 
         <section className="bg-white py-20 relative z-3" />
       </div>
-    </>
+    </div>
   )
 }
