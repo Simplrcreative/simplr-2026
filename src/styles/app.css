@@ -1,6 +1,7 @@
 @import 'lenis/dist/lenis.css';
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@import './modules/reset.css';
 @import './modules/fonts.css';
 @import './modules/theme.css';
 @import './modules/nav.css';

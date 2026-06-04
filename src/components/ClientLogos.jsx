@@ -202,7 +202,7 @@ export default function ClientLogos({ innerRef, shouldAnimate = false }) {
         <div className="grid grid-cols-12">
           <div className="quote col-start-3 col-span-8 flex justify-center">
             <div className=" max-w-[36ch]  text-white split-text text-center">
-              Proudly partnering with brands to create <span>meaningful</span> design experiences
+              Proudly partnering with brands to create <span><i>meaningful</i> design experiences</span>
             </div>
           </div>
         </div>
