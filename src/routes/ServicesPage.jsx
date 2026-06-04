@@ -227,7 +227,7 @@ export default function ServicesPage() {
         ]}
       />
 
-      <section className="page-hero px-5 pb:20 md:pb-40 bg-white section-light min-h-screen flex items-end">
+      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[90ch]">
@@ -237,7 +237,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="px-5 pb-20 md:pt-20 bg-white section-light trigger-split-text-coffee">
+      <section className="px-5 pb-20 bg-white section-light trigger-split-text-coffee">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-coffee pt-20">
             <div className="lead split-text-coffee">Whether you&apos;re building a new brand, refining a digital experience, or bringing your story to life through motion, we apply creative intelligence to create work that connects with audiences and delivers measurable results.</div>

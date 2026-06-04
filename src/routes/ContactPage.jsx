@@ -120,7 +120,7 @@ export default function ContactPage() {
         ]}
       />
 
-      <section className="page-hero px-5 pb-40 bg-coffee section-dark min-h-screen flex items-end">
+      <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back mb-[9rem]" />
           <div className="col-span-11 md:col-span-7 text-white change-logo">

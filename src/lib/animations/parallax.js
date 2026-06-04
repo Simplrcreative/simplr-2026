@@ -83,7 +83,7 @@ export function createParallaxAnimations(scope) {
 
   media.add('(prefers-reduced-motion: no-preference)', () => {
     const createAnimations = (animationTargets, fromVars, toVars) => animationTargets.map((target) => {
-      gsap.set('.parallax', {
+      gsap.set(targets, {
         scale: 1,
         y: 0,
         willChange: 'transform, opacity',
@@ -117,7 +117,7 @@ export function createParallaxAnimations(scope) {
         {
           transformOrigin: 'top right',
           y: 300,
-          scale: 0.8,
+          scale: 0.65,
           ease: 'none',
         },
       ),

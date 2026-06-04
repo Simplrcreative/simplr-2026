@@ -374,7 +374,7 @@ export default function WorkPage() {
         ]}
       />
 
-      <section className="page-hero px-5 pb-40 bg-white section-light min-h-screen flex items-end">
+      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
@@ -384,7 +384,7 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end slide-up-subtle">
+      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end">
         <div className="flex flex-wrap gap-0">
           {FILTERS.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
@@ -404,7 +404,7 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <div ref={workResultsRef} className="work-results slide-up-subtle">
+      <div ref={workResultsRef} className="work-results">
         {groups.map((group, i) => {
           const n = i + 1
           const hasFeatured = !!group.featured

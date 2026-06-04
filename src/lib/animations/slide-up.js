@@ -137,8 +137,8 @@ export function createSlideUpAnimations(scope) {
       ...createAnimations(
         slideUpSubtleTargets,
         {
-          y: 50,
-          autoAlpha: 0.2
+          y: 60,
+          autoAlpha: 1
         },
         {
           y: 0,

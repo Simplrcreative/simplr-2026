@@ -121,7 +121,7 @@ export default function ServicesSinglePage() {
             </div>
             <h1 className="service-card__title">{acfHeading}</h1>
           </div>
-          <div className="col-start-8 col-span-5 parallax">
+          <div className="col-start-7 col-span-6 parallax">
             <div className="featured-image">
               {featuredVideo ? (
                   <div

@@ -174,7 +174,7 @@ export default function Est2014Page() {
         ]}
       />
 
-      <section className="page-hero px-5 pb-40 bg-coffee section-dark min-h-screen flex items-end relative">
+      <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end relative">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-9 text-white change-logo mt-40 max-w-[115ch]">
