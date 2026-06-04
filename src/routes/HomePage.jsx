@@ -17,9 +17,8 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 
-let homeIntroAnimationsPlayed = false
 const HOME_SCROLL_INIT_DELAY_MS = 200
-const HOME_SCROLL_INIT_AFTER_INTRO_MS = 2800
+const HOME_SCROLL_INIT_AFTER_INTRO_MS = 1400
 const HERO_MODAL_FADE_DURATION_MS = 600
 const HERO_MODAL_POST_SCROLL_DELAY_MS = 100
 const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
@@ -42,6 +41,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const btnRef = useRef(null)
   const faqSliderRef = useRef(null)
   const faqButtonRefs = useRef([])
+  const introAnimationsPlayedRef = useRef(false)
   const {
     introComplete = false,
     shouldRunHomeIntroAnimations = false,
@@ -68,7 +68,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   // Stage hero title/video while loader is active so they don't flash before intro animation.
   useLayoutEffect(() => {
-     if (!shouldRunHomeIntroAnimations || introComplete || homeIntroAnimationsPlayed) return
+      if (!shouldRunHomeIntroAnimations || introComplete || introAnimationsPlayedRef.current) return
     setIntroHeroInitialState(heroRef.current)
   }, [introComplete, shouldRunHomeIntroAnimations])
 
@@ -80,7 +80,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     let destroyCaseStudiesAnimation = () => {}
     let destroyShowreelAnimation = () => {}
     let destroyBtnAnimation = () => {}
-    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !homeIntroAnimationsPlayed
+    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !introAnimationsPlayedRef.current
     const timer = setTimeout(() => {
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
       destroyServicesAnimation = createServicesScrollAnimation(servicesRef.current) ?? (() => {})
@@ -133,7 +133,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   // Lock scroll for the full duration of the intro sequence so the user can't
   // scroll past the hero before animations have initialised.
   useEffect(() => {
-    if (!introComplete || !shouldRunHomeIntroAnimations || homeIntroAnimationsPlayed) return
+    if (!introComplete || !shouldRunHomeIntroAnimations || introAnimationsPlayedRef.current) return
 
     document.documentElement.style.overflow = 'hidden'
     const timer = setTimeout(() => {
@@ -148,11 +148,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   // Run hero entrance animations exactly once after the intro sequence.
   useEffect(() => {
-    if (!introComplete || !shouldRunHomeIntroAnimations || homeIntroAnimationsPlayed) return
+    if (!introComplete || !shouldRunHomeIntroAnimations || introAnimationsPlayedRef.current) return
 
     const destroyHeroTitleIntro = createIntroHeroTitleAnimation(heroRef.current)
     const destroyVideoIntro = createIntroVideoAnimation(heroRef.current)
-    homeIntroAnimationsPlayed = true
+    introAnimationsPlayedRef.current = true
 
     return () => {
       destroyHeroTitleIntro?.()
@@ -176,7 +176,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   // Refresh scroll triggers after animations initialize
   useEffect(() => {
     if (!introComplete) return
-    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !homeIntroAnimationsPlayed
+    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !introAnimationsPlayedRef.current
     const timer = setTimeout(
       () => refreshScrollTriggers(),
       shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS + 200 : 250,

@@ -10,6 +10,8 @@ import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
+const INTRO_MIN_VISIBLE_MS = 5000
+const HOME_RETURN_ENTRANCE_FALLBACK_MS = 2200
 
 function requestTransitionCapture() {
   window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_EVENT))
@@ -119,13 +121,13 @@ export default function RootLayout() {
     }
   }, [isHomePage, isIntroVisible, introComplete])
 
-  // Start 3-second minimum timer for intro, then dismiss
+  // Start minimum timer for intro, then dismiss.
   useEffect(() => {
     if (!isIntroVisible) return
     
     const timer = setTimeout(() => {
       setShouldFadeOutIntro(true)
-    }, 5000)
+    }, INTRO_MIN_VISIBLE_MS)
 
     return () => clearTimeout(timer)
   }, [isHomePage, isIntroVisible])
@@ -278,7 +280,7 @@ export default function RootLayout() {
       window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
 
       // Fallback if the event is missed.
-      const timer = setTimeout(startEntrance, 2200)
+      const timer = setTimeout(startEntrance, HOME_RETURN_ENTRANCE_FALLBACK_MS)
 
       return () => {
         clearTimeout(timer)

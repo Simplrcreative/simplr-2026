@@ -60,7 +60,7 @@ This lets Vite proxy `/graphql` to your local WordPress install during `npm run 
 - `About`, `Services`, `Contact`, and `Est. 2014` are WordPress pages matching the route URIs.
 - `Thinking` resolves from WordPress posts by default.
 - `Work` resolves from a custom post type exposed through WPGraphQL. Change `VITE_WORK_CONTENT_TYPE` if your enum is different.
-- Single routes assume WordPress URIs map to `/work/:slug/` and `/thinking/:slug/`.
+- Single routes assume WordPress URIs map to `/work/:slug/` and `/thinking/:topic/:slug/`.
 
 ## Scripts
 

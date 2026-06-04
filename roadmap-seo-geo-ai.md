@@ -4,6 +4,53 @@ Status: Active
 Primary domain target: https://simplr.co.za
 Priority direction: GEO and AI optimisation first, then deep technical SEO hardening.
 
+## Quick Access
+
+- Main roadmap file: roadmap-seo-geo-ai.md
+- Supporting overview: readme.md
+- SEO asset generator: scripts/generate-seo-assets.mjs
+- Crawl assets:
+  - public/sitemap.xml
+  - public/robots.txt
+  - public/llms.txt
+  - public/llms-full.txt
+
+## How To Use This Roadmap
+
+- Status legend:
+  - [ ] Not started
+  - [~] In progress
+  - [x] Done
+- Effort legend:
+  - S = 0.5 to 1 day
+  - M = 1 to 3 days
+  - L = 3+ days
+- Update rule: when starting work, mark item [~] and add owner/date in the Sprint Board.
+- Review cadence: revisit weekly and re-order by business impact.
+
+## Sprint Board (GEO/AI First)
+
+| Priority | Item                                                                            | Effort | Status | Owner | Target Sprint |
+| -------- | ------------------------------------------------------------------------------- | ------ | ------ | ----- | ------------- |
+| P1       | Expand llms-full.txt with route purpose summaries and machine-readable entities | M      | [ ]    | TBD   | Sprint 1      |
+| P1       | Schema audit and fixes for home/services/work/thinking route types              | M      | [ ]    | TBD   | Sprint 1      |
+| P1       | Thinking article template for answer-first intro and explicit entities          | M      | [ ]    | TBD   | Sprint 1      |
+| P1       | GEO manual QA pack (prompt set + citation scoring sheet)                        | S      | [ ]    | TBD   | Sprint 1      |
+| P2       | Sitemap lastmod support for static and dynamic routes                           | M      | [ ]    | TBD   | Sprint 2      |
+| P2       | CI guardrail: fail on localhost URLs in crawl assets                            | S      | [ ]    | TBD   | Sprint 2      |
+| P2       | CI guardrail: internal link check and report                                    | M      | [ ]    | TBD   | Sprint 2      |
+| P2       | Canonical/trailing slash policy lock and consistency pass                       | S      | [ ]    | TBD   | Sprint 2      |
+| P3       | Evaluate pre-render or SSR for top value routes                                 | L      | [ ]    | TBD   | Sprint 3      |
+
+## Recommended Execution Order (Next 2 Weeks)
+
+1. llms-full entity and route summary upgrade.
+2. Schema audit plus route-level fixes.
+3. Thinking and case-study content template hardening.
+4. GEO QA prompt pack and baseline run.
+5. Add CI checks for localhost and link integrity.
+6. Add sitemap lastmod and canonical policy pass.
+
 ## Goals
 
 - Make site content easy for search engines and AI systems to discover, parse, cite, and trust.
@@ -112,3 +159,8 @@ Priority direction: GEO and AI optimisation first, then deep technical SEO harde
 - This roadmap is intended as a living checklist.
 - Update checkboxes as items are completed.
 - Re-prioritise every sprint based on performance, indexing, and business goals.
+
+## Change Log
+
+- 2026-06-04: Initial phased roadmap created.
+- 2026-06-04: Added Sprint Board with effort sizing and next-2-weeks execution order.

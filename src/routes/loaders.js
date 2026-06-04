@@ -2,15 +2,12 @@ import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, f
 
 export function createRootLoader() {
   return async function rootLoader() {
-    const [navigation, { works }] = await Promise.all([
-      fetchNavigationData(),
-      fetchWorksData().catch(() => ({ works: [] })),
-    ])
-    const workCount = works.length
+    // Keep root route non-blocking so app shell + intro overlay render immediately.
+    // Work count can be hydrated by the Work page loader; here we only warm cache.
+    fetchWorksData().catch(() => {})
+
     return {
-      navigation: workCount > 0
-        ? navigation.map((item) => item.key === 'work' ? { ...item, count: String(workCount) } : item)
-        : navigation,
+      navigation: await fetchNavigationData(),
     }
   }
 }
