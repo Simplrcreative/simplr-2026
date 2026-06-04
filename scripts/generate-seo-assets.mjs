@@ -14,6 +14,53 @@ const staticRoutes = [
   { path: '/est-2014', changefreq: 'monthly', priority: '0.6' },
 ]
 
+function normalizeBasePath(value, fallback) {
+  const base = String(value || fallback || '').trim()
+  if (!base) return fallback
+  const withLeadingSlash = base.startsWith('/') ? base : `/${base}`
+  return withLeadingSlash.replace(/\/+$/, '')
+}
+
+function normalizeTopicSlug(value) {
+  const topic = String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return topic || 'news'
+}
+
+function uniqueRoutes(routes) {
+  const seen = new Set()
+  return routes.filter((route) => {
+    const key = route.path
+    if (!key || seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function resolveGraphQlEndpoint(rawEndpoint, env, siteUrl) {
+  const endpoint = String(rawEndpoint || '').trim()
+  if (!endpoint) return ''
+
+  if (/^https?:\/\//i.test(endpoint)) {
+    return endpoint
+  }
+
+  const devProxyTarget = String(env.VITE_WP_DEV_PROXY_TARGET || '').trim()
+  if (endpoint.startsWith('/') && /^https?:\/\//i.test(devProxyTarget)) {
+    return new URL(endpoint, devProxyTarget).toString()
+  }
+
+  if (endpoint.startsWith('/')) {
+    return new URL(endpoint, siteUrl).toString()
+  }
+
+  return endpoint
+}
+
 function parseEnvFile(contents) {
   return contents
     .split(/\r?\n/)
@@ -67,25 +114,30 @@ async function graphQlRequest(endpoint, query, variables = {}) {
 }
 
 async function getDynamicRoutes(env) {
-  const endpoint = env.VITE_WPGRAPHQL_ENDPOINT
+  const siteUrl = env.VITE_SITE_URL || 'https://simplr.co.za'
+  const endpoint = resolveGraphQlEndpoint(env.VITE_WPGRAPHQL_ENDPOINT, env, siteUrl)
 
   if (!endpoint) {
     return []
   }
 
+  const workBasePath = normalizeBasePath(env.VITE_WORK_URI_BASE || '/work/', '/work')
+  const thinkingBasePath = normalizeBasePath(env.VITE_THINKING_URI_BASE || '/thinking/', '/thinking')
+
   const query = `
-    query SitemapRoutes($workType: ContentTypeEnum!, $thinkingType: ContentTypeEnum!) {
+    query SitemapRoutes($workType: ContentTypeEnum!, $first: Int = 100) {
       work: contentNodes(first: 100, where: { contentTypes: [$workType], status: PUBLISH }) {
         nodes {
-          ... on UniformResourceIdentifiable {
-            uri
-          }
+          slug
         }
       }
-      thinking: contentNodes(first: 100, where: { contentTypes: [$thinkingType], status: PUBLISH }) {
+      thinking: posts(first: $first, where: { status: PUBLISH }) {
         nodes {
-          ... on UniformResourceIdentifiable {
-            uri
+          slug
+          topics {
+            nodes {
+              slug
+            }
           }
         }
       }
@@ -95,13 +147,32 @@ async function getDynamicRoutes(env) {
   try {
     const data = await graphQlRequest(endpoint, query, {
       workType: env.VITE_WORK_CONTENT_TYPE || 'WORK',
-      thinkingType: env.VITE_THINKING_CONTENT_TYPE || 'POST',
+      first: 100,
     })
 
-    return [...(data.work?.nodes || []), ...(data.thinking?.nodes || [])]
-      .map((node) => node.uri)
+    const workRoutes = (data.work?.nodes || [])
+      .map((node) => node?.slug)
       .filter(Boolean)
-      .map((uri) => ({ path: uri.replace(/\/$/, ''), changefreq: 'weekly', priority: '0.8' }))
+      .map((slug) => ({
+        path: `${workBasePath}/${slug}`,
+        changefreq: 'weekly',
+        priority: '0.8',
+      }))
+
+    const thinkingRoutes = (data.thinking?.nodes || [])
+      .map((node) => {
+        const slug = node?.slug
+        if (!slug) return null
+        const topicSlug = normalizeTopicSlug(node?.topics?.nodes?.[0]?.slug)
+        return {
+          path: `${thinkingBasePath}/${topicSlug}/${slug}`,
+          changefreq: 'weekly',
+          priority: '0.8',
+        }
+      })
+      .filter(Boolean)
+
+    return uniqueRoutes([...workRoutes, ...thinkingRoutes])
   } catch (error) {
     console.warn('Unable to hydrate dynamic SEO routes from WordPress:', error.message)
     return []
@@ -134,9 +205,9 @@ function buildLlmsFull(siteUrl) {
 
 async function main() {
   const env = await loadEnv()
-  const siteUrl = env.VITE_SITE_URL || 'https://www.simplr.studio'
+  const siteUrl = env.VITE_SITE_URL || 'https://simplr.co.za'
   const dynamicRoutes = await getDynamicRoutes(env)
-  const allRoutes = [...staticRoutes, ...dynamicRoutes]
+  const allRoutes = uniqueRoutes([...staticRoutes, ...dynamicRoutes])
 
   await fs.mkdir(publicDir, { recursive: true })
   await fs.writeFile(path.join(publicDir, 'sitemap.xml'), buildSitemap(siteUrl, allRoutes), 'utf8')

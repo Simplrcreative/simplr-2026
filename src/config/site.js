@@ -1,4 +1,4 @@
-const siteUrl = import.meta.env.VITE_SITE_URL || 'https://www.simplr.studio'
+const siteUrl = import.meta.env.VITE_SITE_URL || 'https://simplr.co.za'
 const wpSiteName = import.meta.env.VITE_WP_SITE_NAME || 'Simplr'
 
 export const siteConfig = {

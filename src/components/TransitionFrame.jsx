@@ -1021,10 +1021,10 @@ export default function TransitionFrame({ children }) {
         })
         document.body.appendChild(serviceCardEl)
         tl.to(serviceCardEl, {
-          y: -80,
+          y: -52,
           autoAlpha: 0,
-          duration: expandDuration * 0.6,
-          ease: 'power2.in',
+          duration: expandDuration * 0.78,
+          ease: 'power2.inOut',
         }, 0)
       }
 

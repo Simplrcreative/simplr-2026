@@ -3,12 +3,12 @@
 This website is a headless WordPress front end built with Vite and React.
 
 ## Main pages
-- http://localhost:5173/work
-- http://localhost:5173/about
-- http://localhost:5173/services
-- http://localhost:5173/thinking
-- http://localhost:5173/contact
-- http://localhost:5173/est-2014
+- https://simplr.co.za/work
+- https://simplr.co.za/about
+- https://simplr.co.za/services
+- https://simplr.co.za/thinking
+- https://simplr.co.za/contact
+- https://simplr.co.za/est-2014
 
 ## Dynamic content
 - Work singles are resolved from /work/:slug

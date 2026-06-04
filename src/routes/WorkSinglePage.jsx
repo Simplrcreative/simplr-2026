@@ -111,8 +111,8 @@ export default function WorkSinglePage() {
                   <div 
                     key={`swag-${index}`}
                     className="swag flex slide-up-subtle"
-                  >
-                    <div className="flex items-start">
+                  > 
+                    <div className="swag-numbers flex justify-end items-start">
                       {preUnit && (
                         <span className="swag-unit pre">{preUnit}</span>
                       )}
@@ -123,11 +123,13 @@ export default function WorkSinglePage() {
                         <span className="swag-unit">{postUnit}</span>
                       )}
                     </div>
+
                     {detail && (
                       <div className="swag-detail">
                         {detail}
                       </div>
                     )}
+
                   </div>
                 )
               })}

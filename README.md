@@ -19,17 +19,17 @@ Vite and React scaffold for a headless WordPress site with Tailwind styling, GSA
 - `/about`
 - `/services`
 - `/thinking`
-- `/thinking/:slug`
+- `/thinking/:topic/:slug`
 - `/contact`
 - `/est-2014`
 
 ## Environment
 
-Copy `.env.example` to `.env` and update the values for your environment.
+Create `.env` and update the values for your environment.
 
 ```bash
-VITE_SITE_URL=https://www.simplr.studio
-VITE_WPGRAPHQL_ENDPOINT=https://cms.simplr.studio/graphql
+VITE_SITE_URL=https://simplr.co.za
+VITE_WPGRAPHQL_ENDPOINT=https://cms.simplr.co.za/graphql
 VITE_WP_DEV_PROXY_TARGET=
 VITE_WP_SITE_NAME=Simplr
 VITE_WORK_CONTENT_TYPE=PROJECT
@@ -85,6 +85,10 @@ npm run build
 - Build-time sitemap and robots generation
 - `llms.txt` and `llms-full.txt` generation for machine-readable discovery
 - Semantic templates for list pages and article pages
+
+## SEO, GEO, and AI roadmap
+
+- Project checklist and phased plan: [roadmap-seo-geo-ai.md](roadmap-seo-geo-ai.md)
 
 ## Transition config
 
