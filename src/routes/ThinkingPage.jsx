@@ -191,7 +191,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section className="post-filter px-5 py-8 bg-white section-light flex justify-end">
+      <section className="post-filter px-5 py-8 bg-white flex justify-end">
         <div className="flex flex-wrap gap-0">
           {filters.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
@@ -210,7 +210,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section ref={postsResultsRef} className="posts-results px-5 pb-20 bg-white section-dark">
+      <section ref={postsResultsRef} className="posts-results px-5 pb-20 bg-white">
         <div className="thinking-posts-grid">
           {filteredPosts.map((post) => {
             const thumb = getThumbnail(post.acfPostBuilder?.acfFeaturedImage)
