@@ -244,7 +244,7 @@ export default function ThinkingSinglePage() {
               <div className="work-featured__meta mt-3">
                   <h3 className="work-card__title alt-transition-txt">{linkedWorkClient}</h3>
                   {linkedWorkCategories.length > 0 && (
-                    <div className="work-card__categories mt-3 flex flex-wrap gap-2">
+                    <div className="work-card__categories mt-3 flex flex-wrap">
                       {linkedWorkCategories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
                     </div>
                   )}

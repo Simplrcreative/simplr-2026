@@ -354,7 +354,7 @@ export default function WorkSinglePage() {
               <div className="work-featured__meta mt-3">
                   <h3 className="work-card__title alt-transition-txt">{nextWork.client}</h3>
                   {nextWork.categories.length > 0 && (
-                    <div className="work-card__categories mt-3 flex flex-wrap gap-2">
+                    <div className="work-card__">
                       {nextWork.categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
                     </div>
                   )}

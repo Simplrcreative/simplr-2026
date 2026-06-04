@@ -139,7 +139,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card__meta mt-3">
       <h3 className="work-card__title">{clients[0].name}</h3>
       {categories.length > 0 && (
-        <div className="work-card__categories mt-3 flex flex-wrap gap-2">
+        <div className="work-card__categories mt-3 flex flex-wrap">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
         </div>
       )}
@@ -171,7 +171,7 @@ function WorkFeatured({ work, cardKey }) {
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{clients[0].name}</h3>
         {categories.length > 0 && (
-          <div className="work-card__categories mt-3 flex flex-wrap gap-2">
+          <div className="work-card__categories mt-3 flex flex-wrap">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
           </div>
         )}
@@ -220,7 +220,7 @@ function TestimonialSection({ work, testimonialData, index, cardKey }) {
             </picture>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
-              <div className="categories mt-3 flex flex-wrap gap-2">
+              <div className="categories mt-3 flex flex-wrap">
                 {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
               </div>
             )}
