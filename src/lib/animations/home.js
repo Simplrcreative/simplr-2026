@@ -28,13 +28,14 @@ export function setIntroHeroInitialState(section) {
     if (heroTitle) {
         gsap.set(heroTitle, {
             autoAlpha: 0,
+            filter: 'blur(20px)',
             y: 200,
             willChange: 'transform, opacity',
         })
     }
 }
 
-export function createIntroVideoAnimation(section) {
+export function createIntroVideoAnimation(section, delay = 0) {
     if (!section) return () => undefined
 
     const heroVideo = section.querySelector('.hero-video')
@@ -51,7 +52,7 @@ export function createIntroVideoAnimation(section) {
         autoAlpha: 1,
         scale: 1,
         duration: 1,
-        delay: 0.75,
+        delay,
         ease: 'power4.out',
         overwrite: 'auto',
         clearProps: 'opacity,visibility,transform,willChange',
@@ -63,7 +64,7 @@ export function createIntroVideoAnimation(section) {
     }
 }
 
-export function createIntroHeroTitleAnimation(section) {
+export function createIntroHeroTitleAnimation(section, delay = 0) {
     if (!section) return () => undefined
 
     const heroTitle = section.querySelector('.hero-title')
@@ -81,15 +82,15 @@ export function createIntroHeroTitleAnimation(section) {
         y: 0,
         filter: 'blur(0px)',
         duration: 1.5,
-        delay: 1,
+        delay,
         ease: 'power4.out',
         overwrite: 'auto',
-        clearProps: 'opacity,visibility,transform,willChange',
+        clearProps: 'opacity,visibility,transform,filter,willChange',
     })
 
     return () => {
         heroTitleIntro.kill()
-        gsap.set(heroTitle, { clearProps: 'opacity,visibility,transform,willChange' })
+        gsap.set(heroTitle, { clearProps: 'opacity,visibility,transform,filter,willChange' })
     }
 }
 

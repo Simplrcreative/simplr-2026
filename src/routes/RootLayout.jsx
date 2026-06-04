@@ -10,8 +10,14 @@ import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
+const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
+const HOME_HERO_TITLE_INTRO_EVENT = 'home-hero:title-intro-start'
+const HOME_HERO_VIDEO_INTRO_EVENT = 'home-hero:video-intro-start'
 const INTRO_MIN_VISIBLE_MS = 5000
 const HOME_RETURN_ENTRANCE_FALLBACK_MS = 2200
+const HOME_NAV_INTRO_DELAY_S = 0.9
+const HOME_HERO_TITLE_AFTER_NAV_S = 0.3
+const HOME_HERO_VIDEO_AFTER_NAV_S = 0.35
 
 function requestTransitionCapture() {
   window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_EVENT))
@@ -255,9 +261,36 @@ export default function RootLayout() {
         { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
         0.15,
       )
-      entranceTl.to(mainNav, { y: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
+      entranceTl.to(
+        mainNav,
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 1,
+          ease: 'power4.out',
+        },
+        HOME_NAV_INTRO_DELAY_S,
+      )
 
-      entranceTl.to(menuIcon, { x: 0, autoAlpha: 1, duration: 1, delay: 1.35, ease: 'power4.out' }, 0)
+      entranceTl.to(menuIcon, { x: 0, autoAlpha: 1, duration: 1, ease: 'power4.out' }, HOME_NAV_INTRO_DELAY_S)
+      entranceTl.call(
+        () => {
+          window.__homeNavIntroStartedAt = performance.now()
+          window.dispatchEvent(new Event(HOME_NAV_INTRO_START_EVENT))
+        },
+        [],
+        HOME_NAV_INTRO_DELAY_S,
+      )
+      entranceTl.call(
+        () => window.dispatchEvent(new Event(HOME_HERO_TITLE_INTRO_EVENT)),
+        [],
+        HOME_NAV_INTRO_DELAY_S + HOME_HERO_TITLE_AFTER_NAV_S,
+      )
+      entranceTl.call(
+        () => window.dispatchEvent(new Event(HOME_HERO_VIDEO_INTRO_EVENT)),
+        [],
+        HOME_NAV_INTRO_DELAY_S + HOME_HERO_VIDEO_AFTER_NAV_S,
+      )
 
       return () => {
         entranceTl.kill()

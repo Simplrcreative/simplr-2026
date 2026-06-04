@@ -131,9 +131,13 @@
 .faq-pill {
     background: rgba(255, 255, 255, 0.92);
 }
+.faq-pill span {
+    margin: -2px 0 0 0;
+}
 
 .faq-answer-fade {
-    animation: faqAnswerFade 260ms ease-out;
+    line-height: 1.5;
+    animation: faqAnswerFade 600ms ease-out;
 }
 
 @keyframes faqAnswerFade {

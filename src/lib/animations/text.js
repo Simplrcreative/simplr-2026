@@ -3,7 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { SplitText } from 'gsap/SplitText'
 
 let pluginsRegistered = false
-const initializedElements = new WeakSet()
+const initializedElements = new Set()
 
 function registerPlugins() {
   if (!pluginsRegistered) {
@@ -24,7 +24,7 @@ export function refreshScrollTriggers() {
 
 /**
  * Initialize SplitText animation for a single element.
- * Prevents double initialization via WeakSet tracking.
+ * Prevents double initialization via Set tracking.
  * Returns the created tween so the caller can clean it up.
  */
 function initializeSplitTextForElement(element, triggerSelector, fromColor, toColor) {
@@ -63,14 +63,17 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
   )
 
   initializedElements.add(element)
-  return tween
+  return { element, tween }
 }
 
 export function createSplitTextAnimation() {
   registerPlugins()
 
   const observers = []
-  const tweens = []
+  const splitTextInstances = []
+  let mutationObserver = null
+  let needsWhiteObserver = false
+  let needsCoffeeObserver = false
 
   /**
    * Create Intersection Observer for lazy initialization of SplitText animations.
@@ -80,15 +83,15 @@ export function createSplitTextAnimation() {
     const elements = Array.from(document.querySelectorAll(elementSelector))
 
     if (elements.length === 0) {
-      return
+      return false
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const tween = initializeSplitTextForElement(entry.target, triggerSelector, fromColor, toColor)
-            if (tween) tweens.push(tween)
+            const instance = initializeSplitTextForElement(entry.target, triggerSelector, fromColor, toColor)
+            if (instance) splitTextInstances.push(instance)
             observer.unobserve(entry.target)
           }
         })
@@ -98,27 +101,65 @@ export function createSplitTextAnimation() {
 
     elements.forEach((el) => observer.observe(el))
     observers.push(observer)
+    return true
   }
 
-  createLazySplitTextObserver(
+  function createLazyMountObserver() {
+    if (mutationObserver) return
+
+    mutationObserver = new MutationObserver(() => {
+      if (needsWhiteObserver && document.querySelector('.split-text')) {
+        needsWhiteObserver = !createLazySplitTextObserver(
+          '.split-text',
+          '.trigger-split-text',
+          'rgba(255, 255, 255, 0.05)',
+          'rgba(255, 255, 255, 1)'
+        )
+      }
+
+      if (needsCoffeeObserver && document.querySelector('.split-text-coffee')) {
+        needsCoffeeObserver = !createLazySplitTextObserver(
+          '.split-text-coffee',
+          '.trigger-split-text-coffee',
+          'rgba(48, 15, 29, 0.05)',
+          'rgba(48, 15, 29, 1)'
+        )
+      }
+
+      if (!needsWhiteObserver && !needsCoffeeObserver) {
+        mutationObserver?.disconnect()
+        mutationObserver = null
+      }
+    })
+
+    mutationObserver.observe(document.body, { childList: true, subtree: true })
+  }
+
+  needsWhiteObserver = !createLazySplitTextObserver(
     '.split-text',
     '.trigger-split-text',
     'rgba(255, 255, 255, 0.05)',
     'rgba(255, 255, 255, 1)'
   )
 
-  createLazySplitTextObserver(
+  needsCoffeeObserver = !createLazySplitTextObserver(
     '.split-text-coffee',
     '.trigger-split-text-coffee',
     'rgba(48, 15, 29, 0.05)',
     'rgba(48, 15, 29, 1)'
   )
 
+  if (needsWhiteObserver || needsCoffeeObserver) {
+    createLazyMountObserver()
+  }
+
   return () => {
     observers.forEach((obs) => obs.disconnect())
-    tweens.forEach((tween) => {
+    mutationObserver?.disconnect()
+    splitTextInstances.forEach(({ element, tween }) => {
       tween.scrollTrigger?.kill()
       tween.kill()
+      initializedElements.delete(element)
     })
   }
 }

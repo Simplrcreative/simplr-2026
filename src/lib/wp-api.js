@@ -458,7 +458,7 @@ const postsQuery = `
 `
 
 const homeCaseStudiesQuery = `
-  query HomePageQuery {
+  query HomeCaseStudiesQuery {
     page(id: "5", idType: DATABASE_ID) {
       acfHomeBuilder {
         acfFeaturedCaseStudies {
@@ -540,6 +540,10 @@ const homeCaseStudiesQuery = `
               }
             }
           }
+        }
+        acfFaqs {
+          acfQuestion
+          acfAnswer
         }
       }
     }
@@ -652,11 +656,23 @@ function normaliseHomeHeroMedia(acfHomeBuilder) {
   }
 }
 
+function normaliseHomeFaqs(acfHomeBuilder) {
+  const faqs = acfHomeBuilder?.acfFaqs ?? []
+
+  return faqs
+    .map((item) => ({
+      question: String(item?.acfQuestion || '').trim(),
+      answer: String(item?.acfAnswer || '').trim(),
+    }))
+    .filter((item) => item.question && item.answer)
+}
+
 async function fetchHomeCaseStudiesData() {
   if (!wpConfig.endpoint) {
     return {
       caseStudies: [],
       testimonialBlock: null,
+      faqs: [],
     }
   }
 
@@ -668,12 +684,14 @@ async function fetchHomeCaseStudiesData() {
     return {
       caseStudies: studies.map(normaliseHomeCaseStudy).filter((study) => study.slug),
       testimonialBlock: normaliseHomeTestimonial(acfHomeBuilder),
+      faqs: normaliseHomeFaqs(acfHomeBuilder),
     }
   } catch (error) {
     reportError('Unable to load home featured case studies', error)
     return {
       caseStudies: [],
       testimonialBlock: null,
+      faqs: [],
     }
   }
 }
@@ -976,6 +994,7 @@ export async function fetchHomeData() {
     page: {
       ...pagePayload.page,
       ...homeHeroMedia,
+      faqs: homeFeatureData.faqs.length ? homeFeatureData.faqs : (pagePayload.page?.faqs ?? []),
     },
     featuredWork: (workPayload.items || []).slice(0, 3),
     caseStudies: homeFeatureData.caseStudies.length ? homeFeatureData.caseStudies : fallbackCaseStudies,

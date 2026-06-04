@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext, Await, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createClientsScrollAnimation, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations } from '../lib/animations/index.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -19,6 +19,10 @@ const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 1400
+const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
+const HOME_HERO_TITLE_AFTER_NAV_MS = 300
+const HOME_HERO_VIDEO_AFTER_NAV_MS = 350
+const HOME_HERO_INTRO_GLOBAL_FALLBACK_MS = 500
 const HERO_MODAL_FADE_DURATION_MS = 600
 const HERO_MODAL_POST_SCROLL_DELAY_MS = 100
 const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
@@ -68,7 +72,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   // Stage hero title/video while loader is active so they don't flash before intro animation.
   useLayoutEffect(() => {
-      if (!shouldRunHomeIntroAnimations || introComplete || introAnimationsPlayedRef.current) return
+      if (!shouldRunHomeIntroAnimations || introAnimationsPlayedRef.current) return
     setIntroHeroInitialState(heroRef.current)
   }, [introComplete, shouldRunHomeIntroAnimations])
 
@@ -98,38 +102,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
 
-  // Client logos mount lazily; initialize ticker only after the logos exist.
-  useEffect(() => {
-    if (!introComplete) return
-
-    let rafId = 0
-    let cleanupClientsAnimation = () => {}
-
-    const initClientsAnimation = () => {
-      cleanupClientsAnimation()
-      cleanupClientsAnimation = createClientsScrollAnimation(clientsRef.current) ?? (() => {})
-      refreshScrollTriggers()
-    }
-
-    const waitForClientLogos = () => {
-      const hasClientLogos = Boolean(clientsRef.current?.querySelector('.client-logos .client-logo'))
-
-      if (hasClientLogos) {
-        initClientsAnimation()
-        return
-      }
-
-      rafId = requestAnimationFrame(waitForClientLogos)
-    }
-
-    waitForClientLogos()
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId)
-      cleanupClientsAnimation()
-    }
-  }, [introComplete])
-
   // Lock scroll for the full duration of the intro sequence so the user can't
   // scroll past the hero before animations have initialised.
   useEffect(() => {
@@ -150,11 +122,66 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   useEffect(() => {
     if (!introComplete || !shouldRunHomeIntroAnimations || introAnimationsPlayedRef.current) return
 
-    const destroyHeroTitleIntro = createIntroHeroTitleAnimation(heroRef.current)
-    const destroyVideoIntro = createIntroVideoAnimation(heroRef.current)
-    introAnimationsPlayedRef.current = true
+    let destroyHeroTitleIntro = () => {}
+    let destroyVideoIntro = () => {}
+    let titleTimer = 0
+    let videoTimer = 0
+    let globalFallbackTimer = 0
+    let titleStarted = false
+    let videoStarted = false
+    let hasScheduled = false
+
+    const startTitleIntro = () => {
+      if (titleStarted) return
+      titleStarted = true
+      introAnimationsPlayedRef.current = true
+      destroyHeroTitleIntro = createIntroHeroTitleAnimation(heroRef.current, 0)
+    }
+
+    const startVideoIntro = () => {
+      if (videoStarted) return
+      videoStarted = true
+      introAnimationsPlayedRef.current = true
+      destroyVideoIntro = createIntroVideoAnimation(heroRef.current, 0)
+    }
+
+    const scheduleFromNavStart = (navStartTimestamp = performance.now()) => {
+      if (hasScheduled) return
+      hasScheduled = true
+      introAnimationsPlayedRef.current = true
+
+      const elapsedMs = Math.max(0, performance.now() - navStartTimestamp)
+      const titleDelayMs = Math.max(0, HOME_HERO_TITLE_AFTER_NAV_MS - elapsedMs)
+      const videoDelayMs = Math.max(0, HOME_HERO_VIDEO_AFTER_NAV_MS - elapsedMs)
+
+      titleTimer = window.setTimeout(startTitleIntro, titleDelayMs)
+      videoTimer = window.setTimeout(startVideoIntro, videoDelayMs)
+    }
+
+    const handleNavIntroStart = () => {
+      const navStartTimestamp = Number(window.__homeNavIntroStartedAt)
+      scheduleFromNavStart(Number.isFinite(navStartTimestamp) ? navStartTimestamp : performance.now())
+    }
+
+    window.addEventListener(HOME_NAV_INTRO_START_EVENT, handleNavIntroStart, { once: true })
+
+    const navStartTimestamp = Number(window.__homeNavIntroStartedAt)
+    if (Number.isFinite(navStartTimestamp)) {
+      scheduleFromNavStart(navStartTimestamp)
+    }
+
+    globalFallbackTimer = window.setTimeout(() => {
+      scheduleFromNavStart(performance.now())
+    }, HOME_HERO_INTRO_GLOBAL_FALLBACK_MS)
 
     return () => {
+      window.removeEventListener(HOME_NAV_INTRO_START_EVENT, handleNavIntroStart)
+      window.clearTimeout(titleTimer)
+      window.clearTimeout(videoTimer)
+      window.clearTimeout(globalFallbackTimer)
+      if (!titleStarted && !videoStarted) {
+        introAnimationsPlayedRef.current = false
+      }
       destroyHeroTitleIntro?.()
       destroyVideoIntro?.()
     }
@@ -701,7 +728,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       </section>
 
       <Suspense fallback={<div ref={clientsRef} className="bg-coffee section-dark min-h-screen" />}>
-        <LazyClientLogos innerRef={clientsRef} />
+        <LazyClientLogos innerRef={clientsRef} shouldAnimate={introComplete} />
       </Suspense>
 
       <section className="testimonials p-5 section-light bg-white footer-off">
@@ -793,7 +820,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                           faqButtonRefs.current[index] = element
                         }}
                         onClick={() => setActiveFaqIndex(index)}
-                        className={`lead faq-pill h-[3.125rem] shrink-0 rounded-full border px-5 flex items-center text-left text-base leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
+                        className={`lead faq-pill h-[3.125rem] shrink-0 rounded-full border px-5 flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
                         aria-pressed={isActive}
                       >
                         <span className="block whitespace-nowrap">{item.question}</span>
@@ -804,7 +831,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
               <div className="md:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[32rem] text-[1.125rem] leading-[1.5] text-coffee">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[32rem] text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

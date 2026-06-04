@@ -1,4 +1,19 @@
-export default function ClientLogos({ innerRef }) {
+import { useEffect } from 'react'
+import { createClientsScrollAnimation, refreshScrollTriggers } from '../lib/animations/index.js'
+
+export default function ClientLogos({ innerRef, shouldAnimate = false }) {
+  useEffect(() => {
+    if (!shouldAnimate || !innerRef?.current) return undefined
+
+    const cleanupClientsAnimation = createClientsScrollAnimation(innerRef.current) ?? (() => {})
+
+    refreshScrollTriggers()
+
+    return () => {
+      cleanupClientsAnimation()
+    }
+  }, [innerRef, shouldAnimate])
+
   return (
       <div ref={innerRef} className="bg-coffee section-dark min-h-screen">
       <section className="clients pt-40 pb-20 overflow-hidden text-white">
