@@ -14,6 +14,7 @@ export function createBtnHoverAnimation(btn) {
   if (!text) return () => {}
 
   const onEnter = () => {
+    btn.dataset.transitionHover = 'true'
     gsap.fromTo(
       text,
       { clipPath: 'inset(0 50% 0 50%)', opacity: 0 },
@@ -22,6 +23,7 @@ export function createBtnHoverAnimation(btn) {
   }
 
   const onLeave = () => {
+    delete btn.dataset.transitionHover
     gsap.to(text, {
       clipPath: 'inset(0 50% 0 50%)',
       opacity: 0,
@@ -34,6 +36,7 @@ export function createBtnHoverAnimation(btn) {
   btn.addEventListener('mouseleave', onLeave)
 
   return () => {
+    delete btn.dataset.transitionHover
     btn.removeEventListener('mouseenter', onEnter)
     btn.removeEventListener('mouseleave', onLeave)
   }

@@ -101,6 +101,22 @@ function createFrozenVideoNode(video, options = {}) {
 
 function createTransitionClone(source) {
   const clone = source.cloneNode(true)
+
+  const liveButtons = [
+    ...(source.matches('.btn') ? [source] : []),
+    ...Array.from(source.querySelectorAll('.btn')),
+  ]
+  const clonedButtons = Array.from(clone.querySelectorAll('.btn'))
+
+  liveButtons.forEach((button, index) => {
+    const clonedButton = clonedButtons[index]
+    if (!clonedButton) return
+
+    if (button.matches(':hover')) {
+      clonedButton.dataset.transitionHover = 'true'
+    }
+  })
+
   const liveVideos = source.matches('video') ? [source] : Array.from(source.querySelectorAll('video'))
   const clonedVideos = clone.matches('video') ? [clone] : Array.from(clone.querySelectorAll('video'))
 

@@ -39,6 +39,9 @@
 .btn:hover .btn-fill::before {
     transform: translate(-50%, -50%) scale(1);
 }
+.btn[data-transition-hover='true'] .btn-fill::before {
+    transform: translate(-50%, -50%) scale(1);
+}
 .btn-inner {
     position: relative;
     z-index: 1;
@@ -72,5 +75,8 @@
     z-index: 2;
 }
 .btn:hover::after {
+    transform: scale(1) translate(-5px, 12.5px) rotate(45deg);
+}
+.btn[data-transition-hover='true']::after {
     transform: scale(1) translate(-5px, 12.5px) rotate(45deg);
 }
