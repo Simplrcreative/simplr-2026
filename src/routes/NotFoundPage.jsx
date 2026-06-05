@@ -10,7 +10,7 @@ export default function NotFoundPage() {
       <Seo title="Not found" pathname="/404" robots="noindex,nofollow" />
       <div className="surface-card px-6 py-10 md:px-10 md:py-14">
         <p className="eyebrow">{status}</p>
-        <h1 className="section-title mt-4">This route is not available.</h1>
+        <h1 className="section-title mt-4">This content is not available.</h1>
         <p className="body-copy mt-6 max-w-2xl">
           The page may not exist yet in WordPress, or the route definition does not match the expected URI structure.
         </p>

@@ -525,7 +525,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       </div>
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-screen flex flex-col justify-end change-logo-back">
-          <div className="grid grid-cols-12 items-start gap-x-5">
+          <div className="grid grid-cols-12 items-start gap-x-5 w-full">
             <div className="col-start-1 col-span-10 md:col-span-7 pb-8 max-w-[95ch]"> 
               <h1 className="hero-title text-coffee">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
@@ -645,7 +645,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-20">
-          <div className="stat-item flex flex-col md:flex-row gap-5 md:justify-between md:w-[65%] relative">
+          <div className="stat-item flex flex-col md:flex-row gap-5 md:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
             <div data-initial="62" className="stat-no text-strategy">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-40 text-strategy text-[5rem]">+</div>

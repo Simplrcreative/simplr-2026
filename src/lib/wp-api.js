@@ -263,6 +263,19 @@ const worksQuery = `
               }
             }
           }
+          acfSecondaryThumbnail {
+            node {
+              guid
+              altText
+              mimeType
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
           acfFeaturedVideo {
             node {
               guid

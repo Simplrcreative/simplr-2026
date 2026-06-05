@@ -147,6 +147,7 @@ function collectCardKeys(groups) {
 function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
+  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail)
   const categories = builder.acfCategory?.nodes ?? []
   const clients = builder.acfClient?.nodes ?? []
 
@@ -182,6 +183,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
 function WorkFeatured({ work, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
+  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail)
   const categories = builder.acfCategory?.nodes ?? []
   const clients = builder.acfClient?.nodes ?? []
 
@@ -214,6 +216,7 @@ function WorkFeatured({ work, cardKey }) {
 function TestimonialSection({ work, testimonialData, fallbackTestimonial, index, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
+  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail)
   const categories = builder.acfCategory?.nodes ?? []
   const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? fallbackTestimonial?.quote ?? ''
   const role = testimonialData?.acfTestimonials?.acfRole ?? fallbackTestimonial?.role ?? ''
@@ -226,7 +229,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
 
   return (
     <section id={`testimonial-${index}`} className="testimonial px-5 py-20 bg-white section-light">
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-12 w-full">
         <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
           <div className="testimonial lead max-w-[38ch]">
             <div className="split-text-coffee trigger-split-text-coffee">

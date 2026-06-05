@@ -54,7 +54,7 @@ export default function WorkSinglePage() {
       />
     
       <section className="page-hero px-5 pb-20 bg-white section-light min-h-screen flex items-end">
-        <div className="grid grid-cols-12 ">
+        <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-start-1 col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
             <div>
@@ -67,7 +67,7 @@ export default function WorkSinglePage() {
               </div>
             )}
           </div>
-          <div className="col-start-8 col-span-5 ">
+          <div className="col-start-9 col-span-5">
             <div className="featured-image section-dark__">
               {thumbnail && (
                 <picture
