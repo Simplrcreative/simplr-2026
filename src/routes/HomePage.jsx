@@ -615,7 +615,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       <section ref={servicesRef} className="services py-20 section-light overflow-x-scroll relative w-full light-to-coffee-outgoing">
          <div className="services-titles flex flex-nowrap items-center text-[5.5rem] gap-10">
-          <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Successfully launched brands since 2015" className="services-title font-literata flex-shrink-0">
+          <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Successfully launched brands since 2015" className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">

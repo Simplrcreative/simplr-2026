@@ -232,11 +232,9 @@ const worksQuery = `
   query WorksQuery($first: Int = 100) {
     acfWorks(first: $first) {
       nodes {
-        databaseId
         slug
         title
         acfWorkBuilder {
-          acfFeaturedWork
           acfCategory {
             nodes {
               name

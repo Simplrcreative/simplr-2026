@@ -94,7 +94,7 @@
 .service-card__title {
   font-family: var(--font-literata);
   font-size: clamp(2rem, 3.5vw, 3.125rem);
-  font-weight: 200;
+  font-weight: 300;
   line-height: 1.2;
   color: var(--color-coffee);
 }

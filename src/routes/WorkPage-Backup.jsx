@@ -38,90 +38,59 @@ function workMatchesFilter(work, filter) {
 }
 
 /**
- * Groups works chronologically into 6-item layout sections.
- * In each full group:
- * - item 1 is always featured
- * - items 2-5 are always small work cards
- * - item 6 is always the testimonial work
+ * Groups works into layout sections. Each group contains:
+ * - featured: work with acfFeaturedWork=true (or null)
+ * - gridItems: up to 4 (featured) or 8 (no featured) remaining works;
+ *              the testimonial work always goes first in the grid
+ * - testimonialWork: the grid item with acfTestimonial (or null)
  *
- * Final partial groups still keep item 1 as featured and render remaining
- * items as small cards.
+ * Priority per group: latest featured → latest w/ testimonial → others
  */
 function groupWorks(works) {
+  const used = new Set()
   const groups = []
-  for (let i = 0; i < works.length; i += 6) {
-    const chunk = works.slice(i, i + 6)
-    if (!chunk.length) continue
+  const avail = () => works.filter((w) => !used.has(w.databaseId))
 
-    groups.push({
-      featured: chunk[0] ?? null,
-      gridItems: chunk.length === 6 ? chunk.slice(1, 5) : chunk.slice(1),
-      testimonialWork: chunk.length === 6 ? chunk[5] : null,
-    })
+  while (avail().length > 0) {
+    const pool = avail()
+    const featured = pool.find((w) => w.acfWorkBuilder?.acfFeaturedWork)
+
+    if (featured) {
+      used.add(featured.databaseId)
+
+      const testimonialWork = avail().find(
+        (w) => w.acfWorkBuilder?.acfTestimonial?.nodes?.length > 0,
+      )
+      const gridItems = []
+      if (testimonialWork) {
+        used.add(testimonialWork.databaseId)
+        gridItems.push(testimonialWork)
+      }
+      avail().slice(0, 4 - gridItems.length).forEach((w) => {
+        used.add(w.databaseId)
+        gridItems.push(w)
+      })
+
+      groups.push({ featured, gridItems, testimonialWork: testimonialWork ?? null })
+    } else {
+      const testimonialWork = pool.find(
+        (w) => w.acfWorkBuilder?.acfTestimonial?.nodes?.length > 0,
+      )
+      const gridItems = []
+      if (testimonialWork) {
+        used.add(testimonialWork.databaseId)
+        gridItems.push(testimonialWork)
+      }
+      avail().slice(0, 8 - gridItems.length).forEach((w) => {
+        used.add(w.databaseId)
+        gridItems.push(w)
+      })
+
+      groups.push({ featured: null, gridItems, testimonialWork: testimonialWork ?? null })
+    }
   }
 
   return groups
-}
-
-const FallbackTesitmonials = [
-  {
-    author: 'Daryl Glass',
-    role: 'Senior Developer',
-    quote: '"I make pretty digital shit happen."',
-  },
-   {
-    author: 'Grant Barnard',
-    role: 'Lead Developer',
-    quote: '"I make pretty digital shit happen."',
-  },
-  {
-    author: 'Melissa Caccia',
-    role: 'Senior Digital Designer',
-    quote: '"I make pretty digital shit."',
-  },
-  {
-    author: 'Grant Medefindt',
-    role: 'Co-Founder & Executive Creative Director',
-    quote: '"I make people make pretty digital shit."',
-  },
-  {
-    author: 'Justin Robinson',
-    role: 'Co-Founder & Executive Creative Director',
-    quote: '"I make people make pretty branding shit."',
-  },
-  {
-    author: 'Andrea Waugh',
-    role: 'Creative Director',
-    quote: '"I make pretty branding shit."',
-  },
-  {
-    author: 'Melanie Kvalsvig',
-    role: 'Operations Director',
-    quote: '"I make all the shit happen."',
-  },
-  {
-    author: 'Jonothan Leader',
-    role: 'Client Service Manager',
-    quote: '"I make sense of client\'s shit."',
-  },
-  {
-    author: 'Byron Zeelie',
-    role: 'Client Service Manager',
-    quote: '"I make sense of client\'s shit."',
-  },
-  {
-    author: 'Melissa Sherwin',
-    role: 'Client Service Manager',
-    quote: '"I make sense of client\'s shit."',
-  },
-]
-
-function pickFallbackTesitmonial(work) {
-  if (!FallbackTesitmonials.length) return null
-
-  const seed = Number(work?.databaseId) || 1
-  const index = Math.abs((seed * 9301 + 49297) % 233280) % FallbackTesitmonials.length
-  return FallbackTesitmonials[index] ?? null
 }
 
 function collectCardKeys(groups) {
@@ -211,15 +180,12 @@ function WorkFeatured({ work, cardKey }) {
   )
 }
 
-function TestimonialSection({ work, testimonialData, fallbackTestimonial, index, cardKey }) {
+function TestimonialSection({ work, testimonialData, index, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
   const categories = builder.acfCategory?.nodes ?? []
-  const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? fallbackTestimonial?.quote ?? ''
-  const role = testimonialData?.acfTestimonials?.acfRole ?? fallbackTestimonial?.role ?? ''
-  const author = testimonialData?.title
-    ?? fallbackTestimonial?.author
-    ?? ''
+  const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? ''
+  const role = testimonialData?.acfTestimonials?.acfRole ?? ''
   const client = testimonialData?.acfClients?.nodes?.[0]?.name
     ?? builder.acfClient?.nodes?.[0]?.name
     ?? ''
@@ -232,13 +198,13 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             <div className="split-text-coffee trigger-split-text-coffee">
               {quote && <div className="mb-20" dangerouslySetInnerHTML={{ __html: `${quote}` }} />}
               <div>
-                {author && <b>{author}</b>}
-                {role && <>{author ? <br /> : null}{role}</>}
+                {client && <b>{client}</b>}
+                {role && <>{client ? <br /> : null}{role}</>}
               </div>
             </div>
           </div>
         </div>
-        <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6">
+        <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 slide-up-from-left">
           <Link 
             to={`/work/${work.slug}`} 
             className="client-work block alt-transition-img" 
@@ -441,33 +407,29 @@ export default function WorkPage() {
       <div ref={workResultsRef} className="work-results">
         {groups.map((group, i) => {
           const n = i + 1
-          const rowStyle = { '--work-row-cols': 2 }
-          const linkedTestimonialId = group.testimonialWork
+          const hasFeatured = !!group.featured
+          const gridCols = hasFeatured ? 'col-start-1 md:col-start-7 col-span-12 md:col-span-6' : 'col-start-1 col-span-12'
+          const rowCols = hasFeatured ? 2 : 4
+          const rowStyle = { '--work-row-cols': rowCols }
+          const testimonialId = group.testimonialWork
             ?.acfWorkBuilder?.acfTestimonial?.nodes?.[0]?.databaseId
-          const linkedTestimonialData = linkedTestimonialId ? testimonials[linkedTestimonialId] : null
-          const hasLinkedTestimonialQuote = Boolean(
-            linkedTestimonialData?.acfTestimonials?.acfTestimonial,
-          )
-          const testimonialData = hasLinkedTestimonialQuote ? linkedTestimonialData : null
-          const fallbackTestimonial = hasLinkedTestimonialQuote
-            ? null
-            : pickFallbackTesitmonial(group.testimonialWork)
+          const testimonialData = testimonialId ? testimonials[testimonialId] : null
 
           return (
             <div key={group.featured?.databaseId ?? `group-${n}`}>
               <section id={`work-${n}`} className="work px-5 pb-20 bg-white section-light">
                 <div className="work-section grid grid-cols-12 gap-5">
 
-                  {group.featured && (
+                  {hasFeatured && (
                     <WorkFeatured
                       work={group.featured}
                       cardKey={`featured-${group.featured.databaseId}`}
                     />
                   )}
 
-                  <div id={`work-grid-${n}`} className="work-grid col-start-1 md:col-start-7 col-span-12 md:col-span-6 flex flex-col justify-between">
+                  <div id={`work-grid-${n}`} className={`work-grid ${gridCols} flex flex-col justify-between`}>
                     <div className="work-cards-top work-cards-row md:flex justify-between mb-20" style={rowStyle}>
-                      {group.gridItems.slice(0, 2).map((work) => (
+                      {group.gridItems.slice(0, hasFeatured ? 2 : 4).map((work) => (
                         <WorkCard
                           key={work.databaseId}
                           work={work}
@@ -476,7 +438,7 @@ export default function WorkPage() {
                       ))}
                     </div>
                     <div className="work-cards-bottom work-cards-row md:flex justify-between" style={rowStyle}>
-                      {group.gridItems.slice(2, 4).map((work) => (
+                      {group.gridItems.slice(hasFeatured ? 2 : 4, hasFeatured ? 4 : 8).map((work) => (
                         <WorkCard
                           key={work.databaseId}
                           work={work}
@@ -493,7 +455,6 @@ export default function WorkPage() {
                 <TestimonialSection
                   work={group.testimonialWork}
                   testimonialData={testimonialData}
-                  fallbackTestimonial={fallbackTestimonial}
                   index={n}
                   cardKey={`testimonial-${group.testimonialWork.databaseId}`}
                 />
