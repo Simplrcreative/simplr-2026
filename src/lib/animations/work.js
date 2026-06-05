@@ -136,3 +136,173 @@ export function createWorkImagesAnimation() {
     media.revert()
   }
 }
+
+/**
+ * Recreates the client-work image handoff motion on hover for thumb-swap cards:
+ * - secondary image slides up into frame
+ * - primary image slides up and out of frame
+ */
+export function createWorkThumbHoverAnimation(scope = document) {
+  const root = scope && typeof scope.querySelectorAll === 'function' ? scope : document
+  const triggers = Array.from(root.querySelectorAll('.thumb-swap-trigger'))
+
+  if (!triggers.length) return () => {}
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const cleanups = []
+
+  triggers.forEach((trigger) => {
+    const picture = trigger.querySelector('.thumb-swap')
+    if (!picture) return
+
+    const primary = picture.querySelector('.thumb-primary')
+    const secondary = picture.querySelector('.thumb-secondary')
+
+    if (!primary || !secondary) return
+
+    if (prefersReducedMotion) {
+      const setHovered = (isHovered) => {
+        picture.classList.toggle('hover-active', isHovered)
+      }
+
+      const onPointerEnter = () => setHovered(true)
+      const onPointerLeave = () => setHovered(false)
+
+      trigger.addEventListener('pointerenter', onPointerEnter)
+      trigger.addEventListener('pointerleave', onPointerLeave)
+      trigger.addEventListener('focusin', onPointerEnter)
+      trigger.addEventListener('focusout', onPointerLeave)
+
+      cleanups.push(() => {
+        trigger.removeEventListener('pointerenter', onPointerEnter)
+        trigger.removeEventListener('pointerleave', onPointerLeave)
+        trigger.removeEventListener('focusin', onPointerEnter)
+        trigger.removeEventListener('focusout', onPointerLeave)
+        picture.classList.remove('hover-active')
+      })
+
+      return
+    }
+
+    gsap.set(primary, {
+      yPercent: 0,
+      autoAlpha: 1,
+      clipPath: 'inset(0% 0% 0% 0%)',
+      zIndex: 1,
+      willChange: 'transform, clip-path',
+    })
+    gsap.set(secondary, {
+      yPercent: 110,
+      autoAlpha: 1,
+      clipPath: 'inset(100% 0% 0% 0%)',
+      zIndex: 2,
+      willChange: 'transform, clip-path',
+    })
+
+    let allowImmediateClick = false
+    const hoverTl = gsap.timeline({ paused: true, defaults: { duration: 0.5, ease: 'power2.in', overwrite: 'auto' } })
+
+    hoverTl.to(
+      primary,
+      {
+        yPercent: -100,
+        clipPath: 'inset(0% 0% 100% 0%)',
+      },
+      0,
+    )
+
+    const hoverTl2 = gsap.timeline({ paused: true, defaults: { duration: 0.5, ease: 'power2.out', overwrite: 'auto' } })
+    hoverTl2.to(
+      secondary,
+      {
+        delay: 0.1,
+        yPercent: 0,
+        clipPath: 'inset(0% 0% 0% 0%)',
+      },
+      0,
+    )
+
+    const setHovered = (isHovered) => {
+      if (isHovered) {
+        trigger.classList.add('hover-active')
+        picture.classList.add('hover-active')
+        hoverTl.play()
+        hoverTl2.play()
+        return
+      }
+
+      trigger.classList.remove('hover-active')
+      picture.classList.remove('hover-active')
+      delete trigger.dataset.transitionHover
+      delete picture.dataset.transitionHover
+      hoverTl.reverse()
+      hoverTl2.reverse()
+    }
+
+    const handleClick = (event) => {
+      if (allowImmediateClick) {
+        allowImmediateClick = false
+        return
+      }
+
+      const hoverInProgress = trigger.matches(':hover')
+        && (hoverTl.progress() < 0.999 || hoverTl2.progress() < 0.999)
+      if (!hoverInProgress) return
+
+      event.preventDefault()
+      event.stopPropagation()
+
+      hoverTl.tweenTo(hoverTl.duration(), {
+        delay: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        overwrite: true,
+        onComplete: () => {
+          // Ensure the enter-state has fully settled before click replay.
+          if (hoverTl.progress() < 0.999 || hoverTl2.progress() < 0.999) return
+          trigger.classList.add('hover-active')
+          picture.classList.add('hover-active')
+          trigger.dataset.transitionHover = 'true'
+          picture.dataset.transitionHover = 'true'
+          allowImmediateClick = true
+          trigger.click()
+        },
+      })
+
+      hoverTl2.tweenTo(hoverTl2.duration(), {
+        delay: 0.1,
+        duration: 0.5,
+        ease: 'power2.in',
+        overwrite: true,
+      })
+    }
+
+    const onPointerEnter = () => setHovered(true)
+    const onPointerLeave = () => setHovered(false)
+
+    trigger.addEventListener('pointerenter', onPointerEnter)
+    trigger.addEventListener('pointerleave', onPointerLeave)
+    trigger.addEventListener('focusin', onPointerEnter)
+    trigger.addEventListener('focusout', onPointerLeave)
+    trigger.addEventListener('click', handleClick)
+
+    cleanups.push(() => {
+      trigger.removeEventListener('pointerenter', onPointerEnter)
+      trigger.removeEventListener('pointerleave', onPointerLeave)
+      trigger.removeEventListener('focusin', onPointerEnter)
+      trigger.removeEventListener('focusout', onPointerLeave)
+      trigger.removeEventListener('click', handleClick)
+      hoverTl.kill()
+      hoverTl2.kill()
+      gsap.set([primary, secondary], { clearProps: 'willChange,clipPath,transform' })
+      trigger.classList.remove('hover-active')
+      picture.classList.remove('hover-active')
+      delete trigger.dataset.transitionHover
+      delete picture.dataset.transitionHover
+    })
+  })
+
+  return () => {
+    cleanups.forEach((cleanup) => cleanup())
+  }
+}

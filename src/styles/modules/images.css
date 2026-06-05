@@ -15,7 +15,6 @@ picture, video {
 }
 .ratio {
     position: relative;
-    background: #efefef;
     padding-top: var(--aspect-ratio-mobile);
 }
 .full-image img, 

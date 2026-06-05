@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -147,7 +147,8 @@ function collectCardKeys(groups) {
 function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
-  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail)
+  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
   const clients = builder.acfClient?.nodes ?? []
 
@@ -155,16 +156,18 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card mb-5 md:mb-0">
     <Link 
       to={`/work/${work.slug}`} 
-      className="block alt-transition-img" 
+      className="block alt-transition-img thumb-swap-trigger" 
       data-card-key={cardKey} 
       data-transition-source="media"
       data-transition-variant="work-card"
+      data-transition-snapshot-state="hover"
     >
       <picture
-        className="ratio overflow-hidden rounded-[10px] block"
+        className="ratio overflow-hidden rounded-[10px] block thumb-swap"
         style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': aspectRatio }}
       >
-        {thumb && <img src={thumb + '.webp'} alt={work.title} />}
+        {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} />}
+        {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" />}
       </picture>
       
     </Link>
@@ -183,23 +186,26 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
 function WorkFeatured({ work, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
-  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail)
+  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
   const clients = builder.acfClient?.nodes ?? []
 
   return (
     <Link
       to={`/work/${work.slug}`}
-      className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img"
+      className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img thumb-swap-trigger"
       data-card-key={cardKey}
       data-transition-source="media"
       data-transition-variant="work-card"
+      data-transition-snapshot-state="hover"
     >
       <picture
-        className="ratio overflow-hidden rounded-[10px] block"
+        className="ratio overflow-hidden rounded-[10px] block thumb-swap"
         style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
       >
-        {thumb && <img src={thumb + '.webp'} alt={work.title} />}
+        {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} />}
+        {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" />}
       </picture>
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{clients[0].name}</h3>
@@ -216,7 +222,8 @@ function WorkFeatured({ work, cardKey }) {
 function TestimonialSection({ work, testimonialData, fallbackTestimonial, index, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
   const thumb = getThumbnail(builder.acfFeaturedThumbnail)
-  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail)
+  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
   const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? fallbackTestimonial?.quote ?? ''
   const role = testimonialData?.acfTestimonials?.acfRole ?? fallbackTestimonial?.role ?? ''
@@ -244,16 +251,18 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
         <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6">
           <Link 
             to={`/work/${work.slug}`} 
-            className="client-work block alt-transition-img" 
+            className="client-work block alt-transition-img thumb-swap-trigger" 
             data-card-key={cardKey}
             data-transition-source="media"
             data-transition-variant="work-card"
+            data-transition-snapshot-state="hover"
           >
             <picture
-              className="ratio overflow-hidden rounded-[10px] block"
+              className="ratio overflow-hidden rounded-[10px] block thumb-swap"
               style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
             >
-              {thumb && <img src={thumb + '.webp'} alt={work.title} title={client} />}
+              {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} title={client} />}
+              {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" title={client} />}
             </picture>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
@@ -301,6 +310,14 @@ export default function WorkPage() {
     return () => {
       cancelAnimationFrame(rafId)
       cleanupSplitText?.()
+    }
+  }, [displayedFilter, groups.length])
+
+  useEffect(() => {
+    const cleanupWorkThumbHover = createWorkThumbHoverAnimation(workResultsRef.current)
+
+    return () => {
+      cleanupWorkThumbHover?.()
     }
   }, [displayedFilter, groups.length])
 

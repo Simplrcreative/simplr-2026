@@ -3,7 +3,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
-import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
 
 
 export default function WorkSinglePage() {
@@ -12,6 +12,7 @@ export default function WorkSinglePage() {
   const pathname = work?.slug ? `/work/${work.slug}` : '/work'
   const categories = work?.acfWorkBuilder?.acfCategory?.nodes ?? []
   const thumbnail = work?.thumbnail || ''
+  const thumbnail2 = work?.thumbnail2 || thumbnail
   const mimeType = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mimeType || ''
   const altText = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.altText || title || 'Untitled'
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
@@ -24,12 +25,12 @@ export default function WorkSinglePage() {
   useEffect(() => {
     // Lock scroll during the featured-image dock transition; unlock on completion.
     if (document.documentElement.classList.contains('page-transitioning')) {
-      document.documentElement.style.overflowY = 'hidden'
-      const unlock = () => { document.documentElement.style.overflowY = '' }
+      lockScroll('work-single-dock')
+      const unlock = () => { unlockScroll('work-single-dock') }
       window.addEventListener('page-transition:complete', unlock, { once: true })
       return () => {
         window.removeEventListener('page-transition:complete', unlock)
-        document.documentElement.style.overflowY = ''
+        unlockScroll('work-single-dock')
       }
     }
   }, [])
@@ -38,10 +39,12 @@ export default function WorkSinglePage() {
     const cleanupSplitText = createSplitTextAnimation()
     const cleanupWorkImages = createWorkImagesAnimation()
     const cleanupNextWork = createNextWorkAnimation()
+    const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
     return () => {
       cleanupSplitText?.()
       cleanupWorkImages?.()
       cleanupNextWork?.()
+      cleanupWorkThumbHover?.()
     }
   }, [])
 
@@ -68,13 +71,14 @@ export default function WorkSinglePage() {
             )}
           </div>
           <div className="col-start-9 col-span-5">
-            <div className="featured-image section-dark__">
+            <div className="featured-image section-dark__ thumb-swap-trigger">
               {thumbnail && (
                 <picture
-                  className="ratio overflow-hidden rounded-[10px]"
+                  className="ratio overflow-hidden rounded-[10px] thumb-swap"
                   style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
                 > 
-                  <img src={thumbnail + '.webp'} alt={title} />
+                  <img className="thumb-primary" src={thumbnail2 + '.webp'} alt={altText} />
+                  <img className="thumb-secondary" src={thumbnail + '.webp'} alt="" aria-hidden="true" />
                 </picture>
               )}
             </div>

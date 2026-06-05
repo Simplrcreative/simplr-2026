@@ -6,6 +6,47 @@ let lenisInstance
 let scrollTriggerRegistered = false
 let subscriberCount = 0
 let tickerCallback
+const activeScrollLocks = new Set()
+const originalScrollStyles = {
+  htmlOverflow: '',
+  bodyOverflow: '',
+  htmlTouchAction: '',
+  bodyTouchAction: '',
+}
+
+function applyNativeScrollLock() {
+  if (activeScrollLocks.size !== 1) return
+
+  originalScrollStyles.htmlOverflow = document.documentElement.style.overflow
+  originalScrollStyles.bodyOverflow = document.body.style.overflow
+  originalScrollStyles.htmlTouchAction = document.documentElement.style.touchAction
+  originalScrollStyles.bodyTouchAction = document.body.style.touchAction
+
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+  document.documentElement.style.touchAction = 'none'
+  document.body.style.touchAction = 'none'
+}
+
+function releaseNativeScrollLock() {
+  if (activeScrollLocks.size > 0) return
+
+  document.documentElement.style.overflow = originalScrollStyles.htmlOverflow
+  document.body.style.overflow = originalScrollStyles.bodyOverflow
+  document.documentElement.style.touchAction = originalScrollStyles.htmlTouchAction
+  document.body.style.touchAction = originalScrollStyles.bodyTouchAction
+}
+
+function syncLenisLockState() {
+  if (!lenisInstance) return
+
+  if (activeScrollLocks.size > 0) {
+    lenisInstance.stop()
+    return
+  }
+
+  lenisInstance.start()
+}
 
 function registerScrollTrigger() {
   if (!scrollTriggerRegistered) {
@@ -43,6 +84,8 @@ function ensureLenis() {
   requestAnimationFrame(() => {
     lenisInstance?.resize()
   })
+
+  syncLenisLockState()
 
   return lenisInstance
 }
@@ -97,4 +140,16 @@ export function scrollToTopImmediate() {
   document.documentElement.scrollTop = 0
   document.body.scrollTop = 0
   window.scrollTo(0, 0)
+}
+
+export function lockScroll(lockId = 'global') {
+  activeScrollLocks.add(lockId)
+  applyNativeScrollLock()
+  syncLenisLockState()
+}
+
+export function unlockScroll(lockId = 'global') {
+  activeScrollLocks.delete(lockId)
+  releaseNativeScrollLock()
+  syncLenisLockState()
 }

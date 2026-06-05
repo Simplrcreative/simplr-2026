@@ -1272,12 +1272,18 @@ export async function fetchWorkEntryData(slug) {
 
     const featuredThumbnailNode = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node
     const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
+    const secondaryThumbnailNode = work?.acfWorkBuilder?.acfSecondaryThumbnail?.node
+    const secondarySizes = secondaryThumbnailNode?.mediaDetails?.sizes ?? []
     const thumbnail = (
       sizes.find((s) => s.name === 'large')
       || sizes.find((s) => s.name === 'full')
     )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+    const thumbnail2 = (
+      secondarySizes.find((s) => s.name === 'large')
+      || secondarySizes.find((s) => s.name === 'full')
+    )?.sourceUrl ?? secondaryThumbnailNode?.guid ?? thumbnail
 
-    return { work: { ...work, thumbnail } }
+    return { work: { ...work, thumbnail, thumbnail2 } }
   } catch (error) {
     if (error instanceof Response) throw error
     reportError(`Unable to load work entry for ${slug}`, error)

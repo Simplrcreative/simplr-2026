@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext, Await, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll } from '../lib/animations/index.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -107,14 +107,14 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   useEffect(() => {
     if (!introComplete || !shouldRunHomeIntroAnimations || introAnimationsPlayedRef.current) return
 
-    document.documentElement.style.overflow = 'hidden'
+    lockScroll('home-intro-sequence')
     const timer = setTimeout(() => {
-      document.documentElement.style.overflow = ''
+      unlockScroll('home-intro-sequence')
     }, HOME_SCROLL_INIT_AFTER_INTRO_MS)
 
     return () => {
       clearTimeout(timer)
-      document.documentElement.style.overflow = ''
+      unlockScroll('home-intro-sequence')
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
 

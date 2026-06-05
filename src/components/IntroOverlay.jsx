@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
+import { lockScroll, unlockScroll } from '../lib/animations/index.js'
 
 export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete }) {
   const overlayRef = useRef(null)
@@ -13,10 +14,12 @@ export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete 
     const overlayNode = overlayRef.current
 
     window.scrollTo(0, 0)
-    document.body.style.overflow = 'hidden'
+    lockScroll('intro-overlay')
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return undefined
+      return () => {
+        unlockScroll('intro-overlay')
+      }
     }
 
     // Hold the overlay in place; fade out is handled by RootLayout state
@@ -33,7 +36,7 @@ export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete 
     })
 
     return () => {
-      document.body.style.overflow = ''
+      unlockScroll('intro-overlay')
       dotsTimeline.kill()
     }
   }, [])

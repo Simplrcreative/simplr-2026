@@ -99,8 +99,68 @@ function createFrozenVideoNode(video, options = {}) {
   return image
 }
 
-function createTransitionClone(source) {
+function createTransitionClone(source, options = {}) {
+  const { forceHover = false, preferSecondaryImage = false } = options
   const clone = source.cloneNode(true)
+
+  const applyHoveredThumbState = (root) => {
+    if (!root || typeof root.querySelectorAll !== 'function') return
+
+    const thumbSwaps = root.matches?.('.thumb-swap')
+      ? [root]
+      : Array.from(root.querySelectorAll('.thumb-swap'))
+
+    thumbSwaps.forEach((thumbSwap) => {
+      const primary = thumbSwap.querySelector('.thumb-primary')
+      const secondary = thumbSwap.querySelector('.thumb-secondary')
+      if (!primary || !secondary) return
+
+      // Lock clone visuals to the hovered end-frame so outgoing transition
+      // always snapshots thumb2, even if pointerdown captured mid-hover tween.
+      primary.style.opacity = '0'
+      primary.style.visibility = 'hidden'
+      primary.style.transform = 'translate3d(0, -100%, 0)'
+      primary.style.clipPath = 'inset(0% 0% 100% 0%)'
+
+      secondary.style.opacity = '1'
+      secondary.style.visibility = 'inherit'
+      secondary.style.transform = 'translate3d(0, 0%, 0)'
+      secondary.style.clipPath = 'inset(0% 0% 0% 0%)'
+    })
+  }
+
+  const sourceHasHoverState = (
+    forceHover
+    || source.matches(':hover')
+    || source.classList.contains('hover-active')
+    || source.dataset.transitionHover === 'true'
+  )
+
+  if (sourceHasHoverState) {
+    clone.dataset.transitionHover = 'true'
+    clone.classList.add('hover-active')
+    applyHoveredThumbState(clone)
+  }
+
+  const liveHoverables = Array.from(source.querySelectorAll('.thumb-swap, .thumb-swap-trigger'))
+  const clonedHoverables = Array.from(clone.querySelectorAll('.thumb-swap, .thumb-swap-trigger'))
+
+  liveHoverables.forEach((node, index) => {
+    const clonedNode = clonedHoverables[index]
+    if (!clonedNode) return
+
+    const shouldSetHover = (
+      forceHover
+      || node.matches(':hover')
+      || node.classList.contains('hover-active')
+      || node.dataset.transitionHover === 'true'
+    )
+
+    if (!shouldSetHover) return
+    clonedNode.dataset.transitionHover = 'true'
+    clonedNode.classList.add('hover-active')
+    applyHoveredThumbState(clonedNode)
+  })
 
   const liveButtons = [
     ...(source.matches('.btn') ? [source] : []),
@@ -139,6 +199,25 @@ function createTransitionClone(source) {
       clonedVideo.replaceWith(frozenNode)
     }
   })
+
+  if (preferSecondaryImage) {
+    const thumbSwaps = clone.matches?.('.thumb-swap')
+      ? [clone]
+      : Array.from(clone.querySelectorAll('.thumb-swap'))
+
+    thumbSwaps.forEach((thumbSwap) => {
+      const primary = thumbSwap.querySelector('.thumb-primary')
+      const secondary = thumbSwap.querySelector('.thumb-secondary')
+      if (!secondary) return
+
+      // Guarantee thumb2 is the only visible media in the outgoing clone.
+      primary?.remove()
+      secondary.style.opacity = '1'
+      secondary.style.visibility = 'visible'
+      secondary.style.transform = 'translate3d(0, 0%, 0)'
+      secondary.style.clipPath = 'inset(0% 0% 0% 0%)'
+    })
+  }
 
   return clone
 }
@@ -368,10 +447,14 @@ export default function TransitionFrame({ children }) {
         if (shouldUseAltTransition) {
           const rect = altSource.getBoundingClientRect()
           if (rect.width > 0 && rect.height > 0) {
-            const clone = createTransitionClone(altSource)
+            const forceHoverSnapshot = nav.link?.dataset?.transitionSnapshotState === 'hover'
             const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant
               ?? nav.link?.dataset?.transitionVariant
               ?? null
+            const clone = createTransitionClone(altSource, {
+              forceHover: forceHoverSnapshot,
+              preferSecondaryImage: forceHoverSnapshot && variant === 'work-card',
+            })
             const hasVideoSource = altSource.matches('video') || Boolean(altSource.querySelector('video'))
 
             // Read the source aspect ratio from the card's picture element so we can
@@ -385,6 +468,9 @@ export default function TransitionFrame({ children }) {
               pathname: nav.url.pathname,
               variant,
               mediaKind: hasVideoSource ? 'video' : 'image',
+              mediaSelector: forceHoverSnapshot && variant === 'work-card'
+                ? '.thumb-secondary, img, canvas, video'
+                : 'img, canvas, video',
               dockSelector: nav.link?.dataset?.transitionDockSelector || null,
               top: rect.top,
               left: rect.left,
@@ -596,7 +682,14 @@ export default function TransitionFrame({ children }) {
     const handlePointerDown = (e) => {
       // Only primary-button navigations; ignore modified clicks/new-tab gestures.
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
-      if (!canCaptureFromEventTarget(e.target)) return
+      const nav = extractSameOriginLink(e.target)
+      if (!nav) return
+
+      // Hover-snapshot links (e.g. work cards) must capture on click, not
+      // pointerdown, otherwise we can snapshot before thumb2 reaches its
+      // hovered end-frame.
+      if (nav.link?.dataset?.transitionSnapshotState === 'hover') return
+
       capture(e.target)
     }
 
@@ -889,7 +982,7 @@ export default function TransitionFrame({ children }) {
         }
       }
 
-      const altCloneMedia = altClone.querySelector('img, canvas, video')
+      const altCloneMedia = altClone.querySelector(altTransition?.mediaSelector || 'img, canvas, video')
       const resolveDockMedia = (target = null) => {
         const dockTarget = target || resolveDockTarget(dockSelector)
         if (!dockTarget) return null
