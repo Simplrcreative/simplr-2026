@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -6,8 +6,11 @@ import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
+import { fetchTestimonialData, fetchWorksData } from '../lib/wp-api.js'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const WORK_BATCH_SIZE = 6
 
 const FILTERS = [
   { id: 'all',                    label: 'All',                      bg: 'var(--color-coffee)',                 text: '#fff' },
@@ -279,12 +282,24 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
 
 export default function WorkPage() {
   const pageRef = useRef(null)
-  const { works = [], testimonials = {} } = useLoaderData() ?? {}
+  const { works: initialWorks = [], testimonials: initialTestimonials = {} } = useLoaderData() ?? {}
   const [activeFilter, setActiveFilter] = useState('all')
   const [displayedFilter, setDisplayedFilter] = useState('all')
   const [isFilterAnimating, setIsFilterAnimating] = useState(false)
+  const [works, setWorks] = useState(initialWorks)
+  const [testimonials, setTestimonials] = useState(initialTestimonials)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasMoreWorks, setHasMoreWorks] = useState(true)
   const workResultsRef = useRef(null)
+  const loadSentinelRef = useRef(null)
   const pendingAddedCardKeysRef = useRef(new Set())
+
+  useEffect(() => {
+    setWorks(initialWorks)
+    setTestimonials(initialTestimonials)
+    setHasMoreWorks(initialWorks.length >= WORK_BATCH_SIZE)
+    setIsLoadingMore(false)
+  }, [initialTestimonials, initialWorks])
 
   const filteredWorks = useMemo(
     () => works.filter((w) => workMatchesFilter(w, displayedFilter)),
@@ -292,6 +307,86 @@ export default function WorkPage() {
   )
 
   const groups = useMemo(() => groupWorks(filteredWorks), [filteredWorks])
+
+  const loadNextBatch = useCallback(async () => {
+    if (isLoadingMore || !hasMoreWorks) {
+      return
+    }
+
+    setIsLoadingMore(true)
+    const nextFirst = Math.max(works.length + WORK_BATCH_SIZE, WORK_BATCH_SIZE)
+
+    try {
+      const { works: nextWorks = [] } = await fetchWorksData({ first: nextFirst })
+
+      if (!Array.isArray(nextWorks) || !nextWorks.length) {
+        setHasMoreWorks(false)
+        return
+      }
+
+      const previousLength = works.length
+      const hasNewWorks = nextWorks.length > previousLength
+
+      if (!hasNewWorks) {
+        setHasMoreWorks(false)
+        return
+      }
+
+      setWorks(nextWorks)
+
+      const testimonialIds = [
+        ...new Set(
+          nextWorks
+            .flatMap((work) => work.acfWorkBuilder?.acfTestimonial?.nodes?.map((n) => n.databaseId) ?? [])
+            .filter(Boolean),
+        ),
+      ]
+
+      const uncachedTestimonialIds = testimonialIds.filter((id) => testimonials[id] === undefined)
+
+      if (uncachedTestimonialIds.length) {
+        const entries = await Promise.all(
+          uncachedTestimonialIds.map(async (id) => [id, await fetchTestimonialData(id)]),
+        )
+
+        setTestimonials((prev) => ({
+          ...prev,
+          ...Object.fromEntries(entries),
+        }))
+      }
+    } catch {
+      setHasMoreWorks(false)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [hasMoreWorks, isLoadingMore, testimonials, works.length])
+
+  useEffect(() => {
+    const sentinel = loadSentinelRef.current
+
+    if (!sentinel || !hasMoreWorks) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadNextBatch()
+        }
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px 420px 0px',
+        threshold: 0,
+      },
+    )
+
+    observer.observe(sentinel)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [hasMoreWorks, loadNextBatch])
 
   useEffect(() => {
     const cleanupSlideUpAnimations = createSlideUpAnimations(pageRef.current)
@@ -523,6 +618,15 @@ export default function WorkPage() {
         })}
 
         <section className="bg-white py-20 relative z-3" />
+
+        {hasMoreWorks && (
+          <section className="bg-white section-light px-5 pb-24">
+            <div ref={loadSentinelRef} className="w-full h-px" aria-hidden="true" />
+            <div className="text-coffee flex justify-center">
+              {isLoadingMore ? 'Loading more work...' : 'Loading next projects...'}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )

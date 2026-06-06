@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData, useParams } from 'react-router-dom'
 import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation } from '../lib/animations/index.js'
-import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
+import { buildEntryPath, fetchThinkingPostsData, getThinkingTopicSlug } from '../lib/wp-api.js'
 
 const FILTER_COLOR_MAP = {
   strategy: 'var(--color-strategy)',
@@ -19,6 +19,8 @@ const FILTER_COLOR_MAP = {
 
 const LIGHT_BG_SLUGS = new Set(['strategy', 'web-design-development'])
 const CARD_START_HEIGHT = 12
+const THINKING_INITIAL_LOAD_SIZE = 8
+const THINKING_BATCH_SIZE = 4
 
 function getFilterColor(slug) {
   const entry = Object.entries(FILTER_COLOR_MAP).find(([key]) => slug.includes(key))
@@ -46,9 +48,21 @@ function postMatchesFilter(post, filterId) {
 }
 
 export default function ThinkingPage() {
-  const { posts = [] } = useLoaderData() ?? {}
+  const { posts: initialPosts = [] } = useLoaderData() ?? {}
   const { filterSlug } = useParams()
   const postsResultsRef = useRef(null)
+  const postsLoadSentinelRef = useRef(null)
+  const animatedPostKeysRef = useRef(new Set())
+  const [posts, setPosts] = useState(initialPosts)
+  const [isLoadingMorePosts, setIsLoadingMorePosts] = useState(false)
+  const [hasMorePosts, setHasMorePosts] = useState(true)
+
+  useEffect(() => {
+    setPosts(initialPosts)
+    setHasMorePosts(initialPosts.length >= THINKING_BATCH_SIZE)
+    setIsLoadingMorePosts(false)
+    animatedPostKeysRef.current.clear()
+  }, [initialPosts])
 
   const filters = useMemo(() => {
     const categoriesBySlug = new Map()
@@ -93,6 +107,10 @@ export default function ThinkingPage() {
     setActiveFilter(nextFilter)
   }, [filterIds, filterSlug])
 
+  useEffect(() => {
+    animatedPostKeysRef.current.clear()
+  }, [activeFilter])
+
   const activeFilterLabel = useMemo(() => {
     if (activeFilter === 'all') return ''
     return filters.find((filter) => filter.id === activeFilter)?.label ?? ''
@@ -103,6 +121,62 @@ export default function ThinkingPage() {
     [posts, activeFilter],
   )
 
+  const loadNextPostsBatch = useCallback(async () => {
+    if (isLoadingMorePosts || !hasMorePosts) {
+      return
+    }
+
+    setIsLoadingMorePosts(true)
+    const nextFirst = Math.max(posts.length + THINKING_BATCH_SIZE, THINKING_INITIAL_LOAD_SIZE)
+
+    try {
+      const { posts: nextPosts = [] } = await fetchThinkingPostsData({ first: nextFirst })
+
+      if (!Array.isArray(nextPosts) || !nextPosts.length) {
+        setHasMorePosts(false)
+        return
+      }
+
+      if (nextPosts.length <= posts.length) {
+        setHasMorePosts(false)
+        return
+      }
+
+      setPosts(nextPosts)
+    } catch {
+      setHasMorePosts(false)
+    } finally {
+      setIsLoadingMorePosts(false)
+    }
+  }, [hasMorePosts, isLoadingMorePosts, posts.length])
+
+  useEffect(() => {
+    const sentinel = postsLoadSentinelRef.current
+
+    if (!sentinel || !hasMorePosts) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadNextPostsBatch()
+        }
+      },
+      {
+        root: null,
+        rootMargin: '0px 0px 420px 0px',
+        threshold: 0,
+      },
+    )
+
+    observer.observe(sentinel)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [hasMorePosts, loadNextPostsBatch])
+
   useEffect(() => createSplitTextAnimation(), [])
 
   useEffect(() => {
@@ -112,12 +186,24 @@ export default function ThinkingPage() {
     const cards = Array.from(container.querySelectorAll('[data-post-card]'))
     if (!cards.length) return
 
+    const newCards = cards.filter((card) => {
+      const key = card.dataset.postCardKey
+      return key && !animatedPostKeysRef.current.has(key)
+    })
+
+    if (!newCards.length) return
+
     const context = gsap.context(() => {
-      cards.forEach((card, index) => {
+      newCards.forEach((card, index) => {
+        const key = card.dataset.postCardKey
         const imageFrame = card.querySelector('[data-post-image-frame]')
         const title = card.querySelector('[data-post-title]')
 
         if (!imageFrame) return
+
+        if (key) {
+          animatedPostKeysRef.current.add(key)
+        }
 
         const finalHeight = imageFrame.getBoundingClientRect().height
         const startHeight = CARD_START_HEIGHT
@@ -217,7 +303,12 @@ export default function ThinkingPage() {
             const postTitle = post.title ?? 'Thinking post'
 
             return (
-              <article key={post.databaseId ?? post.slug} className="thinking-post-card" data-post-card>
+              <article
+                key={post.databaseId ?? post.slug}
+                className="thinking-post-card"
+                data-post-card
+                data-post-card-key={post.databaseId ?? post.slug}
+              >
                 <Link
                   to={buildEntryPath('thinking', post.slug, { topicSlug: getThinkingTopicSlug(post) })}
                   className="thinking-post-link"
@@ -231,6 +322,15 @@ export default function ThinkingPage() {
             )
           })}
         </div>
+
+        {hasMorePosts && (
+          <div className="pt-16">
+            <div ref={postsLoadSentinelRef} className="w-full h-px" aria-hidden="true" />
+            <div className="text-coffee/70 text-[0.95rem]">
+              {isLoadingMorePosts ? 'Loading more thinking posts...' : 'Loading next posts...'}
+            </div>
+          </div>
+        )}
       </section>
 
     </>

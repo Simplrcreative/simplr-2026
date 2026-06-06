@@ -1,13 +1,16 @@
 import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug } from '../lib/wp-api.js'
+import { buildNavigation } from '../config/site.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
     // Keep root route non-blocking so app shell + intro overlay render immediately.
-    // Work count can be hydrated by the Work page loader; here we only warm cache.
+    // Work count can be hydrated later; here we only warm caches.
     fetchWorksData().catch(() => {})
+    fetchHomeData().catch(() => {})
+    fetchNavigationData().catch(() => {})
 
     return {
-      navigation: await fetchNavigationData(),
+      navigation: buildNavigation(),
     }
   }
 }
@@ -79,7 +82,7 @@ export function createServicesSinglePageLoader() {
 
 export function createThinkingPageLoader() {
   return async function ThinkingPageLoader() {
-    return fetchThinkingPostsData()
+    return fetchThinkingPostsData({ first: 8 })
   }
 }
 

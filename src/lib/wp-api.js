@@ -228,10 +228,82 @@ const beyondQuery = `
   }
 `
 
-const worksQuery = `
-  query WorksQuery($first: Int = 100) {
+const DEFAULT_WORKS_LIST_FIRST = 6
+const MAX_WORKS_LIST_FIRST = 100
+const DEFAULT_THINKING_POSTS_FIRST = 4
+const MAX_THINKING_POSTS_FIRST = 100
+
+const worksListQuery = `
+  query WorksListQuery($first: Int = 12) {
     acfWorks(first: $first) {
       nodes {
+        databaseId
+        slug
+        title
+        acfWorkBuilder {
+          acfCategory {
+            nodes {
+              name
+            }
+          }
+          acfClient {
+            nodes {
+              name
+            }
+          }
+          acfType {
+            nodes {
+              name
+            }
+          }
+          acfFeaturedThumbnail {
+            node {
+              guid
+              altText
+              mimeType
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
+          acfSecondaryThumbnail {
+            node {
+              guid
+              altText
+              mimeType
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
+          acfFeaturedVideo {
+            node {
+              guid
+            }
+          }
+          acfTestimonial {
+            nodes {
+              databaseId
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+const workByUriQuery = `
+  query WorkByUriQuery($uri: String!) {
+    nodeByUri(uri: $uri) {
+      __typename
+      ... on AcfWork {
+        databaseId
         slug
         title
         acfWorkBuilder {
@@ -359,8 +431,8 @@ const testimonialQuery = `
 `
 
 const postsQuery = `
-  query PostQuery {
-    posts(first: 50, where: { status: PUBLISH }) {
+  query PostQuery($first: Int = 6) {
+    posts(first: $first, where: { status: PUBLISH }) {
       nodes {
         slug
         title(format: RENDERED)
@@ -1191,13 +1263,22 @@ export function buildEntryPath(collectionKey, slug, options = {}) {
   return `${basePath}/${slug}`
 }
 
-export async function fetchWorksData() {
+export async function fetchWorksData(options = {}) {
+  let first = DEFAULT_WORKS_LIST_FIRST
+
+  if (options && typeof options === 'object') {
+    const parsed = Number.parseInt(options.first, 10)
+    if (Number.isFinite(parsed) && parsed > 0) {
+      first = Math.min(parsed, MAX_WORKS_LIST_FIRST)
+    }
+  }
+
   if (!wpConfig.endpoint) {
     return { works: [] }
   }
 
   try {
-    const data = await remember('works', () => graphQlRequest(worksQuery, { first: 100 }))
+    const data = await remember(`works:${first}`, () => graphQlRequest(worksListQuery, { first }))
     const works = data.acfWorks?.nodes ?? []
 
     return { works }
@@ -1230,7 +1311,7 @@ export async function fetchNextWorkData(currentSlug) {
   if (!wpConfig.endpoint) return null
 
   try {
-    const { works } = await fetchWorksData()
+    const { works } = await fetchWorksData({ first: MAX_WORKS_LIST_FIRST })
     const others = works.filter((w) => w.slug !== currentSlug)
 
     if (!others.length) return null
@@ -1263,8 +1344,33 @@ export async function fetchWorkEntryData(slug) {
   }
 
   try {
-    const { works } = await fetchWorksData()
-    const work = works.find((w) => w.slug === slug) ?? null
+    const cleanSlug = String(slug || '').trim().replace(/^\/+|\/+$/g, '')
+    const workBaseUri = String(wpConfig.workUriBase || '/work/')
+      .replace(/\/+$/g, '')
+
+    const uriCandidates = [
+      `${workBaseUri}/${cleanSlug}/`,
+      `${workBaseUri}/${cleanSlug}`,
+      `/work/${cleanSlug}/`,
+      `/work/${cleanSlug}`,
+    ]
+
+    let work = null
+
+    for (const uri of uriCandidates) {
+      try {
+        const data = await remember(`work-entry:${uri}`, () =>
+          graphQlRequest(workByUriQuery, { uri }),
+        )
+
+        if (data.nodeByUri) {
+          work = data.nodeByUri
+          break
+        }
+      } catch (candidateError) {
+        reportError(`Unable to load work entry for URI "${uri}"`, candidateError)
+      }
+    }
 
     if (!work) {
       throw new Response('Not found', { status: 404 })
@@ -1291,7 +1397,16 @@ export async function fetchWorkEntryData(slug) {
   }
 }
 
-export async function fetchThinkingPostsData() {
+export async function fetchThinkingPostsData(options = {}) {
+  let first = DEFAULT_THINKING_POSTS_FIRST
+
+  if (options && typeof options === 'object') {
+    const parsed = Number.parseInt(options.first, 10)
+    if (Number.isFinite(parsed) && parsed > 0) {
+      first = Math.min(parsed, MAX_THINKING_POSTS_FIRST)
+    }
+  }
+
   if (!wpConfig.endpoint) {
     return {
       posts: fallbackCollections.thinking.map((item) => ({
@@ -1317,7 +1432,7 @@ export async function fetchThinkingPostsData() {
   }
 
   try {
-    const data = await remember('thinking-posts', () => graphQlRequest(postsQuery))
+    const data = await remember(`thinking-posts:${first}`, () => graphQlRequest(postsQuery, { first }))
     const posts = data.posts?.nodes ?? []
 
     return { posts }

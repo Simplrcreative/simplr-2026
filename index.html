@@ -16,8 +16,76 @@
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <title>Simplr</title>
     <script>history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
+    <style>
+      #boot-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 220ms ease, visibility 220ms ease;
+      }
+
+      #boot-loader.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .boot-dots {
+        position: relative;
+        width: 1.875rem;
+        height: 1.875rem;
+      }
+
+      .boot-dot,
+      .boot-dot-top,
+      .boot-dot-mask {
+        position: absolute;
+        inset: 0;
+        width: 1.875rem;
+        height: 1.875rem;
+        border-radius: 9999px;
+      }
+
+      .boot-dot-top { background: #000; z-index: 7; }
+      .boot-dot-mask { background: #fff; z-index: 6; }
+
+      .boot-dot {
+        animation: boot-dot-slide 3s linear infinite;
+        transform: translateX(0%);
+      }
+
+      .boot-dot-1 { background: #705f07; z-index: 5; animation-delay: 0s; }
+      .boot-dot-2 { background: #d5e09e; z-index: 4; animation-delay: 0.6s; }
+      .boot-dot-3 { background: #c8bbff; z-index: 3; animation-delay: 1.2s; }
+      .boot-dot-4 { background: #f15941; z-index: 2; animation-delay: 1.8s; }
+      .boot-dot-5 { background: #596bf0; z-index: 1; animation-delay: 2.4s; }
+
+      @keyframes boot-dot-slide {
+        0% { transform: translateX(0%); }
+        13.333% { transform: translateX(50.5%); }
+        16.666% { transform: translateX(50.5%); }
+        30% { transform: translateX(0%); }
+        100% { transform: translateX(0%); }
+      }
+    </style>
   </head>
   <body>
+    <div id="boot-loader" aria-hidden="true">
+      <div class="boot-dots">
+        <span class="boot-dot-top"></span>
+        <span class="boot-dot-mask"></span>
+        <span class="boot-dot boot-dot-1"></span>
+        <span class="boot-dot boot-dot-2"></span>
+        <span class="boot-dot boot-dot-3"></span>
+        <span class="boot-dot boot-dot-4"></span>
+        <span class="boot-dot boot-dot-5"></span>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

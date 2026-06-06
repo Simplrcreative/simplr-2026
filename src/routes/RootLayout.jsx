@@ -14,7 +14,7 @@ const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
 const HOME_HERO_TITLE_INTRO_EVENT = 'home-hero:title-intro-start'
 const HOME_HERO_VIDEO_INTRO_EVENT = 'home-hero:video-intro-start'
 const INTRO_MIN_VISIBLE_MS = 5000
-const HOME_RETURN_ENTRANCE_FALLBACK_MS = 2200
+const HOME_RETURN_ENTRANCE_FALLBACK_MS = 350
 const HOME_NAV_INTRO_DELAY_S = 0.9
 const HOME_HERO_TITLE_AFTER_NAV_S = 0.3
 const HOME_HERO_VIDEO_AFTER_NAV_S = 0.35
@@ -88,7 +88,7 @@ export default function RootLayout() {
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
-  const [isIntroVisible, setIsIntroVisible] = useState(true)
+  const [isIntroVisible, setIsIntroVisible] = useState(() => window.location.pathname === '/')
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
   const [shouldFadeOutIntro, setShouldFadeOutIntro] = useState(false)
@@ -99,6 +99,10 @@ export default function RootLayout() {
   const btnRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
+
+  useEffect(() => {
+    window.dispatchEvent(new Event('app-shell-ready'))
+  }, [])
 
   useEffect(() => {
     previousPathRef.current = location.pathname

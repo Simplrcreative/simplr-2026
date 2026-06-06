@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 'react'
-import { useLoaderData, useOutletContext, Await, Link } from 'react-router-dom'
+import { useLoaderData, useOutletContext, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
@@ -29,6 +29,26 @@ const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
 const HERO_MODAL_SCROLL_DURATION_MS = 800
 const HERO_MODAL_CONTENT_FADE_DURATION_MS = 600
 const PLAY_ICON_DISABLE_ATTR = 'data-play-icon-disabled'
+
+const HOME_PAGE_FALLBACK = {
+  page: {
+    title: 'Home',
+    intro: '',
+    faqs: [],
+    services: [],
+    workShowcase: {
+      title: '',
+      intro: '',
+    },
+    heroVideoLoop: '',
+    heroVideoFull: '',
+    heroVideoPoster: '',
+    heroVideoPosterAlt: 'Hero video poster',
+  },
+  featuredWork: [],
+  caseStudies: [],
+  testimonialBlock: null,
+}
 
 function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
   const pageRef = useRef(null)
@@ -845,18 +865,41 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
 export default function HomePage() {
   const { homeData } = useLoaderData()
+  const [resolvedHomeData, setResolvedHomeData] = useState(HOME_PAGE_FALLBACK)
+
+  useEffect(() => {
+    let cancelled = false
+
+    Promise.resolve(homeData)
+      .then((data) => {
+        if (!cancelled && data) {
+          setResolvedHomeData(data)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setResolvedHomeData(HOME_PAGE_FALLBACK)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [homeData])
+
+  const {
+    page,
+    featuredWork,
+    caseStudies,
+    testimonialBlock,
+  } = resolvedHomeData
+
   return (
-    <Suspense fallback={<section className="min-h-screen bg-white section-light" />}>
-      <Await resolve={homeData}>
-        {({ page, featuredWork, caseStudies, testimonialBlock }) => (
-          <HomePageContent
-            page={page}
-            featuredWork={featuredWork}
-            caseStudies={caseStudies}
-            testimonialBlock={testimonialBlock}
-          />
-        )}
-      </Await>
-    </Suspense>
+    <HomePageContent
+      page={page}
+      featuredWork={featuredWork}
+      caseStudies={caseStudies}
+      testimonialBlock={testimonialBlock}
+    />
   )
 }
