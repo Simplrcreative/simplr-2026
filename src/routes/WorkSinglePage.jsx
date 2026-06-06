@@ -21,6 +21,9 @@ export default function WorkSinglePage() {
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
   const nextWork = useLoaderData()?.nextWork ?? null
+  const nextThumb = nextWork?.thumbnail || ''
+  const nextThumb2 = nextWork?.thumbnail2 || nextThumb
+  const nextThumbAlt = nextWork?.title || 'Untitled'
 
   useEffect(() => {
     // Lock scroll during the featured-image dock transition; unlock on completion.
@@ -341,22 +344,23 @@ export default function WorkSinglePage() {
               <div className="client-work">
                 <Link
                   to={`/work/${nextWork.slug}`}
-                  className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
+                  className="client-work-img block alt-transition-img thumb-swap-trigger"
                   data-card-key={nextWork.slug}
                   data-transition-source="media"
                   data-transition-variant="work-next"
                 >
                   <picture
-                    className="ratio overflow-hidden"
+                    className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap"
                     style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
                   >
-                    {nextWork.thumbnail && <img src={nextWork.thumbnail + '.webp'} alt={nextWork.title} />}
+                    {nextThumb && <img className="thumb-primary" src={nextThumb + '.webp'} alt={nextThumbAlt} />}
+                    {nextThumb2 && <img className="thumb-secondary" src={nextThumb2 + '.webp'} alt='' aria-hidden="true" />}
                   </picture>
                   
                 </Link>
               </div>
               <div className="work-featured__meta mt-3">
-                  <h3 className="work-card__title alt-transition-txt">{nextWork.client}</h3>
+                  <h3 className="work-card__title alt-transition-txt mb-3">{nextWork.client}</h3>
                   {nextWork.categories.length > 0 && (
                     <div className="work-card__">
                       {nextWork.categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
