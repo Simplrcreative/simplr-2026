@@ -620,11 +620,21 @@ export default function WorkPage() {
         <section className="bg-white py-20 relative z-3" />
 
         {hasMoreWorks && (
-          <section className="bg-white section-light px-5 pb-24">
+          <section className="bg-white section-light px-5">
             <div ref={loadSentinelRef} className="w-full h-px" aria-hidden="true" />
-            <div className="text-coffee flex justify-center">
-              {isLoadingMore ? 'Loading more work...' : 'Loading next projects...'}
-            </div>
+            {isLoadingMore ? (
+              <div className="flex justify-center" aria-label="Loading more work">
+                <div className="boot-dots" aria-hidden="true">
+                  <span className="boot-dot-top"></span>
+                  <span className="boot-dot-mask"></span>
+                  <span className="boot-dot boot-dot-1"></span>
+                  <span className="boot-dot boot-dot-2"></span>
+                  <span className="boot-dot boot-dot-3"></span>
+                  <span className="boot-dot boot-dot-4"></span>
+                  <span className="boot-dot boot-dot-5"></span>
+                </div>
+              </div>
+            ) : null}
           </section>
         )}
       </div>

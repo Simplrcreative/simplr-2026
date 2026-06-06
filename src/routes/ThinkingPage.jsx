@@ -326,9 +326,19 @@ export default function ThinkingPage() {
         {hasMorePosts && (
           <div className="pt-16">
             <div ref={postsLoadSentinelRef} className="w-full h-px" aria-hidden="true" />
-            <div className="text-coffee/70 text-[0.95rem]">
-              {isLoadingMorePosts ? 'Loading more thinking posts...' : 'Loading next posts...'}
-            </div>
+            {isLoadingMorePosts ? (
+              <div className="flex justify-center" aria-label="Loading more thinking posts">
+                <div className="boot-dots" aria-hidden="true">
+                  <span className="boot-dot-top"></span>
+                  <span className="boot-dot-mask"></span>
+                  <span className="boot-dot boot-dot-1"></span>
+                  <span className="boot-dot boot-dot-2"></span>
+                  <span className="boot-dot boot-dot-3"></span>
+                  <span className="boot-dot boot-dot-4"></span>
+                  <span className="boot-dot boot-dot-5"></span>
+                </div>
+              </div>
+            ) : null}
           </div>
         )}
       </section>
