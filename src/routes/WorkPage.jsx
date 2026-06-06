@@ -74,7 +74,7 @@ const FallbackTesitmonials = [
   },
    {
     author: 'Steve Jobs',
-    role: 'Businessman',
+    role: 'Business Leader',
     quote: '"Design is not just what it looks like and feels like. Design is how it works."',
   },
   {
