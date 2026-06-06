@@ -324,7 +324,7 @@ export default function ThinkingPage() {
         </div>
 
         {hasMorePosts && (
-          <div className="pt-16">
+          <div className="bg-white px-5 pt-20">
             <div ref={postsLoadSentinelRef} className="w-full h-px" aria-hidden="true" />
             {isLoadingMorePosts ? (
               <div className="flex justify-center" aria-label="Loading more thinking posts">

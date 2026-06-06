@@ -70,52 +70,52 @@ const FallbackTesitmonials = [
   {
     author: 'Daryl Glass',
     role: 'Senior Developer',
-    quote: '"I make pretty digital shit happen."',
+    quote: '"I make pretty digital things happen."',
   },
    {
     author: 'Grant Barnard',
     role: 'Lead Developer',
-    quote: '"I make pretty digital shit happen."',
+    quote: '"I make pretty digital things happen."',
   },
   {
     author: 'Melissa Caccia',
     role: 'Senior Digital Designer',
-    quote: '"I make pretty digital shit."',
+    quote: '"I make pretty digital things."',
   },
   {
     author: 'Grant Medefindt',
     role: 'Co-Founder & Executive Creative Director',
-    quote: '"I make people make pretty digital shit."',
+    quote: '"I make people make pretty digital things."',
   },
   {
     author: 'Justin Robinson',
     role: 'Co-Founder & Executive Creative Director',
-    quote: '"I make people make pretty branding shit."',
+    quote: '"I make people make pretty branding things."',
   },
   {
     author: 'Andrea Waugh',
     role: 'Creative Director',
-    quote: '"I make pretty branding shit."',
+    quote: '"I make pretty branding things."',
   },
   {
     author: 'Melanie Kvalsvig',
     role: 'Operations Director',
-    quote: '"I make all the shit happen."',
+    quote: '"I make all the things happen."',
   },
   {
     author: 'Jonothan Leader',
     role: 'Client Service Manager',
-    quote: '"I make sense of client\'s shit."',
+    quote: '"I make sense of client things."',
   },
   {
     author: 'Byron Zeelie',
     role: 'Client Service Manager',
-    quote: '"I make sense of client\'s shit."',
+    quote: '"I make sense of client things."',
   },
   {
     author: 'Melissa Sherwin',
     role: 'Client Service Manager',
-    quote: '"I make sense of client\'s shit."',
+    quote: '"I make sense of client things."',
   },
 ]
 
@@ -617,10 +617,8 @@ export default function WorkPage() {
           )
         })}
 
-        <section className="bg-white py-20 relative z-3" />
-
         {hasMoreWorks && (
-          <section className="bg-white section-light px-5">
+          <section className="bg-white px-5 pt-10">
             <div ref={loadSentinelRef} className="w-full h-px" aria-hidden="true" />
             {isLoadingMore ? (
               <div className="flex justify-center" aria-label="Loading more work">
