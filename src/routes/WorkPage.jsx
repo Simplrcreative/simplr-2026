@@ -117,6 +117,16 @@ const FallbackTesitmonials = [
     role: 'Business Leader',
     quote: '"A brand is no longer what we tell the consumer it is - it is what consumers tell each other it is."',
   },
+  {
+    author: 'Amanda Gorman',
+    role: 'Poet and Activist',
+    quote: '"There is always light, if only we\'re brave enough to see it. If only we\'re brave enough to be it."',
+  },
+  {
+    author: 'Audrey Hepburn',
+    role: 'Actress',
+    quote: '"Nothing is impossible. The word itself says, I\'m possible!"'
+  }
 ]
 
 function pickFallbackTesitmonial(work) {
