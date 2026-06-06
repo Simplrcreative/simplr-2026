@@ -109,13 +109,13 @@ const FallbackTesitmonials = [
   },
   {
     author: 'Nick Thackray',
-    role: '',
-    quote: '"Branding is the gravity of your business—unseen, yet holding everything in place."',
+    role: 'Business Leader',
+    quote: '"Branding is the gravity of your business - unseen, yet holding everything in place."',
   },
   {
     author: 'Scott Cook',
-    role: 'Businessman',
-    quote: '"A brand is no longer what we tell the consumer it is—it is what consumers tell each other it is."',
+    role: 'Business Leader',
+    quote: '"A brand is no longer what we tell the consumer it is - it is what consumers tell each other it is."',
   },
 ]
 
