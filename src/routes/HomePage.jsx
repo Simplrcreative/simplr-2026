@@ -101,14 +101,12 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     if (!introComplete) return
     let destroyHeroAnimation = () => {}
     let destroyServicesAnimation = () => {}
-    let destroyCaseStudiesAnimation = () => {}
     let destroyShowreelAnimation = () => {}
     let destroyBtnAnimation = () => {}
     const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !introAnimationsPlayedRef.current
     const timer = setTimeout(() => {
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
       destroyServicesAnimation = createServicesScrollAnimation(servicesRef.current) ?? (() => {})
-      destroyCaseStudiesAnimation = createCaseStudiesScrollAnimation(caseStudiesRef.current) ?? (() => {})
       //destroyShowreelAnimation = createShowreelScrollAnimation(heroRef.current) ?? (() => {})
       destroyBtnAnimation = createBtnHoverAnimation(btnRef.current) ?? (() => {})
     }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
@@ -116,11 +114,27 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       clearTimeout(timer)
       destroyHeroAnimation()
       destroyServicesAnimation()
-      destroyCaseStudiesAnimation()
       //destroyShowreelAnimation()
       destroyBtnAnimation()
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
+
+  // Case studies are deferred with homeData; initialize this animation separately
+  // so it can start once case studies actually exist.
+  useEffect(() => {
+    if (!introComplete || !caseStudies?.length) return
+
+    let destroyCaseStudiesAnimation = () => {}
+    const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !introAnimationsPlayedRef.current
+    const timer = setTimeout(() => {
+      destroyCaseStudiesAnimation = createCaseStudiesScrollAnimation(caseStudiesRef.current) ?? (() => {})
+    }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
+
+    return () => {
+      clearTimeout(timer)
+      destroyCaseStudiesAnimation()
+    }
+  }, [introComplete, shouldRunHomeIntroAnimations, caseStudies?.length])
 
   // Lock scroll for the full duration of the intro sequence so the user can't
   // scroll past the hero before animations have initialised.
@@ -513,6 +527,21 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     )
   }
 
+  function handleCaseStudyTextClick(event, studySlug) {
+    const root = caseStudiesRef.current
+    if (!root || !studySlug) return
+
+    const target = Array.from(root.querySelectorAll('.client-work-img[data-transition-source-key]')).find(
+      (element) => element.getAttribute('data-transition-source-key') === studySlug,
+    )
+
+    if (!target) return
+
+    event.preventDefault()
+    event.stopPropagation()
+    target.click()
+  }
+
   return (
     <div ref={pageRef}>
       <Seo
@@ -703,6 +732,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       to={path} 
                       className="text-xl inline-block alt-transition-text"
                       data-transition-source-key={study.slug}
+                      onClick={(event) => handleCaseStudyTextClick(event, study.slug)}
                     >
                       {study.client}
                       <div className="client-detail font-literata text-5xl font-light pb-3">

@@ -242,10 +242,14 @@ export function createWorkThumbHoverAnimation(scope = document) {
     const handleClick = (event) => {
       if (allowImmediateClick) {
         allowImmediateClick = false
+        delete trigger.dataset.transitionHover
+        delete picture.dataset.transitionHover
         return
       }
 
-      const hoverInProgress = trigger.matches(':hover')
+      const isHovering = trigger.matches(':hover')
+        || trigger.classList.contains('hover-active')
+      const hoverInProgress = isHovering
         && (hoverTl.progress() < 0.999 || hoverTl2.progress() < 0.999)
       if (!hoverInProgress) return
 

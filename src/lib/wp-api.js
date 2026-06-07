@@ -667,6 +667,20 @@ const homeCaseStudiesQuery = `
                       }
                     }
                   }
+                  acfSecondaryThumbnail {
+                    node {
+                      guid
+                      altText
+                      mimeType
+                      sourceUrl
+                      mediaDetails {
+                        sizes {
+                          name
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
                   acfCategory {
                     nodes {
                       name
@@ -772,10 +786,17 @@ function normaliseHomeCaseStudy(study, index) {
   const slug = caseStudy?.slug || `case-study-${index + 1}`
   const featuredThumbnailNode = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node
   const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
-  const thumbnail = (
+  const primaryThumbnail = (
     sizes.find((s) => s.name === 'large')
     || sizes.find((s) => s.name === 'full')
   )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+  const secondaryThumbnailNode = caseStudy?.acfWorkBuilder?.acfSecondaryThumbnail?.node
+  const secondarySizes = secondaryThumbnailNode?.mediaDetails?.sizes ?? []
+  const secondaryThumbnail = (
+    secondarySizes.find((s) => s.name === 'large')
+    || secondarySizes.find((s) => s.name === 'full')
+  )?.sourceUrl ?? secondaryThumbnailNode?.sourceUrl ?? secondaryThumbnailNode?.guid ?? ''
+  const thumbnail = secondaryThumbnail || primaryThumbnail
   const categories = caseStudy?.acfWorkBuilder?.acfCategory?.nodes ?? []
 
   return {

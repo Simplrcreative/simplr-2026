@@ -920,6 +920,7 @@ export default function TransitionFrame({ children }) {
       altClone?.remove()
       nextTitleEl?.remove()
       workSectionEl?.remove()
+      serviceCardEl?.remove()
       wrapper.remove()
       document.documentElement.style.overflowX = ''
 
@@ -1291,7 +1292,26 @@ export default function TransitionFrame({ children }) {
         altClone.remove()
       }
       wrapper.remove()
-        serviceCardEl?.remove()
+      if (compactLogoClone) {
+        gsap.killTweensOf(compactLogoClone)
+        compactLogoClone.remove()
+      }
+      if (headerClone) {
+        gsap.killTweensOf(headerClone)
+        headerClone.remove()
+      }
+      if (nextTitleEl) {
+        gsap.killTweensOf(nextTitleEl)
+        nextTitleEl.remove()
+      }
+      if (workSectionEl) {
+        gsap.killTweensOf(workSectionEl)
+        workSectionEl.remove()
+      }
+      if (serviceCardEl) {
+        gsap.killTweensOf(serviceCardEl)
+        serviceCardEl.remove()
+      }
       document.documentElement.classList.remove('page-transitioning')
       document.documentElement.style.overflowX = ''
       const realHeader = document.querySelector('.header')
