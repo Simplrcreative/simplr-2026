@@ -56,16 +56,6 @@ const pageByUriQuery = `
   }
 `
 
-const collectionQuery = `
-  query CollectionContent($contentType: ContentTypeEnum!, $first: Int = 24) {
-    contentNodes(first: $first, where: { contentTypes: [$contentType], status: PUBLISH }) {
-      nodes {
-        ${contentNodeFields}
-      }
-    }
-  }
-`
-
 const servicesQuery = `
   query servicesQuery {
     page(id: "12", idType: DATABASE_ID) {
@@ -633,8 +623,8 @@ const homeCaseStudiesQuery = `
   }
 `
 
-const homeHeroVideoLoopQuery = `
-  query HomeHeroVideoLoopQuery {
+const homeHeroMediaQuery = `
+  query HomeHeroMediaQuery {
     page(id: "5", idType: DATABASE_ID) {
       acfHomeBuilder {
         acfHeroVideoLoop {
@@ -642,29 +632,11 @@ const homeHeroVideoLoopQuery = `
             guid
           }
         }
-      }
-    }
-  }
-`
-
-const homeHeroVideoPosterQuery = `
-  query HomeHeroVideoPosterQuery {
-    page(id: "5", idType: DATABASE_ID) {
-      acfHomeBuilder {
         acfHeroVideoPoster {
           node {
             guid
           }
         }
-      }
-    }
-  }
-`
-
-const homeHeroVideoFullQuery = `
-  query HomeHeroVideoFullQuery {
-    page(id: "5", idType: DATABASE_ID) {
-      acfHomeBuilder {
         acfHeroVideoFull {
           node {
             guid
@@ -802,26 +774,14 @@ async function fetchHomeHeroMediaData() {
   }
 
   try {
-    const [loopResult, posterResult, fullResult] = await Promise.all([
-      remember('home:hero-media:loop', () => graphQlRequest(homeHeroVideoLoopQuery)).catch((error) => {
-        reportError('Unable to load home hero loop video', error)
-        return null
-      }),
-      remember('home:hero-media:poster', () => graphQlRequest(homeHeroVideoPosterQuery)).catch((error) => {
-        reportError('Unable to load home hero poster image', error)
-        return null
-      }),
-      remember('home:hero-media:full', () => graphQlRequest(homeHeroVideoFullQuery)).catch((error) => {
-        reportError('Unable to load home hero full video', error)
-        return null
-      }),
-    ])
+    const result = await remember('home:hero-media', () => graphQlRequest(homeHeroMediaQuery))
+    const acfHomeBuilder = result?.page?.acfHomeBuilder
 
     return {
-      heroVideoLoop: loopResult?.page?.acfHomeBuilder?.acfHeroVideoLoop?.node?.guid ?? '',
-      heroVideoPoster: posterResult?.page?.acfHomeBuilder?.acfHeroVideoPoster?.node?.guid ?? '',
+      heroVideoLoop: acfHomeBuilder?.acfHeroVideoLoop?.node?.guid ?? '',
+      heroVideoPoster: acfHomeBuilder?.acfHeroVideoPoster?.node?.guid ?? '',
       heroVideoPosterAlt: '',
-      heroVideoFull: fullResult?.page?.acfHomeBuilder?.acfHeroVideoFull?.node?.guid ?? '',
+      heroVideoFull: acfHomeBuilder?.acfHeroVideoFull?.node?.guid ?? '',
     }
   } catch (error) {
     reportError('Unable to load home hero media', error)
@@ -952,10 +912,6 @@ async function fetchHomeWorkCount() {
   }
 }
 
-function getCollectionContentType(collectionKey) {
-  return collectionKey === 'work' ? wpConfig.workContentType : wpConfig.thinkingContentType
-}
-
 export async function graphQlRequest(query, variables = {}) {
   if (!wpConfig.endpoint) {
     throw new Error('VITE_WPGRAPHQL_ENDPOINT is not configured.')
@@ -1042,43 +998,6 @@ export async function fetchPageData(pageKey) {
   }
 }
 
-export async function fetchCollectionData(collectionKey) {
-  const pagePayload = await fetchPageData(collectionKey)
-  const contentType = getCollectionContentType(collectionKey)
-
-  if (!wpConfig.endpoint) {
-    return {
-      ...pagePayload,
-      collectionKey,
-      items: fallbackCollections[collectionKey],
-    }
-  }
-
-  try {
-    const data = await remember(`collection:${collectionKey}`, () =>
-      graphQlRequest(collectionQuery, { contentType }),
-    )
-
-    const items = data.contentNodes?.nodes
-      ?.map((node) => normaliseNode(node, collectionKey))
-      .filter(Boolean)
-
-    return {
-      ...pagePayload,
-      collectionKey,
-      items: items?.length ? items : fallbackCollections[collectionKey],
-    }
-  } catch (error) {
-    reportError(`Unable to load collection for ${collectionKey}`, error)
-
-    return {
-      ...pagePayload,
-      collectionKey,
-      items: fallbackCollections[collectionKey],
-    }
-  }
-}
-
 export async function fetchNavigationData() {
   // Use a tiny home-only query for the Work count instead of fetching the
   // full work collection in the root loader.
@@ -1087,21 +1006,36 @@ export async function fetchNavigationData() {
 }
 
 export async function fetchHomeData() {
-  const [pagePayload, workPayload, homeFeatureData, homeHeroMedia] = await Promise.all([
+  const [pagePayload, worksPayload, homeFeatureData, homeHeroMedia] = await Promise.all([
     fetchPageData('home'),
-    fetchCollectionData('work'),
+    fetchWorksData({ first: 24 }),
     fetchHomeCaseStudiesData(),
     fetchHomeHeroMediaData(),
   ])
 
-  const fallbackCaseStudies = (workPayload.items || []).slice(0, 6).map((item, index) => ({
-    id: item.slug || `case-study-${index + 1}`,
-    slug: item.slug,
-    client: item.title,
-    detail: item.excerpt,
-    thumbnail: item.image?.sourceUrl || '',
-    categories: [],
+  const fallbackFeaturedWork = (worksPayload.works || []).slice(0, 3).map((work) => ({
+    title: work?.title || '',
+    uri: work?.slug ? `/work/${work.slug}/` : '/work/',
+    date: undefined,
   }))
+
+  const fallbackCaseStudies = (worksPayload.works || []).slice(0, 6).map((work, index) => {
+    const featuredThumbnailNode = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node
+    const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
+    const thumbnail = (
+      sizes.find((s) => s.name === 'large')
+      || sizes.find((s) => s.name === 'full')
+    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+
+    return {
+      id: work?.slug || `case-study-${index + 1}`,
+      slug: work?.slug || '',
+      client: work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || work?.title || 'Case study',
+      detail: '',
+      thumbnail,
+      categories: work?.acfWorkBuilder?.acfCategory?.nodes ?? [],
+    }
+  })
 
   return {
     ...pagePayload,
@@ -1110,7 +1044,7 @@ export async function fetchHomeData() {
       ...homeHeroMedia,
       faqs: homeFeatureData.faqs.length ? homeFeatureData.faqs : (pagePayload.page?.faqs ?? []),
     },
-    featuredWork: (workPayload.items || []).slice(0, 3),
+    featuredWork: fallbackFeaturedWork,
     caseStudies: homeFeatureData.caseStudies.length ? homeFeatureData.caseStudies : fallbackCaseStudies,
     testimonialBlock: homeFeatureData.testimonialBlock,
   }
