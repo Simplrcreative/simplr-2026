@@ -78,8 +78,6 @@ const servicesQuery = `
                       guid
                       altText
                       mimeType
-                      altText
-                      mimeType
                     }
                   }
                 }
@@ -219,6 +217,7 @@ const beyondQuery = `
 `
 
 const DEFAULT_WORKS_LIST_FIRST = 6
+const NEXT_WORK_CANDIDATES_FIRST = 24
 const MAX_WORKS_LIST_FIRST = 100
 const DEFAULT_THINKING_POSTS_FIRST = 4
 const MAX_THINKING_POSTS_FIRST = 100
@@ -487,7 +486,115 @@ const postsQuery = `
               altText
               title
               guid
+              mimeType
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
+          acfLinkedWork {
+            nodes {
+              ... on AcfWork {
+                slug
+                title
+                acfWorkBuilder {
+                  acfCategory {
+                    nodes {
+                      name
+                    }
+                  }
+                  acfClient {
+                    nodes {
+                      name
+                    }
+                  }
+                  acfFeaturedThumbnail {
+                    node {
+                      guid
+                      altText
+                      mimeType
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+const thinkingEntryBySlugQuery = `
+  query ThinkingEntryBySlugQuery($slug: String!) {
+    posts(first: 1, where: { status: PUBLISH, name: $slug }) {
+      nodes {
+        slug
+        title(format: RENDERED)
+        content
+        date
+        author {
+          node {
+            name
+            acfUserBuilder {
+              acfProfileImage {
+                node {
+                  mediaDetails {
+                    sizes {
+                      name
+                      sourceUrl
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        acfClients {
+          nodes {
+            name
+          }
+        }
+        categories {
+          nodes {
+            name
+            link
+            slug
+          }
+        }
+        topics {
+          nodes {
+            name
+            link
+            slug
+          }
+        }
+        acfPostBuilder {
+          acfAuthor {
+            nodes {
+              name
+              acfUserBuilder {
+                acfProfileImage {
+                  node {
+                    mediaDetails {
+                      sizes {
+                        name
+                        sourceUrl
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          acfFeaturedImage {
+            node {
               altText
+              title
+              guid
               mimeType
               mediaDetails {
                 sizes {
@@ -704,22 +811,6 @@ function normaliseHomeTestimonial(acfHomeBuilder) {
     caseStudyClient: caseStudyBuilder?.acfClient?.nodes?.[0]?.name ?? '',
     caseStudyCategories: caseStudyBuilder?.acfCategory?.nodes ?? [],
     caseStudyImage: thumbnail,
-  }
-}
-
-function normaliseHomeHeroMedia(acfHomeBuilder) {
-  const posterNode = acfHomeBuilder?.acfHeroVideoPoster?.node
-  const poster = posterNode?.guid ?? ''
-  const loopVideo = acfHomeBuilder?.acfHeroVideoLoop?.node?.guid
-    ?? ''
-  const fullVideo = acfHomeBuilder?.acfHeroVideoFull?.node?.guid
-    ?? ''
-
-  return {
-    heroVideoPoster: poster,
-    heroVideoPosterAlt: '',
-    heroVideoLoop,
-    heroVideoFull,
   }
 }
 
@@ -999,8 +1090,6 @@ export async function fetchPageData(pageKey) {
 }
 
 export async function fetchNavigationData() {
-  // Use a tiny home-only query for the Work count instead of fetching the
-  // full work collection in the root loader.
   const workCount = await fetchHomeWorkCount()
   return buildNavigation({ work: workCount })
 }
@@ -1245,7 +1334,7 @@ export async function fetchNextWorkData(currentSlug) {
   if (!wpConfig.endpoint) return null
 
   try {
-    const { works } = await fetchWorksData({ first: MAX_WORKS_LIST_FIRST })
+    const { works } = await fetchWorksData({ first: NEXT_WORK_CANDIDATES_FIRST })
     const others = works.filter((w) => w.slug !== currentSlug)
 
     if (!others.length) return null
@@ -1425,8 +1514,11 @@ export async function fetchThinkingEntryData(slug) {
   }
 
   try {
-    const { posts } = await fetchThinkingPostsData()
-    const post = posts.find((p) => p.slug === slug) ?? null
+    const cleanSlug = String(slug).trim()
+    const data = await remember(`thinking-entry:${cleanSlug}`, () =>
+      graphQlRequest(thinkingEntryBySlugQuery, { slug: cleanSlug }),
+    )
+    const post = data.posts?.nodes?.[0] ?? null
 
     if (!post) {
       throw new Response('Not found', { status: 404 })

@@ -1,26 +1,18 @@
 import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug } from '../lib/wp-api.js'
-import { buildNavigation } from '../config/site.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
     // Keep root route non-blocking so app shell + intro overlay render immediately.
-    // Work count can be hydrated later; here we only warm caches.
-    fetchWorksData().catch(() => {})
-    fetchHomeData().catch(() => {})
-    fetchNavigationData().catch(() => {})
+    // Route-specific loaders fetch their own data.
 
     return {
-      navigation: buildNavigation(),
+      navigation: await fetchNavigationData(),
     }
   }
 }
 
 export function createHomeLoader() {
   return function homeLoader() {
-    // Fire-and-forget to warm the works cache so the first alt-transition
-    // to a /work/:slug page resolves instantly instead of waiting for a
-    // cold GraphQL round-trip.
-    fetchWorksData()
     return { homeData: fetchHomeData() }
   }
 }
@@ -90,7 +82,7 @@ export function createThinkingSinglePageLoader() {
   return async function ThinkingSinglePageLoader({ params, request }) {
     const [entry, { posts }] = await Promise.all([
       fetchThinkingEntryData(params.slug),
-      fetchThinkingPostsData(),
+      fetchThinkingPostsData({ first: 8 }),
     ])
 
     const canonicalTopicSlug = getThinkingTopicSlug(entry.page)

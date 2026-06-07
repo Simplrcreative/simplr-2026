@@ -1,7 +1,7 @@
 // useRoutePrefetch.js
 // Prefetches route data on hover/focus for all main routes
 import { useCallback } from 'react'
-import { fetchHomeData, fetchNavigationData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchWorksData, fetchWorkEntryData } from '../lib/wp-api.js'
+import { fetchHomeData, fetchPeopleData, fetchServicesData, fetchWorksData } from '../lib/wp-api.js'
 
 // Map route paths to their prefetch functions
 const prefetchMap = {
