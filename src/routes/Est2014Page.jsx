@@ -187,7 +187,7 @@ export default function Est2014Page() {
         {beyondItems.length ? (
           <div ref={galleryRef} className="spotlight-images">
             {beyondItems.map((item) => (
-              <div key={item.id} className="img" style={{ aspectRatio: item.width / item.height }}>
+              <figure key={item.id} className="img" style={{ aspectRatio: item.width / item.height }}>
                 {item.type === 'video' ? (
                   <video
                     src={item.source}
@@ -200,7 +200,8 @@ export default function Est2014Page() {
                 ) : (
                   <img src={item.source} alt={item.caption} />
                 )}
-              </div>
+                {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
+              </figure>
             ))}
           </div>
         ) : null}
