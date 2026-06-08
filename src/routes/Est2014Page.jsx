@@ -44,7 +44,7 @@ function initSpotlightAnimations() {
   const startPositions = Array.from(images).map(() => ({
     x: 0,
     y: 0,
-    x: -1000,
+    z: -2000,
     scale: 0,
   }))
   const endPositions = scatterDirections.map((dir) => ({
@@ -68,7 +68,7 @@ function initSpotlightAnimations() {
     onUpdate: (self) => {
       const progress = self.progress
       images.forEach((img, index) => {
-        const staggerDelay = index * 0.03
+        const staggerDelay = index * 0.01
         const scaleMultiplier = isMobile ? 4 : 2
         let imageProgress = Math.max(0, (progress - staggerDelay) * 4)
         const start = startPositions[index]
