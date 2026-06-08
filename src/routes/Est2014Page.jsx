@@ -6,94 +6,121 @@ import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 
-
 gsap.registerPlugin(ScrollTrigger)
 
-function getGalleryGap(width) {
-  if (width >= 1024) return 14
-  if (width >= 768) return 12
-  return 10
-}
+function initSpotlightAnimations() {
+  ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
 
-function getTargetRowHeight(width) {
-  if (width >= 1400) return 340
-  if (width >= 1200) return 320
-  if (width >= 1024) return 290
-  if (width >= 768) return 230
-  return 180
-}
+  const images = document.querySelectorAll(".img")
+  if (!images.length) return
 
-function getPreferredCardWidth(width) {
-  if (width >= 1400) return 500
-  if (width >= 1200) return 460
-  if (width >= 1024) return 380
-  if (width >= 768) return 280
-  return 180
-}
+  const scatterDirections = [
+    { x: 1.3, y: 0.7 },
+    { x: -1.5, y: 1.0 },
+    { x: 1.1, y: -1.3 },
+    { x: -1.7, y: -0.8 },
+    { x: -1.0, y: -1.4 },
+    { x: 1.6, y: 0.3 },
+    { x: -0.7, y: 1.7 },
+    { x: 1.2, y: -1.6 },
+    { x: -1.4, y: 0.9 },
+    { x: 1.8, y: -0.5 },
+    { x: -1.1, y: -1.8 },
+    { x: 0.9, y: 1.8 },
+    { x: -1.9, y: 0.4 },
+    { x: 1.0, y: -1.9 },
+    { x: -0.8, y: 1.9 },
+    { x: 1.7, y: -1.0 },
+    { x: -1.3, y: -1.2 },
+    { x: 0.7, y: 2.0 },
+    { x: 1.2, y: -0.2 },
+    { x: 1.6, y: -0.9 },
+  ]
 
-function buildJustifiedRows(items, containerWidth) {
-  if (!items.length || !containerWidth) return []
+  const screenWidth = window.innerWidth
+  const screenHeight = window.innerHeight
+  const isMobile = screenWidth < 768
+  const scatterMultiplier = isMobile ? 2.5 : 0.5
+  const startPositions = Array.from(images).map(() => ({
+    x: 0,
+    y: 0,
+    x: -1000,
+    scale: 0,
+  }))
+  const endPositions = scatterDirections.map((dir) => ({
+    x: dir.x * screenWidth * scatterMultiplier,
+    y: dir.y * screenHeight * scatterMultiplier,
+    z: 2000,
+    scale: 1,
+  }))
 
-  const gap = getGalleryGap(containerWidth)
-  const targetRowHeight = getTargetRowHeight(containerWidth)
-  const preferredCardWidth = getPreferredCardWidth(containerWidth)
-  const maxItemsPerRow = Math.max(
-    1,
-    Math.floor((containerWidth + gap) / (preferredCardWidth + gap)),
-  )
-  const rows = []
-  let row = []
-  let ratioSum = 0
-
-  const flushRow = (forceNaturalHeight = false) => {
-    if (!row.length) return
-
-    const rowGapTotal = gap * (row.length - 1)
-    const justifiedHeight = (containerWidth - rowGapTotal) / Math.max(ratioSum, 0.001)
-    const naturalHeight = targetRowHeight
-    const baseHeight = forceNaturalHeight ? naturalHeight : justifiedHeight
-    const height = Math.max(150, Math.min(420, baseHeight))
-
-    rows.push({
-      id: `row-${rows.length}`,
-      height,
-      items: row.map((item) => ({
-        ...item,
-        width: height * item.ratio,
-      })),
-    })
-
-    row = []
-    ratioSum = 0
-  }
-
-  items.forEach((item) => {
-    row.push(item)
-    ratioSum += item.ratio
-    const projectedWidth = ratioSum * targetRowHeight + gap * (row.length - 1)
-    if (projectedWidth >= containerWidth || row.length >= maxItemsPerRow) {
-      flushRow(false)
-    }
+  images.forEach((img, index) => {
+    gsap.set(img, startPositions[index])
   })
 
-  if (row.length) {
-    const naturalWidth = ratioSum * targetRowHeight + gap * (row.length - 1)
-    flushRow(naturalWidth < containerWidth * 0.8)
-  }
-
-  return rows
+  ScrollTrigger.create({
+    trigger: ".spotlight",
+    start: "top top",
+    end: `+=${window.innerHeight * 15}px`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 1,
+    onUpdate: (self) => {
+      const progress = self.progress
+      images.forEach((img, index) => {
+        const staggerDelay = index * 0.03
+        const scaleMultiplier = isMobile ? 4 : 2
+        let imageProgress = Math.max(0, (progress - staggerDelay) * 4)
+        const start = startPositions[index]
+        const end = endPositions[index]
+        const zValue = gsap.utils.interpolate(
+          start.z, 
+          end.z, 
+          imageProgress
+        )
+        const scaleValue = gsap.utils.interpolate(
+          start.scale,
+          end.scale,
+          imageProgress * scaleMultiplier
+        )
+        const xValue = gsap.utils.interpolate(
+          start.x,
+          end.x,
+          imageProgress
+        )
+        const yValue = gsap.utils.interpolate(
+          start.y,
+          end.y,
+          imageProgress
+        )
+        gsap.set(img, {
+          z: zValue,
+          scale: scaleValue,
+          x: xValue,
+          y: yValue
+        })
+      })
+    }
+  })
 }
 
 export default function Est2014Page() {
   const { beyondItems = [] } = useLoaderData() ?? {}
   const btnRef = useRef(null)
   const galleryRef = useRef(null)
-  const [measuredRatios, setMeasuredRatios] = useState({})
-  const [galleryWidth, setGalleryWidth] = useState(0)
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
   }, [])
+
+  useEffect(() => {
+    initSpotlightAnimations()
+    window.addEventListener('resize', initSpotlightAnimations)
+    return () => {
+      window.removeEventListener('resize', initSpotlightAnimations)
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
+  }, [beyondItems.length])
 
   useEffect(() => {
     const muteAndPauseAllGalleryVideos = () => {
@@ -105,59 +132,13 @@ export default function Est2014Page() {
         video.pause()
       })
     }
-
-    const handlePointerDown = (event) => {
-      const link = event.target?.closest?.('a[href]')
-      if (!link) return
-      muteAndPauseAllGalleryVideos()
-    }
-
-    document.addEventListener('pointerdown', handlePointerDown, { capture: true })
-    return () => {
-      document.removeEventListener('pointerdown', handlePointerDown, { capture: true })
-      muteAndPauseAllGalleryVideos()
-    }
   }, [])
-
-  useEffect(() => {
-    if (!galleryRef.current) return
-
-    const node = galleryRef.current
-    const updateWidth = () => setGalleryWidth(node.clientWidth || 0)
-    updateWidth()
-
-    const observer = new ResizeObserver(updateWidth)
-    observer.observe(node)
-
-    return () => observer.disconnect()
-  }, [])
-
-  const galleryItems = useMemo(() => (
-    beyondItems.map((item) => ({
-      ...item,
-      ratio: measuredRatios[item.id] ?? item.ratio ?? 1,
-    }))
-  ), [beyondItems, measuredRatios])
-
-  const galleryRows = useMemo(
-    () => buildJustifiedRows(galleryItems, galleryWidth),
-    [galleryItems, galleryWidth],
-  )
-
-  const setMeasuredRatio = (id, width, height) => {
-    if (!width || !height) return
-    const nextRatio = width / height
-
-    setMeasuredRatios((prev) => {
-      const current = prev[id]
-      if (current && Math.abs(current - nextRatio) < 0.01) return prev
-      return { ...prev, [id]: nextRatio }
-    })
-  }
 
   const pathname = '/est-2014'
   const title = 'Est 2014'
   const description = 'Est 2014 Page'
+
+  console.log(beyondItems)
 
   return (
     <>
@@ -197,46 +178,23 @@ export default function Est2014Page() {
         </div>
       </section>
 
-      <section className="beyond-items px-5 bg-coffee change-logo pb-5">
-        {galleryItems.length ? (
-          <div ref={galleryRef} className="beyond-grid ">
-            {galleryRows.map((row) => (
-              <div key={row.id} className="beyond-row slide-up-subtle" style={{ '--beyond-row-height': `${row.height}px` }}>
-                {row.items.map((item) => {
-                  const imageSource = item.mimeType && item.mimeType !== 'image/gif'
-                    ? `${item.source}.webp`
-                    : item.source
-
-                  return (
-                    <figure key={item.id} className="beyond-card" style={{ width: `${item.width}px` }}>
-                      {item.type === 'video' ? (
-                        <video
-                          className="beyond-card__media"
-                          src={item.source}
-                          muted
-                          loop
-                          playsInline
-                          autoPlay
-                          preload="metadata"
-                          onLoadedMetadata={(event) => {
-                            setMeasuredRatio(item.id, event.currentTarget.videoWidth, event.currentTarget.videoHeight)
-                          }}
-                        />
-                      ) : (
-                        <img
-                          className="beyond-card__media"
-                          src={imageSource}
-                          alt={item.caption || 'Beyond item'}
-                          loading="lazy"
-                          onLoad={(event) => {
-                            setMeasuredRatio(item.id, event.currentTarget.naturalWidth, event.currentTarget.naturalHeight)
-                          }}
-                        />
-                      )}
-                      {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
-                    </figure>
-                  )
-                })}
+      <section className="spotlight bg-coffee change-logo min-h-screen overflow-hidden relative">
+        {beyondItems.length ? (
+          <div ref={galleryRef} className="spotlight-images">
+            {beyondItems.map((item) => (
+              <div key={item.id} className="img" style={{ aspectRatio: item.width / item.height }}>
+                {item.type === 'video' ? (
+                  <video
+                    src={item.source}
+                    muted
+                    playsInline
+                    autoPlay
+                    loop
+                    controls={false}
+                  />
+                ) : (
+                  <img src={item.source} alt={item.caption} />
+                )}
               </div>
             ))}
           </div>
