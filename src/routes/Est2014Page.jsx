@@ -45,7 +45,7 @@ function initSpotlightAnimations() {
     x: -200,
     y: -200,
     z: -2000,
-    scale: 0,
+    scale: 0
   }))
   const endPositions = Array.from(images).map((_, index) => {
     const dir = scatterDirections[index % scatterDirections.length]
@@ -53,7 +53,7 @@ function initSpotlightAnimations() {
       x: dir.x * screenWidth * scatterMultiplier,
       y: dir.y * screenHeight * scatterMultiplier,
       z: 2000,
-      scale: 1,
+      scale: 1
     }
   })
 
@@ -61,11 +61,33 @@ function initSpotlightAnimations() {
     gsap.set(img, startPositions[index])
   })
 
+  gsap.set('.spotlight-background', {
+    autoAlpha: 0,
+    scale: 0.5
+  })
+
+  const backgroundFadeStart = 'top 0%'
+  const backgroundFadeEnd = `+=${window.innerHeight * 10}px`
+
+  gsap.to('.spotlight-background', {
+    autoAlpha: 1,
+    scale: 1,
+    duration: 1,
+    delay: 0,
+    ease: 'linear',
+    scrollTrigger: {
+      trigger: '.spotlight',
+      start: backgroundFadeStart,
+      end: backgroundFadeEnd,
+      toggleActions: 'play reverse play reverse',
+    },
+  })
+
   const animationMultiplier = isMobile ? 4 : 4
 
   ScrollTrigger.create({
     trigger: ".spotlight",
-    start: "top top",
+    start: "top 0%",
     end: `+=${window.innerHeight * 10}px`,
     pin: true,
     pinSpacing: true,
@@ -161,9 +183,9 @@ export default function Est2014Page() {
         ]}
       />
 
-      <section className="page-hero px-5 pt-20 bg-coffee section-dark min-h-[80vh] flex items-end relative">
+      <section className="page-hero px-5 bg-coffee section-dark min-h-[80vh] flex items-end relative">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-span-12 change-logo-back" />
+          <div className="col-span-12 change-logo-back " />
           <div className="col-span-9 text-white change-logo mt-40 max-w-[115ch] ">
             <div className="eyebrow">Beyond the work</div>
             <h1 className="hero-title">Simplr has never <span>just been about the work.</span> It&apos;s about the people, <span><i>the energy,</i></span> and the <span>shared ambition behind it.</span> Not everything we do is visible in the outcome - <span><i>some of it lives here.</i></span></h1>
@@ -184,7 +206,7 @@ export default function Est2014Page() {
         </div>
       </section>
 
-      <section className="spotlight bg-coffee change-logo min-h-screen overflow-hidden relative">
+      <section className="spotlight bg-coffee change-logo min-h-screen relative">
         {beyondItems.length ? (
           <div ref={galleryRef} className="spotlight-images">
             {beyondItems.map((item) => {
@@ -222,6 +244,7 @@ export default function Est2014Page() {
             })}
           </div>
         ) : null}
+        <div className="spotlight-background"></div>
       </section>
 
     </>
