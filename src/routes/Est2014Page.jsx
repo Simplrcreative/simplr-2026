@@ -61,28 +61,6 @@ function initSpotlightAnimations() {
     gsap.set(img, startPositions[index])
   })
 
-  gsap.set('.spotlight-background', {
-    autoAlpha: 0,
-    scale: 0.5
-  })
-
-  const backgroundFadeStart = 'top 0%'
-  const backgroundFadeEnd = `+=${window.innerHeight * 10}px`
-
-  gsap.to('.spotlight-background', {
-    autoAlpha: 1,
-    scale: 1,
-    duration: 1,
-    delay: 0,
-    ease: 'linear',
-    scrollTrigger: {
-      trigger: '.spotlight',
-      start: backgroundFadeStart,
-      end: backgroundFadeEnd,
-      toggleActions: 'play reverse play reverse',
-    },
-  })
-
   const animationMultiplier = isMobile ? 4 : 4
 
   ScrollTrigger.create({
