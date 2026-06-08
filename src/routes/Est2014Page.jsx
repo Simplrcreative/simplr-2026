@@ -113,6 +113,7 @@ export default function Est2014Page() {
   const { beyondItems = [] } = useLoaderData() ?? {}
   const btnRef = useRef(null)
   const galleryRef = useRef(null)
+  const [videoRatios, setVideoRatios] = useState({})
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
@@ -186,23 +187,39 @@ export default function Est2014Page() {
       <section className="spotlight bg-coffee change-logo min-h-screen overflow-hidden relative">
         {beyondItems.length ? (
           <div ref={galleryRef} className="spotlight-images">
-            {beyondItems.map((item) => (
-              <figure key={item.id} className="img" style={{ aspectRatio: item.width / item.height }}>
-                {item.type === 'video' ? (
-                  <video
-                    src={item.source}
-                    muted
-                    playsInline
-                    autoPlay
-                    loop
-                    controls={false}
-                  />
-                ) : (
-                  <img src={item.source} alt={item.caption} />
-                )}
-                {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
-              </figure>
-            ))}
+            {beyondItems.map((item) => {
+              const ratio = item.type === 'video'
+                ? videoRatios[item.id] ?? item.width / item.height
+                : item.width / item.height
+
+              return (
+                <figure key={item.id} className="img" style={{ aspectRatio: ratio }}>
+                  {item.type === 'video' ? (
+                    <video
+                      src={item.source}
+                      muted
+                      playsInline
+                      autoPlay
+                      loop
+                      controls={false}
+                      onLoadedMetadata={(event) => {
+                        const width = event.currentTarget.videoWidth
+                        const height = event.currentTarget.videoHeight
+                        if (width && height) {
+                          setVideoRatios((prev) => ({
+                            ...prev,
+                            [item.id]: width / height,
+                          }))
+                        }
+                      }}
+                    />
+                  ) : (
+                    <img src={item.source} alt={item.caption} />
+                  )}
+                  {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
+                </figure>
+              )
+            })}
           </div>
         ) : null}
       </section>
