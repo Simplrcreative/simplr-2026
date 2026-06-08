@@ -61,23 +61,18 @@ function initSpotlightAnimations() {
   ScrollTrigger.create({
     trigger: ".spotlight",
     start: "top top",
-    end: `+=${window.innerHeight * 15}px`,
+    end: `+=${window.innerHeight * 10}px`,
     pin: true,
     pinSpacing: true,
     scrub: 1,
     onUpdate: (self) => {
       const progress = self.progress
       images.forEach((img, index) => {
-        const staggerDelay = index * 0.01
-        const scaleMultiplier = isMobile ? 4 : 2
+        const staggerDelay = index * 0.015
+        const scaleMultiplier = isMobile ? 4 : 1.5
         let imageProgress = Math.max(0, (progress - staggerDelay) * 4)
         const start = startPositions[index]
         const end = endPositions[index]
-        const zValue = gsap.utils.interpolate(
-          start.z, 
-          end.z, 
-          imageProgress
-        )
         const scaleValue = gsap.utils.interpolate(
           start.scale,
           end.scale,
@@ -93,11 +88,16 @@ function initSpotlightAnimations() {
           end.y,
           imageProgress
         )
+        const zValue = gsap.utils.interpolate(
+          start.z, 
+          end.z, 
+          imageProgress
+        )
         gsap.set(img, {
-          z: zValue,
           scale: scaleValue,
           x: xValue,
-          y: yValue
+          y: yValue,
+          z: zValue
         })
       })
     }
