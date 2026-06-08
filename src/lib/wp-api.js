@@ -1307,6 +1307,19 @@ export function buildEntryPath(collectionKey, slug, options = {}) {
   return `${basePath}/${slug}`
 }
 
+/**
+ * Prefetch work entry data to warm GraphQL cache.
+ * Call on case study hover to speed up subsequent navigation.
+ */
+export function prefetchWorkEntry(slug) {
+  if (!slug) return
+  // Fire and forget — results are cached by the API layer
+  Promise.all([
+    fetchWorkEntryData(slug),
+    fetchNextWorkData(slug),
+  ]).catch(() => {}) // Silently ignore errors
+}
+
 export async function fetchWorksData(options = {}) {
   let first = DEFAULT_WORKS_LIST_FIRST
 

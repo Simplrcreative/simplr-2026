@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
 import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll } from '../lib/animations/index.js'
-import { buildEntryPath } from '../lib/wp-api.js'
+import { buildEntryPath, prefetchWorkEntry } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
   collectionSchema,
@@ -245,19 +245,58 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     return () => clearTimeout(timer)
   }, [introComplete, shouldRunHomeIntroAnimations])
 
-  // Video pause/play on visibility change
+  // Video visibility and loop management
   useEffect(() => {
     const video = heroVideoRef.current
     if (!video) return
+
+    let loopCount = 0
+    const MAX_LOOPS = 3
+    let observer = null
+
+    // Handle when video loops
+    const onLoop = () => {
+      loopCount += 1
+      if (loopCount >= MAX_LOOPS && document.hidden) {
+        video.pause()
+      }
+    }
+
+    // Handle tab visibility changes
     const onVisibilityChange = () => {
       if (document.hidden) {
         video.pause()
-      } else {
+      } else if (loopCount < MAX_LOOPS) {
         video.play().catch(() => {})
       }
     }
+
+    // Intersection Observer to play only when video is in viewport
+    observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !document.hidden && loopCount < MAX_LOOPS) {
+          video.play().catch(() => {})
+        } else if (!entry.isIntersecting || document.hidden) {
+          video.pause()
+          // Reset loop count when video leaves viewport
+          if (!entry.isIntersecting) {
+            loopCount = 0
+          }
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    observer.observe(video)
+    video.addEventListener('loop', onLoop)
     document.addEventListener('visibilitychange', onVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
+
+    return () => {
+      observer?.disconnect()
+      video.removeEventListener('loop', onLoop)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      video.pause()
+    }
   }, [])
 
   // Close hero modal when pressing Escape
@@ -588,7 +627,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 <video
                   ref={heroVideoRef}
                   className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden rounded-[10px]"
-                  autoPlay
                   muted
                   playsInline
                   loop
@@ -732,8 +770,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       to={path} 
                       className="text-xl inline-block alt-transition-text"
                       data-transition-source-key={study.slug}
-                      onClick={(event) => handleCaseStudyTextClick(event, study.slug)}
-                    >
+                      onClick={(event) => handleCaseStudyTextClick(event, study.slug)}                      onMouseEnter={() => prefetchWorkEntry(study.slug)}                    >
                       {study.client}
                       <div className="client-detail font-literata text-5xl font-light pb-3">
                         <span className="client-detail-text">{study.detail}</span>
@@ -755,8 +792,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       to={path}
                       className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                       data-transition-source="media"
-                      data-transition-source-key={study.slug}
-                    >
+                      data-transition-source-key={study.slug}                      onMouseEnter={() => prefetchWorkEntry(study.slug)}                    >
                       <picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
                         {study.thumbnail ? <img src={study.thumbnail + '.webp'} title={study.client} /> : null}
                       </picture>

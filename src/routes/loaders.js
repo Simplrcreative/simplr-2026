@@ -1,4 +1,4 @@
-import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug } from '../lib/wp-api.js'
+import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {

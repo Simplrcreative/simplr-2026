@@ -529,7 +529,7 @@ export function createHeroScrollAnimation(scope) {
           start: 'top top',
           end: () => getHeroEndDistance(),
           scrub: true,
-          markers: debugHeroScroll,
+          markers: true,
           invalidateOnRefresh: true,
           refreshPriority: 1,
           anticipatePin: 0,
@@ -568,6 +568,7 @@ export function createHeroScrollAnimation(scope) {
         y: -400,
         filter: 'blur(20px)',
         duration: 1,
+        delay: 0.1,
       }, 'hero-start')
 
       /*timeline.to(navHolder, {
