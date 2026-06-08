@@ -529,7 +529,7 @@ export function createHeroScrollAnimation(scope) {
           start: 'top top',
           end: () => getHeroEndDistance(),
           scrub: true,
-          markers: true,
+          //markers: true,
           invalidateOnRefresh: true,
           refreshPriority: 1,
           anticipatePin: 0,

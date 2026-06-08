@@ -1,4 +1,5 @@
-const WP_GRAPHQL_URL = 'https://stg-simplragency-dashboard.kinsta.cloud/graphql'
+//const WP_GRAPHQL_URL = 'https://simplragency-dashboard.kinsta.cloud/graphql'
+const WP_GRAPHQL_URL = 'https://simplrdashboard.kinsta.cloud/graphql'
 
 function getRequestBody(req) {
   if (typeof req.body === 'string') {
