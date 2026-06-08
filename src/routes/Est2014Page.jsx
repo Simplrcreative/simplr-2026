@@ -40,23 +40,28 @@ function initSpotlightAnimations() {
   const screenWidth = window.innerWidth
   const screenHeight = window.innerHeight
   const isMobile = screenWidth < 768
-  const scatterMultiplier = isMobile ? 2.5 : 0.5
+  const scatterMultiplier = isMobile ? 2.5 : 0.65
   const startPositions = Array.from(images).map(() => ({
-    x: 0,
-    y: 0,
+    x: -200,
+    y: -200,
     z: -2000,
     scale: 0,
   }))
-  const endPositions = scatterDirections.map((dir) => ({
-    x: dir.x * screenWidth * scatterMultiplier,
-    y: dir.y * screenHeight * scatterMultiplier,
-    z: 2000,
-    scale: 1,
-  }))
+  const endPositions = Array.from(images).map((_, index) => {
+    const dir = scatterDirections[index % scatterDirections.length]
+    return {
+      x: dir.x * screenWidth * scatterMultiplier,
+      y: dir.y * screenHeight * scatterMultiplier,
+      z: 2000,
+      scale: 1,
+    }
+  })
 
   images.forEach((img, index) => {
     gsap.set(img, startPositions[index])
   })
+
+  const animationMultiplier = isMobile ? 4 : 4
 
   ScrollTrigger.create({
     trigger: ".spotlight",
@@ -64,13 +69,13 @@ function initSpotlightAnimations() {
     end: `+=${window.innerHeight * 10}px`,
     pin: true,
     pinSpacing: true,
-    scrub: 1,
+    scrub: 2,
     onUpdate: (self) => {
       const progress = self.progress
       images.forEach((img, index) => {
-        const staggerDelay = index * 0.015
-        const scaleMultiplier = isMobile ? 4 : 1.5
-        let imageProgress = Math.max(0, (progress - staggerDelay) * 4)
+        const staggerDelay = index * 0.05
+        const scaleMultiplier = isMobile ? 4 : 4
+        let imageProgress = Math.max(0, (progress - staggerDelay) * animationMultiplier)
         const start = startPositions[index]
         const end = endPositions[index]
         const scaleValue = gsap.utils.interpolate(
@@ -155,10 +160,10 @@ export default function Est2014Page() {
         ]}
       />
 
-      <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end relative">
+      <section className="page-hero px-5 pt-20 bg-coffee section-dark min-h-[80vh] flex items-end relative">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-9 text-white change-logo mt-40 max-w-[115ch]">
+          <div className="col-span-9 text-white change-logo mt-40 max-w-[115ch] ">
             <div className="eyebrow">Beyond the work</div>
             <h1 className="hero-title">Simplr has never <span>just been about the work.</span> It&apos;s about the people, <span><i>the energy,</i></span> and the <span>shared ambition behind it.</span> Not everything we do is visible in the outcome - <span><i>some of it lives here.</i></span></h1>
           </div>
@@ -182,7 +187,7 @@ export default function Est2014Page() {
         {beyondItems.length ? (
           <div ref={galleryRef} className="spotlight-images">
             {beyondItems.map((item) => (
-              <div key={item.id} className="img" style={{ aspectRatio: item.width / item.height }}>
+              <figure key={item.id} className="img" style={{ aspectRatio: item.width / item.height }}>
                 {item.type === 'video' ? (
                   <video
                     src={item.source}
@@ -195,7 +200,8 @@ export default function Est2014Page() {
                 ) : (
                   <img src={item.source} alt={item.caption} />
                 )}
-              </div>
+                {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
+              </figure>
             ))}
           </div>
         ) : null}
