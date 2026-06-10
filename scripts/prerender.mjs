@@ -233,10 +233,13 @@ async function main() {
 
   // Try @sparticuz/chromium first (works on Vercel / serverless Linux)
   try {
+    console.log('🔍  Trying @sparticuz/chromium...')
     const chromiumMod = await import('@sparticuz/chromium')
     const sparticuz = chromiumMod.default || chromiumMod
     const executablePath = await sparticuz.executablePath()
     const execDir = path.dirname(executablePath)
+    console.log(`   executablePath: ${executablePath}`)
+    console.log(`   execDir: ${execDir}`)
 
     // Point the dynamic linker to the bundled shared libraries
     // (libnspr4.so, libnss3.so, etc. live next to the binary)
@@ -248,11 +251,20 @@ async function main() {
       headless: sparticuz.headless,
     })
     browserSource = '@sparticuz/chromium'
+    console.log('✅  @sparticuz/chromium launched successfully')
   } catch (sparticuzErr) {
+    console.error('⚠️  @sparticuz/chromium failed:', sparticuzErr.message)
+    if (sparticuzErr.stack) {
+      console.error('   Stack:', sparticuzErr.stack.split('\n').slice(0, 3).join('\n'))
+    }
+
     // Fall back to standard Playwright chromium (local dev)
     try {
+      console.log('🔍  Falling back to standard Playwright chromium...')
       browser = await chromium.launch()
+      console.log('✅  Standard Playwright chromium launched successfully')
     } catch (err) {
+      console.error('⚠️  Standard Playwright chromium failed:', err.message)
       const systemChrome = getSystemChromePath()
       if (systemChrome) {
         try {
