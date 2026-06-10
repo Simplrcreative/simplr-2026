@@ -8,7 +8,7 @@
     "seo:assets": "node scripts/generate-seo-assets.mjs",
     "prebuild": "node scripts/generate-seo-assets.mjs",
     "build": "vite build",
-    "postbuild": "export PLAYWRIGHT_BROWSERS_PATH=0 && npx playwright install chromium && npx playwright install-deps chromium && node scripts/prerender.mjs",
+    "postbuild": "export PLAYWRIGHT_BROWSERS_PATH=0 && (npx playwright install chromium || true) && node scripts/prerender.mjs",
     "prerender": "node scripts/prerender.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
