@@ -8,6 +8,7 @@ import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimation
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import PictureImg from '../components/PictureImg.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -325,6 +326,22 @@ export default function ServicesSinglePage() {
                     <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
                       <img src={caseStudyImage} title="Satalia" />
                     </picture>
+                    <div className="ratio overflow-hidden rounded-[10px] block thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <PictureImg
+                        loaderSrc = {caseStudyloader + '.webp'}
+                        mobileSrc = {caseStudyThumbnail + '.webp'}
+                        desktopSrc = {caseStudyDesktop + '.webp'}
+                        imgClass = 'thumb-primary rounded-[10px]'
+                        altText = {caseStudyClient}
+                      />
+                      <PictureImg
+                        loaderSrc = {secondaryCaseStudyloader + '.webp'}
+                        mobileSrc = {secondaryCaseStudyThumbnail + '.webp'}
+                        desktopSrc = {secondaryCaseStudyDesktop + '.webp'}
+                        imgClass = 'thumb-secondary rounded-[10px]'
+                        altText = ''
+                      />
+                    </div>
                     <div className="mt-3 flex">
                     {caseStudyClient}
                     </div>
