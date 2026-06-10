@@ -60,6 +60,9 @@ const servicesQuery = `
   query servicesQuery {
     page(id: "12", idType: DATABASE_ID) {
       acfServices {
+        acfHeading
+        acfIntroductionLead
+        acfIntroduction
         acfServices {
           acfDescription
           acfService
@@ -1302,13 +1305,14 @@ export async function fetchServicesData() {
 
   try {
     const data = await remember('services', () => graphQlRequest(servicesQuery))
-    const services = data.page?.acfServices?.acfServices ?? []
+    const services = data.page?.acfServices || []
 
     return { services }
   } catch (error) {
     reportError('Unable to load services data', error)
 
-    return { services: [] }
+    return { 
+      services: [] }
   }
 }
 

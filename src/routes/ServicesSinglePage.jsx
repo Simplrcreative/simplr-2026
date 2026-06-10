@@ -304,7 +304,6 @@ export default function ServicesSinglePage() {
           </section>
         )
       })}
-      </div>
 
       {testimonial && (
         <section className="testimonials p-5 section-light bg-white footer-off">
@@ -340,6 +339,8 @@ export default function ServicesSinglePage() {
           </div>
         </section>
       )}
+       
+      </div>
 
     </div>
   )

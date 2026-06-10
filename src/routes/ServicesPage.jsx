@@ -6,6 +6,8 @@ import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 import { Link } from 'react-router-dom'
+import RichHeading from '../components/RichHeading.jsx'
+import RichText from '../components/RichText.jsx'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -152,8 +154,8 @@ function ServiceCard({ service }) {
                           >
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
-                              <span className="btn-text text-coffee">Find out more</span>
-                              Find out more
+                              <span className="btn-text text-coffee">Explore {acfService}</span>
+                              Explore {acfService}
                           </span>
                       </Link>
                   </div>
@@ -166,8 +168,8 @@ function ServiceCard({ service }) {
 }
 
 export default function ServicesPage() {
-  const { services = [] } = useLoaderData() ?? {}
-
+  const { services } = useLoaderData() ?? {}
+  const servicesCards = services?.acfServices || []
 
   useEffect(() => {
     let cleanupSplitText = null
@@ -228,25 +230,25 @@ export default function ServicesPage() {
       />
 
       <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
-        <div className="grid grid-cols-12">
+        <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[90ch]">
-            <div className="eyebrow">Brand and digital design services</div>
-            <h1 className="hero-title">As a Cape Town-based <span>brand and digital design agency</span>, Simplr helps organisations <span><i>define</i></span> their brand, <span><i>design</i></span> enterprise websites, and <span><i>build</i></span> digital experiences that scale.</h1>
+            <div className="eyebrow">{services.acfHeading}</div>
+            <RichHeading as="h1" html={services.acfIntroductionLead} className="hero-title" />
           </div>
         </div>
       </section>
 
       <section className="px-5 pb-20 bg-white section-light trigger-split-text-coffee">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-coffee pt-20">
-            <div className="lead split-text-coffee">Whether you&apos;re building a new brand, refining a digital experience, or bringing your story to life through motion, we apply creative intelligence to create work that connects with audiences and delivers measurable results.</div>
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-coffee pt-20">
+            <RichText html={services.acfIntroduction} className="lead split-text-coffee" />
           </div>
         </div>
       </section>
 
       <section className="services-cards bg-white section-light">
-        {services.map((service, i) => (
+        {servicesCards.map((service, i) => (
           <ServiceCard key={i} service={service} />
         ))}
       </section>
