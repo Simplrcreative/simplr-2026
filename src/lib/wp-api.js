@@ -800,7 +800,6 @@ const homeWorkCountQuery = `
     }
   }
 `
-
 function normaliseHomeCaseStudy(study, index) {
   const caseStudy = study?.acfCaseStudy?.nodes?.[0]
   const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
