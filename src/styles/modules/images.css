@@ -22,7 +22,14 @@ picture, video {
     width: 100%;
     height: auto;
 }
-
+img.lazy {
+    will-change: filter;
+    filter: blur(10px);
+    transition: filter 0.3s ease 1s
+}
+img.lazy.loaded {
+    filter: blur(0px);
+}
 @media (min-width: 48rem) {
     .ratio {
         padding-top: var(--aspect-ratio-desktop);

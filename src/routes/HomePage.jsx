@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, prefetchWorkEntry } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -15,8 +15,9 @@ import {
 import caseStudyTwo from '../assets/img/case-study-example-2.jpg'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
-const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
+import PictureImg from '../components/PictureImg.jsx'
 
+const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 1400
 const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
@@ -542,6 +543,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const testimonial = testimonialBlock?.testimonial ?? null
   const testimonialData = testimonialBlock?.testimonialData ?? null
   const linkedCaseStudy = testimonialBlock?.caseStudy ?? null
+  const linkedCaseStudyLoaderImg =  testimonialBlock?.caseStudyLoaderImg || caseStudyTwo
   const linkedCaseStudyImage = testimonialBlock?.caseStudyImage || caseStudyTwo
   const linkedCaseStudyClient = testimonialBlock?.caseStudyClient || 'Satalia'
   const linkedCaseStudyCategories = testimonialBlock?.caseStudyCategories ?? []
@@ -580,6 +582,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     event.stopPropagation()
     target.click()
   }
+
+  useEffect(() => {
+    const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
+    return () => {
+      cleanupWorkThumbHover?.()
+    }
+  }, [])
 
   return (
     <div ref={pageRef}>
@@ -793,9 +802,18 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                       data-transition-source="media"
                       data-transition-source-key={study.slug}                      onMouseEnter={() => prefetchWorkEntry(study.slug)}                    >
-                      <picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      {/*<picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
                         {study.thumbnail ? <img src={study.thumbnail + '.webp'} title={study.client} /> : null}
-                      </picture>
+                      </picture>*/}
+                      <div className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        <PictureImg
+                          loaderSrc = {study.loaderImg + '.webp'}
+                          mobileSrc = {study.thumbnail + '.webp'}
+                          desktopSrc = {study.thumbnail + '.webp'}
+                          imgClass = ''
+                          altText = ''
+                        />
+                      </div>
                     </Link>
                     {study.categories?.length > 0 && (
                       <div className="categories mt-5 flex">
@@ -821,9 +839,37 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         <div id="testimonial-1" className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
               <div className="client-work">
+                <Link
+                  to='#'
+                  className="alt-transition-img thumb-swap-trigger"
+                  data-card-key=''
+                  data-transition-source="media"
+                  data-transition-variant="work-card"
+                  data-transition-snapshot-state="hover"
+                >
+                  {/*
                   <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
                     <img src={linkedCaseStudyImage} title={linkedCaseStudyClient} />
                   </picture>
+                  */}
+                  <div className="ratio overflow-hidden rounded-[10px] block thumb-swap" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
+                    <PictureImg
+                      loaderSrc = {linkedCaseStudyLoaderImg + '.webp'}
+                      mobileSrc = {linkedCaseStudyImage + '.webp'}
+                      desktopSrc = {linkedCaseStudyImage + '.webp'}
+                      imgClass = 'thumb-primary rounded-[10px]'
+                      altText = ''
+                    />
+                    <PictureImg
+                      loaderSrc = {linkedCaseStudyLoaderImg + '.webp'}
+                      mobileSrc = {linkedCaseStudyImage + '.webp'}
+                      desktopSrc = {linkedCaseStudyImage + '.webp'}
+                      imgClass = 'thumb-secondary rounded-[10px]'
+                      altText = ''
+                    />
+                  </div>
+                </Link>
+
                   <div className="mt-3 flex">
                   {linkedCaseStudyClient}
                   </div>

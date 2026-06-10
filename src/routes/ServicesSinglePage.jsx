@@ -1,11 +1,41 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation } from '../lib/animations/index.js'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
+function initBottomMenu() {
+  
+  const tl = gsap.timeline();
+
+  gsap.set('.bottom-menu', {
+    y: 50,
+    opacity: 0
+  })
+
+  tl.to('.bottom-menu',{
+    y: 0,
+    opacity: 1,
+    duration: 0.75,
+    ease: 'power4.inOut'
+  })
+
+  ScrollTrigger.create({
+    trigger: ".bottom-menu-trigger",
+    start: "top 100%",
+    paused: true,
+    //markers: true,
+    animation: tl, 
+    toggleActions: "play reverse play reverse" 
+  })
+}
 
 const SERVICE_COLORS = {
   strategy: 'var(--color-strategy)',
@@ -50,6 +80,7 @@ export default function ServicesSinglePage() {
   const caseStudyImage = caseStudyData?.acfFeaturedThumbnail?.node?.guid || ''
   const caseStudyClient = caseStudyData?.acfClient?.nodes?.[0]?.name || ''
   const caseStudyCategories = caseStudyData?.acfCategory?.nodes ?? []
+  const ctaBtnRef = useRef(null)
 
   useEffect(() => {
     const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
@@ -63,6 +94,14 @@ export default function ServicesSinglePage() {
       cleanupParallax?.()
     }
   }, [acfSections, testimonial])
+
+  useEffect(() => {
+    if (ctaBtnRef.current) return createBtnHoverAnimation(ctaBtnRef.current)
+  }, [])
+
+  useEffect(() => {
+    initBottomMenu()
+  }, [])
 
   function isAccordionOpen(sectionIndex, accordionIndex) {
     const openIndex = openAccordions[sectionIndex]
@@ -91,7 +130,7 @@ export default function ServicesSinglePage() {
 
 
   return (
-    <div ref={pageRef}>
+    <div ref={pageRef} className="relative">
       <Seo
         title={title}
         description={description}
@@ -110,6 +149,39 @@ export default function ServicesSinglePage() {
           ]),
         ]}
       />
+
+      <div className="bottom-menu fixed z-10 right-5 bottom-5">
+        <Link
+          to='/services/strategy'
+          className={`category border leading-none font-medium rounded-full ${pathname === '/services/strategy' ? 'border-strategy bg-strategy text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+        >
+        Strategy
+        </Link>
+        <Link
+          to='/services/branding-design'
+          className={`category border leading-none font-medium rounded-full ${pathname === '/services/branding-design' ? 'border-branding-design bg-branding-design text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+        >
+        Branding & Design
+        </Link>
+        <Link
+          to='/services/web-design-development'
+          className={`category border leading-none font-medium rounded-full ${pathname === '/services/web-design-development' ? 'border-web-design-development bg-web-design-development text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+        >
+        Web Design & Development
+        </Link>
+        <Link
+          to='/services/motion'
+          className={`category border leading-none font-medium rounded-full ${pathname === '/services/motion' ? 'border-motion bg-motion text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+        >
+        Motion
+        </Link>
+        <Link
+          to='/services/templates'
+          className={`category border leading-none font-medium rounded-full ${pathname === '/services/templates' ? 'border-templates bg-templates text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+        >
+        Templates
+        </Link>
+      </div>
 
       <section className="page-hero px-5 pb-5 mb-15 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">
@@ -153,9 +225,12 @@ export default function ServicesSinglePage() {
         </div>
       </section>
 
+      <div className="bottom-menu-trigger">
+
       {acfSections?.map((section, sectionIndex) => {
         const sectionHeading = section?.acfSectionHeading || ''
         const sectionContent = section?.acfSectionContent || ''
+        const sectionCta = section?.acfCta || ''
         const sectionAccordion = section?.acfAccordion || []
 
         if (!sectionHeading && !sectionContent && sectionAccordion.length === 0) {
@@ -173,6 +248,23 @@ export default function ServicesSinglePage() {
               {sectionContent && (
                 <div className="col-start-4 col-span-5 slide-up-subtle">
                   <RichText html={sectionContent} className="service-richtext pt-20" />
+                </div>
+              )}
+              {sectionCta && (
+                <div className="button-wrapper col-start-4 col-span-5 slide-up-subtle mt-4">
+                  <Link 
+                    to={sectionCta.url}
+                    ref={ctaBtnRef}
+                    title={sectionCta.title}
+                    target={sectionCta.target}
+                    className="btn relative mt-10"
+                  >
+                    <span className="btn-fill" aria-hidden="true" />
+                    <span className="btn-inner">
+                      <span className="btn-text text-coffee">{sectionCta.title}</span>
+                      {sectionCta.title}
+                    </span>
+                  </Link>
                 </div>
               )}
               {sectionAccordion.length > 0 && (
@@ -212,6 +304,7 @@ export default function ServicesSinglePage() {
           </section>
         )
       })}
+      </div>
 
       {testimonial && (
         <section className="testimonials p-5 section-light bg-white footer-off">
@@ -247,6 +340,7 @@ export default function ServicesSinglePage() {
           </div>
         </section>
       )}
+
     </div>
   )
 }

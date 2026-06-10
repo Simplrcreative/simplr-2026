@@ -4,15 +4,37 @@ import Seo from '../components/Seo.jsx'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
+import PictureImg from '../components/PictureImg.jsx'
 
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
+
+  return (
+    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+    thumbnailNode?.guid ??
+    ''
+  )
+}
 
 export default function WorkSinglePage() {
   const { work } = useLoaderData() ?? {}
   const title = work?.title || 'Work'
   const pathname = work?.slug ? `/work/${work.slug}` : '/work'
   const categories = work?.acfWorkBuilder?.acfCategory?.nodes ?? []
-  const thumbnail = work?.thumbnail || ''
-  const thumbnail2 = work?.thumbnail2 || thumbnail
+  //const thumbnail = work?.thumbnail || ''
+  //const thumbnail2 = work?.thumbnail2 || thumbnail
+  //NEW SOURCES
+  const featuredThumbnail = work?.acfWorkBuilder?.acfFeaturedThumbnail
+  const loaderSrc = getThumbnail(featuredThumbnail, 'loader')
+  const mobileSrc = getThumbnail(featuredThumbnail, 'medium')
+  const desktopSrc = getThumbnail(featuredThumbnail, 'large')
+  const secondaryThumbnail = work?.acfWorkBuilder?.acfSecondaryThumbnail || featuredThumbnail
+  const secondaryLoaderSrc = getThumbnail(secondaryThumbnail, 'loader')
+  const secondaryMobileSrc = getThumbnail(secondaryThumbnail, 'medium')
+  const secondaryDesktopSrc = getThumbnail(secondaryThumbnail, 'large')
+  //END NEW SOURCES
   const mimeType = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.mimeType || ''
   const altText = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.altText || title || 'Untitled'
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
@@ -75,7 +97,7 @@ export default function WorkSinglePage() {
           </div>
           <div className="col-start-9 col-span-5">
             <div className="featured-image section-dark__ thumb-swap-trigger">
-              {thumbnail && (
+              {/*{thumbnail && (
                 <picture
                   className="ratio overflow-hidden rounded-[10px] thumb-swap"
                   style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
@@ -83,6 +105,29 @@ export default function WorkSinglePage() {
                   <img className="thumb-primary" src={thumbnail2 + '.webp'} alt={altText} />
                   <img className="thumb-secondary" src={thumbnail + '.webp'} alt="" aria-hidden="true" />
                 </picture>
+              )}*/}
+              {loaderSrc && (
+                <div
+                  className="ratio overflow-hidden rounded-[10px] thumb-swap"
+                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                >
+                  <PictureImg
+                    loaderSrc = {secondaryLoaderSrc + '.webp'}
+                    mobileSrc = {secondaryMobileSrc + '.webp'}
+                    desktopSrc = {secondaryDesktopSrc + '.webp'}
+                    imgClass = 'thumb-primary rounded-[10px]'
+                    altText = {altText}
+                    lazyLoad = {false}
+                  />
+                  <PictureImg
+                    loaderSrc = {loaderSrc + '.webp'}
+                    mobileSrc = {mobileSrc + '.webp'}
+                    desktopSrc = {desktopSrc + '.webp'}
+                    imgClass = 'thumb-secondary rounded-[10px]'
+                    altText = ''
+                    lazyLoad = {false}
+                  />
+                </div>
               )}
             </div>
           </div>

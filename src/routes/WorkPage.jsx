@@ -4,6 +4,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
+import PictureImg from '../components/PictureImg.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
 import { fetchTestimonialData, fetchWorksData } from '../lib/wp-api.js'
@@ -21,13 +22,13 @@ const FILTERS = [
   { id: 'templates',              label: 'Templates',                bg: 'var(--color-templates)',              text: '#fff' },
 ]
 
-function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large') {
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
   const thumbnailNode = acfFeaturedThumbnail?.node
   const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
 
   return (
     sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
-    sizes.find((s) => s.name === 'full')?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
     thumbnailNode?.guid ??
     ''
   )
@@ -159,8 +160,18 @@ function collectCardKeys(groups) {
 
 function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
-  const thumb = getThumbnail(builder.acfFeaturedThumbnail)
-  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  //const thumb = getThumbnail(builder.acfFeaturedThumbnail)
+  //const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  //NEW SOURCES
+  const featuredThumbnail = builder.acfFeaturedThumbnail
+  const loaderSrc = getThumbnail(featuredThumbnail, 'loader')
+  const mobileSrc = getThumbnail(featuredThumbnail, 'medium')
+  const desktopSrc = getThumbnail(featuredThumbnail, 'large')
+  const secondaryThumbnail = builder.acfSecondaryThumbnail || featuredThumbnail
+  const secondaryLoaderSrc = getThumbnail(secondaryThumbnail, 'loader')
+  const secondaryMobileSrc = getThumbnail(secondaryThumbnail, 'medium')
+  const secondaryDesktopSrc = getThumbnail(secondaryThumbnail, 'large')
+  //END NEW SOURCES
   const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
   const clients = builder.acfClient?.nodes ?? []
@@ -175,13 +186,30 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
       data-transition-variant="work-card"
       data-transition-snapshot-state="hover"
     >
-      <picture
+      <div
         className="ratio overflow-hidden rounded-[10px] block thumb-swap"
         style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': aspectRatio }}
       >
-        {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} />}
+        
+        <PictureImg
+          loaderSrc = {loaderSrc + '.webp'}
+          mobileSrc = {mobileSrc + '.webp'}
+          desktopSrc = {desktopSrc + '.webp'}
+          imgClass = 'thumb-primary rounded-[10px]'
+          altText = {thumbAlt}
+        />
+        <PictureImg
+          loaderSrc = {secondaryLoaderSrc + '.webp'}
+          mobileSrc = {secondaryMobileSrc + '.webp'}
+          desktopSrc = {secondaryDesktopSrc + '.webp'}
+          imgClass = 'thumb-secondary rounded-[10px]'
+          altText = ''
+        />
+        
+        {/*{thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} />}
         {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" />}
-      </picture>
+        */}
+      </div>
       
     </Link>
     <div className="work-card__meta mt-3">
@@ -198,8 +226,18 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
 
 function WorkFeatured({ work, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
-  const thumb = getThumbnail(builder.acfFeaturedThumbnail)
-  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  //const thumb = getThumbnail(builder.acfFeaturedThumbnail)
+  //const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  //NEW SOURCES
+  const featuredThumbnail = builder.acfFeaturedThumbnail
+  const loaderSrc = getThumbnail(featuredThumbnail, 'loader')
+  const mobileSrc = getThumbnail(featuredThumbnail, 'medium')
+  const desktopSrc = getThumbnail(featuredThumbnail, 'large')
+  const secondaryThumbnail = builder.acfSecondaryThumbnail || featuredThumbnail
+  const secondaryLoaderSrc = getThumbnail(secondaryThumbnail, 'loader')
+  const secondaryMobileSrc = getThumbnail(secondaryThumbnail, 'medium')
+  const secondaryDesktopSrc = getThumbnail(secondaryThumbnail, 'large')
+  //END NEW SOURCES
   const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
   const clients = builder.acfClient?.nodes ?? []
@@ -213,13 +251,29 @@ function WorkFeatured({ work, cardKey }) {
       data-transition-variant="work-card"
       data-transition-snapshot-state="hover"
     >
-      <picture
+      <div
         className="ratio overflow-hidden rounded-[10px] block thumb-swap"
         style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
       >
+        <PictureImg
+          loaderSrc = {loaderSrc + '.webp'}
+          mobileSrc = {mobileSrc + '.webp'}
+          desktopSrc = {desktopSrc + '.webp'}
+          imgClass = 'thumb-primary rounded-[10px]'
+          altText = {thumbAlt}
+        />
+        <PictureImg
+          loaderSrc = {secondaryLoaderSrc + '.webp'}
+          mobileSrc = {secondaryMobileSrc + '.webp'}
+          desktopSrc = {secondaryDesktopSrc + '.webp'}
+          imgClass = 'thumb-secondary rounded-[10px]'
+          altText = ''
+        />
+        {/*
         {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} />}
         {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" />}
-      </picture>
+        */}
+      </div>
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{clients[0].name}</h3>
         {categories.length > 0 && (
@@ -234,8 +288,18 @@ function WorkFeatured({ work, cardKey }) {
 
 function TestimonialSection({ work, testimonialData, fallbackTestimonial, index, cardKey }) {
   const builder = work.acfWorkBuilder ?? {}
-  const thumb = getThumbnail(builder.acfFeaturedThumbnail)
-  const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  //const thumb = getThumbnail(builder.acfFeaturedThumbnail)
+  //const thumb2 = getThumbnail(builder.acfSecondaryThumbnail) || thumb
+  //NEW SOURCES
+  const featuredThumbnail = builder.acfFeaturedThumbnail
+  const loaderSrc = getThumbnail(featuredThumbnail, 'loader')
+  const mobileSrc = getThumbnail(featuredThumbnail, 'medium')
+  const desktopSrc = getThumbnail(featuredThumbnail, 'large')
+  const secondaryThumbnail = builder.acfSecondaryThumbnail || featuredThumbnail
+  const secondaryLoaderSrc = getThumbnail(secondaryThumbnail, 'loader')
+  const secondaryMobileSrc = getThumbnail(secondaryThumbnail, 'medium')
+  const secondaryDesktopSrc = getThumbnail(secondaryThumbnail, 'large')
+  //END NEW SOURCES
   const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
   const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? fallbackTestimonial?.quote ?? ''
@@ -270,13 +334,29 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             data-transition-variant="work-card"
             data-transition-snapshot-state="hover"
           >
-            <picture
+            <div
               className="ratio overflow-hidden rounded-[10px] block thumb-swap"
-              style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+              style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
             >
-              {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} title={client} />}
-              {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" title={client} />}
-            </picture>
+              <PictureImg
+                loaderSrc = {loaderSrc + '.webp'}
+                mobileSrc = {mobileSrc + '.webp'}
+                desktopSrc = {desktopSrc + '.webp'}
+                imgClass = 'thumb-primary rounded-[10px]'
+                altText = {thumbAlt}
+              />
+              <PictureImg
+                loaderSrc = {secondaryLoaderSrc + '.webp'}
+                mobileSrc = {secondaryMobileSrc + '.webp'}
+                desktopSrc = {secondaryDesktopSrc + '.webp'}
+                imgClass = 'thumb-secondary rounded-[10px]'
+                altText = ''
+              />
+              {/*
+              {thumb && <img className="thumb-primary rounded-[10px]" src={thumb + '.webp'} alt={thumbAlt} />}
+              {thumb2 && <img className="thumb-secondary rounded-[10px]" src={thumb2 + '.webp'} alt='' aria-hidden="true" />}
+              */}
+            </div>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
               <div className="categories mt-3 flex flex-wrap">

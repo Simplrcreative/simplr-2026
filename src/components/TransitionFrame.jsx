@@ -459,11 +459,12 @@ export default function TransitionFrame({ children }) {
 
             // Read the source aspect ratio from the card's picture element so we can
             // fix the altClone dimensions for non-90% cards (e.g. WorkCard at 64%).
-            const sourcePicture = altSource.querySelector('picture')
+            //const sourcePicture = altSource.querySelector('picture')
+            const sourcePicture = altSource.querySelector('.ratio')
             const sourceAspectRatio = sourcePicture
               ? sourcePicture.style.getPropertyValue('--aspect-ratio-desktop').trim() || null
               : null
-
+              
             altTransitionRef.current = {
               pathname: nav.url.pathname,
               variant,
@@ -970,7 +971,8 @@ export default function TransitionFrame({ children }) {
       // This lets the card expand cleanly from 64% to 90% without letterboxing.
       const sourceAspectRatio = altTransition?.sourceAspectRatio
       if (sourceAspectRatio && sourceAspectRatio !== '90%') {
-        const clonePicture = altClone.querySelector('picture')
+        //const clonePicture = altClone.querySelector('picture')
+        const clonePicture = altClone.querySelector('.ratio')
         if (clonePicture) {
           Object.assign(clonePicture.style, {
             position: 'absolute',
