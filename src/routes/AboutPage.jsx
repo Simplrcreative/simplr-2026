@@ -10,6 +10,17 @@ import {
   createBioAnimation,
 } from '../lib/animations/index.js'
 
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSize = 'medium_large') {
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
+
+  return (
+    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+    thumbnailNode?.guid ??
+    ''
+  )
+}
 
 export default function AboutPage() {
   useEffect(() => createSplitTextAnimation(), [])
@@ -155,12 +166,12 @@ export default function AboutPage() {
               </svg>
             </button>
             {people.map((person) => {
-              const src = person.acfProfileImage?.node?.sourceUrl
+              const src = getThumbnail(person.acfProfileImage)
               if (!src) return null
               return (
                 <img
                   key={person.acfName}
-                  src={src}
+                  src={src + '.webp'}
                   alt={person.acfName}
                   className={`person-hover-img${displayImageName === person.acfName ? ' is-visible' : ''}${activeBio === person.acfName ? ' is-active' : ''}`}
                 />

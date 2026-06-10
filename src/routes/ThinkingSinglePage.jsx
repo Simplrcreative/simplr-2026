@@ -126,19 +126,17 @@ export default function ThinkingSinglePage() {
     }
   }, [content])
 
-  function getThumbnail(featuredImage, preferredSize = 'large') {
-  const sizes = featuredImage?.node?.mediaDetails?.sizes
-  if (sizes?.length) {
+  function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
+    const thumbnailNode = acfFeaturedThumbnail?.node
+    const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
+
     return (
-      sizes.find((size) => size.name === preferredSize)?.sourceUrl
-      ?? sizes[sizes.length - 1]?.sourceUrl
-      ?? featuredImage?.node?.sourceUrl
-      ?? ''
+      sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+      sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+      thumbnailNode?.guid ??
+      ''
     )
   }
-
-  return featuredImage?.node?.sourceUrl ?? ''
-}
   const thumb = getThumbnail(page.acfPostBuilder?.acfFeaturedImage)
 
   const morePosts = useMemo(() => {

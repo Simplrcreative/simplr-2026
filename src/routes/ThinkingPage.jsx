@@ -27,18 +27,16 @@ function getFilterColor(slug) {
   return entry ? entry[1] : 'var(--color-coffee)'
 }
 
-function getThumbnail(featuredImage, preferredSize = 'large') {
-  const sizes = featuredImage?.node?.mediaDetails?.sizes
-  if (sizes?.length) {
-    return (
-      sizes.find((size) => size.name === preferredSize)?.sourceUrl
-      ?? sizes[sizes.length - 1]?.sourceUrl
-      ?? featuredImage?.node?.sourceUrl
-      ?? ''
-    )
-  }
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
 
-  return featuredImage?.node?.sourceUrl ?? ''
+  return (
+    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+    thumbnailNode?.guid ??
+    ''
+  )
 }
 
 function postMatchesFilter(post, filterId) {

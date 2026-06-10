@@ -140,6 +140,7 @@ const serviceSinglePageQuery = `
         acfCaseStudy {
           nodes {
             ... on AcfWork {
+              slug
               acfWorkBuilder {
                 acfClient {
                   nodes {
@@ -182,7 +183,13 @@ const peopleQuery = `
           acfAlign
           acfProfileImage {
             node {
-              sourceUrl
+              guid
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
             }
           }
         }
@@ -307,7 +314,6 @@ const workByUriQuery = `
     nodeByUri(uri: $uri) {
       __typename
       ... on AcfWork {
-        databaseId
         slug
         title
         acfWorkBuilder {
@@ -665,8 +671,8 @@ const homeCaseStudiesQuery = `
           acfClientDetail
           acfCaseStudy {
             nodes {
-              slug
               ... on AcfWork {
+                slug
                 acfWorkBuilder {
                   acfFeaturedThumbnail {
                     node {

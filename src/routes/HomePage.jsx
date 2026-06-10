@@ -543,10 +543,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const testimonial = testimonialBlock?.testimonial ?? null
   const testimonialData = testimonialBlock?.testimonialData ?? null
   const linkedCaseStudy = testimonialBlock?.caseStudy ?? null
-  const linkedCaseStudyLoaderImg =  testimonialBlock?.caseStudyLoaderImg || caseStudyTwo
-  const linkedCaseStudyImage = testimonialBlock?.caseStudyImage || caseStudyTwo
-  const linkedCaseStudyClient = testimonialBlock?.caseStudyClient || 'Satalia'
+  const linkedCaseStudyLoaderImg =  testimonialBlock?.caseStudyLoaderImg || ''
+  const linkedCaseStudyImage = testimonialBlock?.caseStudyImage || ''
+  const linkedCaseStudyClient = testimonialBlock?.caseStudyClient || ''
   const linkedCaseStudyCategories = testimonialBlock?.caseStudyCategories ?? []
+  const linkedCaseStudySlug = linkedCaseStudy?.slug || ''
 
   function showPreviousFaq() {
     if (!faqs.length) {
@@ -840,7 +841,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
               <div className="client-work">
                 <Link
-                  to='#'
+                  to={`/work/${linkedCaseStudySlug}`}
                   className="alt-transition-img thumb-swap-trigger"
                   data-card-key=''
                   data-transition-source="media"

@@ -4,7 +4,7 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -36,6 +36,18 @@ function initBottomMenu() {
     animation: tl, 
     toggleActions: "play reverse play reverse" 
   })
+}
+
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
+
+  return (
+    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+    thumbnailNode?.guid ??
+    ''
+  )
 }
 
 const SERVICE_COLORS = {
@@ -77,8 +89,20 @@ export default function ServicesSinglePage() {
   const testimonialData = testimonial?.acfTestimonials || ''
   const caseStudies = service?.acfCaseStudy?.nodes || []
   const caseStudy = caseStudies[0] || ''
+  const caseStudySlug = caseStudy?.slug || ''
   const caseStudyData = caseStudy?.acfWorkBuilder || ''
-  const caseStudyImage = caseStudyData?.acfFeaturedThumbnail?.node?.guid || ''
+  console.log(caseStudy);
+  //const caseStudyImage = caseStudyData?.acfFeaturedThumbnail?.node?.guid || ''
+  //NEW SOURCES
+  const featuredThumbnail = caseStudyData?.acfFeaturedThumbnail
+  const loaderSrc = getThumbnail(featuredThumbnail, 'loader')
+  const mobileSrc = getThumbnail(featuredThumbnail, 'medium')
+  const desktopSrc = getThumbnail(featuredThumbnail, 'large')
+  const secondaryThumbnail = caseStudyData?.acfSecondaryThumbnail || featuredThumbnail
+  const secondaryLoaderSrc = getThumbnail(secondaryThumbnail, 'loader')
+  const secondaryMobileSrc = getThumbnail(secondaryThumbnail, 'medium')
+  const secondaryDesktopSrc = getThumbnail(secondaryThumbnail, 'large')
+  //END NEW SOURCES
   const caseStudyClient = caseStudyData?.acfClient?.nodes?.[0]?.name || ''
   const caseStudyCategories = caseStudyData?.acfCategory?.nodes ?? []
   const ctaBtnRefs = useRef({})
@@ -87,12 +111,14 @@ export default function ServicesSinglePage() {
     const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
     const cleanupParallax = createParallaxAnimations(pageRef.current)
     const cleanupSplitText = createSplitTextAnimation()
+    const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
     refreshScrollTriggers()
 
     return () => {
       cleanupSlideUp?.()
       cleanupSplitText?.()
       cleanupParallax?.()
+      cleanupWorkThumbHover?.()
     }
   }, [acfSections, testimonial])
 
@@ -323,25 +349,31 @@ export default function ServicesSinglePage() {
             <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
                 {caseStudy && (
                 <div className="client-work">
-                    <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                      <img src={caseStudyImage} title="Satalia" />
-                    </picture>
-                    <div className="ratio overflow-hidden rounded-[10px] block thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
-                      <PictureImg
-                        loaderSrc = {caseStudyloader + '.webp'}
-                        mobileSrc = {caseStudyThumbnail + '.webp'}
-                        desktopSrc = {caseStudyDesktop + '.webp'}
-                        imgClass = 'thumb-primary rounded-[10px]'
-                        altText = {caseStudyClient}
-                      />
-                      <PictureImg
-                        loaderSrc = {secondaryCaseStudyloader + '.webp'}
-                        mobileSrc = {secondaryCaseStudyThumbnail + '.webp'}
-                        desktopSrc = {secondaryCaseStudyDesktop + '.webp'}
-                        imgClass = 'thumb-secondary rounded-[10px]'
-                        altText = ''
-                      />
-                    </div>
+                  <Link
+                    to={`/work/${caseStudySlug}`}
+                    className="alt-transition-img thumb-swap-trigger"
+                    data-card-key=''
+                    data-transition-source="media"
+                    data-transition-variant="work-card"
+                    data-transition-snapshot-state="hover"
+                  >
+                      <div className="ratio overflow-hidden rounded-[10px] block thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                        <PictureImg
+                          loaderSrc = {loaderSrc + '.webp'}
+                          mobileSrc = {mobileSrc + '.webp'}
+                          desktopSrc = {desktopSrc + '.webp'}
+                          imgClass = 'thumb-primary rounded-[10px]'
+                          altText = {caseStudyClient}
+                        />
+                        <PictureImg
+                          loaderSrc = {secondaryLoaderSrc + '.webp'}
+                          mobileSrc = {secondaryMobileSrc + '.webp'}
+                          desktopSrc = {secondaryDesktopSrc + '.webp'}
+                          imgClass = 'thumb-secondary rounded-[10px]'
+                          altText = ''
+                        />
+                      </div>
+                    </Link>
                     <div className="mt-3 flex">
                     {caseStudyClient}
                     </div>
