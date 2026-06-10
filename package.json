@@ -8,7 +8,7 @@
     "seo:assets": "node scripts/generate-seo-assets.mjs",
     "prebuild": "node scripts/generate-seo-assets.mjs",
     "build": "vite build",
-    "postbuild": "export PLAYWRIGHT_BROWSERS_PATH=0 && npx playwright install chromium && node scripts/prerender.mjs",
+    "postbuild": "node scripts/prerender.mjs",
     "prerender": "node scripts/prerender.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@sparticuz/chromium": "^149.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

@@ -229,28 +229,55 @@ async function main() {
   }
 
   let browser
+  let browserSource = 'playwright'
+
+  // Try @sparticuz/chromium first (works on Vercel / serverless Linux)
   try {
-    browser = await chromium.launch()
-  } catch (err) {
-    const systemChrome = getSystemChromePath()
-    if (systemChrome) {
-      try {
-        browser = await chromium.launch({ executablePath: systemChrome })
-        console.log(`🧭  Using system Chrome: ${systemChrome}\n`)
-      } catch (systemErr) {
+    const chromiumMod = await import('@sparticuz/chromium')
+    const sparticuz = chromiumMod.default || chromiumMod
+    const executablePath = await sparticuz.executablePath()
+    const execDir = path.dirname(executablePath)
+
+    // Point the dynamic linker to the bundled shared libraries
+    // (libnspr4.so, libnss3.so, etc. live next to the binary)
+    process.env.LD_LIBRARY_PATH = execDir
+
+    browser = await chromium.launch({
+      args: [...sparticuz.args, '--no-sandbox'],
+      executablePath,
+      headless: sparticuz.headless,
+    })
+    browserSource = '@sparticuz/chromium'
+  } catch (sparticuzErr) {
+    // Fall back to standard Playwright chromium (local dev)
+    try {
+      browser = await chromium.launch()
+    } catch (err) {
+      const systemChrome = getSystemChromePath()
+      if (systemChrome) {
+        try {
+          browser = await chromium.launch({ executablePath: systemChrome })
+          console.log(`🧭  Using system Chrome: ${systemChrome}\n`)
+          browserSource = 'system'
+        } catch (systemErr) {
+          console.error('❌  Failed to launch Chromium.')
+          console.error('   Make sure Playwright browsers are installed:')
+          console.error('   npm run postinstall   # or   npx playwright install chromium')
+          console.error('\n   Details:', err.message)
+          process.exit(1)
+        }
+      } else {
         console.error('❌  Failed to launch Chromium.')
         console.error('   Make sure Playwright browsers are installed:')
         console.error('   npm run postinstall   # or   npx playwright install chromium')
         console.error('\n   Details:', err.message)
         process.exit(1)
       }
-    } else {
-      console.error('❌  Failed to launch Chromium.')
-      console.error('   Make sure Playwright browsers are installed:')
-      console.error('   npm run postinstall   # or   npx playwright install chromium')
-      console.error('\n   Details:', err.message)
-      process.exit(1)
     }
+  }
+
+  if (browserSource === '@sparticuz/chromium') {
+    console.log('🚀  Using @sparticuz/chromium\n')
   }
 
   const server = await createServer(distDir, graphqlEndpoint)
