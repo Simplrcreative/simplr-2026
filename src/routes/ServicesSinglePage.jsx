@@ -80,7 +80,7 @@ export default function ServicesSinglePage() {
   const caseStudyImage = caseStudyData?.acfFeaturedThumbnail?.node?.guid || ''
   const caseStudyClient = caseStudyData?.acfClient?.nodes?.[0]?.name || ''
   const caseStudyCategories = caseStudyData?.acfCategory?.nodes ?? []
-  const ctaBtnRef = useRef(null)
+  const ctaBtnRefs = useRef({})
 
   useEffect(() => {
     const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
@@ -96,8 +96,19 @@ export default function ServicesSinglePage() {
   }, [acfSections, testimonial])
 
   useEffect(() => {
-    if (ctaBtnRef.current) return createBtnHoverAnimation(ctaBtnRef.current)
-  }, [])
+    const cleanups = []
+
+    Object.values(ctaBtnRefs.current).forEach((btn) => {
+      if (btn) {
+        const cleanup = createBtnHoverAnimation(btn)
+        if (cleanup) cleanups.push(cleanup)
+      }
+    })
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup())
+    }
+  }, [acfSections])
 
   useEffect(() => {
     initBottomMenu()
@@ -254,7 +265,7 @@ export default function ServicesSinglePage() {
                 <div className="button-wrapper col-start-4 col-span-5 slide-up-subtle mt-4">
                   <Link 
                     to={sectionCta.url}
-                    ref={ctaBtnRef}
+                    ref={(el) => { ctaBtnRefs.current[sectionIndex] = el }}
                     title={sectionCta.title}
                     target={sectionCta.target}
                     className="btn relative mt-10"
