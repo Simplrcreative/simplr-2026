@@ -37,19 +37,19 @@ If you leave this out, the app will use the direct Kinsta URL. That works fine a
 
 The `postbuild` script (`scripts/prerender.mjs`) uses Playwright to render every route into static HTML. Vercel’s build containers are Linux-based and do **not** include Chrome.
 
-### Option A — `postinstall` script (recommended)
+### `postinstall` script
 
-Add this to `package.json`:
+Already added to `package.json`:
 
 ```json
 "postinstall": "PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium"
 ```
 
-`PLAYWRIGHT_BROWSERS_PATH=0` installs the browser inside `node_modules` so Vercel caches it between builds.
+`PLAYWRIGHT_BROWSERS_PATH=0` installs the browser inside `node_modules` so Vercel caches it between builds. The first deploy after this change will download Chromium (~50–100 MB), which adds roughly 30–60 seconds to the build. Subsequent builds reuse the cached browser.
 
-### Option B — skip prerendering if the browser is missing
+### Fallback — skip prerendering if the browser is missing
 
-If you want the build to succeed even when Chromium can’t be installed, change `postbuild` to log a warning instead of exiting with an error. (Not recommended—you’ll silently lose prerendered HTML.)
+If you ever want the build to succeed even when Chromium can’t be installed, change `postbuild` to log a warning instead of exiting with an error. (Not recommended—you’ll silently lose prerendered HTML.)
 
 ---
 
