@@ -272,18 +272,32 @@ async function main() {
           console.log(`🧭  Using system Chrome: ${systemChrome}\n`)
           browserSource = 'system'
         } catch (systemErr) {
-          console.error('❌  Failed to launch Chromium.')
-          console.error('   Make sure Playwright browsers are installed:')
-          console.error('   npm run postinstall   # or   npx playwright install chromium')
-          console.error('\n   Details:', err.message)
-          process.exit(1)
+          // NO BROWSER AVAILABLE — skip prerendering so build doesn't fail
+          console.error('\n┌────────────────────────────────────────────────────────────┐')
+          console.error('│  ⚠️  BROWSER UNAVAILABLE — SKIPPING PRERENDER              │')
+          console.error('│                                                            │')
+          console.error('│  No Chromium browser could be launched.                   │')
+          console.error('│  The site will still work as an SPA.                      │')
+          console.error('│  To fix prerendering, try:                                │')
+          console.error('│    • Set Node.js 22.x in Vercel project settings          │')
+          console.error('│    • Or run locally: npm run postinstall && npm run build │')
+          console.error('└────────────────────────────────────────────────────────────┘\n')
+          console.error('   Details:', err.message)
+          return
         }
       } else {
-        console.error('❌  Failed to launch Chromium.')
-        console.error('   Make sure Playwright browsers are installed:')
-        console.error('   npm run postinstall   # or   npx playwright install chromium')
-        console.error('\n   Details:', err.message)
-        process.exit(1)
+        // NO BROWSER AVAILABLE — skip prerendering so build doesn't fail
+        console.error('\n┌────────────────────────────────────────────────────────────┐')
+        console.error('│  ⚠️  BROWSER UNAVAILABLE — SKIPPING PRERENDER              │')
+        console.error('│                                                            │')
+        console.error('│  No Chromium browser could be launched.                   │')
+        console.error('│  The site will still work as an SPA.                      │')
+        console.error('│  To fix prerendering, try:                                │')
+        console.error('│    • Set Node.js 22.x in Vercel project settings          │')
+        console.error('│    • Or run locally: npm run postinstall && npm run build │')
+        console.error('└────────────────────────────────────────────────────────────┘\n')
+        console.error('   Details:', err.message)
+        return
       }
     }
   }
