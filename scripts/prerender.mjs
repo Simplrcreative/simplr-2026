@@ -1,11 +1,11 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import http from 'node:http'
-import { chromium } from 'playwright'
 
 // Ensure Playwright looks for browsers in the same location where
 // `npm run postinstall` installs them (inside node_modules).
 process.env.PLAYWRIGHT_BROWSERS_PATH = '0'
+const { chromium } = await import('playwright')
 
 const projectRoot = process.cwd()
 const distDir = path.join(projectRoot, 'dist')
