@@ -4,6 +4,7 @@ import Seo from '../components/Seo.jsx'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation } from '../lib/animations/index.js'
 import RichText from '../components/RichText.jsx'
 import RichHeading from '../components/RichHeading.jsx'
+import ContactForm from '../components/ContactForm.jsx'
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
   const thumbnailNode = acfFeaturedThumbnail?.node
@@ -24,6 +25,7 @@ export default function LandingPage() {
   const title = page?.title || 'Untitled'
   const landingPageContent = page?.acfLandingPageBuilder || ''
   const headline = landingPageContent.acfHeadline || ''
+   const showForm = landingPageContent.acfShowForm || false
   const introduction = landingPageContent.acfIntroduction || ''
   const featuredImage = getThumbnail(landingPageContent.acfFeaturedImage)
   const acfSections = landingPageContent?.acfSections || []
@@ -105,7 +107,7 @@ export default function LandingPage() {
 
         return (
           <section key={`section-${sectionIndex}`} className="px-5 py-20 bg-white section-light">
-            <div className="grid grid-cols-12 ">
+            <div className="grid grid-cols-12 w-full">
               {sectionHeading && (
                 <div className="col-span-6 max-w-[70ch] slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="font-literata section-heading"/>
@@ -191,6 +193,16 @@ export default function LandingPage() {
           </section>
         )
       })}
+
+      {showForm && (
+        <section className="px-5 pt-20">
+          <div className="grid grid-cols-12 w-full">
+            <div className="col-start-8 col-span-5">
+              <ContactForm style="dark" heading="This is a cool heading" />
+            </div>
+          </div>
+        </section>
+      )}
 
     </div>
   )
