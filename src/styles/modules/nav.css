@@ -120,7 +120,7 @@ nav.light a.is-active .nav-link__orb {
         mix-blend-mode:difference
     }
     .menu-icon.active {
-        transform: translate(-1.25rem, 1.25rem)
+        transform: translate(-1.25rem, 1.25rem)!important;
     }
     .menu-icon div {
         /*filter: brightness(1);
