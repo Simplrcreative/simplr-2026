@@ -9,6 +9,7 @@ import ThinkingPage from '../routes/ThinkingPage.jsx'
 import ThinkingSinglePage from '../routes/ThinkingSinglePage.jsx'
 import ContactPage from '../routes/ContactPage.jsx'
 import Est2014Page from '../routes/Est2014Page.jsx'
+import LandingPage from '../routes/LandingPage.jsx'
 import DefaultPage from '../routes/DefaultPage.jsx'
 import NotFoundPage from '../routes/NotFoundPage.jsx'
 import RootLayout from '../routes/RootLayout.jsx'
@@ -23,6 +24,7 @@ import {
   createThinkingSinglePageLoader,
   createContactPageLoader,
   createEst2014PageLoader,
+  createLandingPageLoader,
   createDefaultPageLoader,
   createRootLoader,
 } from '../routes/loaders.js'
@@ -111,6 +113,12 @@ export const router = createBrowserRouter([
         path: 'site-map',
         element: <DefaultPage />,
         loader: createDefaultPageLoader(),
+        handle: { pageBg: 'light' },
+      },
+      {
+        path: ':slug',
+        element: <LandingPage />,
+        loader: createLandingPageLoader(),
         handle: { pageBg: 'light' },
       },
     ],

@@ -658,6 +658,8 @@ const thinkingEntryBySlugQuery = `
   }
 `
 
+const landingByUriQuery = ''
+
 const homeCaseStudiesQuery = `
   query HomeCaseStudiesQuery {
     page(id: "5", idType: DATABASE_ID) {
@@ -1598,5 +1600,27 @@ export async function fetchThinkingEntryData(slug) {
     if (error instanceof Response) throw error
     reportError(`Unable to load thinking entry for ${slug}`, error)
     throw new Response('Not found', { status: 404 })
+  }
+}
+
+export async function fetchLandingPageData(slug) {
+  if (!wpConfig.endpoint) {
+    return { slug, page: null }
+  }
+
+  try {
+    const uri = `/${slug}/`
+    const data = await remember(`default-page:${slug}`, () =>
+      graphQlRequest(landingByUriQuery, { uri }),
+    )
+
+    const node = data.nodeByUri
+    return {
+      slug,
+      page: node ? { title: node.title || slug, content: node.content || '' } : null,
+    }
+  } catch (error) {
+    reportError(`Unable to load default page for ${slug}`, error)
+    return { slug, page: null }
   }
 }

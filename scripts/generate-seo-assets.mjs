@@ -144,39 +144,74 @@ async function getDynamicRoutes(env) {
     }
   `
 
+  const servicesQuery = `
+    query ServiceRoutes {
+      servicesPage: page(id: "12", idType: DATABASE_ID) {
+        acfServices {
+          acfServices {
+            acfLinkToService {
+              nodes {
+                ... on Page {
+                  uri
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+
+  let data
+  let servicesData = null
+
   try {
-    const data = await graphQlRequest(endpoint, query, {
+    data = await graphQlRequest(endpoint, query, {
       workType: env.VITE_WORK_CONTENT_TYPE || 'WORK',
       first: 100,
     })
-
-    const workRoutes = (data.work?.nodes || [])
-      .map((node) => node?.slug)
-      .filter(Boolean)
-      .map((slug) => ({
-        path: `${workBasePath}/${slug}`,
-        changefreq: 'weekly',
-        priority: '0.8',
-      }))
-
-    const thinkingRoutes = (data.thinking?.nodes || [])
-      .map((node) => {
-        const slug = node?.slug
-        if (!slug) return null
-        const topicSlug = normalizeTopicSlug(node?.topics?.nodes?.[0]?.slug)
-        return {
-          path: `${thinkingBasePath}/${topicSlug}/${slug}`,
-          changefreq: 'weekly',
-          priority: '0.8',
-        }
-      })
-      .filter(Boolean)
-
-    return uniqueRoutes([...workRoutes, ...thinkingRoutes])
   } catch (error) {
     console.warn('Unable to hydrate dynamic SEO routes from WordPress:', error.message)
     return []
   }
+
+  try {
+    servicesData = await graphQlRequest(endpoint, servicesQuery)
+  } catch {
+    // Non-critical: if the services query fails we still want work/thinking routes.
+  }
+
+  const workRoutes = (data.work?.nodes || [])
+    .map((node) => node?.slug)
+    .filter(Boolean)
+    .map((slug) => ({
+      path: `${workBasePath}/${slug}`,
+      changefreq: 'weekly',
+      priority: '0.8',
+    }))
+
+  const thinkingRoutes = (data.thinking?.nodes || [])
+    .map((node) => {
+      const slug = node?.slug
+      if (!slug) return null
+      const topicSlug = normalizeTopicSlug(node?.topics?.nodes?.[0]?.slug)
+      return {
+        path: `${thinkingBasePath}/${topicSlug}/${slug}`,
+        changefreq: 'weekly',
+        priority: '0.8',
+      }
+    })
+    .filter(Boolean)
+
+  const serviceRoutes = (servicesData?.servicesPage?.acfServices?.acfServices || [])
+    .map((item) => item?.acfLinkToService?.nodes?.[0]?.uri)
+    .filter(Boolean)
+    .map((uri) => {
+      const path = String(uri).replace(/\/+$/, '') || '/'
+      return { path, changefreq: 'monthly', priority: '0.7' }
+    })
+
+  return uniqueRoutes([...workRoutes, ...thinkingRoutes, ...serviceRoutes])
 }
 
 function buildSitemap(siteUrl, routes) {

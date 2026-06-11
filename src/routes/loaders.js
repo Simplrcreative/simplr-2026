@@ -121,3 +121,10 @@ export function createDefaultPageLoader() {
     return fetchDefaultPageData(slug)
   }
 }
+
+export function createLandingPageLoader() {
+  return async function landingPageLoader({ request }) {
+    const slug = new URL(request.url).pathname.replace(/^\/|\/$/g, '')
+    return fetchLandingPageData(slug)
+  }
+}
