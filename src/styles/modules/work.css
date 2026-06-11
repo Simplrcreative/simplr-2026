@@ -167,6 +167,9 @@
   font-weight: 500;
   line-height: 1.1;
 }
+.landing-page .swag-detail {
+  max-width: none;
+}
 .text-only-section {
   font-family: var(--font-literata);
   font-size: clamp(2.5rem, 4vw, 3.125rem);
@@ -187,6 +190,9 @@
 @media (min-width: 768px) {
   .swag-numbers {
     width: calc(55% - 3.75rem)
+  }
+  .landing-page .swag-numbers {
+    width: 100%
   }
   .swag-details {
     width: calc(45% - 3.75rem)

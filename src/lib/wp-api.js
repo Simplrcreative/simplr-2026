@@ -690,6 +690,12 @@ const landingByUriQuery = `
           acfFeatures {
             acfTitle
             acfContent
+            acfSwag {
+              acfDetail
+              acfNumber
+              acfPostUnit
+              acfPreUnit
+            }
           }
           acfCta {
             target

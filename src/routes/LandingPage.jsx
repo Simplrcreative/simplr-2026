@@ -150,11 +150,8 @@ export default function LandingPage() {
                   {sectionFeatures.map((feature, featureIndex) => {
                     const featureTitle = feature?.acfTitle || ''
                     const featureContent = feature?.acfContent || ''
+                    const swags = feature?.acfSwag || ''
                     const featureKey = `section-${sectionIndex}-feature-${featureIndex}`
-
-                    if (!featureTitle && !featureContent) {
-                      return null
-                    }
 
                     return (
                       <div key={featureKey} className="feature-item slide-up-subtle">
@@ -162,6 +159,43 @@ export default function LandingPage() {
                         <div className="feature-content">
                             <RichText html={featureContent} />
                         </div>
+                        {swags && (
+                          <div className="swags my-20">
+                          {swags.map((swag, index) => {
+                            const preUnit = swag.acfPreUnit ?? ''
+                            const postUnit = swag.acfPostUnit ?? ''
+                            const number = swag.acfNumber ?? ''
+                            const detail = swag.acfDetail ?? ''
+
+                            return (
+                              <div 
+                                key={`swag-${index}`}
+                                className="swag landing-page flex slide-up-subtle"
+                              > 
+                                <div className="swag-numbers flex justify-start items-start">
+                                  {preUnit && (
+                                    <span className="swag-unit pre">{preUnit}</span>
+                                  )}
+                                  {number && (
+                                    <span className="swag-number">{number}</span>
+                                  )}
+                                  {postUnit && (
+                                    <span className="swag-unit">{postUnit}</span>
+                                  )}
+                                  {detail && (
+                                    <span className="ps-5 pt-2 swag-detail">
+                                      {detail}
+                                    </span>
+                                  )}
+                                </div>
+
+                                
+
+                              </div>
+                            )
+                          })}
+                          </div>
+                        )}
                       </div>
                     )
                   })}
