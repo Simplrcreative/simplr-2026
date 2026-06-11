@@ -184,7 +184,7 @@ export default function Est2014Page() {
         </div>
       </section>
 
-      <section className="spotlight bg-coffee change-logo min-h-screen relative">
+      <section className="spotlight bg-coffee section-dark change-logo min-h-screen relative">
         {beyondItems.length ? (
           <div ref={galleryRef} className="spotlight-images">
             {beyondItems.map((item) => {
