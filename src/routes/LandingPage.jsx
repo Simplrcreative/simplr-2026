@@ -1,40 +1,197 @@
-import { useLoaderData } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLoaderData, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation } from '../lib/animations/index.js'
 import RichText from '../components/RichText.jsx'
+import RichHeading from '../components/RichHeading.jsx'
 
-export default function DefaultPage() {
-  const { slug, page } = useLoaderData() ?? {}
-  const title = page?.title || 'Untitled'
-  const content = page?.content || ''
-  const pathname = page?.slug ? `/thinking/${page?.slug}` : '/thinking'
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
 
   return (
-    <>
+    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+    thumbnailNode?.guid ??
+    ''
+  )
+}
+
+export default function LandingPage() {
+  const pageRef = useRef(null)
+  const { page } = useLoaderData() ?? {}
+  const { pathname } = useLocation()
+  const title = page?.title || 'Untitled'
+  const landingPageContent = page?.acfLandingPageBuilder || ''
+  const headline = landingPageContent.acfHeadline || ''
+  const introduction = landingPageContent.acfIntroduction || ''
+  const featuredImage = getThumbnail(landingPageContent.acfFeaturedImage)
+  const acfSections = landingPageContent?.acfSections || []
+  const ctaBtnRefs = useRef({})
+   useEffect(() => {
+    const cleanups = []
+
+    Object.values(ctaBtnRefs.current).forEach((btn) => {
+      if (btn) {
+        const cleanup = createBtnHoverAnimation(btn)
+        if (cleanup) cleanups.push(cleanup)
+      }
+    })
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup())
+    }
+  }, [acfSections])
+
+  useEffect(() => {
+    const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
+    const cleanupParallax = createParallaxAnimations(pageRef.current)
+    const cleanupSplitText = createSplitTextAnimation()
+    refreshScrollTriggers()
+
+    return () => {
+      cleanupSlideUp?.()
+      cleanupSplitText?.()
+      cleanupParallax?.()
+    }
+  }, [])
+
+  return (
+    <div ref={pageRef}>
       <Seo
         title={title || 'Thinking'}
         description=""
         pathname={pathname}
       />
 
-      <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex items-end">
+      <section className="post-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-3 col-span-8 text-coffee mt-40 flex flex-col items-center change-logo-back">
-              <div className="eyebrow"></div>
-              <h1 className="hero-title text-center"><span>{title}</span></h1>
+          <div className="col-span-12 change-logo-back" />
+          <div className="col-span-12 md:col-span-5 text-coffee change-logo mt-40 max-w-[90ch]">
+              <div className="eyebrow">{title}</div>
+              <h1 className="hero-title"><span>{headline}</span></h1>
+              <div className="mt-10 max-w-[70ch]">
+                <RichText html={introduction} />
+              </div>
+          </div>
+          <div className="col-start-6 col-span-7 parallax">
+            <div className="featured-image">
+              {featuredImage && (
+                  <picture
+                    className="ratio overflow-hidden rounded-[10px]"
+                    style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                  >
+                    {featuredImage && <source srcSet={featuredImage + '.webp'} type="image/webp" />}
+                    {featuredImage && <img src={featuredImage + '.webp'} alt={title} />}
+                  </picture>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="post-content px-5 pb-20 bg-white section-light">
-        <div className="grid grid-cols-12 w-full">
-          <div className="col-start-4 col-span-6">
-            
-            {content && (
-            <RichText html={content} />
-            )}
-          </div>
-        </div>
-      </section>
-    </>
+      {acfSections?.map((section, sectionIndex) => {
+        const sectionHeading = section?.acfHeadline || ''
+        const sectionIntroduction = section?.acfIntroduction || ''
+        const sectionContent = section?.acfContent || ''
+        const sectionContentAfter = section?.acfContentAfter || ''
+        const sectionSteps = section?.acfSteps || []
+        const sectionFeatures = section?.acfFeatures || []
+        const sectionCta = section?.acfCta || ''
+
+        if (!sectionHeading) {
+          return null
+        }
+
+        return (
+          <section key={`section-${sectionIndex}`} className="px-5 py-20 bg-white section-light">
+            <div className="grid grid-cols-12 ">
+              {sectionHeading && (
+                <div className="col-span-6 max-w-[70ch] slide-up-subtle">
+                  <RichHeading as="h2" html={sectionHeading} className="font-literata section-heading"/>
+                  <div className="mt-10 slide-up-subtle">
+                    {sectionIntroduction && (
+                      <RichText html={sectionIntroduction} />
+                    )}
+                  </div>
+                </div>
+              )}
+              {sectionContent && (
+                <div className="col-start-7 col-span-6 section-content slide-up-subtle">
+                  <RichText html={sectionContent} />
+                </div>
+              )}
+              {sectionSteps.length > 0 && (
+                <div className="col-start-7 col-span-5 step-list">
+                  {sectionSteps.map((step, stepIndex) => {
+                    const stepTitle = step?.acfTitle || ''
+                    const stepContent = step?.acfContent || ''
+                    const stepKey = `section-${sectionIndex}-step-${stepIndex}`
+
+                    if (!stepTitle && !stepContent) {
+                      return null
+                    }
+
+                    return (
+                      <div key={stepKey} className="step-item slide-up-subtle">
+                        <div className="step-title"><span>Step {stepIndex + 1}</span> {stepTitle}</div>
+                        <div className="step-content">
+                            <RichText html={stepContent} />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {sectionFeatures.length > 0 && (
+                <div className="col-start-7 col-span-5 feature-list">
+                  {sectionFeatures.map((feature, featureIndex) => {
+                    const featureTitle = feature?.acfTitle || ''
+                    const featureContent = feature?.acfContent || ''
+                    const featureKey = `section-${sectionIndex}-feature-${featureIndex}`
+
+                    if (!featureTitle && !featureContent) {
+                      return null
+                    }
+
+                    return (
+                      <div key={featureKey} className="feature-item slide-up-subtle">
+                        <div className="feature-title">{featureTitle}</div>
+                        <div className="feature-content">
+                            <RichText html={featureContent} />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {sectionContentAfter && (
+                <div className="col-start-7 col-span-6 section-content slide-up-subtle">
+                  <RichText html={sectionContentAfter} />
+                </div>
+              )}
+              {sectionCta && (
+                <div className="button-wrapper col-start-7 col-span-6 slide-up-subtle mt-4">
+                  <Link 
+                    to={sectionCta.url}
+                    ref={(el) => { ctaBtnRefs.current[sectionIndex] = el }}
+                    title={sectionCta.title}
+                    target={sectionCta.target}
+                    className="btn relative mt-10"
+                  >
+                    <span className="btn-fill" aria-hidden="true" />
+                    <span className="btn-inner">
+                      <span className="btn-text text-coffee">{sectionCta.title}</span>
+                      {sectionCta.title}
+                    </span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </section>
+        )
+      })}
+
+    </div>
   )
 }

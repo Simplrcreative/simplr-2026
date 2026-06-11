@@ -116,7 +116,7 @@ export const router = createBrowserRouter([
         handle: { pageBg: 'light' },
       },
       {
-        path: ':slug',
+        path: '*',
         element: <LandingPage />,
         loader: createLandingPageLoader(),
         handle: { pageBg: 'light' },

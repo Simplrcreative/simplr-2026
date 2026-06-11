@@ -9,7 +9,7 @@ h1, h2, h3, h4, h5 {
     white-space: nowrap;
 }
 h1, 
-h2.service-section-heading {
+h2.section-heading {
     font-size: clamp(2.5rem, 4vw, 3.125rem);
 }
 h1.large {
@@ -31,12 +31,12 @@ h2 {
     color: rgba(48, 15, 29, 0)
 }
 .hero-title,
-h2.service-section-heading {
+h2.section-heading {
     font-family: var(--font-aeonik);
     font-weight: 300;
 }
 .hero-title span,
-h2.service-section-heading span {
+h2.section-heading span {
     font-family: var(--font-literata);
     font-weight: 400;
 }

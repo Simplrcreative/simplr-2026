@@ -1,4 +1,4 @@
-import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
+import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchLandingPageData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -118,13 +118,21 @@ export function createEst2014PageLoader() {
 export function createDefaultPageLoader() {
   return async function defaultPageLoader({ request }) {
     const slug = new URL(request.url).pathname.replace(/^\/|\/$/g, '')
-    return fetchDefaultPageData(slug)
+    const data = await fetchDefaultPageData(slug)
+    if (!data.page) {
+      throw new Response('Not found', { status: 404 })
+    }
+    return data
   }
 }
 
 export function createLandingPageLoader() {
   return async function landingPageLoader({ request }) {
     const slug = new URL(request.url).pathname.replace(/^\/|\/$/g, '')
-    return fetchLandingPageData(slug)
+    const data = await fetchLandingPageData(slug)
+    if (!data.page) {
+      throw new Response('Not found', { status: 404 })
+    }
+    return data
   }
 }

@@ -38,7 +38,7 @@ function initBottomMenu() {
   })
 }
 
-function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
   const thumbnailNode = acfFeaturedThumbnail?.node
   const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
 
@@ -280,7 +280,7 @@ export default function ServicesSinglePage() {
             <div className="grid grid-cols-12 ">
               {sectionHeading && (
                 <div className="col-span-9 pe-40 slide-up-subtle">
-                  <RichHeading as="h2" html={sectionHeading} className="service-section-heading" />
+                  <RichHeading as="h2" html={sectionHeading} className="section-heading" />
                 </div>
               )}
               {sectionContent && (

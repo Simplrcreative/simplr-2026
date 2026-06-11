@@ -26,7 +26,7 @@ const contentNodeFields = `
     }
   }
   ... on NodeWithFeaturedImage {
-    featuredImage {
+    acfFeaturedImage {
       node {
         sourceUrl(size: LARGE)
         altText
@@ -658,7 +658,49 @@ const thinkingEntryBySlugQuery = `
   }
 `
 
-const landingByUriQuery = ''
+const landingByUriQuery = `
+  query LandingByUriQuery($slug: String!) {
+  acfLandingPages(first: 1, where: {status: PUBLISH, name: $slug}) {
+    nodes {
+      slug
+      title(format: RENDERED)
+      acfLandingPageBuilder {
+        acfHeadline
+        acfFeaturedImage {
+          node {
+            mediaDetails {
+              sizes {
+                name
+                sourceUrl
+              }
+            }
+          }
+        }
+        acfIntroduction
+        acfSections {
+          acfHeadline
+          acfIntroduction
+          acfContent
+          acfContentAfter
+          acfSteps {
+            acfTitle
+            acfContent
+          }
+          acfFeatures {
+            acfTitle
+            acfContent
+          }
+          acfCta {
+            target
+            title
+            url
+          }
+        }
+      }
+    }
+  }
+}
+`
 
 const homeCaseStudiesQuery = `
   query HomeCaseStudiesQuery {
@@ -1609,18 +1651,17 @@ export async function fetchLandingPageData(slug) {
   }
 
   try {
-    const uri = `/${slug}/`
-    const data = await remember(`default-page:${slug}`, () =>
-      graphQlRequest(landingByUriQuery, { uri }),
+    const data = await remember(`landing-page:${slug}`, () =>
+      graphQlRequest(landingByUriQuery, { slug }),
     )
 
-    const node = data.nodeByUri
+    const node = data.acfLandingPages?.nodes?.[0] ?? null
     return {
       slug,
-      page: node ? { title: node.title || slug, content: node.content || '' } : null,
+      page: node,
     }
   } catch (error) {
-    reportError(`Unable to load default page for ${slug}`, error)
+    reportError(`Unable to load landing page for ${slug}`, error)
     return { slug, page: null }
   }
 }

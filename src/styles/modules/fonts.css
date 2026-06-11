@@ -55,21 +55,21 @@
 }
 
 .font-literata {
-  font-family: "Literata", serif;
+  font-family: "Literata", serif!important;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
 }
 
 .font-literata-light {
-  font-family: "Literata", serif;
+  font-family: "Literata", serif!important;
   font-optical-sizing: auto;
   font-weight: 300;
   font-style: normal;
 }
 
 .font-literata-italic {
-  font-family: "Literata", serif;
+  font-family: "Literata", serif!important;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: italic;

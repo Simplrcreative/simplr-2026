@@ -126,7 +126,7 @@ export default function ThinkingSinglePage() {
     }
   }, [content])
 
-  function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'full') {
+  function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
     const thumbnailNode = acfFeaturedThumbnail?.node
     const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
 

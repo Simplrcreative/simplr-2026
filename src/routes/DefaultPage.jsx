@@ -1,12 +1,12 @@
-import { useLoaderData } from 'react-router-dom'
+import { useLoaderData, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import RichText from '../components/RichText.jsx'
 
 export default function DefaultPage() {
-  const { slug, page } = useLoaderData() ?? {}
+  const { page } = useLoaderData() ?? {}
+  const { pathname } = useLocation()
   const title = page?.title || 'Untitled'
   const content = page?.content || ''
-  const pathname = page?.slug ? `/thinking/${page?.slug}` : '/thinking'
 
   return (
     <>
