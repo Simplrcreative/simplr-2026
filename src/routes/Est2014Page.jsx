@@ -5,6 +5,18 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
+import PictureImg from '../components/PictureImg.jsx'
+
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
+  const thumbnailNode = acfFeaturedThumbnail?.node
+  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
+  return (
+    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
+    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
+    thumbnailNode?.guid ??
+    ''
+  )
+}
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -144,8 +156,6 @@ export default function Est2014Page() {
   const title = 'Est 2014'
   const description = 'Est 2014 Page'
 
-  console.log(beyondItems)
-
   return (
     <>
       <Seo
@@ -192,8 +202,16 @@ export default function Est2014Page() {
                 ? videoRatios[item.id] ?? item.width / item.height
                 : item.width / item.height
 
+              const imgLoaderSrc = getThumbnail(item.source, 'loader')
+              const imgMobileSrc = getThumbnail(item.source, 'medium')
+              const imgDesktopSrc = getThumbnail(item.source, 'large')
+
               return (
-                <figure key={item.id} className="img" style={{ aspectRatio: ratio }}>
+                <figure
+                  key={item.id}
+                  className="img"
+                  style={{ width: '400px', aspectRatio: ratio }}
+                >
                   {item.type === 'video' ? (
                     <video
                       src={item.source}
@@ -214,7 +232,14 @@ export default function Est2014Page() {
                       }}
                     />
                   ) : (
-                    <img src={item.source} alt={item.caption} />
+                    <PictureImg
+                      loaderSrc={imgLoaderSrc + '.webp'}
+                      mobileSrc={imgMobileSrc + '.webp'}
+                      desktopSrc={imgDesktopSrc + '.webp'}
+                      pictureClass="w-full h-full block"
+                      imgClass="beyond-card__media"
+                      altText={item.caption}
+                    />
                   )}
                   {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
                 </figure>

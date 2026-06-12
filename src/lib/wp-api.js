@@ -1320,26 +1320,28 @@ export async function fetchBeyondData() {
         const images = entry?.acfBeyondBuilder?.acfImages ?? []
 
         return images.map((item, imageIndex) => {
-          const videoNode = item?.acfVideo?.node
-          const imageNode = item?.acfImage?.node
-          const mediaNode = videoNode?.guid ? videoNode : imageNode
+          const videoGuid = item?.acfVideo?.node?.guid   // string URL or undefined
+          const imageNode = item?.acfImage               // { node: { guid, mediaDetails, ... } }
 
-          if (!mediaNode?.guid) {
-            return null
-          }
+          if (!videoGuid && !imageNode?.node?.guid) return null
 
-          const width = Number(mediaNode?.mediaDetails?.width) || null
-          const height = Number(mediaNode?.mediaDetails?.height) || null
-          const mimeType = item?.acfImage?.node?.mimeType || null
+          const width = videoGuid
+            ? Number(item?.acfVideo?.node?.mediaDetails?.width) || null
+            : Number(imageNode?.node?.mediaDetails?.width) || null
+          const height = videoGuid
+            ? Number(item?.acfVideo?.node?.mediaDetails?.height) || null
+            : Number(imageNode?.node?.mediaDetails?.height) || null
 
           return {
             id: `beyond-${entryIndex}-${imageIndex}`,
-            type: videoNode?.guid ? 'video' : 'image',
-            source: mediaNode.guid,
+            type: videoGuid ? 'video' : 'image',
+            // video: plain URL string consumed by <video src>
+            // image: acfImage object { node: {...} } consumed by getThumbnail()
+            source: videoGuid ?? imageNode,
             caption: item?.acfCaption || '',
             width,
             height,
-            mimeType,
+            mimeType: imageNode?.node?.mimeType || null,
             ratio: width && height ? width / height : null,
           }
         })
