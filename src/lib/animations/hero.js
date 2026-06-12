@@ -507,6 +507,13 @@ export function createHeroScrollAnimation(scope) {
     //   y: 0
     // })
 
+    const screenWidth = window.innerWidth
+    const isMobile = screenWidth < 768
+    let shouldPin = section
+    if(isMobile) {
+      shouldPin = false
+    }
+
     gsap.set(heroImage, {
       display: 'block',
       transformOrigin: 'right bottom',
@@ -525,7 +532,7 @@ export function createHeroScrollAnimation(scope) {
         scrollTrigger: {
           id: 'hero-scroll',
           trigger: section,
-          pin: section,
+          pin: shouldPin,
           start: 'top top',
           end: () => getHeroEndDistance(),
           scrub: true,
