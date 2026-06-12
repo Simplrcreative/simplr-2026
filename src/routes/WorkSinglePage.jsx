@@ -87,7 +87,7 @@ export default function WorkSinglePage() {
         pathname={pathname}
       />
     
-      <section className="page-hero px-5 pb-20 bg-white section-light min-h-screen flex items-end">
+      <section className="page-hero px-5 pb-10 md:pb-20 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
@@ -106,7 +106,7 @@ export default function WorkSinglePage() {
               {loaderSrc && (
                 <div
                   className="ratio overflow-hidden rounded-[10px] thumb-swap"
-                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
+                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
                 >
                   <PictureImg
                     loaderSrc = {secondaryLoaderSrc + '.webp'}
@@ -131,9 +131,9 @@ export default function WorkSinglePage() {
         </div>
       </section>
 
-      <section className="work-intro px-5 py-20 bg-white change-logo section-light__">
+      <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo section-light__">
         <div className="grid grid-cols-12">
-          <div className="work-types col-start-1 col-span-5 slide-up-subtle">
+          <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle">
              {types.map(({ name }, index) => {
               const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
               return (
@@ -146,7 +146,7 @@ export default function WorkSinglePage() {
               )
              })}
           </div>
-          <div className="col-start-8 col-span-5 trigger-split-text-coffee">
+          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 trigger-split-text-coffee">
             <RichText html={introduction} className="split-text-coffee"/>
             {swags && (
               <div className="swags my-20">
@@ -194,9 +194,9 @@ export default function WorkSinglePage() {
         let txtOrder, imgOrder
         if (alignment === 'right') {
           txtOrder = 'order-1 col-start-1'
-          imgOrder = 'order-2 col-start-7 ps-2 section-dark__'
+          imgOrder = 'order-2 col-start-1 md:col-start-7 ps-2 section-dark__'
         } else {
-          txtOrder = 'order-2 col-start-9 section-light__'
+          txtOrder = 'order-2 col-start-1 md:col-start-9 section-light__'
           imgOrder = 'order-1 col-start-1 pe-2'
         }
         const content = section?.acfContent || ''
@@ -228,10 +228,10 @@ export default function WorkSinglePage() {
               )}
               {layout === 'Image & Text' && (
                 <>
-                  <div className={`col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee`}>
+                  <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
-                  <div className={`col-span-6 ${imgOrder}`}>
+                  <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
                     {video1 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
@@ -268,7 +268,7 @@ export default function WorkSinglePage() {
               )}
               {layout === 'Two Images' && (
                 <>
-                  <div className="col-start-1 col-span-6 pe-2">
+                  <div className="col-start-1 col-span-12 md:col-span-6 pe-2">
                     {video1 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
@@ -290,7 +290,7 @@ export default function WorkSinglePage() {
                       />
                     )}
                   </div>
-                  <div className="col-start-7 col-span-6 ps-2 section-dark__">
+                  <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 ps-2 section-dark__">
                     {video2 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video

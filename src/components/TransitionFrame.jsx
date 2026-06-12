@@ -1026,25 +1026,44 @@ export default function TransitionFrame({ children }) {
       const dockDuration = 1.5
       const dockStart = expandDuration + pauseDuration
       const width = window.innerWidth * 1.1
+      // Portrait on mobile — height-driven expansion so the clone fills the full screen.
+      const isPortrait = window.innerWidth < window.innerHeight
 
       const servicesSourceAspectRatio = altTransition?.width && altTransition?.height
         ? altTransition.width / altTransition.height
         : 16 / 9
 
+      // Aspect ratio of the source card (width / height). Used for height-driven
+      // sizing on portrait mobile so the expanded clone fills the full viewport height
+      // with the correct proportional width.
+      const cardAspectRatio = altTransition?.width && altTransition?.height
+        ? altTransition.width / altTransition.height
+        : 1 / 0.9
+
       // For services, expand to a centered cover box that fills at least the
       // viewport height and width while preserving the source media ratio.
+      // For portrait mobile (non-service), expand height to 100vh and derive width
+      // from the card's aspect ratio so the clone fills the screen correctly.
       const expandedWidth = isServiceDockTransition
         ? Math.max(width, window.innerHeight * servicesSourceAspectRatio)
-        : width
+        : isPortrait
+          ? window.innerHeight * 1.2 * cardAspectRatio
+          : width
       const expandedHeight = isServiceDockTransition
         ? expandedWidth / servicesSourceAspectRatio
-        : width * 0.9
+        : isPortrait
+          ? window.innerHeight * 1.2
+          : width * 0.9
       const expandedTop = isServiceDockTransition
         ? (window.innerHeight - expandedHeight) / 2
-        : '-30%'
+        : isPortrait
+          ? 0
+          : '-30%'
       const expandedLeft = isServiceDockTransition
         ? (window.innerWidth - expandedWidth) / 2
-        : 0
+        : isPortrait
+          ? (window.innerWidth - expandedWidth) / 2
+          : 0
 
       const crossfadeToTarget = (target) => {
         gsap.set(target, { autoAlpha: 1 })
@@ -1059,7 +1078,7 @@ export default function TransitionFrame({ children }) {
       tl.to(altClone, {
         top: expandedTop,
         left: expandedLeft,
-        filter: 'blur(10px)',
+        //filter: 'blur(10px)',
         width: expandedWidth,
         height: expandedHeight,
         borderRadius: 0,
@@ -1179,7 +1198,7 @@ export default function TransitionFrame({ children }) {
         }
 
         tl.to(altClone, {
-          filter: 'blur(0px)',
+          //filter: 'blur(0px)',
           top: dock.rect.top,
           left: dock.rect.left,
           width: dock.rect.width,

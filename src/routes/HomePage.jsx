@@ -802,7 +802,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       {/*<picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
                         {study.thumbnail ? <img src={study.thumbnail + '.webp'} title={study.client} /> : null}
                       </picture>*/}
-                      <div className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                      <div className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}>
                         <PictureImg
                           loaderSrc = {study.loaderImg + '.webp'}
                           mobileSrc = {study.thumbnail + '.webp'}
