@@ -1,62 +1,58 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText = '', imgClass = '', lazyLoad = true }) {
-    
-    const screenWidth = window.innerWidth
-    const isMobile = screenWidth < 768
-    const fullSrc = isMobile ? mobileSrc : desktopSrc
-    const [isIntersecting, setIsIntersecting] = useState(false);
-    const imgRef = useRef(null);
-   
+export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText = '', imgClass = '', pictureClass = '', lazyLoad = true }) {
+
+    const [isIntersecting, setIsIntersecting] = useState(!lazyLoad);
+    const [isFullLoaded, setIsFullLoaded] = useState(false);
+    const pictureRef = useRef(null);
+
     useEffect(() => {
+        if (!lazyLoad) return;
+
         const observer = new IntersectionObserver(
-        ([entry]) => {
-            if (entry.isIntersecting) {
-            setIsIntersecting(true);
-            observer.disconnect(); // Stop observing once loaded
-            }
-        },
-        { rootMargin: '50px' } // Pre-load 50px before entering viewport
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsIntersecting(true);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: '50px' }
         );
 
-        if (imgRef.current) {
-            observer.observe(imgRef.current);
-            imgRef.current.classList.add('loaded')
-        } else {
-            imgRef.current.classList.remove('loaded')
-        }
+        if (pictureRef.current) observer.observe(pictureRef.current);
 
         return () => observer.disconnect();
-    }, []);
+    }, [lazyLoad]);
 
+    // Only mark as loaded once the *full* image fires onLoad, not the placeholder
+    const handleLoad = () => {
+        if (isIntersecting) setIsFullLoaded(true);
+    };
+
+    // Applied to <picture>, not <img>, so GSAP can animate .thumb-primary/.thumb-secondary freely
+    const blurStyle = {
+        filter: isFullLoaded ? 'none' : 'blur(12px)',
+        // scale(1.05) pushes blurred edges outside the parent's overflow:hidden area
+        transform: isFullLoaded ? 'scale(1)' : 'scale(1.05)',
+        transition: isIntersecting ? 'filter 0.6s ease, transform 0.6s ease' : 'none',
+    };
 
     return (
-        <picture>
-            {/*}
-            <source 
-                type="image/webp" 
-                media="(max-width:768px)" 
-                data-srcset={mobileSrc} 
-                srcSet={loaderSrc} />
-            <source 
-                type="image/webp" 
-                data-srcset={desktopSrc} 
-                srcSet={loaderSrc} />
-            <img 
-                ref={imgRef}
-                data-src={loaderSrc} 
-                src={loaderSrc} 
-                className={`lazy ${imgClass}`} 
-                alt={altText} 
+        <picture ref={pictureRef} className={pictureClass} style={blurStyle}>
+            <source
+                media="(max-width:767px)"
+                srcSet={isIntersecting ? mobileSrc : loaderSrc}
             />
-            */}
+            <source
+                srcSet={isIntersecting ? desktopSrc : loaderSrc}
+            />
             <img
-                ref={imgRef}
-                src={isIntersecting ? fullSrc : loaderSrc}
+                src={loaderSrc}
                 alt={altText}
-                className={`lazy ${imgClass}`}
+                className={imgClass}
+                onLoad={handleLoad}
             />
         </picture>
-    )
+    );
 }
                 
