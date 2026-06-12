@@ -12,7 +12,6 @@ import {
   serviceCatalogSchema,
   webPageSchema,
 } from '../lib/seo.js'
-import caseStudyTwo from '../assets/img/case-study-example-2.jpg'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import PictureImg from '../components/PictureImg.jsx'
@@ -30,6 +29,7 @@ const HERO_MODAL_ENTER_FRAME_DELAY_MS = 32
 const HERO_MODAL_SCROLL_DURATION_MS = 800
 const HERO_MODAL_CONTENT_FADE_DURATION_MS = 600
 const PLAY_ICON_DISABLE_ATTR = 'data-play-icon-disabled'
+const PLAY_ICON_CLOSE_ATTR = 'data-play-icon-close'
 
 const HOME_PAGE_FALLBACK = {
   page: {
@@ -427,6 +427,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     const unpinThreshold = triggerThreshold ?? heroSectionThreshold ?? markerThreshold ?? 0
 
     const revealHeroModal = () => {
+      document.documentElement.setAttribute(PLAY_ICON_CLOSE_ATTR, 'true')
       setIsHeroModalMounted(true)
       setIsHeroModalOpen(false)
 
@@ -494,6 +495,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   function closeHeroVideoModal({ scrollToNextSection = false } = {}) {
     clearPendingHeroModalOpen()
     if (!isHeroModalVisible) return
+
+    document.documentElement.removeAttribute(PLAY_ICON_CLOSE_ATTR)
 
     if (scrollToNextSection) {
       document.documentElement.setAttribute(PLAY_ICON_DISABLE_ATTR, 'true')
@@ -616,10 +619,22 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           faqSchema('/', page.faqs),
         ]}
       />
-      <div className="play-icon text-white bg-branding-design fixed z-[9999] w-[100px] h-[100px] rounded-full flex items-center justify-center pointer-events-none">
-        <svg xmlns="http://www.w3.org/2000/svg" className="ms-2" width="22" height="20" viewBox="0 0 18 20" fill="currentColor">
-          <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
-        </svg>
+      <div
+        className={`play-icon text-white bg-branding-design fixed z-[999999] w-[100px] h-[100px] rounded-full flex items-center justify-center transition-[background-color] duration-200 ${isHeroModalVisible ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
+        onClick={isHeroModalVisible ? () => closeHeroVideoModal({ scrollToNextSection: true }) : undefined}
+        role={isHeroModalVisible ? 'button' : undefined}
+        aria-label={isHeroModalVisible ? 'Close video' : undefined}
+      >
+        {isHeroModalVisible ? (
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <line x1="3" y1="3" x2="19" y2="19"/>
+            <line x1="19" y1="3" x2="3" y2="19"/>
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="ms-2" width="22" height="20" viewBox="0 0 18 20" fill="currentColor">
+            <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
+          </svg>
+        )}
       </div>
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-screen flex flex-col justify-end change-logo-back">
@@ -666,17 +681,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           aria-label="Full hero video"
           onClick={closeHeroVideoModal}
         >
-          <button
-              type="button"
-              className="hero-video-modal-close absolute right-3 top-3 z-10 rounded-full bg-branding-design text-sm text-white w-[30px] h-[30px]"
-              onClick={(event) => {
-                event.stopPropagation()
-                closeHeroVideoModal({ scrollToNextSection: true })
-              }}
-              aria-label="Close full hero video"
-            >
-              X
-          </button>
           <div
             className={`hero-video-modal-inner w-full transition-all ease-out  ${isHeroModalOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.75]'}`}
             style={{

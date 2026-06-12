@@ -380,7 +380,9 @@ export function createHeroScrollAnimation(scope) {
 
       const updatePlayIconVisibility = (visible) => {
         const playIconDisabled = document.documentElement.hasAttribute('data-play-icon-disabled')
-        const nextVisible = playIconDisabled ? false : visible
+        const closeMode = document.documentElement.hasAttribute('data-play-icon-close')
+        // Close mode always wins over disabled — the icon must be visible to be clickable.
+        const nextVisible = closeMode ? true : (playIconDisabled ? false : visible)
 
         if (nextVisible === isOver) return
 
@@ -396,6 +398,13 @@ export function createHeroScrollAnimation(scope) {
 
       const syncPlayIconState = () => {
         const playIconDisabled = document.documentElement.hasAttribute('data-play-icon-disabled')
+        const closeMode = document.documentElement.hasAttribute('data-play-icon-close')
+
+        // In close mode the icon follows the mouse everywhere and is always visible.
+        if (closeMode) {
+          updatePlayIconVisibility(true)
+          return
+        }
 
         if (playIconDisabled || hiddenBySection || !hasPointer) {
           updatePlayIconVisibility(false)
@@ -432,7 +441,7 @@ export function createHeroScrollAnimation(scope) {
       }
 
       const onHeroPointerLeave = () => {
-        updatePlayIconVisibility(false)
+        syncPlayIconState()
       }
 
       const onViewportChange = () => {
@@ -450,7 +459,7 @@ export function createHeroScrollAnimation(scope) {
 
       const onBrandsGrowEnter = () => {
         hiddenBySection = true
-        updatePlayIconVisibility(false)
+        syncPlayIconState()
       }
 
       const onBrandsGrowLeave = () => {
@@ -460,7 +469,7 @@ export function createHeroScrollAnimation(scope) {
 
       const onNavEnter = () => {
         hiddenBySection = true
-        updatePlayIconVisibility(false)
+        syncPlayIconState()
       }
 
       const onNavLeave = () => {
