@@ -37,16 +37,19 @@ export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText =
         if (isIntersecting) setIsFullLoaded(true);
     };
 
-    // Applied to <picture>, not <img>, so GSAP can animate .thumb-primary/.thumb-secondary freely
-    const blurStyle = {
+    // Filter is on <img>, NOT <picture>, for two reasons:
+    // 1. <picture> is used as the dock target in page transitions — any transform on it
+    //    inflates getBoundingClientRect() and breaks the dock animation sizing.
+    // 2. GSAP hover animation uses transform/clipPath/zIndex on the <img> but never filter,
+    //    so filter is the one property we can safely own on the same element.
+    // No scale() needed — the parent always has overflow:hidden which clips blur edges.
+    const imgStyle = {
         filter: isFullLoaded ? 'none' : 'blur(12px)',
-        // scale(1.05) pushes blurred edges outside the parent's overflow:hidden area
-        transform: isFullLoaded ? 'scale(1)' : 'scale(1.05)',
-        transition: isIntersecting ? 'filter 0.6s ease, transform 0.6s ease' : 'none',
+        transition: isIntersecting ? 'filter 0.6s ease' : 'none',
     };
 
     return (
-        <picture ref={pictureRef} className={pictureClass} style={blurStyle}>
+        <picture ref={pictureRef} className={pictureClass}>
             <source
                 media="(max-width:767px)"
                 srcSet={isIntersecting ? mobileSrc : loaderSrc}
@@ -59,6 +62,7 @@ export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText =
                 alt={altText}
                 className={imgClass}
                 onLoad={handleLoad}
+                style={imgStyle}
             />
         </picture>
     );
