@@ -537,6 +537,25 @@ const postsQuery = `
                       guid
                       altText
                       mimeType
+                      mediaDetails {
+                        sizes {
+                          name
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
+                  acfSecondaryThumbnail {
+                    node {
+                      guid
+                      altText
+                      mimeType
+                      mediaDetails {
+                        sizes {
+                          name
+                          sourceUrl
+                        }
+                      }
                     }
                   }
                 }
@@ -646,6 +665,25 @@ const thinkingEntryBySlugQuery = `
                       guid
                       altText
                       mimeType
+                      mediaDetails {
+                        sizes {
+                          name
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
+                  acfSecondaryThumbnail {
+                    node {
+                      guid
+                      altText
+                      mimeType
+                      mediaDetails {
+                        sizes {
+                          name
+                          sourceUrl
+                        }
+                      }
                     }
                   }
                 }
@@ -1461,18 +1499,20 @@ export async function fetchNextWorkData(currentSlug) {
     if (!others.length) return null
 
     const pick = others[Math.floor(Math.random() * others.length)]
-    const featuredThumbnailNode = pick?.acfWorkBuilder?.acfFeaturedThumbnail?.node
-    const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
-    const thumbnail = (
-      sizes.find((s) => s.name === 'large')
-      || sizes.find((s) => s.name === 'full')
-    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+    const featuredThumbnailNode = pick?.acfWorkBuilder?.acfFeaturedThumbnail
+    const secondaryThumbnailNode = pick?.acfWorkBuilder?.acfSecondaryThumbnail
+    //const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
+    //const thumbnail = (
+    //  sizes.find((s) => s.name === 'large')
+    //  || sizes.find((s) => s.name === 'full')
+    //)?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
 
     return {
       slug: pick.slug,
       title: pick.title,
-      thumbnail,
+      //thumbnail,
       featuredThumbnailNode,
+      secondaryThumbnailNode,
       client: pick.acfWorkBuilder?.acfClient?.nodes?.[0]?.name ?? '',
       categories: pick.acfWorkBuilder?.acfCategory?.nodes ?? [],
     }

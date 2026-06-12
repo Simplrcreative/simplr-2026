@@ -43,9 +43,15 @@ export default function WorkSinglePage() {
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
   const nextWork = useLoaderData()?.nextWork ?? null
-  const nextThumb = nextWork?.thumbnail || ''
-  const nextThumb2 = nextWork?.thumbnail2 || nextThumb
+  const nextThumbNode = nextWork?.featuredThumbnailNode || ''
+  const nextThumb2Node = nextWork?.secondaryThumbnailNode || nextThumbNode
   const nextThumbAlt = nextWork?.title || 'Untitled'
+  const nextLoaderSrc   = getThumbnail(nextThumbNode, 'loader') + '.webp'
+  const nextMobileSrc   = getThumbnail(nextThumbNode, 'medium') + '.webp'
+  const nextDesktopSrc  = getThumbnail(nextThumbNode) + '.webp'
+  const nextLoader2Src  = getThumbnail(nextThumb2Node, 'loader') + '.webp'
+  const nextMobile2Src  = getThumbnail(nextThumb2Node, 'medium') + '.webp'
+  const nextDesktop2Src = getThumbnail(nextThumb2Node) + '.webp'
 
   useEffect(() => {
     // Lock scroll during the featured-image dock transition; unlock on completion.
@@ -97,15 +103,6 @@ export default function WorkSinglePage() {
           </div>
           <div className="col-start-9 col-span-5">
             <div className="featured-image section-dark__ thumb-swap-trigger">
-              {/*{thumbnail && (
-                <picture
-                  className="ratio overflow-hidden rounded-[10px] thumb-swap"
-                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
-                > 
-                  <img className="thumb-primary" src={thumbnail2 + '.webp'} alt={altText} />
-                  <img className="thumb-secondary" src={thumbnail + '.webp'} alt="" aria-hidden="true" />
-                </picture>
-              )}*/}
               {loaderSrc && (
                 <div
                   className="ratio overflow-hidden rounded-[10px] thumb-swap"
@@ -206,26 +203,18 @@ export default function WorkSinglePage() {
         const content2 = section?.acfContent2 || ''
         const video1 = section?.acfVideo1?.node?.guid || ''
         const video2 = section?.acfVideo2?.node?.guid || ''
-        const getSizeUrl = (field) =>
-          field?.node?.mediaDetails?.sizes?.find((s) => s.name === 'large')?.sourceUrl
-          || field?.node?.guid
-          || ''
-        const image1 = getSizeUrl(section?.acfImage1)
-        const image2 = getSizeUrl(section?.acfImage2)
         const mimeType1 = section?.acfImage1?.node?.mimeType || ''
         const mimeType2 = section?.acfImage2?.node?.mimeType || ''
-        let fImage1 = image1
-        let fMimeType1 = mimeType1
-        if(mimeType1 != 'image/gif') {
-          fImage1 = image1 + '.webp'
-          fMimeType1 = 'image/webp'
-        }
-        let fImage2 = image2
-        let fMimeType2 = mimeType2
-        if(mimeType2 != 'image/gif') {
-          fImage2 = image2 + '.webp'
-          fMimeType2 = 'image/webp'
-        }
+        const isGif1 = mimeType1 === 'image/gif'
+        const isGif2 = mimeType2 === 'image/gif'
+        const ext1 = isGif1 ? '' : '.webp'
+        const ext2 = isGif2 ? '' : '.webp'
+        const fImage1Loader = getThumbnail(section?.acfImage1, 'loader') + ext1
+        const fImage1Mobile = getThumbnail(section?.acfImage1, 'medium') + ext1
+        const fImage1       = getThumbnail(section?.acfImage1) + ext1
+        const fImage2Loader = getThumbnail(section?.acfImage2, 'loader') + ext2
+        const fImage2Mobile = getThumbnail(section?.acfImage2, 'medium') + ext2
+        const fImage2       = getThumbnail(section?.acfImage2) + ext2
         const altText1 = section?.acfImage1?.node?.altText || 'Untitled'
         const altText2 = section?.acfImage2?.node?.altText || 'Untitled'
 
@@ -247,7 +236,7 @@ export default function WorkSinglePage() {
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video1}
-                          poster={fImage1 || undefined}
+                          poster={fImage1Mobile || undefined}
                           autoPlay
                           muted
                           loop
@@ -255,14 +244,13 @@ export default function WorkSinglePage() {
                         />
                       </div>
                     ) : (
-                      <picture className="full-image overflow-hidden rounded-[10px]">
-                        {fImage1 && (
-                          <>
-                            <source srcSet={fImage1} type={fMimeType1} />
-                            <img src={fImage1} alt={altText1} />
-                          </>
-                        )}
-                      </picture>
+                      <PictureImg
+                        loaderSrc={fImage1Loader}
+                        mobileSrc={fImage1Mobile}
+                        desktopSrc={fImage1}
+                        altText={altText1}
+                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                      />
                     )}
                   </div>
                 </>
@@ -285,7 +273,7 @@ export default function WorkSinglePage() {
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video1}
-                          poster={fImage1 || undefined}
+                          poster={fImage1Mobile || undefined}
                           autoPlay
                           muted
                           loop
@@ -293,14 +281,13 @@ export default function WorkSinglePage() {
                         />
                       </div>
                     ) : (
-                      <picture className="full-image overflow-hidden rounded-[10px]">
-                        {fImage1 && (
-                          <>
-                            <source srcSet={fImage1} type={fMimeType1} />
-                            <img src={fImage1} alt={altText1} />
-                          </>
-                        )}
-                      </picture>
+                      <PictureImg
+                        loaderSrc={fImage1Loader}
+                        mobileSrc={fImage1Mobile}
+                        desktopSrc={fImage1}
+                        altText={altText1}
+                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                      />
                     )}
                   </div>
                   <div className="col-start-7 col-span-6 ps-2 section-dark__">
@@ -308,7 +295,7 @@ export default function WorkSinglePage() {
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
                           src={video2}
-                          poster={fImage2 || undefined}
+                          poster={fImage2Mobile || undefined}
                           autoPlay
                           muted
                           loop
@@ -316,14 +303,13 @@ export default function WorkSinglePage() {
                         />
                       </div>
                     ) : (
-                      <picture className="full-image overflow-hidden rounded-[10px]">
-                        {fImage2 && (
-                          <>
-                            <source srcSet={fImage2} type={fMimeType2} />
-                            <img src={fImage2} alt={altText2} />
-                          </>
-                        )}
-                      </picture>
+                      <PictureImg
+                        loaderSrc={fImage2Loader}
+                        mobileSrc={fImage2Mobile}
+                        desktopSrc={fImage2}
+                        altText={altText2}
+                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                      />
                     )}
                   </div>
                 </>
@@ -334,7 +320,7 @@ export default function WorkSinglePage() {
                     <div className="full-image overflow-hidden rounded-[10px]">
                       <video
                         src={video1}
-                        poster={fImage1 || undefined}
+                        poster={fImage1Mobile || undefined}
                         autoPlay
                         muted
                         loop
@@ -342,14 +328,13 @@ export default function WorkSinglePage() {
                       />
                     </div>
                   ) : (
-                    <picture className="full-image overflow-hidden rounded-[10px]">
-                      {fImage1 && (
-                        <>
-                          <source srcSet={fImage1} type="image/webp" />
-                          <img src={fImage1} alt={altText1} />
-                        </>
-                      )}
-                    </picture>
+                    <PictureImg
+                      loaderSrc={fImage1Loader}
+                      mobileSrc={fImage1Mobile}
+                      desktopSrc={fImage1}
+                      altText={altText1}
+                      pictureClass="full-image overflow-hidden rounded-[10px]"
+                    />
                   )}
                 </div>
               )}
@@ -394,14 +379,23 @@ export default function WorkSinglePage() {
                   data-transition-source="media"
                   data-transition-variant="work-next"
                 >
-                  <picture
-                    className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap"
-                    style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
-                  >
-                    {nextThumb && <img className="thumb-primary" src={nextThumb + '.webp'} alt={nextThumbAlt} />}
-                    {nextThumb2 && <img className="thumb-secondary" src={nextThumb2 + '.webp'} alt='' aria-hidden="true" />}
-                  </picture>
-                  
+                  <div className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                    <PictureImg
+                      loaderSrc={nextLoaderSrc}
+                      mobileSrc={nextMobileSrc}
+                      desktopSrc={nextDesktopSrc}
+                      imgClass='thumb-primary rounded-[10px]'
+                      altText={nextThumbAlt}
+                    />
+                    <PictureImg
+                      loaderSrc={nextLoader2Src}
+                      mobileSrc={nextMobile2Src}
+                      desktopSrc={nextDesktop2Src}
+                      imgClass='thumb-secondary rounded-[10px]'
+                      altText=''
+                    />
+                  </div>
+            
                 </Link>
               </div>
               <div className="work-featured__meta mt-3">

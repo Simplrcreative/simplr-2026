@@ -24,6 +24,14 @@ export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText =
         return () => observer.disconnect();
     }, [lazyLoad]);
 
+    // If all three sources are identical, no new browser load fires after intersection —
+    // the blur would never clear. Detect this and resolve immediately.
+    useEffect(() => {
+        if (isIntersecting && loaderSrc === mobileSrc && loaderSrc === desktopSrc) {
+            setIsFullLoaded(true);
+        }
+    }, [isIntersecting, loaderSrc, mobileSrc, desktopSrc]);
+
     // Only mark as loaded once the *full* image fires onLoad, not the placeholder
     const handleLoad = () => {
         if (isIntersecting) setIsFullLoaded(true);
