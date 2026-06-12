@@ -90,18 +90,18 @@ export default function WorkSinglePage() {
       <section className="page-hero px-5 pb-20 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-start-1 col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
+          <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
               <h1 className="hero-title"><span>{title}</span></h1>
             </div>
             {categories.length > 0 && (
-              <div className="categories mt-3 flex flex-wrap gap-0">
+              <div className="categories my-10 md:mt-3 md:mb-0 flex flex-wrap gap-0">
                 {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
               </div>
             )}
           </div>
-          <div className="col-start-9 col-span-5">
+          <div className="col-start-1 md:col-start-9 col-span-12 md:col-span-5">
             <div className="featured-image section-dark__ thumb-swap-trigger">
               {loaderSrc && (
                 <div

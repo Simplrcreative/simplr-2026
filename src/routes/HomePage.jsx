@@ -662,14 +662,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </button>
             </div>
           </div>
-          {/*
-          <div className="show-title-wrapper">
-            <div className="show-title text-white" >
-              Watch Our Showreel
-            </div>
-          </div>
-          */}
-          
       </section>
 
       {isHeroModalVisible && hasHeroFullVideo ? (
@@ -767,9 +759,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </Link>
       </section>
 
-      <section ref={caseStudiesRef} className="case-studies px-5 py-30 section-dark light-to-coffee-incoming min-h-screen">
+      <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
         
-          <div className="grid grid-cols-12 items-emd slide-up pt-10">
+          <div className="grid grid-cols-12 items-emd slide-up md:pt-10">
             <div className="col-start-1 col-span-12 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
@@ -821,7 +813,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       </div>
                     </Link>
                     {study.categories?.length > 0 && (
-                      <div className="categories mt-5 flex">
+                      <div className="categories mt-5 hidden md:flex">
                         {study.categories.map(({ name }) => (
                           <CategoryBadge key={`${study.id}-${name}`} name={name} />
                         ))}
@@ -968,7 +960,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
               <div className="md:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[32rem] text-[1.125rem] text-coffee">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[20rem] md:max-w-[32rem] text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>
