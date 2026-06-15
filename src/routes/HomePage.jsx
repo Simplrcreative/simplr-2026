@@ -749,7 +749,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         <Link 
           to="services"
           ref={btnRef}
-          className="btn md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
+          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
         >
           <span className="btn-fill" aria-hidden="true" />
           <span className="btn-inner">
