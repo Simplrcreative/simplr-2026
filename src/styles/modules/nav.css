@@ -290,6 +290,7 @@ nav.light a.is-active .nav-link__orb {
         display: inline-block;
     }
     .tagline {
+        margin: 0;
         font-size: 1.375rem;
         line-height: 1.625rem;
     }
