@@ -178,18 +178,11 @@
 
 
 /* ─── Bullets / value props section ─────────────────────── */
-.bullets-grid {
-  display: flex;
-  gap: 4.125rem;
-  align-items: flex-start;
-}
-
 .bullet-item {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4.125rem;
-  max-width: 35ch
+  gap: 2rem;
 }
 
 .bullet-dot {
@@ -226,4 +219,20 @@
   color: #fff;
   margin: 0;
   
+}
+@media (max-width: 767.9px) {
+  .bullet-item {
+    margin-bottom: 4.125rem;
+  }
+}
+@media (min-width: 768px) {
+  .bullets-grid {
+    display: flex;
+    gap: 4.125rem;
+    align-items: flex-start;
+  }
+  .bullet-item {
+    max-width: 35ch;
+    gap: 4.125rem;
+  }
 }

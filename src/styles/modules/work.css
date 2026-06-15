@@ -172,11 +172,10 @@
 }
 .text-only-section {
   font-family: var(--font-literata);
-  font-size: clamp(2.5rem, 4vw, 3.125rem);
+  font-size: 1.875rem;
   font-weight: 300;
-  line-height: 1.2;
+  line-height: 1.4;
 }
-
 .work-content h3 {
   margin: 0 0 1.875rem 0;
 }
@@ -196,5 +195,9 @@
   }
   .swag-details {
     width: calc(45% - 3.75rem)
+  }
+  .text-only-section {
+    font-size: clamp(2.5rem, 4vw, 3.125rem);
+    line-height: 1.2;
   }
 }

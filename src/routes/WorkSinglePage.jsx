@@ -194,10 +194,10 @@ export default function WorkSinglePage() {
         let txtOrder, imgOrder
         if (alignment === 'right') {
           txtOrder = 'order-1 col-start-1'
-          imgOrder = 'order-2 col-start-1 md:col-start-7 ps-2 section-dark__'
+          imgOrder = 'order-2 col-start-1 md:col-start-7 md:ps-2'
         } else {
-          txtOrder = 'order-2 col-start-1 md:col-start-9 section-light__'
-          imgOrder = 'order-1 col-start-1 pe-2'
+          txtOrder = 'order-2 col-start-1 md:col-start-9'
+          imgOrder = 'order-1 col-start-1 md:pe-2'
         }
         const content = section?.acfContent || ''
         const content2 = section?.acfContent2 || ''
@@ -222,13 +222,13 @@ export default function WorkSinglePage() {
           <section key={`section-${index}`} className="work-content px-5 pb-5">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
-                <div className="col-start-2 col-span-10 section-light__ pt-18 pb-20 trigger-split-text-coffee">
+                <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-10 py-10 md:pt-18 md:pb-20 trigger-split-text-coffee">
                   <RichText html={content} className="text-only-section split-text-coffee text-center" />
                 </div>
               )}
               {layout === 'Image & Text' && (
                 <>
-                  <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
+                  <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee mt-8 md:mt-0`}>
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
@@ -268,7 +268,7 @@ export default function WorkSinglePage() {
               )}
               {layout === 'Two Images' && (
                 <>
-                  <div className="col-start-1 col-span-12 md:col-span-6 pe-2">
+                  <div className="col-start-1 col-span-12 md:col-span-6 pb-5 md:pb-0 md:pe-2">
                     {video1 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
@@ -290,7 +290,7 @@ export default function WorkSinglePage() {
                       />
                     )}
                   </div>
-                  <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 ps-2 section-dark__">
+                  <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 md:ps-2">
                     {video2 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
                         <video
@@ -315,7 +315,7 @@ export default function WorkSinglePage() {
                 </>
               )}
               {layout === 'Full Image' && (
-                <div className="col-span-12 section-dark__">
+                <div className="col-span-12">
                   {video1 ? (
                     <div className="full-image overflow-hidden rounded-[10px]">
                       <video
@@ -344,9 +344,9 @@ export default function WorkSinglePage() {
       })}
 
       {testimonial && (
-        <section className="work-testimonial px-5 pt-40 pb-20 section-light__">
+        <section className="work-testimonial px-5 py-5 md:pt-40 md:pb-20">
           <div className="grid grid-cols-12">
-            <div className="col-start-7 col-span-4 ps-2 slide-up-subtle">
+            <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-4 md:ps-2 slide-up-subtle">
               {testimonial.acfTestimonials?.acfTestimonial && (
                 <blockquote
                   className="testimonial-quote mb-10"
@@ -368,9 +368,9 @@ export default function WorkSinglePage() {
 
       {nextWork && (
         
-      <section className="next-work px-5 py-20 bg-white section-light__ relative overflow-hidden__">
+      <section className="next-work px-5 py-20 bg-white relative overflow-hidden__">
         <div className="grid grid-cols-12 relative z-1">
-            <div className="col-start-5 col-span-4 pt-20">
+            <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">
                 <Link
                   to={`/work/${nextWork.slug}`}
@@ -409,7 +409,7 @@ export default function WorkSinglePage() {
             </div>
         </div>
         <div className="next-title-wrapper ">
-          <div className="next-title text-coffee min-h-[600px]" >
+          <div className="next-title text-coffee md:min-h-[600px]">
             Next Case Study
           </div>
         </div>

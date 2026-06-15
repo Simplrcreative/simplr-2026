@@ -109,14 +109,14 @@ export default function AboutPage() {
 
       <section className="px-5 py-20 bg-coffee section-dark trigger-split-text">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-white pt-20">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-white md:pt-20">
             <div className="lead split-text">Guided by creative intelligence, we simplify complexity to help brands connect, adapt, and grow.</div>
           </div>
         </div>
       </section>
 
       {/* People section */}
-      <section id="our-people" ref={peopleSectionRef} className="people py-20 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
+      <section id="our-people" ref={peopleSectionRef} className="people py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
         <div ref={scatterRef} className="people-scatter relative z-3 max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
@@ -217,7 +217,7 @@ export default function AboutPage() {
 
       <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden">
         <div className="grid grid-cols-12 gap-x-5 w-full">
-          <div className="col-start-2 col-span-10">
+          <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-10">
             <div className="bullets-grid">
 
               <div id="bullet-item-1" className="bullet-item">
@@ -249,9 +249,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 py-40 bg-coffee trigger-split-text">
+      <section className="px-5 pb-20 md:py-40 bg-coffee trigger-split-text">
         <div className="grid grid-cols-12">
-          <div className="col-start-4 col-span-4 text-white">
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-white">
             <div className="lead split-text">Guided by creative intelligence, we simplify complexity to help brands connect, adapt, and grow.</div>
           </div>
         </div>
