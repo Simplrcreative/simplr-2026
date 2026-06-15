@@ -60,11 +60,11 @@
 /* ─── Profile image — inside image column, vertically centered ── */
 
 .person-hover-img {
-  position: absolute;
-  top: 0;
+  position:absolute;
+  top: 50%!important;
   left: 0;
   width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 3 / 4;
   height: auto;
   object-fit: cover;
   border-radius: 10px;
@@ -91,20 +91,19 @@
 .people-grid {
   top: 50%;
   transform: translateY(-50%);
-  height: 90vh;
+  /*height: 90vh;*/
   overflow: hidden
 }
 .bio-close {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 3rem;
+  right: -25%;
   left: auto;
   transform: translateX(0);
   color: #fff;
   cursor: pointer;
   background: none;
   border: none;
-  padding: 0 1rem;
   opacity: 0.8;
   transition: opacity 0.2s;
 }
@@ -150,6 +149,17 @@
 .bio-text p + p {
   margin-top: 1.5rem;
 }
+@media (max-width: 767.9px) {
+  .bio-overlay {
+    z-index: 0!important;
+  }
+  .person-hover-img {
+    margin-top: 3rem!important;
+  }
+  .bio-content {
+    padding-top: 95vw;
+  }
+}
 @media (min-width: 768px) {
   .person-item.align-end  { margin-left: auto; }
   .person-item.align-start { margin-right: auto; }
@@ -168,6 +178,7 @@
     top: 0;
     right: auto;
     left: 50%;
+    padding: 0 1rem;
     transform: translateX(-50%);
   }
   .person-hover-img {

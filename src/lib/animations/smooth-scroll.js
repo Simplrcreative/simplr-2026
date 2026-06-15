@@ -125,6 +125,20 @@ export function refreshSmoothScroll() {
   })
 }
 
+export function lenisScrollTo(target, options = {}) {
+  if (lenisInstance) {
+    lenisInstance.scrollTo(target, options)
+    return
+  }
+  // Fallback when Lenis is not active (e.g. during page transitions)
+  const top = typeof target === 'number'
+    ? target
+    : target instanceof Element
+      ? target.getBoundingClientRect().top + window.scrollY
+      : 0
+  window.scrollTo({ top, behavior: 'smooth' })
+}
+
 export function scrollToTopImmediate() {
   if (lenisInstance) {
     lenisInstance.stop()

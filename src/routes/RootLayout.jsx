@@ -440,7 +440,7 @@ export default function RootLayout() {
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
       </div>
 
-      <header className={`header fixed z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
+      <header className={`header fixed z-[1001] md:z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
         <div className="nav-holder flex px-5 pt-[1.25rem] md:pt-[3.125rem] flex-row items-start justify-between">
           
           <div className="logo-holder">

@@ -12,10 +12,6 @@ h1,
 h2.section-heading {
     font-size: clamp(2.1rem, 4vw, 3.125rem);
 }
-h1.large {
-    font-size: clamp(4rem, 4vw, 5.3rem);
-    line-height: 1;
-}
 h2 {
     font-size: clamp(2rem, 4vw, 2.5rem);
 }
@@ -73,4 +69,13 @@ h2.section-heading span {
 .show-title {
     transform: translateX(200vw);
     opacity: 1
+}
+h1.large {
+    font-size: 2rem;
+    line-height: 1;
+}
+@media (min-width: 768px) {
+    h1.large {
+        font-size: clamp(4rem, 4vw, 5.3rem);
+    }
 }

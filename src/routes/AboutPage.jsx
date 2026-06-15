@@ -8,6 +8,7 @@ import {
   createPeopleScatterAnimation,
   createPeopleSectionClear,
   createBioAnimation,
+  lenisScrollTo,
 } from '../lib/animations/index.js'
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSize = 'medium_large') {
@@ -68,8 +69,9 @@ export default function AboutPage() {
 
   const handlePersonClick = (name) => {
     setActiveBio(name)
-    const top = peopleSectionRef.current?.getBoundingClientRect().top + window.scrollY
-    window.scrollTo({ top, behavior: 'smooth' })
+    if (peopleSectionRef.current) {
+      lenisScrollTo(peopleSectionRef.current)
+    }
   }
 
   const handlePersonEnter = (person) => {
@@ -152,7 +154,7 @@ export default function AboutPage() {
         <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-5">
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
-          <div className="col-start-2 md:col-start-6 col-span-10 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
+          <div className="col-start-3 col-span-8 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
             <button
               ref={closeRef}
               className="bio-close"
@@ -182,7 +184,7 @@ export default function AboutPage() {
           {/* Bio column — single panel, GSAP drives opacity + y; starts hidden */}
           <div
             ref={overlayRef}
-            className="col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-start"
+            className="bio-overlay col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-start"
             style={{ zIndex: 10, opacity: 0, pointerEvents: 'none' }}
           >
             {displayPerson && (

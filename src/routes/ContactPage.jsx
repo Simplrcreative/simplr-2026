@@ -171,7 +171,7 @@ export default function ContactPage() {
                     </div>
                   ))}
 
-                  <div className="flex gap-[50px] items-start">
+                  <div className="flex gap-[50px] items-start flex-col md:flex-row">
                     <span className="text-base shrink-0">Type of enquiry</span>
                     <div className="flex flex-col gap-[5px]">
                       {ENQUIRY_TYPES.map(({ name, value, bg, text }) => (
