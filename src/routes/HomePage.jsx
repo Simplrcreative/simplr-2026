@@ -762,7 +762,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
         
           <div className="grid grid-cols-12 items-emd slide-up md:pt-10">
-            <div className="col-start-1 col-span-12 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
+            <div className="col-start-1 col-span-11 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 
@@ -876,13 +876,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                         <CategoryBadge key={name} name={name} />
                       ))}
                     </div>
-                  ) : (
-                    <div className="categories mt-3 flex">
-                      <div className="category bg-branding-design text-text-white leading-none font-medium rounded-full">Branding & Design</div>
-                      <div className="category bg-web-design-development text-text-coffee leading-none font-medium rounded-full">Web Design & Development</div>
-                      <div className="category bg-motion text-text-white leading-none font-medium rounded-full">Motion</div>
-                    </div>
-                  )}
+                  ) : null}
               </div>
 
           </div>
@@ -959,7 +953,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 </div>
               </div>
 
-              <div className="md:col-span-5">
+              <div className="col-start-1 col-span-12 md:col-span-5">
                 <div key={activeFaq.question} className="faq-answer-fade max-w-[20rem] md:max-w-[32rem] text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
