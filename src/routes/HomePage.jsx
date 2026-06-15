@@ -707,7 +707,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       </section>
 
       <section ref={servicesRef} className="services py-20 section-light overflow-x-scroll relative w-full light-to-coffee-outgoing">
-         <div className="services-titles flex flex-nowrap items-center text-[5.5rem] gap-10">
+         <div className="services-titles flex flex-nowrap items-center text-[3rem] md:text-[5.5rem] gap-10">
           <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Successfully launched brands since 2015" className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
           </div>
@@ -778,7 +778,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       data-transition-source-key={study.slug}
                       onClick={(event) => handleCaseStudyTextClick(event, study.slug)}                      onMouseEnter={() => prefetchWorkEntry(study.slug)}                    >
                       {study.client}
-                      <div className="client-detail font-literata text-5xl font-light pb-3">
+                      <div className="client-detail font-literata text-3xl md:text-5xl font-light pb-3">
                         <span className="client-detail-text">{study.detail}</span>
                       </div>
                     </Link>

@@ -451,7 +451,6 @@ export default function RootLayout() {
                 onClick={handleLogoTransitionClick}
               >
               <BrandLogo />
-              
                 <div className="tagline">
                   <span>Creative.</span><br/>
                   Applied.<br/>

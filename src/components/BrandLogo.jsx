@@ -1,6 +1,6 @@
 export default function BrandLogo() {
   return (
-    <div className="logo inline-block font-literata text-2xl text-coffee mb-5">
+    <div className="logo inline-block font-literata text-2xl text-coffee md:mb-5">
       <svg width="527" height="172" viewBox="0 0 527 172" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <g id="logo-implr">
           <g>

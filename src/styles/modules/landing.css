@@ -26,7 +26,7 @@
 .stat-no {
     line-height: 0.69;
     color: var(--color-strategy);
-    font-size: 16rem;
+    font-size: 14rem;
 }
 
 .stat-plus {
@@ -122,13 +122,18 @@
 
 /* --- TESTIMONIALS --- */
 .quote {
-    font-size: 3.125rem;
+    font-size: 2rem;
     font-weight: 300;
     line-height: 1.2; 
 }
 .quote span {
     font-family: var(--font-literata);
     font-weight: 400;
+}
+@media (min-width: 768px) {
+    .quote {
+        font-size: 3.125rem;
+    }
 }
 
 /* --- FAQS --- */
