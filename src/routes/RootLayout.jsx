@@ -5,7 +5,7 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, createSplitTextAnimation, scrollToTopImmediate } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate } from '../lib/animations/index.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -387,9 +387,16 @@ export default function RootLayout() {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
   }, [])
 
-  useEffect(() => createSplitTextAnimation(), [])
+  // NOTE: createSplitTextAnimation() is intentionally NOT called here.
+  // RootLayout never unmounts during SPA navigation, so a [] effect's cleanup
+  // never fires — its MutationObserver/IntersectionObserver chain would silently
+  // accumulate a new ScrollTrigger per .split-text element on every page visit.
+  // Each page component calls createSplitTextAnimation() with its own useEffect
+  // so cleanup runs correctly on unmount.
 
-  useEffect(() => createFooterAnimation(footerRef.current), [location.pathname])
+  // Footer DOM is static — recreating this animation on every route change is
+  // unnecessary and accumulates gsap.matchMedia() contexts.
+  useEffect(() => createFooterAnimation(footerRef.current), [])
 
   return (
     <div 

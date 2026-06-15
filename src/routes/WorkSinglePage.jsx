@@ -133,7 +133,7 @@ export default function WorkSinglePage() {
 
       <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo section-light__">
         <div className="grid grid-cols-12">
-          <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle">
+          <div className="work-types flex flex-col flex-wrap md:block col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle">
              {types.map(({ name }, index) => {
               const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
               return (
@@ -141,7 +141,7 @@ export default function WorkSinglePage() {
                   <span className={`work-type${insertBreak ? ' work-type--line-end' : ''}`}>
                     {name}
                   </span>
-                  {insertBreak && <br />}
+                  {insertBreak && <br className="hidden md:block" />}
                 </Fragment>
               )
              })}
@@ -159,9 +159,9 @@ export default function WorkSinglePage() {
                 return (
                   <div 
                     key={`swag-${index}`}
-                    className="swag flex slide-up-subtle"
+                    className="swag flex flex-col md:flex-row slide-up-subtle"
                   > 
-                    <div className="swag-numbers flex justify-end items-start">
+                    <div className="swag-numbers flex justify-start md:justify-end items-start">
                       {preUnit && (
                         <span className="swag-unit pre">{preUnit}</span>
                       )}
@@ -194,7 +194,7 @@ export default function WorkSinglePage() {
         let txtOrder, imgOrder
         if (alignment === 'right') {
           txtOrder = 'order-1 col-start-1'
-          imgOrder = 'order-2 col-start-1 md:col-start-7 md:ps-2'
+          imgOrder = 'order-2 col-start-1 md:col-start-7 md:ps-2 mt-5 md:mt-0'
         } else {
           txtOrder = 'order-2 col-start-1 md:col-start-9'
           imgOrder = 'order-1 col-start-1 md:pe-2'
@@ -222,12 +222,17 @@ export default function WorkSinglePage() {
           <section key={`section-${index}`} className="work-content px-5 pb-5">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
-                <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-10 py-10 md:pt-18 md:pb-20 trigger-split-text-coffee">
-                  <RichText html={content} className="text-only-section split-text-coffee text-center" />
-                </div>
+                <>
+                {/* TEXT ONLY SECTION */}
+                  <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-10 py-10 md:pt-18 md:pb-20 trigger-split-text-coffee">
+                    <RichText html={content} className="text-only-section split-text-coffee text-center" />
+                  </div>
+                {/* END TEXT ONLY SECTION */}
+                </>
               )}
               {layout === 'Image & Text' && (
                 <>
+                {/* IMAGE &TEXT SECTION */}
                   <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee mt-8 md:mt-0`}>
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
@@ -253,10 +258,12 @@ export default function WorkSinglePage() {
                       />
                     )}
                   </div>
+                  {/* END IMAGE &TEXT SECTION */}
                 </>
               )}
               {layout === 'Two Text Boxes' && (
                 <>
+                {/* TWO TEXT BOXES SECTION */}
                   <div className={`col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
@@ -264,10 +271,12 @@ export default function WorkSinglePage() {
                   <div className={`col-start-1 md:col-start-9 col-span-12 md:col-span-4 flex flex-col justify-end`}>
                     <RichText html={content2} className="split-text-coffee"/>
                   </div>
+                  {/* END TWO TEXT BOXES SECTION */}
                 </>
               )}
               {layout === 'Two Images' && (
                 <>
+                {/* TWO IMAGES SECTION */}
                   <div className="col-start-1 col-span-12 md:col-span-6 pb-5 md:pb-0 md:pe-2">
                     {video1 ? (
                       <div className="full-image overflow-hidden rounded-[10px]">
@@ -312,9 +321,12 @@ export default function WorkSinglePage() {
                       />
                     )}
                   </div>
+                  {/* END TWO IMAGES SECTION */}
                 </>
               )}
               {layout === 'Full Image' && (
+                <>
+                {/* FULL IMAGE SECTION */}
                 <div className="col-span-12">
                   {video1 ? (
                     <div className="full-image overflow-hidden rounded-[10px]">
@@ -337,8 +349,11 @@ export default function WorkSinglePage() {
                     />
                   )}
                 </div>
+              {/* END FULL IMAGE SECTION */}
+              </>
               )}
             </div>
+            
           </section>
         )
       })}
@@ -379,7 +394,7 @@ export default function WorkSinglePage() {
                   data-transition-source="media"
                   data-transition-variant="work-next"
                 >
-                  <div className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
+                  <div className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}>
                     <PictureImg
                       loaderSrc={nextLoaderSrc}
                       mobileSrc={nextMobileSrc}

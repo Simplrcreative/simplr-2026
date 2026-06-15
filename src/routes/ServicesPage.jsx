@@ -94,7 +94,7 @@ function ServiceVideo({ src, poster, title, to }) {
   return (
     <Link
       to={to}
-      className="service-card__video col-start-1 md:col-start-8 col-span-9 md:col-span-5"
+      className="service-card__video col-start-1 md:col-start-8 col-span-8 md:col-span-5"
       data-transition-source-key={to}
       data-transition-dock-selector="[data-transition-dock='service-featured-media']"
       aria-label={`View ${title}`}
@@ -132,7 +132,7 @@ function ServiceCard({ service }) {
 
   return (
     <article className="service-card bg-white flex flex-col justify-end">
-        <div className="service-card-inner pt-20 md:pt-40">
+        <div className="service-card-inner pt-10 md:pt-40">
             <div className="service-card__header">
                 <div className="service-card__label">
                     <ServiceLabelIcon color={accentColor} />
@@ -142,7 +142,7 @@ function ServiceCard({ service }) {
             </div>
 
             <div className="service-card__body grid grid-cols-12">
-              <div className="service-card__content col-start-1 md:col-start-4 col-span-9 md:col-span-3">
+              <div className="service-card__content col-start-1 md:col-start-4 col-span-8 md:col-span-3">
                   <div className="service-card__description">{acfDescription}</div>
                   <div className="button-wrapper mt-10">
                       <Link 
@@ -154,8 +154,8 @@ function ServiceCard({ service }) {
                           >
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
-                              <span className="btn-text text-coffee">Explore {acfService}</span>
-                              Explore {acfService}
+                              <span className="btn-text text-coffee">Explore <span className="hidden md:inline">{acfService}</span></span>
+                              Explore <span className="hidden md:inline">{acfService}</span>
                           </span>
                       </Link>
                   </div>

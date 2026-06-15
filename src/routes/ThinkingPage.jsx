@@ -5,6 +5,7 @@ import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, fetchThinkingPostsData, getThinkingTopicSlug } from '../lib/wp-api.js'
+import PictureImg from '../components/PictureImg.jsx'
 
 const FILTER_COLOR_MAP = {
   strategy: 'var(--color-strategy)',
@@ -297,6 +298,7 @@ export default function ThinkingPage() {
       <section ref={postsResultsRef} className="posts-results px-5 pb-20 bg-white">
         <div className="thinking-posts-grid">
           {filteredPosts.map((post) => {
+            const loaderThumb = getThumbnail(post.acfPostBuilder?.acfFeaturedImage, 'loader')
             const thumb = getThumbnail(post.acfPostBuilder?.acfFeaturedImage)
             const postTitle = post.title ?? 'Thinking post'
 
@@ -311,9 +313,16 @@ export default function ThinkingPage() {
                   to={buildEntryPath('thinking', post.slug, { topicSlug: getThinkingTopicSlug(post) })}
                   className="thinking-post-link"
                 >
-                  <picture className="thinking-post__image-frame" data-post-image-frame>
-                    {thumb ? <img src={thumb + '.webp'} alt={post.featuredImage?.node?.altText || postTitle} /> : null}
-                  </picture>
+                  <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '54%' }} >
+                    <PictureImg
+                      loaderSrc = {loaderThumb + '.webp'}
+                      mobileSrc = {thumb + '.webp'}
+                      desktopSrc = {thumb + '.webp'}
+                      imgClass = ''
+                      altText = ''
+                      attributes = {{ 'data-post-image-frame': true }}
+                    />
+                  </div>
                   <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
                 </Link>
               </article>

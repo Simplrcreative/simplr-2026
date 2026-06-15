@@ -107,29 +107,37 @@ export function createSplitTextAnimation() {
   function createLazyMountObserver() {
     if (mutationObserver) return
 
+    // Debounce via RAF so React's reconciliation batches don't fire this
+    // hundreds of times per render — we only need one check per paint frame.
+    let rafId = null
     mutationObserver = new MutationObserver(() => {
-      if (needsWhiteObserver && document.querySelector('.split-text')) {
-        needsWhiteObserver = !createLazySplitTextObserver(
-          '.split-text',
-          '.trigger-split-text',
-          'rgba(255, 255, 255, 0.05)',
-          'rgba(255, 255, 255, 1)'
-        )
-      }
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
 
-      if (needsCoffeeObserver && document.querySelector('.split-text-coffee')) {
-        needsCoffeeObserver = !createLazySplitTextObserver(
-          '.split-text-coffee',
-          '.trigger-split-text-coffee',
-          'rgba(48, 15, 29, 0.05)',
-          'rgba(48, 15, 29, 1)'
-        )
-      }
+        if (needsWhiteObserver && document.querySelector('.split-text')) {
+          needsWhiteObserver = !createLazySplitTextObserver(
+            '.split-text',
+            '.trigger-split-text',
+            'rgba(255, 255, 255, 0.05)',
+            'rgba(255, 255, 255, 1)'
+          )
+        }
 
-      if (!needsWhiteObserver && !needsCoffeeObserver) {
-        mutationObserver?.disconnect()
-        mutationObserver = null
-      }
+        if (needsCoffeeObserver && document.querySelector('.split-text-coffee')) {
+          needsCoffeeObserver = !createLazySplitTextObserver(
+            '.split-text-coffee',
+            '.trigger-split-text-coffee',
+            'rgba(48, 15, 29, 0.05)',
+            'rgba(48, 15, 29, 1)'
+          )
+        }
+
+        if (!needsWhiteObserver && !needsCoffeeObserver) {
+          mutationObserver?.disconnect()
+          mutationObserver = null
+        }
+      })
     })
 
     mutationObserver.observe(document.body, { childList: true, subtree: true })

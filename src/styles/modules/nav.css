@@ -262,6 +262,7 @@ nav.light a.is-active .nav-link__orb {
 }
 
 .tagline {
+    margin: 1.25rem 0 0 0;
     font-size: 1.2rem;
     line-height: 1.5rem;
     font-weight: 400;

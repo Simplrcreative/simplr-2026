@@ -9,16 +9,19 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), tailwindcss()],
-    server: proxyTarget
-      ? {
-          proxy: {
-            '/graphql': {
-              target: proxyTarget,
-              changeOrigin: true,
-              secure: false,
+    server: {
+      host: true, // listen on 0.0.0.0 so LAN devices can connect
+      ...(proxyTarget
+        ? {
+            proxy: {
+              '/graphql': {
+                target: proxyTarget,
+                changeOrigin: true,
+                secure: false,
+              },
             },
-          },
-        }
-      : undefined,
+          }
+        : {}),
+    },
   }
 })

@@ -5,6 +5,7 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import { createNextWorkAnimation, createSlideUpAnimations, refreshScrollTriggers } from '../lib/animations/index.js'
 import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
+import PictureImg from '../components/PictureImg.jsx'
 
 function categoryToFilterSlug(category) {
   const bySlug = String(category?.slug || '').trim().toLowerCase()
@@ -137,6 +138,7 @@ export default function ThinkingSinglePage() {
       ''
     )
   }
+  const loaderThumb = getThumbnail(page.acfPostBuilder?.acfFeaturedImage, 'loader')
   const thumb = getThumbnail(page.acfPostBuilder?.acfFeaturedImage)
 
   const morePosts = useMemo(() => {
@@ -148,11 +150,14 @@ export default function ThinkingSinglePage() {
     return others.slice(0, 4)
   }, [posts, slug])
   const linkedWork = page?.acfPostBuilder?.acfLinkedWork?.nodes ?? []
+  let linkedWorkLoader = ''
   let linkedWorkThumbnail = ''
   let linkedWorkCategories = ''
   let linkedWorkClient = ''
   if(linkedWork.length > 0) {
-    linkedWorkThumbnail = linkedWork[0].acfWorkBuilder?.acfFeaturedThumbnail?.node?.guid || ''
+    //linkedWorkThumbnail = linkedWork[0].acfWorkBuilder?.acfFeaturedThumbnail?.node?.guid || ''
+    linkedWorkLoader= getThumbnail(linkedWork[0].acfWorkBuilder?.acfFeaturedThumbnail, 'loader')
+    linkedWorkThumbnail = getThumbnail(linkedWork[0].acfWorkBuilder?.acfFeaturedThumbnail)
     linkedWorkCategories = linkedWork[0].acfWorkBuilder?.acfCategory?.nodes || []
     linkedWorkClient = linkedWork[0].acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''
   }
@@ -199,9 +204,15 @@ export default function ThinkingSinglePage() {
           </div>
           {thumb && ( 
           <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20">
-            <picture className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}>
-              <img src={thumb + '.webp'} alt={title} />
-            </picture>
+            <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }} >
+              <PictureImg
+                loaderSrc = {loaderThumb + '.webp'}
+                mobileSrc = {thumb + '.webp'}
+                desktopSrc = {thumb + '.webp'}
+                imgClass = ''
+                altText = ''
+              />
+            </div>
           </div>
           )}
         </div>
@@ -230,12 +241,15 @@ export default function ThinkingSinglePage() {
                   data-card-key={linkedWork[0].slug}
                   data-transition-variant="work-next"
                 >
-                  <picture
-                    className="ratio overflow-hidden"
-                    style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}
-                  >
-                    {linkedWorkThumbnail && <img src={linkedWorkThumbnail + '.webp'} alt={linkedWork[0].title} />}
-                  </picture>
+                  <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }} >
+                    <PictureImg
+                      loaderSrc = {linkedWorkLoader + '.webp'}
+                      mobileSrc = {linkedWorkThumbnail + '.webp'}
+                      desktopSrc = {linkedWorkThumbnail + '.webp'}
+                      imgClass = ''
+                      altText = {linkedWork[0].title}
+                    />
+                  </div>
                   
                 </Link>
               </div>
@@ -261,6 +275,7 @@ export default function ThinkingSinglePage() {
         <section className="more-posts px-5 py-20 bg-white section-dark">
           <div className="thinking-posts-grid">
             {morePosts.map((post) => {
+              const postLoader = getThumbnail(post.acfPostBuilder?.acfFeaturedImage, 'loader')
               const postThumb = getThumbnail(post.acfPostBuilder?.acfFeaturedImage)
               const postTitle = post.title ?? 'Thinking post'
               return (
@@ -269,9 +284,16 @@ export default function ThinkingSinglePage() {
                     to={buildEntryPath('thinking', post.slug, { topicSlug: getThinkingTopicSlug(post) })}
                     className="thinking-post-link"
                   >
-                    <picture className="thinking-post__image-frame" data-post-image-frame>
-                      {postThumb ? <img src={postThumb + '.webp'} alt={postTitle} /> : null}
-                    </picture>
+                    <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '54%' }} >
+                      <PictureImg
+                        loaderSrc = {postLoader + '.webp'}
+                        mobileSrc = {postThumb + '.webp'}
+                        desktopSrc = {postThumb + '.webp'}
+                        imgClass = ''
+                        altText = {postTitle}
+                        attributes = {{ 'data-post-image-frame': true }}
+                      />
+                    </div>
                     <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
                   </Link>
                 </article>

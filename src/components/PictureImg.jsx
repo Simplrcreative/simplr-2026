@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText = '', imgClass = '', pictureClass = '', lazyLoad = true }) {
+export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText = '', imgClass = '', pictureClass = '', lazyLoad = true, attributes = {} }) {
 
     const [isIntersecting, setIsIntersecting] = useState(!lazyLoad);
     const [isFullLoaded, setIsFullLoaded] = useState(false);
@@ -49,7 +49,7 @@ export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText =
     };
 
     return (
-        <picture ref={pictureRef} className={pictureClass}>
+        <picture ref={pictureRef} className={pictureClass} {...attributes}>
             <source
                 media="(max-width:767px)"
                 srcSet={isIntersecting ? mobileSrc : loaderSrc}
