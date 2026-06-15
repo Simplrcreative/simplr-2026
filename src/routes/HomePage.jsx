@@ -620,7 +620,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         ]}
       />
       <div
-        className={`play-icon text-white bg-branding-design fixed z-[999999] w-[100px] h-[100px] rounded-full flex items-center justify-center transition-[background-color] duration-200 ${isHeroModalVisible ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
+        className={`play-icon text-white bg-branding-design fixed z-[999999] w-[100px] h-[100px] rounded-full hidden md:flex items-center justify-center transition-[background-color] duration-200 ${isHeroModalVisible ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
         onClick={isHeroModalVisible ? () => closeHeroVideoModal({ scrollToNextSection: true }) : undefined}
         role={isHeroModalVisible ? 'button' : undefined}
         aria-label={isHeroModalVisible ? 'Close video' : undefined}
@@ -706,7 +706,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
       </section>
 
-      <section ref={servicesRef} className="services py-20 section-light overflow-x-scroll relative w-full light-to-coffee-outgoing">
+      <section ref={servicesRef} className="services py-20 section-light overflow-hidden relative w-full light-to-coffee-outgoing">
          <div className="services-titles flex flex-nowrap items-center text-[3rem] md:text-[5.5rem] gap-10">
           <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Successfully launched brands since 2015" className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
@@ -760,7 +760,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       </section>
 
       <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
-        
           <div className="grid grid-cols-12 items-emd slide-up md:pt-10">
             <div className="col-start-1 col-span-11 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
@@ -785,9 +784,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   </div>
                 )
               })}
-
             </div>
-
             <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 order-1 md:order-2 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
@@ -822,9 +819,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   </div>
                 )
               })}
-
             </div>
-
           </div>
       </section>
 
@@ -953,8 +948,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 </div>
               </div>
 
-              <div className="col-start-1 col-span-12 md:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[20rem] md:max-w-[32rem] text-[1.125rem] text-coffee">
+              <div className="md:col-span-5">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[16rem] md:max-w-[32rem] text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

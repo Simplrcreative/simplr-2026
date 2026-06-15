@@ -368,7 +368,7 @@ export default function WorkSinglePage() {
 
       {nextWork && (
         
-      <section className="next-work px-5 py-20 bg-white relative overflow-hidden__">
+      <section className="next-work px-5 py-20 bg-white relative overflow-hidden">
         <div className="grid grid-cols-12 relative z-1">
             <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">
