@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
@@ -16,6 +18,108 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSiz
   )
 }
 
+gsap.registerPlugin(ScrollTrigger)
+
+function initSpotlightAnimations() {
+  ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+
+  const images = document.querySelectorAll(".img")
+  if (!images.length) return
+
+  const scatterDirections = [
+    { x: 1.3, y: 0.7 },
+    { x: -1.5, y: 1.0 },
+    { x: 1.1, y: -1.3 },
+    { x: -1.7, y: -0.8 },
+    { x: -1.0, y: -1.4 },
+    { x: 1.6, y: 0.3 },
+    { x: -0.7, y: 1.7 },
+    { x: 1.2, y: -1.6 },
+    { x: -1.4, y: 0.9 },
+    { x: 1.8, y: -0.5 },
+    { x: -1.1, y: -1.8 },
+    { x: 0.9, y: 1.8 },
+    { x: -1.9, y: 0.4 },
+    { x: 1.0, y: -1.9 },
+    { x: -0.8, y: 1.9 },
+    { x: 1.7, y: -1.0 },
+    { x: -1.3, y: -1.2 },
+    { x: 0.7, y: 2.0 },
+    { x: 1.2, y: -0.2 },
+    { x: 1.6, y: -0.9 },
+  ]
+
+  const screenWidth = window.innerWidth
+  const screenHeight = window.innerHeight
+  const isMobile = screenWidth < 768
+  const scatterMultiplier = isMobile ? 2.5 : 0.65
+  const startPositions = Array.from(images).map(() => ({
+    x: -200,
+    y: -200,
+    z: -2000,
+    scale: 0
+  }))
+  const endPositions = Array.from(images).map((_, index) => {
+    const dir = scatterDirections[index % scatterDirections.length]
+    return {
+      x: dir.x * screenWidth * scatterMultiplier,
+      y: dir.y * screenHeight * scatterMultiplier,
+      z: 2000,
+      scale: 1
+    }
+  })
+
+  images.forEach((img, index) => {
+    gsap.set(img, startPositions[index])
+  })
+
+  const animationMultiplier = isMobile ? 4 : 4
+
+  ScrollTrigger.create({
+    trigger: ".spotlight",
+    start: "top 0%",
+    end: `+=${window.innerHeight * 10}px`,
+    pin: true,
+    pinSpacing: true,
+    scrub: 2,
+    onUpdate: (self) => {
+      const progress = self.progress
+      images.forEach((img, index) => {
+        const staggerDelay = index * 0.05
+        const scaleMultiplier = isMobile ? 4 : 4
+        let imageProgress = Math.max(0, (progress - staggerDelay) * animationMultiplier)
+        const start = startPositions[index]
+        const end = endPositions[index]
+        const scaleValue = gsap.utils.interpolate(
+          start.scale,
+          end.scale,
+          imageProgress * scaleMultiplier
+        )
+        const xValue = gsap.utils.interpolate(
+          start.x,
+          end.x,
+          imageProgress
+        )
+        const yValue = gsap.utils.interpolate(
+          start.y,
+          end.y,
+          imageProgress
+        )
+        const zValue = gsap.utils.interpolate(
+          start.z, 
+          end.z, 
+          imageProgress
+        )
+        gsap.set(img, {
+          scale: scaleValue,
+          x: xValue,
+          y: yValue,
+          z: zValue
+        })
+      })
+    }
+  })
+}
 
 export default function Est2014Page() {
   const { beyondItems = [] } = useLoaderData() ?? {}
@@ -25,6 +129,27 @@ export default function Est2014Page() {
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
+  }, [])
+
+  useEffect(() => {
+    initSpotlightAnimations()
+    window.addEventListener('resize', initSpotlightAnimations)
+    return () => {
+      window.removeEventListener('resize', initSpotlightAnimations)
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+    }
+  }, [beyondItems.length])
+
+  useEffect(() => {
+    const muteAndPauseAllGalleryVideos = () => {
+      const videos = Array.from(galleryRef.current?.querySelectorAll('video') ?? [])
+      videos.forEach((video) => {
+        video.muted = true
+        video.defaultMuted = true
+        video.volume = 0
+        video.pause()
+      })
+    }
   }, [])
 
   const pathname = '/est-2014'
@@ -69,9 +194,9 @@ export default function Est2014Page() {
         </div>
       </section>
 
-      <section className="beyond-section px-5 pb-5 pt-20 bg-coffee section-dark change-logo">
+      <section className="spotlight bg-coffee section-dark change-logo min-h-screen relative">
         {beyondItems.length ? (
-          <div ref={galleryRef} className="beyond-masonry">
+          <div ref={galleryRef} className="spotlight-images">
             {beyondItems.map((item) => {
               const ratio = item.type === 'video'
                 ? videoRatios[item.id] ?? item.width / item.height
@@ -82,7 +207,11 @@ export default function Est2014Page() {
               const imgDesktopSrc = getThumbnail(item.source, 'large')
 
               return (
-                <figure key={item.id} className="beyond-masonry__item">
+                <figure
+                  key={item.id}
+                  className="img"
+                  style={{ width: '400px', aspectRatio: ratio }}
+                >
                   {item.type === 'video' ? (
                     <video
                       src={item.source}
@@ -91,7 +220,6 @@ export default function Est2014Page() {
                       autoPlay
                       loop
                       controls={false}
-                      style={{ aspectRatio: ratio || '16/9' }}
                       onLoadedMetadata={(event) => {
                         const width = event.currentTarget.videoWidth
                         const height = event.currentTarget.videoHeight
@@ -108,8 +236,8 @@ export default function Est2014Page() {
                       loaderSrc={imgLoaderSrc + '.webp'}
                       mobileSrc={imgMobileSrc + '.webp'}
                       desktopSrc={imgDesktopSrc + '.webp'}
-                      pictureClass="beyond-masonry__picture"
-                      imgClass="beyond-masonry__img"
+                      pictureClass="w-full h-full block"
+                      imgClass="beyond-card__media"
                       altText={item.caption}
                     />
                   )}
@@ -119,6 +247,7 @@ export default function Est2014Page() {
             })}
           </div>
         ) : null}
+        <div className="spotlight-background"></div>
       </section>
 
     </>

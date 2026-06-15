@@ -83,6 +83,7 @@ nav.light a.is-active .nav-link__orb {
        transform: scale(0)!important;
        transition: transform 0.3s ease
     }
+
     nav.main.active {
         transform: scale(1)!important;
         transition: transform 0.3s ease
@@ -94,6 +95,21 @@ nav.light a.is-active .nav-link__orb {
     nav a:hover .nav-link__content span {
     text-decoration: underline;
     }
+    .nav-background {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(0px);
+        z-index: 9999;
+        pointer-events: none;
+        transition: backdrop-filter 0.3s ease;
+    }
+    .nav-background.active {
+        backdrop-filter: blur(5px);
+    }
     .menu-icon {
         cursor: pointer;
         z-index: 10001;
@@ -103,14 +119,6 @@ nav.light a.is-active .nav-link__orb {
     }
     .menu-icon.active {
         transform: translate(-1.25rem, 1.25rem)!important;
-    }
-    .menu-icon div {
-        /*filter: brightness(1);
-        transition: filter 0.25s ease;*/
-        
-    }
-    .menu-icon.active div {
-        /*filter: brightness(100);*/
     }
     nav a {
         transform: translateX(50px)!important;
@@ -208,6 +216,9 @@ nav.light a.is-active .nav-link__orb {
         font-size: 0.65rem;
         padding: 0 0 0 1px;
         top: -0.5em;
+    }
+    .nav-background {
+        display: none;
     }
 }
 @media (min-width: 1024px) {

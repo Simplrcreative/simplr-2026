@@ -5,7 +5,7 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll } from '../lib/animations/index.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -107,6 +107,7 @@ export default function RootLayout() {
   useEffect(() => {
     previousPathRef.current = location.pathname
     setIsNavOpen(false)
+    unlockScroll('nav')
   }, [location.pathname])
 
   // Reset intro state when leaving home page
@@ -441,7 +442,15 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2 ${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((o) => !o)}>
+      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2 ${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((o) => {
+          const next = !o
+          if (next) {
+            lockScroll('nav')
+          } else {
+            unlockScroll('nav')
+          }
+          return next
+        })}>
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
@@ -490,6 +499,7 @@ export default function RootLayout() {
               )
             })}
           </nav>
+          <div className={`nav-background${isNavOpen ? ' active' : ''}`}></div>
         </div>
       </header>
 
