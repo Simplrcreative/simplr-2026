@@ -5,6 +5,15 @@ import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
 
+const BATCH_SIZE = 8
+
+function getNumCols() {
+  if (window.matchMedia('(min-width: 1280px)').matches) return 4
+  if (window.matchMedia('(min-width: 900px)').matches) return 3
+  if (window.matchMedia('(min-width: 640px)').matches) return 2
+  return 1
+}
+
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
   const thumbnailNode = acfFeaturedThumbnail?.node
   const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
@@ -16,16 +25,77 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSiz
   )
 }
 
-
 export default function Est2014Page() {
   const { beyondItems = [] } = useLoaderData() ?? {}
   const btnRef = useRef(null)
   const galleryRef = useRef(null)
+  const sentinelRef = useRef(null)
   const [videoRatios, setVideoRatios] = useState({})
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE)
+  const [numCols, setNumCols] = useState(getNumCols)
+
+  const visibleItems = beyondItems.slice(0, visibleCount)
+  const hasMore = visibleCount < beyondItems.length
+
+  // Distribute items into explicit columns so new batches always append without reshuffling
+  const columns = Array.from({ length: numCols }, (_, colIndex) =>
+    visibleItems
+      .map((item, i) => ({ item, globalIndex: i }))
+      .filter(({ globalIndex }) => globalIndex % numCols === colIndex)
+  )
+
+  useEffect(() => {
+    const update = () => setNumCols(getNumCols())
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
   }, [])
+
+  // Load next batch when sentinel scrolls into view
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel || !hasMore) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, beyondItems.length))
+        }
+      },
+      { rootMargin: '0px 0px 400px 0px' }
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasMore, beyondItems.length])
+
+  // Animate newly added items into view
+  useEffect(() => {
+    const gallery = galleryRef.current
+    if (!gallery) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { rootMargin: '0px 0px 60px 0px', threshold: 0.05 }
+    )
+
+    gallery.querySelectorAll('.beyond-masonry__item:not(.is-visible)').forEach((item) => {
+      observer.observe(item)
+    })
+
+    return () => observer.disconnect()
+  }, [visibleCount])
 
   const pathname = '/est-2014'
   const title = 'Est 2014'
@@ -70,55 +140,67 @@ export default function Est2014Page() {
       </section>
 
       <section className="beyond-section px-5 pb-5 pt-20 bg-coffee section-dark change-logo">
-        {beyondItems.length ? (
+        {visibleItems.length ? (
           <div ref={galleryRef} className="beyond-masonry">
-            {beyondItems.map((item) => {
-              const ratio = item.type === 'video'
-                ? videoRatios[item.id] ?? item.width / item.height
-                : item.width / item.height
+            {columns.map((colItems, colIndex) => (
+              <div key={colIndex} className="beyond-masonry__col">
+                {colItems.map(({ item, globalIndex }) => {
+                  const ratio = item.type === 'video'
+                    ? videoRatios[item.id] ?? item.width / item.height
+                    : item.width / item.height
 
-              const imgLoaderSrc = getThumbnail(item.source, 'loader')
-              const imgMobileSrc = getThumbnail(item.source, 'medium')
-              const imgDesktopSrc = getThumbnail(item.source, 'large')
+                  const imgLoaderSrc = getThumbnail(item.source, 'loader')
+                  const imgMobileSrc = getThumbnail(item.source, 'medium')
+                  const imgDesktopSrc = getThumbnail(item.source, 'large')
 
-              return (
-                <figure key={item.id} className="beyond-masonry__item">
-                  {item.type === 'video' ? (
-                    <video
-                      src={item.source}
-                      muted
-                      playsInline
-                      autoPlay
-                      loop
-                      controls={false}
-                      style={{ aspectRatio: ratio || '16/9' }}
-                      onLoadedMetadata={(event) => {
-                        const width = event.currentTarget.videoWidth
-                        const height = event.currentTarget.videoHeight
-                        if (width && height) {
-                          setVideoRatios((prev) => ({
-                            ...prev,
-                            [item.id]: width / height,
-                          }))
-                        }
-                      }}
-                    />
-                  ) : (
-                    <PictureImg
-                      loaderSrc={imgLoaderSrc + '.webp'}
-                      mobileSrc={imgMobileSrc + '.webp'}
-                      desktopSrc={imgDesktopSrc + '.webp'}
-                      pictureClass="beyond-masonry__picture"
-                      imgClass="beyond-masonry__img"
-                      altText={item.caption}
-                    />
-                  )}
-                  {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
-                </figure>
-              )
-            })}
+                  return (
+                    <figure
+                      key={item.id}
+                      className="beyond-masonry__item"
+                      style={{ transitionDelay: `${(globalIndex % BATCH_SIZE) * 0.04}s` }}
+                    >
+                      {item.type === 'video' ? (
+                        <video
+                          src={item.source}
+                          muted
+                          playsInline
+                          autoPlay
+                          loop
+                          controls={false}
+                          style={{ aspectRatio: ratio || '16/9' }}
+                          onLoadedMetadata={(event) => {
+                            const width = event.currentTarget.videoWidth
+                            const height = event.currentTarget.videoHeight
+                            if (width && height) {
+                              setVideoRatios((prev) => ({
+                                ...prev,
+                                [item.id]: width / height,
+                              }))
+                            }
+                          }}
+                        />
+                      ) : (
+                        <PictureImg
+                          loaderSrc={imgLoaderSrc + '.webp'}
+                          mobileSrc={imgMobileSrc + '.webp'}
+                          desktopSrc={imgDesktopSrc + '.webp'}
+                          pictureClass="beyond-masonry__picture"
+                          imgClass="beyond-masonry__img"
+                          altText={item.caption}
+                        />
+                      )}
+                      {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
+                    </figure>
+                  )
+                })}
+              </div>
+            ))}
           </div>
         ) : null}
+
+        {hasMore && (
+          <div ref={sentinelRef} className="w-full h-px" aria-hidden="true" />
+        )}
       </section>
 
     </>

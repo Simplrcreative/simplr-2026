@@ -69,6 +69,10 @@ export function createParallaxAnimations(scope) {
     return () => undefined
   }
 
+  if (window.innerWidth < 768) {
+    return () => undefined
+  }
+
   registerPlugins()
 
   const ParallaxTargets = Array.from(scope.querySelectorAll('.parallax'))

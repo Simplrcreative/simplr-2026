@@ -188,7 +188,7 @@ export default function ServicesSinglePage() {
         ]}
       />
 
-      <div className="bottom-menu fixed z-10 right-5 bottom-5">
+      <div className="bottom-menu hidden md:block fixed z-10 right-5 bottom-5">
         <Link
           to='/services/strategy'
           className={`category border leading-none font-medium rounded-full ${pathname === '/services/strategy' ? 'border-strategy bg-strategy text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
@@ -221,17 +221,17 @@ export default function ServicesSinglePage() {
         </Link>
       </div>
 
-      <section className="page-hero px-5 pb-5 mb-15 bg-white section-light min-h-screen flex items-end">
+      <section className="page-hero px-5 pb-5 mb-15 bg-white section-light min-h-[90vh] md:min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-5 text-coffee change-logo">
+          <div className="col-start-1 col-span-12 md:col-span-5 text-coffee mb-10 md:mb-0 change-logo">
             <div className="service-card__label mb-5">
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
             </div>
             <h1 className="service-card__title">{acfHeading}</h1>
           </div>
-          <div className="col-start-7 col-span-6 parallax">
+          <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 parallax">
             <div className="featured-image">
               {featuredVideo ? (
                   <div
@@ -276,20 +276,20 @@ export default function ServicesSinglePage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-5 py-20 bg-white section-light">
+          <section key={`section-${sectionIndex}`} className="px-5 pb-20 md:py-20 bg-white section-light">
             <div className="grid grid-cols-12 ">
               {sectionHeading && (
-                <div className="col-span-9 pe-40 slide-up-subtle">
+                <div className="col-start-1 col-span-12 md:col-span-9 md:pe-40 slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="section-heading" />
                 </div>
               )}
               {sectionContent && (
-                <div className="col-start-4 col-span-5 slide-up-subtle">
-                  <RichText html={sectionContent} className="service-richtext pt-20" />
+                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 slide-up-subtle">
+                  <RichText html={sectionContent} className="service-richtext pt-10 md:pt-20" />
                 </div>
               )}
               {sectionCta && (
-                <div className="button-wrapper col-start-4 col-span-5 slide-up-subtle my-4">
+                <div className="button-wrapper col-start-1 md:col-start-4 col-span-12 md:col-span-5 slide-up-subtle my-4">
                   <Link 
                     to={sectionCta.url}
                     ref={(el) => { ctaBtnRefs.current[sectionIndex] = el }}
@@ -306,7 +306,7 @@ export default function ServicesSinglePage() {
                 </div>
               )}
               {sectionAccordion.length > 0 && (
-                <div className="col-start-4 col-span-5 pt-20 service-accordion-list">
+                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 pt-10 md:pt-20 service-accordion-list">
                   {sectionAccordion.map((accordion, accordionIndex) => {
                     const accordionTitle = accordion?.acfTitle || ''
                     const accordionContent = accordion?.acfContent || ''
@@ -388,10 +388,10 @@ export default function ServicesSinglePage() {
                 )}
 
             </div>
-            <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee">
+            <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee  mb-15 md:mb-0 ">
               <div className="testimonial lead max-w-[38ch]">
                 <div className="split-text-coffee trigger-split-text-coffee">
-                  <div className="mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
+                  <div className="mb-10 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
                   <div><b>{testimonial.title}</b><br/>{testimonialData.acfRole}</div>
                 </div>
               </div>
