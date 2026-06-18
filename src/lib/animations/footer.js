@@ -3,7 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 let pluginsRegistered = false
 
-const FOOTER_LIGHT_CLASS = 'footer-light__'
+const FOOTER_LIGHT_CLASS = 'footer'
 
 function registerPlugins() {
   if (!pluginsRegistered) {
@@ -119,9 +119,10 @@ export function createFooterAnimation(scope) {
           applyFooterLightState(true)
         },
         onEnterBack: () => {
-          previousCompactLogoState = root.classList.contains('compact-logo-active')
-          previousNavFooterLightState = nav?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-          previousLogoHolderFooterLightState = logoHolder?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
+          // Do NOT re-capture previous state here — the footer class is already
+          // active at this point (we're re-entering from below the end marker),
+          // so capturing now would overwrite the correct pre-footer snapshot with
+          // the active state, causing restorePageState() to keep the class on.
           root.classList.remove('compact-logo-active')
           applyFooterLightState(true)
         },
@@ -129,9 +130,11 @@ export function createFooterAnimation(scope) {
           restorePageState()
         },
         onUpdate: (self) => {
-          if (self.progress > 0 || self.isActive) {
+          if (self.progress > 0) {
             root.classList.remove('compact-logo-active')
             applyFooterLightState(true)
+          } else {
+            restorePageState()
           }
         },
         onRefresh: (self) => {
@@ -392,9 +395,6 @@ export function createFooterAnimation(scope) {
         })
       },
       onEnterBack: () => {
-        previousCompactLogoState = root.classList.contains('compact-logo-active')
-        previousNavFooterLightState = nav?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-        previousLogoHolderFooterLightState = logoHolder?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
         root.classList.remove('compact-logo-active')
         nav?.classList.add(FOOTER_LIGHT_CLASS)
         logoHolder?.classList.add(FOOTER_LIGHT_CLASS)

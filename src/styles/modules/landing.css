@@ -36,11 +36,37 @@
     line-height: 1.2;
     font-weight: 400
 }
-@media (min-width: 768px) {
+@media (max-width: 767.9px) {
     .stat-no {
-        font-size: clamp(30rem, 21.43rem + 17.86vw, 37.5rem);
+        position: relative
+    }
+    .stat-no::after {
+        content: '+';
+        font-size:  6rem;
+        transform: translateY(-7rem);
+        color: inherit;
+        display: inline-block;
+    }
+    .stat-plus {
+        display: none;
     }
 }
+@media (min-width: 768px) {
+    .stat-no {
+        font-size: 30rem;
+    }
+}
+@media (min-width: 1024px) {
+    .stat-no {
+        font-size: 25rem;
+    }
+}
+@media (min-width: 1280px) {
+    .stat-no {
+        font-size: 37.5rem;
+    }
+}
+
 
 /* --- CASE STUDIES --- */
 .case-studies--unpinned .alt-transition-img,
@@ -92,11 +118,6 @@
 .client-work-img {
     transform-origin: bottom right;
     transition: transform 0.6s ease-out
-}
-.client-work-img:hover,
-.client-work-img.hover-active {
-    /*transform: scaleX(1.05);
-    transition: transform 0.3s ease-out*/
 }
 .client-work-img picture {
     transform-origin: center right!important;

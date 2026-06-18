@@ -513,7 +513,7 @@ export default function RootLayout() {
 
       <div className="bg-white section-light footer-off"></div>
 
-      <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white">
+      <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white z-[100000] relative">
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-6">
@@ -522,7 +522,7 @@ export default function RootLayout() {
               <Link 
                 to="contact"
                 ref={btnRef}
-                className="btn relative mt-10"
+                className="btn relative mt-5 xl:mt-10"
                 onPointerDown={requestTransitionCapture}
                 onClick={handleFooterTransitionLinkClick}
               >
@@ -554,9 +554,9 @@ export default function RootLayout() {
           </div>
         </div>
 
-        <div className="mt-32 grid grid-cols-1 gap-14 lg:grid-cols-12">
+        <div className="pt-10 xl:pt-32 grid grid-cols-1 gap-14 lg:grid-cols-12n">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
-                <div className="socials flex flex-col md:flex-row gap-[1.25rem] md:gap-[2.5rem] mb-[3.75rem]">
+                <div className="socials flex flex-col md:flex-row gap-[1.25rem] md:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
                   {Object.entries(socials).map(([title, url]) => (
                     <a
                       key={title}
@@ -571,7 +571,7 @@ export default function RootLayout() {
                 </div>
                 <div className="footer-details-meta max-w-[20rem]">
                   <div>Unit AS02, The Forum, Lifestyle House,<br/>Northbank Lane, Century City,<br/>South Africa</div>
-                  <div className="my-[3.75rem]">
+                  <div className="mt-5 mb-0 xl:my-[3.75rem]">
                     Simplr © 2026<br/>
                     <a href="/privacy-policy/" title="Privacy policy">Privacy policy</a> | <a href="/site-map/" title="Sitemap">Sitemap</a>
                   </div>

@@ -242,8 +242,7 @@ nav.light a.is-active .nav-link__orb {
     height: auto;
 }
 
-.logo-holder.light svg,
-.logo-holder.footer-light svg {
+.logo-holder.light svg {
     fill: white;
 }
 
@@ -292,6 +291,11 @@ nav.light a.is-active .nav-link__orb {
     background-color: var(--color-coffee)!important;
     transition: color 0.6s ease 0.1s, background-color 0.4s ease
 }
+@media (max-width: 767.9px) {
+    .logo-holder.footer svg {
+        fill: var(--color-coffee)
+    }
+}
 @media (min-width: 768px) {
     .logo-holder {
         max-width: 16.5rem;
@@ -317,6 +321,7 @@ nav.light a.is-active .nav-link__orb {
         max-width: 33rem;
     }
 }
+
 /* --- END LOGO --- */
 
 .pin-spacer:has(.section-light) {

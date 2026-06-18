@@ -98,9 +98,7 @@
   }
 }
 
-.footer-off {
-  min-height: calc(70vh - 54px)
-}
+
 
 .category {
   font-size: 0.75rem;
@@ -137,4 +135,12 @@
 .parallax-subtle {
   transform-origin: 'bottom center';
   transform: scale(1.2) translateY(-40px)
+}
+.footer-off {
+  min-height: 50vh
+}
+@media (min-width: 768px) {
+  .footer-off {
+    min-height: calc(70vh - 54px)
+  }
 }

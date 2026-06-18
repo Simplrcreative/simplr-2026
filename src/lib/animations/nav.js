@@ -57,24 +57,29 @@ export function createLogoScrollAnimation(scope) {
     },
   })
 
-  const isDesktop = window.matchMedia('(min-width: 768px)').matches
+  const screenWidth = window.innerWidth
 
   //RESPONSIVE VALUES
   let logoScale = 1
   let logoY = 0
   let logoDuration = 0
-
   let taglineScale = 0.65
   let taglineY = -88
   let taglineX = 65
 
-  if (isDesktop) {
+  if (screenWidth >= 1280) {
     logoY = -10
-    logoScale = 0.35
     logoDuration = 0.5
-
+    logoScale = 0.35
     taglineScale = 0.68
     taglineY = -213
+    taglineX = 65
+  } else if (screenWidth >= 768) {
+    logoY = -10
+    logoDuration = 0.5
+    logoScale = 0.55
+    taglineScale = 0.68
+    taglineY = -155
     taglineX = 65
   }
 
@@ -112,7 +117,7 @@ export function createLogoScrollAnimation(scope) {
     0.3,
   )
 
-  if (isDesktop) {
+  if (screenWidth >= 768) {
     timeline.to(
       '.header',
       {

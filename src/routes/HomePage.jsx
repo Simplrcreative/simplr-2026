@@ -738,8 +738,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-20">
-          <div className="stat-item flex flex-col md:flex-row gap-5 md:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
-            <div data-initial="62" className="stat-no text-strategy">0</div>
+          <div className="stat-item flex flex-col md:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
+            <div data-initial="62" className="stat-no text-strategy md:min-w-[32rem] xl:min-w-auto">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-40 text-strategy text-[5rem]">+</div>
               <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-10 md:mt-0">Successfully launched brands since 2015 </div>
@@ -875,13 +875,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
           </div>
-          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee">
-            <div className="testimonial lead max-w-[38ch]">
+          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
+            <div className="testimonial lead max-w-[38ch] mb-5 md:mb-0">
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (
-                  <div className="mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
+                  <div className="mb-10 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
                 ) : (
-                  <p className="mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
+                  <p className="mb-10 md:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
                 )}
                 <p><b>{testimonial?.title || 'Daniel Hulme'}</b><br/>{testimonialData?.acfRole || 'CEO Satalia'}</p>
               </div>

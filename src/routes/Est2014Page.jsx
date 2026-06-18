@@ -5,12 +5,11 @@ import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
 
-const BATCH_SIZE = 8
-
 function getNumCols() {
-  if (window.matchMedia('(min-width: 1280px)').matches) return 4
-  if (window.matchMedia('(min-width: 900px)').matches) return 3
-  if (window.matchMedia('(min-width: 640px)').matches) return 2
+  const w = window.innerWidth
+  if (w >= 1280) return 4
+  if (w >= 900) return 3
+  if (w >= 640) return 2
   return 1
 }
 
@@ -29,17 +28,11 @@ export default function Est2014Page() {
   const { beyondItems = [] } = useLoaderData() ?? {}
   const btnRef = useRef(null)
   const galleryRef = useRef(null)
-  const sentinelRef = useRef(null)
   const [videoRatios, setVideoRatios] = useState({})
-  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE)
   const [numCols, setNumCols] = useState(getNumCols)
 
-  const visibleItems = beyondItems.slice(0, visibleCount)
-  const hasMore = visibleCount < beyondItems.length
-
-  // Distribute items into explicit columns so new batches always append without reshuffling
   const columns = Array.from({ length: numCols }, (_, colIndex) =>
-    visibleItems
+    beyondItems
       .map((item, i) => ({ item, globalIndex: i }))
       .filter(({ globalIndex }) => globalIndex % numCols === colIndex)
   )
@@ -55,25 +48,7 @@ export default function Est2014Page() {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
   }, [])
 
-  // Load next batch when sentinel scrolls into view
-  useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel || !hasMore) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, beyondItems.length))
-        }
-      },
-      { rootMargin: '0px 0px 400px 0px' }
-    )
-
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [hasMore, beyondItems.length])
-
-  // Animate newly added items into view
+  // Fade items in as they scroll into view
   useEffect(() => {
     const gallery = galleryRef.current
     if (!gallery) return
@@ -90,12 +65,10 @@ export default function Est2014Page() {
       { rootMargin: '0px 0px 60px 0px', threshold: 0.05 }
     )
 
-    gallery.querySelectorAll('.beyond-masonry__item:not(.is-visible)').forEach((item) => {
-      observer.observe(item)
-    })
+    gallery.querySelectorAll('.beyond-masonry__item').forEach((item) => observer.observe(item))
 
     return () => observer.disconnect()
-  }, [visibleCount])
+  }, [])
 
   const pathname = '/est-2014'
   const title = 'Est 2014'
@@ -140,11 +113,11 @@ export default function Est2014Page() {
       </section>
 
       <section className="beyond-section px-5 pb-5 pt-20 bg-coffee section-dark change-logo">
-        {visibleItems.length ? (
+        {beyondItems.length ? (
           <div ref={galleryRef} className="beyond-masonry">
             {columns.map((colItems, colIndex) => (
               <div key={colIndex} className="beyond-masonry__col">
-                {colItems.map(({ item, globalIndex }) => {
+                {colItems.map(({ item }) => {
                   const ratio = item.type === 'video'
                     ? videoRatios[item.id] ?? item.width / item.height
                     : item.width / item.height
@@ -154,11 +127,7 @@ export default function Est2014Page() {
                   const imgDesktopSrc = getThumbnail(item.source, 'large')
 
                   return (
-                    <figure
-                      key={item.id}
-                      className="beyond-masonry__item"
-                      style={{ transitionDelay: `${(globalIndex % BATCH_SIZE) * 0.04}s` }}
-                    >
+                    <figure key={item.id} className="beyond-masonry__item">
                       {item.type === 'video' ? (
                         <video
                           src={item.source}
@@ -197,10 +166,6 @@ export default function Est2014Page() {
             ))}
           </div>
         ) : null}
-
-        {hasMore && (
-          <div ref={sentinelRef} className="w-full h-px" aria-hidden="true" />
-        )}
       </section>
 
     </>

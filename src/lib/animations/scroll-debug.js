@@ -34,8 +34,8 @@ function summarizeTriggers(triggers) {
 export function isScrollTriggerDebugEnabled() {
   if (typeof window === 'undefined') return false
   if (!import.meta.env.DEV) return false
-  // Allow quick local opt-out in DevTools: window.__SIMPLR_SCROLL_DEBUG__ = false
-  return window.__SIMPLR_SCROLL_DEBUG__ !== false
+  // Set window.__SIMPLR_SCROLL_DEBUG__ = true in DevTools to re-enable
+  return window.__SIMPLR_SCROLL_DEBUG__ === false
 }
 
 export function logRouteScrollTriggerState(route, phase = 'snapshot') {
