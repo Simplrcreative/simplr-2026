@@ -1,0 +1,36 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  background-color: white;
+  transition: opacity 0.5s ease-out;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.progressBarContainer {
+  width: 15rem;
+  background-color: rgb(48, 15, 29, 0.1);
+  height: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 0 2.5rem 1.25rem;
+}
+
+.progressBarFill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  background-color: #300F1D;
+}

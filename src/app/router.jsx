@@ -8,7 +8,7 @@ import ServicesSinglePage from '../routes/ServicesSinglePage.jsx'
 import ThinkingPage from '../routes/ThinkingPage.jsx'
 import ThinkingSinglePage from '../routes/ThinkingSinglePage.jsx'
 import ContactPage from '../routes/ContactPage.jsx'
-import Est2014Page from '../routes/Est2014Page.jsx'
+import Est2014PageInfinite from '../routes/Est2014Page-infinite.jsx'
 import LandingPage from '../routes/LandingPage.jsx'
 import DefaultPage from '../routes/DefaultPage.jsx'
 import NotFoundPage from '../routes/NotFoundPage.jsx'
@@ -99,9 +99,9 @@ export const router = createBrowserRouter([
       },
       {
         path: 'est-2014',
-        element: <Est2014Page />,
+        element: <Est2014PageInfinite />,
         loader: createEst2014PageLoader(),
-        handle: { pageBg: 'dark' },
+        handle: { pageBg: 'light', hideFooter: true },
       },
       {
         path: 'privacy-policy',

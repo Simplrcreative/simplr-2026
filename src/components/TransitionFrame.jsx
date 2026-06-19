@@ -7,6 +7,7 @@ import { createSurfaceColorTransitions, createSlideUpAnimations, scrollToTopImme
 
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
+const PAGE_TRANSITION_PREPARE_CAPTURE_EVENT = 'page-transition:prepare-capture'
 const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
 const DARK_PATHS = new Set(['/about', '/contact', '/est-2014'])
@@ -25,6 +26,72 @@ function escapeAttributeValue(value) {
   }
 
   return value.replace(/(["\\])/g, '\\$1')
+}
+
+function createFrozenWebGLCanvasNode(sourceCanvas) {
+  if (!sourceCanvas || sourceCanvas.tagName !== 'CANVAS') return null
+
+  const rect = sourceCanvas.getBoundingClientRect()
+  const displayWidth = Math.round(rect.width)
+  const displayHeight = Math.round(rect.height)
+  if (displayWidth <= 0 || displayHeight <= 0) return null
+
+  const bufferWidth = sourceCanvas.width
+  const bufferHeight = sourceCanvas.height
+  if (bufferWidth <= 0 || bufferHeight <= 0) return null
+
+  const computed = getComputedStyle(sourceCanvas)
+
+  try {
+    const frozen = document.createElement('canvas')
+    frozen.width = bufferWidth
+    frozen.height = bufferHeight
+
+    const ctx = frozen.getContext('2d')
+    if (!ctx) return null
+
+    ctx.drawImage(sourceCanvas, 0, 0)
+
+    frozen.className = sourceCanvas.className
+    frozen.classList.add('transition-capture-canvas')
+    if (sourceCanvas.style.cssText) {
+      frozen.style.cssText = sourceCanvas.style.cssText
+    }
+
+    frozen.style.width = computed.width && computed.width !== 'auto' ? computed.width : `${displayWidth}px`
+    frozen.style.height = computed.height && computed.height !== 'auto' ? computed.height : `${displayHeight}px`
+    frozen.style.display = computed.display === 'inline' ? 'block' : computed.display || 'block'
+
+    if (!frozen.style.borderRadius) {
+      frozen.style.borderRadius = computed.borderRadius
+    }
+
+    frozen.dataset.frozenClone = 'true'
+    return frozen
+  } catch {
+    return null
+  }
+}
+
+function appendFixedCaptureCanvas(clone, liveCanvas, frozenCanvas) {
+  const rect = liveCanvas.getBoundingClientRect()
+  Object.assign(frozenCanvas.style, {
+    position: 'fixed',
+    top: `${rect.top}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    margin: '0',
+    padding: '0',
+    zIndex: '0',
+    pointerEvents: 'none',
+  })
+
+  clone.appendChild(frozenCanvas)
+
+  clone.querySelectorAll('.transition-capture-canvas:not([data-frozen-clone])').forEach((node) => {
+    node.style.visibility = 'hidden'
+  })
 }
 
 function createFrozenVideoNode(video, options = {}) {
@@ -420,6 +487,8 @@ export default function TransitionFrame({ children }) {
       if (hasCapturedRef.current) return
       hasCapturedRef.current = true
 
+      window.dispatchEvent(new Event(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT))
+
       // Record scroll position at click time. window.scrollY at useLayoutEffect
       // time may already be 0 (browser clamps scroll for new page DOM).
       capturedScrollYRef.current = window.scrollY
@@ -637,6 +706,15 @@ export default function TransitionFrame({ children }) {
           clonedVideo.replaceWith(canvas)
         } catch {
           // Cross-origin video — leave the cloned element (poster will show)
+        }
+      })
+
+      const liveCaptureCanvases = Array.from(ref.current.querySelectorAll('canvas.transition-capture-canvas'))
+
+      liveCaptureCanvases.forEach((liveCanvas) => {
+        const frozenCanvas = createFrozenWebGLCanvasNode(liveCanvas)
+        if (frozenCanvas) {
+          appendFixedCaptureCanvas(clone, liveCanvas, frozenCanvas)
         }
       })
 

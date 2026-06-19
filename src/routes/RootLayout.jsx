@@ -378,6 +378,7 @@ export default function RootLayout() {
   // Set handle: { pageBg: 'dark' } on any route that opens on a coffee section.
   const matches = useMatches()
   const pageBg = matches.findLast((m) => m.handle?.pageBg)?.handle.pageBg ?? 'light'
+  const hideFooter = matches.findLast((m) => m.handle?.hideFooter !== undefined)?.handle.hideFooter ?? false
 
   // Set html[data-page-bg] synchronously before the browser paints.
   useLayoutEffect(() => {
@@ -397,7 +398,10 @@ export default function RootLayout() {
 
   // Footer DOM is static — recreating this animation on every route change is
   // unnecessary and accumulates gsap.matchMedia() contexts.
-  useEffect(() => createFooterAnimation(footerRef.current), [])
+  useEffect(() => {
+    if (hideFooter || !footerRef.current) return undefined
+    return createFooterAnimation(footerRef.current)
+  }, [hideFooter])
 
   return (
     <div 
@@ -511,9 +515,11 @@ export default function RootLayout() {
         </TransitionFrame>
       </main>
 
-      <div className="bg-white section-light footer-off"></div>
+      {!hideFooter ? (
+        <>
+          <div className="bg-white section-light footer-off"></div>
 
-      <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white z-[100000] relative">
+          <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white z-[100000] relative">
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-6">
@@ -621,7 +627,10 @@ export default function RootLayout() {
               </svg>
           </div>
         </div>
-      </footer>
+          </footer>
+        </>
+      ) : null}
+      
     </div>
   )
 }
