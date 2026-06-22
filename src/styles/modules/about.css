@@ -92,7 +92,7 @@
   top: 50%;
   transform: translateY(-50%);
   /*height: 90vh;*/
-  overflow: hidden
+  /*overflow: hidden*/
 }
 .bio-close {
   position: absolute;
@@ -106,6 +106,7 @@
   border: none;
   opacity: 0.8;
   transition: opacity 0.2s;
+  z-index: 1010;
 }
 
 .bio-close:hover {
@@ -149,17 +150,94 @@
 .bio-text p + p {
   margin-top: 1.5rem;
 }
+
 @media (max-width: 767.9px) {
-  .bio-overlay {
-    z-index: 0!important;
+  .people.people--bio-open {
+    overflow: visible;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: 100vh;
+    height: auto;
+    padding-bottom: 3rem;
   }
+
+  .people-grid {
+    top: 0;
+    transform: none;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .people-info {
+    min-height: 0;
+  }
+
   .person-hover-img {
-    margin-top: 3rem!important;
+    position: fixed;
+    left: 50%;
+    top: 50% !important;
+    width: 50%;
+    height: auto;
+    margin-top: 0 !important;
+    z-index: 1005;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+    transition:
+      opacity 0.35s ease,
+      scale 0.35s ease,
+      filter 0.35s ease,
+      top 0.45s ease,
+      transform 0.45s ease;
   }
+
+  /* Bio open — slide up from center to top / center */
+  .person-hover-img.is-active {
+    top: 5rem !important;
+    transform: translateX(-50%);
+  }
+
+  .person-hover-img.is-visible {
+    transition:
+      opacity 0.35s ease,
+      scale 0.35s ease,
+      filter 0.35s ease,
+      top 0.45s ease,
+      transform 0.45s ease;
+  }
+
+  .bio-overlay {
+    position: relative;
+    z-index: 1006 !important;
+    margin-top: calc(5rem + 50vw * 4 / 3 + 1.5rem);
+    pointer-events: none;
+  }
+
+  .people--bio-open .bio-overlay {
+    pointer-events: auto;
+  }
+
   .bio-content {
-    padding-top: 95vw;
+    padding-top: 0;
+  }
+
+  .bio-text {
+    max-height: calc(100vh - 5rem - 50vw * 4 / 3 - 11rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 0.25rem;
+  }
+
+  .bio-close {
+    position: fixed;
+    top: 5rem;
+    right: 1.25rem;
+    left: auto;
+    transform: none;
+    z-index: 1012;
   }
 }
+
 @media (min-width: 768px) {
   .person-item.align-end  { margin-left: auto; }
   .person-item.align-start { margin-right: auto; }

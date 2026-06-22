@@ -118,16 +118,21 @@ export default function AboutPage() {
       </section>
 
       {/* People section */}
-      <section id="our-people" ref={peopleSectionRef} className="people py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center">
+      <section
+        id="our-people"
+        ref={peopleSectionRef}
+        className={`people py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center${activeBio ? ' people--bio-open' : ''}${hoveredPerson && !activeBio ? ' people--preview' : ''}`}
+      >
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
-        <div ref={scatterRef} className="people-scatter relative z-3 max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
+        <div ref={scatterRef} className="people-scatter relative z-[1011] max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
           {people.map((person) => (
             <div
               key={person.acfName}
               className={`person-item mb-5 md:mb-0 flex${hoveredPerson === person.acfName ? ' is-hovered' : ''}${person.acfAlign ? ` align-${person.acfAlign}` : ''}`}
               onMouseEnter={() => handlePersonEnter(person)}
               onMouseLeave={() => setHoveredPerson(null)}
+              onTouchStart={() => handlePersonEnter(person)}
               onClick={() => handlePersonClick(person.acfName)}
             >
               <span className={`person-name ${person.acfFont ?? ''} ${person.acfDivision ?? ''}`}>
@@ -151,10 +156,10 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-5">
+        <div className="absolute z-[1010] people-grid w-full grid grid-cols-12 pointer-events-none px-5">
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
-          <div className="col-start-3 col-span-8 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
+          <div className="people-info col-start-4 col-span-6 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
             <button
               ref={closeRef}
               className="bio-close"

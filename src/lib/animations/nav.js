@@ -128,7 +128,7 @@ export function createLogoScrollAnimation(scope) {
     )
 
     timeline.to(
-      'nav.main',
+      '#desktop-nav',
       {
         y: -20,
         duration: 0.5,
@@ -187,7 +187,7 @@ export function createLogoPageAnimation(scope) {
     )
 
     timeline.to(
-      'nav.main',
+      '#desktop-nav',
       {
         y: -20,
         duration: 0.5,

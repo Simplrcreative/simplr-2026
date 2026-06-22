@@ -160,7 +160,7 @@ export function createNavSectionTheme(scope) {
 
   registerPlugins()
 
-  const nav = document.querySelector('nav.main')
+  const nav = document.querySelector('#desktop-nav')
   const logo = document.querySelector('.logo-holder')
   const themedSections = Array.from(scope.querySelectorAll('.section-light, .section-dark'))
   const changeLogoSections = Array.from(scope.querySelectorAll('.change-logo'))
@@ -322,7 +322,7 @@ export function createHeroScrollAnimation(scope) {
     const heroImage = section?.querySelector('.hero-video')
     const heroVideoHolder = section?.querySelector('.hero-video-holder')
     const navHolder = document.querySelector('.nav-holder')
-    const nav = document.querySelector('nav.main')
+    const nav = document.querySelector('#desktop-nav')
     const logo = document.querySelector('.logo-holder')
     const themedSections = Array.from(document.querySelectorAll('.section-light, .section-dark'))
     const changeLogoSections = Array.from(document.querySelectorAll('.change-logo'))

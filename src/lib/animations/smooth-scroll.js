@@ -146,7 +146,7 @@ export function scrollToTopImmediate() {
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
     window.scrollTo(0, 0)
-    lenisInstance.start()
+    syncLenisLockState()
     ScrollTrigger.update()
     return
   }

@@ -70,8 +70,11 @@ nav.light a.is-active .nav-link__orb {
     background: white;
 }
 
+.logo-holder.light {
+    color: white;
+}
 @media (max-width: 767.9px) {
-    nav.main {
+    #mobile-nav {
        position: fixed;
        z-index: 10000;
        top: 1.25rem;
@@ -83,11 +86,13 @@ nav.light a.is-active .nav-link__orb {
        transform: scale(0)!important;
        transition: transform 0.3s ease;
        border-radius: 10px 0 0 10px;
+       pointer-events: none;
     }
 
-    nav.main.active {
+    #mobile-nav.active {
         transform: scale(1)!important;
-        transition: transform 0.3s ease
+        transition: transform 0.3s ease;
+        pointer-events: all
     }
     .nav-link__orb,
     .nav-link__content--inverted {
@@ -116,7 +121,8 @@ nav.light a.is-active .nav-link__orb {
         z-index: 10001;
         transform: translate(0,0);
         transition: transform 0.25s ease;
-        mix-blend-mode:difference
+        mix-blend-mode:difference;
+        gap: 0.5rem
     }
     .menu-icon.active {
         transform: translate(0, 1.25rem)!important;

@@ -1070,7 +1070,7 @@ export default function TransitionFrame({ children }) {
       // fading the header in. dataset.pageBg has now been updated by
       // RootLayout's layout effect (parent runs after child).
       const incomingPageBg = document.documentElement.dataset.pageBg
-      const nav = document.querySelector('nav.main')
+      const nav = document.querySelector('#desktop-nav')
       const logoHolder = document.querySelector('.logo-holder')
       if (incomingPageBg === 'dark') {
         nav?.classList.add('light')

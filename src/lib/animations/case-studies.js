@@ -71,8 +71,6 @@ export function createCaseStudiesScrollAnimation(scope) {
       if (mediaFrame) {
         gsap.set(mediaFrame, {
           y: 100,
-          '--aspect-ratio-desktop': '90%',
-          '--aspect-ratio-mobile': '90%',
           clipPath: createWorkMaskClip('87%', '0%'),
           transformOrigin: 'bottom center',
         })

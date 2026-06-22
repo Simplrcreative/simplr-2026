@@ -106,7 +106,7 @@ export default function WorkSinglePage() {
               {loaderSrc && (
                 <div
                   className="ratio overflow-hidden rounded-[10px] thumb-swap"
-                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
+                  style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
                 >
                   <PictureImg
                     loaderSrc = {secondaryLoaderSrc + '.webp'}
@@ -394,7 +394,7 @@ export default function WorkSinglePage() {
                   data-transition-source="media"
                   data-transition-variant="work-next"
                 >
-                  <div className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}>
+                  <div className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}>
                     <PictureImg
                       loaderSrc={nextLoaderSrc}
                       mobileSrc={nextMobileSrc}

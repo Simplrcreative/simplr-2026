@@ -66,7 +66,7 @@ export function createFooterAnimation(scope) {
   const logoDot = document.querySelector('#logo-dot')
   const tagline = document.querySelector('.tagline')
   const header = document.querySelector('.header')
-  const nav = document.querySelector('nav.main')
+  const nav = document.querySelector('#desktop-nav')
   const logoHolder = document.querySelector('.logo-holder')
   const navHolder = document.querySelector('.nav-holder')
   const footerBlock = document.querySelector('.footer-block')
@@ -81,8 +81,6 @@ export function createFooterAnimation(scope) {
 
   media.add('(prefers-reduced-motion: no-preference)', () => {
     let previousCompactLogoState = root.classList.contains('compact-logo-active')
-    let previousNavFooterLightState = nav?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-    let previousLogoHolderFooterLightState = logoHolder?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
 
     const applyFooterLightState = (isActive) => {
       nav?.classList.toggle(FOOTER_LIGHT_CLASS, isActive)
@@ -94,8 +92,21 @@ export function createFooterAnimation(scope) {
         'compact-logo-active',
         resolveCurrentCompactLogoState(nav, previousCompactLogoState),
       )
-      nav?.classList.toggle(FOOTER_LIGHT_CLASS, previousNavFooterLightState)
-      logoHolder?.classList.toggle(FOOTER_LIGHT_CLASS, previousLogoHolderFooterLightState)
+      nav?.classList.remove(FOOTER_LIGHT_CLASS)
+      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
+    }
+
+    const shouldApplyFooterLightState = (self) =>
+      self.progress > 0 || (self.isActive && self.direction === 1)
+
+    const syncFooterNavState = (self) => {
+      if (shouldApplyFooterLightState(self)) {
+        root.classList.remove('compact-logo-active')
+        applyFooterLightState(true)
+        return
+      }
+
+      restorePageState()
     }
 
     const timeline = gsap.timeline({
@@ -113,37 +124,19 @@ export function createFooterAnimation(scope) {
         refreshPriority: -30,
         onEnter: () => {
           previousCompactLogoState = root.classList.contains('compact-logo-active')
-          previousNavFooterLightState = nav?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-          previousLogoHolderFooterLightState = logoHolder?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-          root.classList.remove('compact-logo-active')
-          applyFooterLightState(true)
+          syncFooterNavState(timeline.scrollTrigger)
         },
         onEnterBack: () => {
-          // Do NOT re-capture previous state here — the footer class is already
-          // active at this point (we're re-entering from below the end marker),
-          // so capturing now would overwrite the correct pre-footer snapshot with
-          // the active state, causing restorePageState() to keep the class on.
-          root.classList.remove('compact-logo-active')
-          applyFooterLightState(true)
+          syncFooterNavState(timeline.scrollTrigger)
         },
         onLeaveBack: () => {
           restorePageState()
         },
         onUpdate: (self) => {
-          if (self.progress > 0) {
-            root.classList.remove('compact-logo-active')
-            applyFooterLightState(true)
-          } else {
-            restorePageState()
-          }
+          syncFooterNavState(self)
         },
         onRefresh: (self) => {
-          if (self.progress > 0 || self.isActive) {
-            root.classList.remove('compact-logo-active')
-            applyFooterLightState(true)
-          } else {
-            restorePageState()
-          }
+          syncFooterNavState(self)
         },
       },
     })
@@ -359,16 +352,32 @@ export function createFooterAnimation(scope) {
 
   media.add('(prefers-reduced-motion: reduce)', () => {
     let previousCompactLogoState = root.classList.contains('compact-logo-active')
-    let previousNavFooterLightState = nav?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-    let previousLogoHolderFooterLightState = logoHolder?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
+
+    const applyFooterLightState = () => {
+      nav?.classList.add(FOOTER_LIGHT_CLASS)
+      logoHolder?.classList.add(FOOTER_LIGHT_CLASS)
+    }
 
     const restorePageState = () => {
       root.classList.toggle(
         'compact-logo-active',
         resolveCurrentCompactLogoState(nav, previousCompactLogoState),
       )
-      nav?.classList.toggle(FOOTER_LIGHT_CLASS, previousNavFooterLightState)
-      logoHolder?.classList.toggle(FOOTER_LIGHT_CLASS, previousLogoHolderFooterLightState)
+      nav?.classList.remove(FOOTER_LIGHT_CLASS)
+      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
+    }
+
+    const shouldApplyFooterLightState = (self) =>
+      self.progress > 0 || (self.isActive && self.direction === 1)
+
+    const syncFooterNavState = (self) => {
+      if (shouldApplyFooterLightState(self)) {
+        root.classList.remove('compact-logo-active')
+        applyFooterLightState()
+        return
+      }
+
+      restorePageState()
     }
 
     const trigger = ScrollTrigger.create({
@@ -380,11 +389,7 @@ export function createFooterAnimation(scope) {
       refreshPriority: -30,
       onEnter: () => {
         previousCompactLogoState = root.classList.contains('compact-logo-active')
-        previousNavFooterLightState = nav?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-        previousLogoHolderFooterLightState = logoHolder?.classList.contains(FOOTER_LIGHT_CLASS) ?? false
-        root.classList.remove('compact-logo-active')
-        nav?.classList.add(FOOTER_LIGHT_CLASS)
-        logoHolder?.classList.add(FOOTER_LIGHT_CLASS)
+        syncFooterNavState(trigger)
         gsap.set(logo, { scale: 1, y: 0 })
         gsap.set(implrPaths, { x: 0, filter: 'blur(0px)', autoAlpha: 1 })
         if (footerBlock) {
@@ -395,9 +400,7 @@ export function createFooterAnimation(scope) {
         })
       },
       onEnterBack: () => {
-        root.classList.remove('compact-logo-active')
-        nav?.classList.add(FOOTER_LIGHT_CLASS)
-        logoHolder?.classList.add(FOOTER_LIGHT_CLASS)
+        syncFooterNavState(trigger)
         gsap.set(logo, { scale: 1, y: 0 })
         gsap.set(implrPaths, { x: 0, filter: 'blur(0px)', autoAlpha: 1 })
         if (footerBlock) {
@@ -412,6 +415,12 @@ export function createFooterAnimation(scope) {
         if (footerBlock) {
           gsap.set(footerBlock, { autoAlpha: 0, y: '-50vh'})
         }
+      },
+      onUpdate: (self) => {
+        syncFooterNavState(self)
+      },
+      onRefresh: (self) => {
+        syncFooterNavState(self)
       },
     })
 

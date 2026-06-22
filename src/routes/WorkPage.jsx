@@ -253,7 +253,7 @@ function WorkFeatured({ work, cardKey }) {
     >
       <div
         className="ratio overflow-hidden rounded-[10px] block thumb-swap"
-        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
+        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
       >
         <PictureImg
           loaderSrc = {loaderSrc + '.webp'}
@@ -336,7 +336,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
           >
             <div
               className="ratio overflow-hidden rounded-[10px] block thumb-swap"
-              style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
+              style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
             >
               <PictureImg
                 loaderSrc = {loaderSrc + '.webp'}

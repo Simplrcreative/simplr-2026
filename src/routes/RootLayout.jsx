@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLoaderData, useLocation, useMatches, useNavigation } from 'react-router-dom'
 import { useRoutePrefetch } from '../lib/useRoutePrefetch.js'
 import BrandLogo from '../components/BrandLogo.jsx'
@@ -71,6 +71,13 @@ function handleLogoTransitionClick() {
   requestTransitionCapture()
 }
 
+function createMobileNavLinkClickHandler(closeMobileNav) {
+  return (event) => {
+    closeMobileNav()
+    handleTransitionLinkClick(event)
+  }
+}
+
 const socials = {
   linkedin: 'https://www.linkedin.com/company/simplrcreative/',
   instagram: 'https://www.instagram.com/simplrcreative',
@@ -100,14 +107,17 @@ export default function RootLayout() {
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
 
+  const closeMobileNav = useCallback(() => {
+    setIsNavOpen(false)
+    unlockScroll('nav')
+  }, [])
+
   useEffect(() => {
     window.dispatchEvent(new Event('app-shell-ready'))
   }, [])
 
   useEffect(() => {
     previousPathRef.current = location.pathname
-    setIsNavOpen(false)
-    unlockScroll('nav')
   }, [location.pathname])
 
   // Reset intro state when leaving home page
@@ -146,6 +156,8 @@ export default function RootLayout() {
   // On every route change: kill the previous logo animation, scroll to top,
   // and clear any GSAP inline styles left by the scroll animation.
   useLayoutEffect(() => {
+    closeMobileNav()
+
     destroyLogoRef.current?.()
     destroyLogoRef.current = null
     
@@ -155,7 +167,7 @@ export default function RootLayout() {
     destroyNavSectionThemeRef.current = null
     
     scrollToTopImmediate()
-    document.querySelector('nav.main')?.classList.remove('light')
+    document.querySelector('#desktop-nav')?.classList.remove('light')
     document.querySelector('.logo-holder')?.classList.remove('light')
     document.documentElement.classList.remove('compact-logo-active')
 
@@ -210,7 +222,7 @@ export default function RootLayout() {
       willChange: 'transform',
     })
     if (isHomePage) {
-      gsap.set(layout?.querySelector('nav.main'), {
+      gsap.set(layout?.querySelector('#desktop-nav'), {
         autoAlpha: 0,
         y: -30,
       })
@@ -219,7 +231,7 @@ export default function RootLayout() {
         x: 30,
       })
     } else {
-      gsap.set(layout?.querySelector('nav.main'), {
+      gsap.set(layout?.querySelector('#desktop-nav'), {
         autoAlpha: 1,
         y: 0,
         clearProps: 'opacity,visibility,transform',
@@ -230,7 +242,7 @@ export default function RootLayout() {
         clearProps: 'opacity,visibility,transform',
       })
     }
-  }, [location.pathname, isHomePage])
+  }, [closeMobileNav, location.pathname, isHomePage])
 
   useEffect(() => {
     if (!isHomePage) {
@@ -250,7 +262,7 @@ export default function RootLayout() {
       const logo = layoutRef.current?.querySelector('.logo')
       const tagline = layoutRef.current?.querySelector('.tagline')
       const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
-      const mainNav = layoutRef.current?.querySelectorAll('nav.main')
+      const mainNav = layoutRef.current?.querySelector('#desktop-nav')
       const menuIcon = layoutRef.current?.querySelectorAll('.menu-icon')
 
       const entranceTl = gsap.timeline({
@@ -429,7 +441,7 @@ export default function RootLayout() {
         />
       </div>
 
-      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-[1000]">
+      <div className="compact-logo fixed top-[1.25rem] left-[1.25rem] z-[1003]">
         <Link
           id="compact-logo-link"
           to="/"
@@ -437,7 +449,7 @@ export default function RootLayout() {
           onPointerDown={requestTransitionCapture}
           onClick={handleLogoTransitionClick}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="54" height="47" viewBox="0 0 54 47">
+          <svg xmlns="http://www.w3.org/2000/svg" width="52" height="45" viewBox="0 0 54 47">
             <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
             <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
             <path d="M24.5075 45.744C27.3879 44.5739 28.8836 42.3885 28.8836 39.2684C28.8836 37.1635 28.0616 35.2939 26.4422 33.7028C24.0996 31.2946 20.8299 29.8955 17.0409 28.2673C16.0087 27.8215 14.9518 27.3696 13.8701 26.8805C11.305 25.7476 8.90059 24.5094 6.96595 23.5189C2.60837 21.1107 0 17.2043 0 13.0688C0 9.46575 1.39072 6.33319 4.14125 3.764C5.89046 2.12343 7.83128 0.990508 9.93281 0.365234C7.91782 1.44863 6.75579 3.40493 6.75579 5.9184C6.75579 12.8336 13.2582 15.2294 20.1376 17.7738C27.7278 20.5783 35.5715 23.4694 35.5715 32.6999C35.5715 36.9159 34.0509 40.1784 30.9357 42.6733C29.0629 44.1344 26.9366 45.1558 24.5137 45.744H24.5075Z" />
@@ -446,8 +458,8 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2 ${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((o) => {
-          const next = !o
+      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((open) => {
+          const next = !open
           if (next) {
             lockScroll('nav')
           } else {
@@ -474,7 +486,7 @@ export default function RootLayout() {
               onPointerLeave={hideNavLinkOrb}
               onFocus={e => { showNavLinkOrb(e); prefetch(); }}
               onBlur={hideNavLinkOrb}
-              onClick={handleTransitionLinkClick}
+              onClick={createMobileNavLinkClickHandler(closeMobileNav)}
             >
               <span className="nav-link__orb" aria-hidden="true" />
               <NavLinkLabel label={item.label} count={item.count} />
@@ -494,7 +506,7 @@ export default function RootLayout() {
                 onPointerDown={requestTransitionCapture}
                 onClick={handleLogoTransitionClick}
               >
-              <BrandLogo />
+                <BrandLogo />
                 <div className="tagline">
                   <span>Creative.</span><br/>
                   Applied.<br/>
@@ -504,7 +516,7 @@ export default function RootLayout() {
             
           </div>
 
-          <nav id="desktop-nav" className={`main hidden md:flex flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
+          <nav id="desktop-nav" className="main hidden md:flex flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]">
             {navigation.map((item) => {
               const prefetch = useRoutePrefetch(item.path)
               return (

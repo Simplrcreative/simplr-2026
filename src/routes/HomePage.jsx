@@ -787,8 +787,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       onMouseEnter={() => prefetchWorkEntry(study.slug)}
                     >
                       <div
-                        className="ratio overflow-hidden"
-                        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
+                        className="ratio overflow-hidden test"
+                        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
                       >
                         <PictureImg
                           loaderSrc={study.secondaryLoaderImg + '.webp'}
