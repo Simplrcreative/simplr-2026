@@ -129,36 +129,71 @@ export function createBulletsAnimation(section) {
   }
 }
 
-export function createBioAnimation(scatter, overlay, close, isOpen) {
+export function createBioAnimation(scatter, overlay, close, isOpen, onCloseComplete) {
   if (!scatter || !overlay) return () => undefined
 
+  const bioContent = overlay.querySelector('.bio-content')
   const isDesktop = window.matchMedia('(min-width: 768px)').matches
   const scatterX = isDesktop ? '-60%' : '-101%'
 
   if (isOpen) {
-    const t1 = gsap.to(scatter, { x: scatterX, opacity: 0.75, duration: 0.5, ease: 'power4.out' })
-    const t2 = isDesktop
-      ? gsap.fromTo(
-          overlay,
-          { opacity: 0, x: 500 },
-          { opacity: 1, x: 0, duration: 0.75, ease: 'power4.out', delay: 0.35, pointerEvents: 'auto' },
-        )
-      : gsap.fromTo(
-          overlay,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.6, ease: 'power4.out', delay: 0.25, pointerEvents: 'auto' },
-        )
-    const t3 = close
-      ? gsap.fromTo(close, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power1.out', delay: 0.3, pointerEvents: 'auto' })
-      : null
-    return () => { t1.kill(); t2.kill(); t3?.kill() }
+    const tl = gsap.timeline()
+
+    tl.to(scatter, { x: scatterX, opacity: 0.75, duration: 0.5, ease: 'power4.out' }, 0)
+
+    if (isDesktop) {
+      tl.fromTo(
+        overlay,
+        { opacity: 0, x: 500 },
+        { opacity: 1, x: 0, duration: 0.75, ease: 'power4.out', pointerEvents: 'auto' },
+        0.35,
+      )
+    } else {
+      tl.fromTo(
+        overlay,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, ease: 'power4.out', pointerEvents: 'auto' },
+        0.25,
+      )
+      if (bioContent) {
+        tl.fromTo(bioContent, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power4.out' }, 0.35)
+      }
+    }
+
+    if (close) {
+      tl.fromTo(
+        close,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3, ease: 'power1.out', pointerEvents: 'auto' },
+        0.3,
+      )
+    }
+
+    return () => tl.kill()
   }
 
-  const t1 = isDesktop
-    ? gsap.to(overlay, { opacity: 0, x: 500, duration: 0.75, ease: 'power4.in', delay: 0.25, pointerEvents: 'none' })
-    : gsap.to(overlay, { opacity: 0, duration: 0.45, ease: 'power4.in', pointerEvents: 'none' })
-  const t2 = close ? gsap.to(close, { opacity: 0, duration: 0.3, ease: 'power1.in', pointerEvents: 'none' }) : null
-  const t3 = gsap.to(scatter, { x: '0%', opacity: 1, duration: 0.75, ease: 'power4.in', delay: 0.4 })
+  const tl = gsap.timeline({
+    onComplete: () => onCloseComplete?.(),
+  })
 
-  return () => { t1.kill(); t2?.kill(); t3.kill() }
+  if (close) {
+    tl.to(close, { opacity: 0, duration: 0.25, ease: 'power1.in', pointerEvents: 'none' }, 0)
+  }
+
+  if (isDesktop) {
+    tl.to(
+      overlay,
+      { opacity: 0, x: 500, duration: 0.75, ease: 'power4.in', pointerEvents: 'none' },
+      close ? 0.1 : 0.25,
+    )
+  } else {
+    tl.to(overlay, { opacity: 0, duration: 0.45, ease: 'power4.in', pointerEvents: 'none' }, 0)
+    if (bioContent) {
+      tl.to(bioContent, { opacity: 0, duration: 0.45, ease: 'power4.in' }, 0)
+    }
+  }
+
+  tl.to(scatter, { x: '0%', opacity: 1, duration: 0.75, ease: 'power4.in' }, 0.4)
+
+  return () => tl.kill()
 }

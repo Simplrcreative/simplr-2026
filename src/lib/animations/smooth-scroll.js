@@ -7,6 +7,8 @@ let scrollTriggerRegistered = false
 let subscriberCount = 0
 let tickerCallback
 const activeScrollLocks = new Set()
+const scrollLockOptions = new Map()
+let nativeLockApplied = false
 const originalScrollStyles = {
   htmlOverflow: '',
   bodyOverflow: '',
@@ -14,18 +16,34 @@ const originalScrollStyles = {
   bodyTouchAction: '',
 }
 
-function applyNativeScrollLock() {
-  if (activeScrollLocks.size !== 1) return
+function shouldPreventTouchForActiveLocks() {
+  return [...activeScrollLocks].some((lockId) => {
+    const options = scrollLockOptions.get(lockId)
+    return options?.preventTouch !== false
+  })
+}
 
-  originalScrollStyles.htmlOverflow = document.documentElement.style.overflow
-  originalScrollStyles.bodyOverflow = document.body.style.overflow
-  originalScrollStyles.htmlTouchAction = document.documentElement.style.touchAction
-  originalScrollStyles.bodyTouchAction = document.body.style.touchAction
+function applyNativeScrollLock() {
+  if (activeScrollLocks.size === 0) return
+
+  if (!nativeLockApplied) {
+    originalScrollStyles.htmlOverflow = document.documentElement.style.overflow
+    originalScrollStyles.bodyOverflow = document.body.style.overflow
+    originalScrollStyles.htmlTouchAction = document.documentElement.style.touchAction
+    originalScrollStyles.bodyTouchAction = document.body.style.touchAction
+    nativeLockApplied = true
+  }
 
   document.documentElement.style.overflow = 'hidden'
   document.body.style.overflow = 'hidden'
-  document.documentElement.style.touchAction = 'none'
-  document.body.style.touchAction = 'none'
+
+  if (shouldPreventTouchForActiveLocks()) {
+    document.documentElement.style.touchAction = 'none'
+    document.body.style.touchAction = 'none'
+  } else {
+    document.documentElement.style.touchAction = originalScrollStyles.htmlTouchAction
+    document.body.style.touchAction = originalScrollStyles.bodyTouchAction
+  }
 }
 
 function releaseNativeScrollLock() {
@@ -35,6 +53,7 @@ function releaseNativeScrollLock() {
   document.body.style.overflow = originalScrollStyles.bodyOverflow
   document.documentElement.style.touchAction = originalScrollStyles.htmlTouchAction
   document.body.style.touchAction = originalScrollStyles.bodyTouchAction
+  nativeLockApplied = false
 }
 
 function syncLenisLockState() {
@@ -156,14 +175,22 @@ export function scrollToTopImmediate() {
   window.scrollTo(0, 0)
 }
 
-export function lockScroll(lockId = 'global') {
+export function lockScroll(lockId = 'global', options = {}) {
   activeScrollLocks.add(lockId)
+  scrollLockOptions.set(lockId, options)
   applyNativeScrollLock()
   syncLenisLockState()
 }
 
 export function unlockScroll(lockId = 'global') {
   activeScrollLocks.delete(lockId)
-  releaseNativeScrollLock()
+  scrollLockOptions.delete(lockId)
+
+  if (activeScrollLocks.size > 0) {
+    applyNativeScrollLock()
+  } else {
+    releaseNativeScrollLock()
+  }
+
   syncLenisLockState()
 }

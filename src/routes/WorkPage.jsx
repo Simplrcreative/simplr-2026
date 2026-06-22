@@ -312,12 +312,12 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
     ?? ''
 
   return (
-    <section id={`testimonial-${index}`} className="testimonial px-5 py-20 bg-white section-light">
+    <section id={`testimonial-${index}`} className="testimonial px-5 pb-5 md:py-20 bg-white section-light">
       <div className="grid grid-cols-12 w-full">
         <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
           <div className="testimonial lead max-w-[38ch]">
             <div className="split-text-coffee trigger-split-text-coffee">
-              {quote && <div className="mb-20" dangerouslySetInnerHTML={{ __html: `${quote}` }} />}
+              {quote && <div className="mb-5 md:mb-20" dangerouslySetInnerHTML={{ __html: `${quote}` }} />}
               <div>
                 {author && <b>{author}</b>}
                 {role && <>{author ? <br /> : null}{role}</>}
@@ -325,7 +325,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             </div>
           </div>
         </div>
-        <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6">
+        <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 mt-10 md:mt-0">
           <Link 
             to={`/work/${work.slug}`} 
             className="client-work block alt-transition-img thumb-swap-trigger" 
@@ -613,7 +613,7 @@ export default function WorkPage() {
         ]}
       />
 
-      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
@@ -660,7 +660,7 @@ export default function WorkPage() {
 
           return (
             <div key={group.featured?.databaseId ?? `group-${n}`}>
-              <section id={`work-${n}`} className="work px-5 pb-20 bg-white section-light">
+              <section id={`work-${n}`} className="work px-5 pb-5 md:pb-20 bg-white section-light">
                 <div className="work-section grid grid-cols-12 gap-5">
 
                   {group.featured && (
@@ -671,7 +671,7 @@ export default function WorkPage() {
                   )}
 
                   <div id={`work-grid-${n}`} className="work-grid col-start-1 md:col-start-7 col-span-12 md:col-span-6 flex flex-col justify-between">
-                    <div className="work-cards-top work-cards-row md:flex justify-between mb-20" style={rowStyle}>
+                    <div className="work-cards-top work-cards-row md:flex justify-between md:mb-20" style={rowStyle}>
                       {group.gridItems.slice(0, 2).map((work) => (
                         <WorkCard
                           key={work.databaseId}

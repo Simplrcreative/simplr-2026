@@ -88,6 +88,12 @@
 }
 
 /* ─── Bio overlay ────────────────────────────────────────── */
+.bio-overlay {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
 .people-grid {
   top: 50%;
   transform: translateY(-50%);
@@ -104,13 +110,14 @@
   cursor: pointer;
   background: none;
   border: none;
-  opacity: 0.8;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.2s;
   z-index: 1010;
 }
 
 .bio-close:hover {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .bio-name {
@@ -151,14 +158,53 @@
   margin-top: 1.5rem;
 }
 
+.people-bio-backdrop {
+  display: none;
+}
+
 @media (max-width: 767.9px) {
+  .people-bio-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 10002;
+    backdrop-filter: blur(0);
+    pointer-events: none;
+    transition: backdrop-filter 0.3s ease;
+  }
+
+  .people-bio-backdrop.active {
+    backdrop-filter: blur(5px);
+    pointer-events: auto;
+  }
+
+  .people--bio-open .people-scatter {
+    z-index: 1008;
+  }
+
+  .people--bio-open .person-hover-img.is-visible {
+    z-index: 10004;
+  }
+
+  .people--bio-closing .person-hover-img.is-visible {
+    top: 50% !important;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    scale: 0.85;
+    transition:
+      opacity 0.35s ease,
+      scale 0.35s ease,
+      filter 0.35s ease,
+      top 0.35s ease,
+      transform 0.35s ease;
+  }
+
+  .people--bio-open .people-grid {
+    z-index: 10003 !important;
+  }
+
   .people.people--bio-open {
-    overflow: visible;
-    align-items: flex-start;
-    justify-content: flex-start;
-    min-height: 100vh;
-    height: auto;
-    padding-bottom: 3rem;
+    overflow: hidden;
   }
 
   .people-grid {
@@ -190,9 +236,10 @@
       transform 0.45s ease;
   }
 
-  /* Bio open — slide up from center to top / center */
+  /* Bio open — pinned top / center */
   .person-hover-img.is-active {
-    top: 5rem !important;
+    top: 1.25rem !important;
+    z-index: 10004;
     transform: translateX(-50%);
   }
 
@@ -208,12 +255,33 @@
   .bio-overlay {
     position: relative;
     z-index: 1006 !important;
-    margin-top: calc(5rem + 50vw * 4 / 3 + 1.5rem);
+    margin-top: calc(1.25rem + 50vw * 4 / 3 + 1.5rem);
     pointer-events: none;
   }
 
   .people--bio-open .bio-overlay {
+    position: fixed;
+    top: calc(1.25rem + 50vw * 4 / 3 + 1.25rem);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
+    padding: 0 1.25rem 1.25rem;
     pointer-events: auto;
+    z-index: 10004 !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .people--bio-open .bio-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    padding-right: 0.25rem;
   }
 
   .bio-content {
@@ -221,20 +289,16 @@
   }
 
   .bio-text {
-    max-height: calc(100vh - 5rem - 50vw * 4 / 3 - 11rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    padding-right: 0.25rem;
+    margin-top: 1.5rem;
   }
 
   .bio-close {
     position: fixed;
-    top: 5rem;
+    top: 1.25rem;
     right: 1.25rem;
     left: auto;
     transform: none;
-    z-index: 1012;
+    z-index: 10005;
   }
 }
 

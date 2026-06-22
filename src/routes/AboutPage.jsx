@@ -9,6 +9,8 @@ import {
   createPeopleSectionClear,
   createBioAnimation,
   lenisScrollTo,
+  lockScroll,
+  unlockScroll,
 } from '../lib/animations/index.js'
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSize = 'medium_large') {
@@ -31,6 +33,7 @@ export default function AboutPage() {
   const { people } = useLoaderData()
 
   const [activeBio, setActiveBio] = useState(null)
+  const [bioLayoutOpen, setBioLayoutOpen] = useState(false)
   const [hoveredPerson, setHoveredPerson] = useState(null)
 
   const scatterRef = useRef(null)
@@ -45,8 +48,13 @@ export default function AboutPage() {
   if (activePerson) lastPersonRef.current = activePerson
   const displayPerson = activePerson ?? lastPersonRef.current
 
-  // Image shown on hover OR when a bio is active
-  const displayImageName = hoveredPerson ?? activeBio
+  // Image shown on hover, active bio, or while close animation finishes
+  const displayImageName = hoveredPerson ?? activeBio ?? (bioLayoutOpen ? displayPerson?.acfName : null)
+
+  const closeBio = () => {
+    setActiveBio(null)
+    setHoveredPerson(null)
+  }
 
   // Bullets animation
   useEffect(() => createBulletsAnimation(bulletsSectionRef.current), [])
@@ -57,17 +65,37 @@ export default function AboutPage() {
   )
 
   useEffect(
-    () => createPeopleSectionClear(peopleSectionRef.current, () => {
-      setActiveBio(null)
-      setHoveredPerson(null)
-    }),
+    () => createPeopleSectionClear(peopleSectionRef.current, closeBio),
     [],
   )
   useEffect(() => {
-    return createBioAnimation(scatterRef.current, overlayRef.current, closeRef.current, !!activeBio)
+    return createBioAnimation(
+      scatterRef.current,
+      overlayRef.current,
+      closeRef.current,
+      !!activeBio,
+      () => setBioLayoutOpen(false),
+    )
   }, [activeBio])
 
+  useEffect(() => {
+    if (!bioLayoutOpen) {
+      unlockScroll('about-bio')
+      return undefined
+    }
+
+    const isMobile = window.matchMedia('(max-width: 767.9px)').matches
+    if (!isMobile) {
+      return undefined
+    }
+
+    lockScroll('about-bio', { preventTouch: false })
+
+    return () => unlockScroll('about-bio')
+  }, [bioLayoutOpen])
+
   const handlePersonClick = (name) => {
+    setBioLayoutOpen(true)
     setActiveBio(name)
     if (peopleSectionRef.current) {
       lenisScrollTo(peopleSectionRef.current)
@@ -121,15 +149,20 @@ export default function AboutPage() {
       <section
         id="our-people"
         ref={peopleSectionRef}
-        className={`people py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center${activeBio ? ' people--bio-open' : ''}${hoveredPerson && !activeBio ? ' people--preview' : ''}`}
+        className={`people py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center${bioLayoutOpen ? ' people--bio-open' : ''}${bioLayoutOpen && !activeBio ? ' people--bio-closing' : ''}${hoveredPerson && !activeBio && !bioLayoutOpen ? ' people--preview' : ''}`}
       >
+        <div
+          className={`people-bio-backdrop${bioLayoutOpen ? ' active' : ''}`}
+          aria-hidden="true"
+          onClick={closeBio}
+        />
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
-        <div ref={scatterRef} className="people-scatter relative max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
+        <div ref={scatterRef} className="people-scatter relative z-[1011] max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
           {people.map((person) => (
             <div
               key={person.acfName}
-              className={`person-item mb-5 md:mb-0 flex${hoveredPerson === person.acfName ? ' is-hovered' : ''}${person.acfAlign ? ` align-${person.acfAlign}` : ''}`}
+              className={`person-item mb-4 md:mb-0 flex${hoveredPerson === person.acfName ? ' is-hovered' : ''}${person.acfAlign ? ` align-${person.acfAlign}` : ''}`}
               onMouseEnter={() => handlePersonEnter(person)}
               onMouseLeave={() => setHoveredPerson(null)}
               onTouchStart={() => handlePersonEnter(person)}
@@ -164,8 +197,7 @@ export default function AboutPage() {
               ref={closeRef}
               className="bio-close"
               aria-label="Close bio"
-              onClick={() => setActiveBio(null)}
-              style={{ opacity: 0, pointerEvents: 'none' }}
+              onClick={closeBio}
             >
               <svg width="20" height="20" viewBox="0 0 22 22" stroke="currentColor">
                 <path d="M1 1L21 21" strokeWidth="2" strokeLinecap="round"/>
@@ -190,10 +222,9 @@ export default function AboutPage() {
           <div
             ref={overlayRef}
             className="bio-overlay col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-start"
-            style={{ zIndex: 10, opacity: 0, pointerEvents: 'none' }}
           >
             {displayPerson && (
-              <div className="bio-content">
+              <div className="bio-content" data-lenis-prevent>
                 <h3 className="bio-name">{displayPerson.acfName}</h3>
                 <div className="bio-role">{displayPerson.acfRole}</div>
                 {displayPerson.acfExperience && (
