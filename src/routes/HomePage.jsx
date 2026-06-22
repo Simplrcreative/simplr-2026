@@ -691,7 +691,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
       </section>
 
-      <section ref={servicesRef} className="services py-20 section-light overflow-hidden relative w-full light-to-coffee-outgoing">
+      <section ref={servicesRef} className="services py-10 md:py-20 section-light overflow-hidden relative w-full light-to-coffee-outgoing">
          <div className="services-titles flex flex-nowrap items-center text-[3rem] md:text-[5.5rem] gap-10">
           <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Successfully launched brands since 2015" className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
@@ -722,19 +722,19 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           </div>
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
-        <div className="service-stats pt-20">
+        <div className="service-stats pt-10 md:pt-20">
           <div className="stat-item flex flex-col md:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
             <div data-initial="62" className="stat-no text-strategy md:min-w-[32rem] xl:min-w-auto">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-40 text-strategy text-[5rem]">+</div>
-              <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-10 md:mt-0">Successfully launched brands since 2015 </div>
+              <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Successfully launched brands since 2015 </div>
             </div>
           </div>
         </div>
         <Link 
           to="services"
           ref={btnRef}
-          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
+          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-8 md:mt-0"
         >
           <span className="btn-fill" aria-hidden="true" />
           <span className="btn-inner">

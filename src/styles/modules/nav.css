@@ -76,12 +76,13 @@ nav.light a.is-active .nav-link__orb {
        z-index: 10000;
        top: 1.25rem;
        left: 1.25rem;
-       right: 1.25rem;
+       right: 0;
        height: calc(100vh - 2.5rem);
        background: var(--color-coffee);
        transform-origin: top right;
        transform: scale(0)!important;
-       transition: transform 0.3s ease
+       transition: transform 0.3s ease;
+       border-radius: 10px 0 0 10px;
     }
 
     nav.main.active {
@@ -118,7 +119,7 @@ nav.light a.is-active .nav-link__orb {
         mix-blend-mode:difference
     }
     .menu-icon.active {
-        transform: translate(-1.25rem, 1.25rem)!important;
+        transform: translate(0, 1.25rem)!important;
     }
     nav a {
         transform: translateX(50px)!important;

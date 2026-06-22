@@ -460,6 +460,30 @@ export default function RootLayout() {
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
       </div>
 
+      <nav id="mobile-nav" className={`z-[1003] main flex flex-col md:hidden flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
+        {navigation.map((item) => {
+          const prefetch = useRoutePrefetch(item.path)
+          return (
+            <NavLink
+              key={item.key}
+              to={item.path}
+              className={navLinkClassName}
+              onPointerDown={requestTransitionCapture}
+              onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
+              onPointerMove={showNavLinkOrb}
+              onPointerLeave={hideNavLinkOrb}
+              onFocus={e => { showNavLinkOrb(e); prefetch(); }}
+              onBlur={hideNavLinkOrb}
+              onClick={handleTransitionLinkClick}
+            >
+              <span className="nav-link__orb" aria-hidden="true" />
+              <NavLinkLabel label={item.label} count={item.count} />
+              <NavLinkLabel label={item.label} count={item.count} inverted />
+            </NavLink>
+          )
+        })}
+      </nav>
+
       <header className={`header fixed z-[1001] md:z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
         <div className="nav-holder flex px-5 pt-[1.25rem] md:pt-[3.125rem] flex-row items-start justify-between">
           
@@ -480,7 +504,7 @@ export default function RootLayout() {
             
           </div>
 
-          <nav className={`main flex flex-col md:flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
+          <nav id="desktop-nav" className={`main hidden md:flex flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
             {navigation.map((item) => {
               const prefetch = useRoutePrefetch(item.path)
               return (
@@ -503,6 +527,7 @@ export default function RootLayout() {
               )
             })}
           </nav>
+
           <div className={`nav-background${isNavOpen ? ' active' : ''}`}></div>
         </div>
       </header>
@@ -519,7 +544,7 @@ export default function RootLayout() {
         <>
           <div className="bg-white section-light footer-off"></div>
 
-          <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white z-[1000] relative">
+        <footer ref={footerRef} className="px-5 pt-5 md:pt-0 min-h-[50vh] bg-white z-[1002] relative">
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-6">
