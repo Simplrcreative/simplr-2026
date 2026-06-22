@@ -905,11 +905,16 @@ function normaliseHomeCaseStudy(study, index) {
     secondarySizes.find((s) => s.name === 'large')
     || secondarySizes.find((s) => s.name === 'full')
   )?.sourceUrl ?? secondaryThumbnailNode?.sourceUrl ?? secondaryThumbnailNode?.guid ?? ''
-  const loaderImg = (
+  const primaryLoaderImg = (
+    sizes.find((s) => s.name === 'loader')
+    || sizes.find((s) => s.name === 'thumbnail')
+  )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+  const secondaryLoaderImg = (
     secondarySizes.find((s) => s.name === 'loader')
     || secondarySizes.find((s) => s.name === 'thumbnail')
-  ) ?? ''
-  const thumbnail = secondaryThumbnail || primaryThumbnail
+  )?.sourceUrl ?? primaryLoaderImg
+  const displayThumbnail = secondaryThumbnail || primaryThumbnail
+  const displayLoaderImg = secondaryLoaderImg || primaryLoaderImg
   const categories = caseStudy?.acfWorkBuilder?.acfCategory?.nodes ?? []
 
   return {
@@ -917,8 +922,12 @@ function normaliseHomeCaseStudy(study, index) {
     slug,
     client,
     detail: study?.acfClientDetail || '',
-    loaderImg,
-    thumbnail,
+    loaderImg: displayLoaderImg,
+    thumbnail: displayThumbnail,
+    primaryThumbnail,
+    secondaryThumbnail: secondaryThumbnail || primaryThumbnail,
+    primaryLoaderImg,
+    secondaryLoaderImg,
     categories,
   }
 }
@@ -1250,23 +1259,38 @@ export async function fetchHomeData() {
 
   const fallbackCaseStudies = (worksPayload.works || []).slice(0, 6).map((work, index) => {
     const featuredThumbnailNode = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node
+    const secondaryThumbnailNode = work?.acfWorkBuilder?.acfSecondaryThumbnail?.node
     const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
-    const loaderImg = (
-      sizes .find((s) => s.name === 'loader')
+    const secondarySizes = secondaryThumbnailNode?.mediaDetails?.sizes ?? []
+    const primaryLoaderImg = (
+      sizes.find((s) => s.name === 'loader')
       || sizes.find((s) => s.name === 'thumbnail')
-    ) ?? ''
-    const thumbnail = (
+    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+    const secondaryLoaderImg = (
+      secondarySizes.find((s) => s.name === 'loader')
+      || secondarySizes.find((s) => s.name === 'thumbnail')
+    )?.sourceUrl ?? primaryLoaderImg
+    const primaryThumbnail = (
       sizes.find((s) => s.name === 'large')
       || sizes.find((s) => s.name === 'full')
     )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+    const secondaryThumbnail = (
+      secondarySizes.find((s) => s.name === 'large')
+      || secondarySizes.find((s) => s.name === 'full')
+    )?.sourceUrl ?? secondaryThumbnailNode?.guid ?? ''
+    const displayThumbnail = secondaryThumbnail || primaryThumbnail
 
     return {
       id: work?.slug || `case-study-${index + 1}`,
       slug: work?.slug || '',
       client: work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || work?.title || 'Case study',
       detail: '',
-      loaderImg,
-      thumbnail,
+      loaderImg: secondaryLoaderImg || primaryLoaderImg,
+      thumbnail: displayThumbnail,
+      primaryThumbnail,
+      secondaryThumbnail: secondaryThumbnail || primaryThumbnail,
+      primaryLoaderImg,
+      secondaryLoaderImg,
       categories: work?.acfWorkBuilder?.acfCategory?.nodes ?? [],
     }
   })

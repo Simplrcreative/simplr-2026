@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 const SCROLL_HEIGHT_FIRST_CHANGE = window.innerHeight * 0.35
 const SCROLL_HEIGHT_PER_CLIENT = window.innerHeight * 0.85
 const WORK_MASK_RADIUS = '10px'
+const PAGE_TRANSITION_PREPARE_CAPTURE_EVENT = 'page-transition:prepare-capture'
 
 function createWorkMaskClip(topInset, bottomInset) {
   return `inset(${topInset} 0% ${bottomInset} 0% round ${WORK_MASK_RADIUS})`
@@ -64,12 +65,11 @@ export function createCaseStudiesScrollAnimation(scope) {
     // Stack works absolutely so they crossfade without collapsing the container
     gsap.set(clientWorkList, { position: 'relative' })
     clientWorks.forEach((work) => {
-      const picture = work.querySelector('.client-work-img picture')
-      const img = work.querySelector('img')
+      const mediaFrame = work.querySelector('.client-work-img .ratio')
 
       gsap.set(work, { position: 'absolute', top: 0, left: 0, width: '100%', opacity: 0, zIndex: 0 })
-      if (picture) {
-        gsap.set(picture, {
+      if (mediaFrame) {
+        gsap.set(mediaFrame, {
           y: 100,
           '--aspect-ratio-desktop': '90%',
           '--aspect-ratio-mobile': '90%',
@@ -77,7 +77,6 @@ export function createCaseStudiesScrollAnimation(scope) {
           transformOrigin: 'bottom center',
         })
       }
-      if (img) gsap.set(img, { scale: 1 })
     })
 
     // Clip details to zero height — no display toggling, no layout jump
@@ -167,20 +166,16 @@ export function createCaseStudiesScrollAnimation(scope) {
 
       if (previousWork && previousWork !== nextWork) {
 
-        const previousPicture = previousWork.querySelector('.client-work-img picture')
-        const previousImage = previousWork.querySelector('img')
+        const previousMediaFrame = previousWork.querySelector('.client-work-img .ratio')
         const previousCategories = previousWork.querySelector('.categories')
 
         gsap.killTweensOf(previousWork)
 
-        if (previousPicture) gsap.killTweensOf(previousPicture)
-        if (previousImage) gsap.killTweensOf(previousImage)
+        if (previousMediaFrame) gsap.killTweensOf(previousMediaFrame)
         if (previousCategories) gsap.killTweensOf(previousCategories)
 
         gsap.set(previousWork, { opacity: 1, zIndex: 1 })
         gsap.to(previousWork, {
-          //opacity: 1,
-          //duration: 0.1,
           ease: 'none',
           onStart: () => {
             if (previousCategories) gsap.set(previousCategories, { opacity: 0 })
@@ -189,8 +184,8 @@ export function createCaseStudiesScrollAnimation(scope) {
             gsap.set(previousWork, { zIndex: 0 })
           }
         })
-        if (previousPicture) {
-          gsap.to(previousPicture, {
+        if (previousMediaFrame) {
+          gsap.to(previousMediaFrame, {
             y: -300 * travelDirection,
             clipPath: exitingEndClip,
             transformOrigin: 'bottom center',
@@ -199,43 +194,37 @@ export function createCaseStudiesScrollAnimation(scope) {
             ease: 'none',
           })
         }
-        if (previousImage) {
-          gsap.to(previousImage, { scale: 1, duration: 1, ease: 'none' })
-        }
       }
 
       if (nextWork) {
         
-        const nextPicture = nextWork.querySelector('.client-work-img picture')
-        const nextImage = nextWork.querySelector('img')
+        const nextMediaFrame = nextWork.querySelector('.client-work-img .ratio')
         const nextCategories = nextWork.querySelector('.categories')
 
         gsap.killTweensOf(nextWork)
 
-        if (nextPicture) gsap.killTweensOf(nextPicture)
-        if (nextImage) gsap.killTweensOf(nextImage)
+        if (nextMediaFrame) gsap.killTweensOf(nextMediaFrame)
         if (nextCategories) gsap.killTweensOf(nextCategories)
 
         if (previousIndex < 0) {
           gsap.set(nextWork, { opacity: 1, zIndex: 2 })
           if (nextCategories) gsap.set(nextCategories, { opacity: 1 })
-          if (nextPicture) {
-            gsap.set(nextPicture, {
+          if (nextMediaFrame) {
+            gsap.set(nextMediaFrame, {
               y: 0,
               clipPath: fullyOpenClip,
               transformOrigin: 'top center',
             })
           }
-          if (nextImage) gsap.set(nextImage, { scale: 1.2 })
           return
         }
 
         gsap.set(nextWork, { opacity: 1, zIndex: 2 })
         if (nextCategories) gsap.set(nextCategories, { opacity: 1 })
 
-        if (nextPicture) {
+        if (nextMediaFrame) {
           gsap.fromTo(
-            nextPicture,
+            nextMediaFrame,
             {
               y: 300 * travelDirection,
               clipPath: enteringStartClip,
@@ -247,9 +236,6 @@ export function createCaseStudiesScrollAnimation(scope) {
               ease: 'none',
             },
           )
-        }
-        if (nextImage) {
-          gsap.fromTo(nextImage, { scale: 1 }, { scale: 1.2, dekay: 0.2, duration: 0.5, ease: 'none' })
         }
       }
     }
@@ -263,6 +249,59 @@ export function createCaseStudiesScrollAnimation(scope) {
 
     const totalScrollLength = SCROLL_HEIGHT_FIRST_CHANGE + (clientNames.length - 1) * SCROLL_HEIGHT_PER_CLIENT
 
+    function resolveIndexFromScroll(scrolled) {
+      if (scrolled < SCROLL_HEIGHT_FIRST_CHANGE) {
+        return 0
+      }
+
+      return 1 + Math.min(
+        Math.floor((scrolled - SCROLL_HEIGHT_FIRST_CHANGE) / SCROLL_HEIGHT_PER_CLIENT),
+        clientNames.length - 2,
+      )
+    }
+
+    const onPrepareCapture = (event) => {
+      const sourceKey = event?.detail?.caseStudySourceKey
+        || clientNames[currentIndex]?.dataset?.client
+      const targetWork = sourceKey
+        ? (clientWorksById.get(sourceKey) || document.getElementById(sourceKey))
+        : clientWorks[currentIndex]
+      const fullyOpenClip = createWorkMaskClip('0%', '0%')
+      const closedClip = createWorkMaskClip('87%', '0%')
+
+      clientWorks.forEach((work) => {
+        const mediaFrame = work.querySelector('.client-work-img .ratio')
+        const targets = [work, mediaFrame].filter(Boolean)
+        const isTarget = targetWork ? work === targetWork : false
+
+        gsap.killTweensOf(targets)
+
+        if (isTarget) {
+          gsap.set(work, { opacity: 1, zIndex: 2 })
+          if (mediaFrame) {
+            gsap.set(mediaFrame, { clearProps: 'transform' })
+            gsap.set(mediaFrame, {
+              y: 0,
+              clipPath: fullyOpenClip,
+              transformOrigin: 'bottom center',
+            })
+          }
+          return
+        }
+
+        gsap.set(work, { opacity: 0, zIndex: 0 })
+        if (mediaFrame) {
+          gsap.set(mediaFrame, {
+            y: 100,
+            clipPath: closedClip,
+            transformOrigin: 'bottom center',
+          })
+        }
+      })
+    }
+
+    window.addEventListener(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, onPrepareCapture)
+
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: 'top top',
@@ -274,29 +313,40 @@ export function createCaseStudiesScrollAnimation(scope) {
       onLeaveBack: () => section.classList.add('case-studies--unpinned'),
       onUpdate: (self) => {
         const scrolled = self.progress * totalScrollLength
-        let index
-        if (scrolled < SCROLL_HEIGHT_FIRST_CHANGE) {
-          index = 0
-        } else {
-          index = 1 + Math.min(
-            Math.floor((scrolled - SCROLL_HEIGHT_FIRST_CHANGE) / SCROLL_HEIGHT_PER_CLIENT),
-            clientNames.length - 2,
-          )
-        }
-        setActiveClient(index, self.direction)
+        setActiveClient(resolveIndexFromScroll(scrolled), self.direction)
       },
     })
 
+    requestAnimationFrame(() => {
+      trigger.refresh()
+      if (trigger.progress > 0) {
+        setActiveClient(resolveIndexFromScroll(trigger.progress * totalScrollLength), 1)
+      }
+    })
+
     return () => {
-      trigger.kill()
+      window.removeEventListener(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, onPrepareCapture)
+      trigger.kill(true)
+      gsap.set(section, { clearProps: 'transform,top,left,width,maxWidth,maxHeight,padding,margin' })
       section.classList.remove('case-studies--unpinned')
       ro?.disconnect()
       cleanupHoverListeners.forEach((cleanup) => cleanup())
+      clientNames.forEach((name) => name.classList.remove('active'))
       clientWorks.forEach((work) => {
+        const mediaFrame = work.querySelector('.client-work-img .ratio')
         const workImage = work.querySelector('.client-work-img')
+        const targets = [work, mediaFrame, workImage].filter(Boolean)
+
+        gsap.killTweensOf(targets)
+        gsap.set(work, { clearProps: 'opacity,zIndex,position,top,left,width,transform' })
+        if (mediaFrame) gsap.set(mediaFrame, { clearProps: 'transform,clipPath,y' })
         workImage?.classList.remove('hover-active')
       })
-      clientDetails.forEach((detail) => detail?.classList.remove('hover-active'))
+      clientDetails.forEach((detail) => {
+        detail?.classList.remove('hover-active')
+        if (detail) gsap.set(detail, { clearProps: 'height,opacity,overflow' })
+      })
+      if (clientWorkList) gsap.set(clientWorkList, { clearProps: 'minHeight,position' })
     }
   })
 

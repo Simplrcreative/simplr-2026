@@ -519,7 +519,7 @@ export default function RootLayout() {
         <>
           <div className="bg-white section-light footer-off"></div>
 
-          <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white z-[100000] relative">
+          <footer ref={footerRef} className="px-5 min-h-[50vh] bg-white z-[1000] relative">
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-6">

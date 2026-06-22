@@ -572,23 +572,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     )
   }
 
-  function handleCaseStudyTextClick(event, studySlug) {
-    const root = caseStudiesRef.current
-    if (!root || !studySlug) return
-
-    const target = Array.from(root.querySelectorAll('.client-work-img[data-transition-source-key]')).find(
-      (element) => element.getAttribute('data-transition-source-key') === studySlug,
-    )
-
-    if (!target) return
-
-    event.preventDefault()
-    event.stopPropagation()
-    target.click()
-  }
-
   useEffect(() => {
-    const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
+    const cleanupWorkThumbHover = createWorkThumbHoverAnimation(pageRef.current)
     return () => {
       cleanupWorkThumbHover?.()
     }
@@ -775,7 +760,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       to={path} 
                       className="text-xl inline-block alt-transition-text"
                       data-transition-source-key={study.slug}
-                      onClick={(event) => handleCaseStudyTextClick(event, study.slug)}                      onMouseEnter={() => prefetchWorkEntry(study.slug)}                    >
+                      data-transition-variant="work-card"
+                      onMouseEnter={() => prefetchWorkEntry(study.slug)}
+                    >
                       {study.client}
                       <div className="client-detail font-literata text-3xl md:text-5xl font-light pb-3">
                         <span className="client-detail-text">{study.detail}</span>
@@ -795,17 +782,20 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       to={path}
                       className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                       data-transition-source="media"
-                      data-transition-source-key={study.slug}                      onMouseEnter={() => prefetchWorkEntry(study.slug)}                    >
-                      {/*<picture className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '90%' }}>
-                        {study.thumbnail ? <img src={study.thumbnail + '.webp'} title={study.client} /> : null}
-                      </picture>*/}
-                      <div className="ratio overflow-hidden" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}>
+                      data-transition-source-key={study.slug}
+                      data-transition-variant="work-card"
+                      onMouseEnter={() => prefetchWorkEntry(study.slug)}
+                    >
+                      <div
+                        className="ratio overflow-hidden"
+                        style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '64%' }}
+                      >
                         <PictureImg
-                          loaderSrc = {study.loaderImg + '.webp'}
-                          mobileSrc = {study.thumbnail + '.webp'}
-                          desktopSrc = {study.thumbnail + '.webp'}
-                          imgClass = ''
-                          altText = ''
+                          loaderSrc={study.secondaryLoaderImg + '.webp'}
+                          mobileSrc={study.secondaryThumbnail + '.webp'}
+                          desktopSrc={study.secondaryThumbnail + '.webp'}
+                          imgClass="rounded-[10px]"
+                          altText=""
                         />
                       </div>
                     </Link>

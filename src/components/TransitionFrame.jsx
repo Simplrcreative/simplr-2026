@@ -28,6 +28,32 @@ function escapeAttributeValue(value) {
   return value.replace(/(["\\])/g, '\\$1')
 }
 
+function normalizeCaseStudyCaptureTransforms(altSource) {
+  const nodes = Array.from(altSource.querySelectorAll('.ratio, .thumb-primary, .thumb-secondary'))
+  if (!nodes.length) return () => undefined
+
+  const saved = nodes.map((node) => ({
+    node,
+    y: gsap.getProperty(node, 'y'),
+    yPercent: gsap.getProperty(node, 'yPercent'),
+    scale: gsap.getProperty(node, 'scale'),
+    clipPath: node.style.clipPath,
+  }))
+
+  gsap.set(nodes, { clearProps: 'transform,clipPath' })
+
+  return () => {
+    saved.forEach(({ node, y, yPercent, scale, clipPath }) => {
+      const restore = {}
+      if (Number.isFinite(y)) restore.y = y
+      if (Number.isFinite(yPercent)) restore.yPercent = yPercent
+      if (Number.isFinite(scale)) restore.scale = scale
+      if (Object.keys(restore).length) gsap.set(node, restore)
+      if (clipPath) node.style.clipPath = clipPath
+    })
+  }
+}
+
 function createFrozenWebGLCanvasNode(sourceCanvas) {
   if (!sourceCanvas || sourceCanvas.tagName !== 'CANVAS') return null
 
@@ -487,8 +513,6 @@ export default function TransitionFrame({ children }) {
       if (hasCapturedRef.current) return
       hasCapturedRef.current = true
 
-      window.dispatchEvent(new Event(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT))
-
       // Record scroll position at click time. window.scrollY at useLayoutEffect
       // time may already be 0 (browser clamps scroll for new page DOM).
       capturedScrollYRef.current = window.scrollY
@@ -504,9 +528,23 @@ export default function TransitionFrame({ children }) {
 
       altTransitionRef.current = null
 
+      let caseStudySourceKey = null
+
       if (target) {
         const nav = extractSameOriginLink(target)
         const altSource = nav ? resolveAltTransitionSource(target, nav.link) : null
+
+        if (altSource?.closest('.case-studies')) {
+          caseStudySourceKey = altSource.dataset?.transitionSourceKey
+            || nav?.link?.dataset?.transitionSourceKey
+            || altSource.closest('.client-work')?.id
+            || null
+        }
+
+        window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, {
+          detail: { caseStudySourceKey },
+        }))
+
         const shouldUseAltTransition = Boolean(
           nav
           && altSource
@@ -514,7 +552,14 @@ export default function TransitionFrame({ children }) {
         )
 
         if (shouldUseAltTransition) {
-          const rect = altSource.getBoundingClientRect()
+          const captureTarget = altSource.closest('.case-studies')
+            ? (altSource.querySelector('.ratio') || altSource)
+            : altSource
+          const restoreCaseStudyTransforms = altSource.closest('.case-studies')
+            ? normalizeCaseStudyCaptureTransforms(altSource)
+            : () => undefined
+          const rect = captureTarget.getBoundingClientRect()
+
           if (rect.width > 0 && rect.height > 0) {
             const forceHoverSnapshot = nav.link?.dataset?.transitionSnapshotState === 'hover'
             const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant
@@ -524,6 +569,15 @@ export default function TransitionFrame({ children }) {
               forceHover: forceHoverSnapshot,
               preferSecondaryImage: forceHoverSnapshot && variant === 'work-card',
             })
+
+            if (altSource.closest('.case-studies')) {
+              clone.querySelectorAll('img, .ratio').forEach((node) => {
+                node.style.transform = 'none'
+              })
+            }
+
+            restoreCaseStudyTransforms()
+
             const hasVideoSource = altSource.matches('video') || Boolean(altSource.querySelector('video'))
 
             // Read the source aspect ratio from the card's picture element so we can
@@ -554,7 +608,7 @@ export default function TransitionFrame({ children }) {
             // For work-card: capture the parent work section so it can animate out
             // independently while the snapshot is hidden.
             if (variant === 'work-card') {
-              const workSection = altSource.closest('section')
+              const workSection = altSource.closest('.case-studies') || altSource.closest('section')
               if (workSection) {
                 const sRect = workSection.getBoundingClientRect()
                 altTransitionRef.current.workSectionClone = workSection.cloneNode(true)
@@ -596,8 +650,14 @@ export default function TransitionFrame({ children }) {
                 }
               }
             }
+          } else {
+            restoreCaseStudyTransforms()
           }
         }
+      } else {
+        window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, {
+          detail: { caseStudySourceKey: null },
+        }))
       }
 
       // --- Header clone ---
@@ -1034,6 +1094,8 @@ export default function TransitionFrame({ children }) {
     let nextTitleEl = null
     let workSectionEl = null
     let serviceCardEl = null
+    let dockPollTimeoutId = 0
+    let dockPollCancelled = false
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
 
     if (altClone) {
@@ -1064,6 +1126,9 @@ export default function TransitionFrame({ children }) {
       }
 
       const altCloneMedia = altClone.querySelector(altTransition?.mediaSelector || 'img, canvas, video')
+      if (altCloneMedia) {
+        gsap.set(altCloneMedia, { scale: 1, clearProps: 'transform' })
+      }
       const resolveDockMedia = (target = null) => {
         const dockTarget = target || resolveDockTarget(dockSelector)
         if (!dockTarget) return null
@@ -1319,6 +1384,8 @@ export default function TransitionFrame({ children }) {
         tl.add(() => {
           const start = performance.now()
           const poll = () => {
+            if (dockPollCancelled) return
+
             const lateDock = getDockRect(dockSelector)
 
             if (lateDock) {
@@ -1370,7 +1437,7 @@ export default function TransitionFrame({ children }) {
             }
 
             if (performance.now() - start < ALT_DOCK_MAX_WAIT_MS) {
-              window.setTimeout(poll, ALT_DOCK_POLL_MS)
+              dockPollTimeoutId = window.setTimeout(poll, ALT_DOCK_POLL_MS)
             }
           }
 
@@ -1385,9 +1452,14 @@ export default function TransitionFrame({ children }) {
     }
 
     return () => {
+      dockPollCancelled = true
+      window.clearTimeout(dockPollTimeoutId)
       tl.kill()
       if (altClone) {
         gsap.killTweensOf(altClone)
+        altClone.querySelectorAll('img, canvas, video, .thumb-primary, .thumb-secondary').forEach((node) => {
+          gsap.killTweensOf(node)
+        })
         altClone.remove()
       }
       wrapper.remove()
@@ -1413,6 +1485,8 @@ export default function TransitionFrame({ children }) {
       }
       document.documentElement.classList.remove('page-transitioning')
       document.documentElement.style.overflowX = ''
+      gsap.killTweensOf(el)
+      gsap.set(el, { clearProps: 'transform,opacity,visibility' })
       const realHeader = document.querySelector('.header')
       if (realHeader) {
         gsap.killTweensOf(realHeader)
