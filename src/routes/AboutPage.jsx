@@ -125,7 +125,7 @@ export default function AboutPage() {
       >
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
-        <div ref={scatterRef} className="people-scatter relative z-[1011] max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
+        <div ref={scatterRef} className="people-scatter relative max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
           {people.map((person) => (
             <div
               key={person.acfName}
@@ -156,7 +156,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="absolute z-[1010] people-grid w-full grid grid-cols-12 pointer-events-none px-5">
+        <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-5">
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
           <div className="people-info col-start-4 col-span-6 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>

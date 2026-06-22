@@ -580,12 +580,16 @@ export default function TransitionFrame({ children }) {
 
             const hasVideoSource = altSource.matches('video') || Boolean(altSource.querySelector('video'))
 
-            // Read the source aspect ratio from the card's picture element so we can
-            // fix the altClone dimensions for non-90% cards (e.g. WorkCard at 64%).
-            //const sourcePicture = altSource.querySelector('picture')
+            // Read the card aspect ratio for the current viewport so non-90% cards
+            // (and mobile 65% ratios) flatten correctly during the expand animation.
             const sourcePicture = altSource.querySelector('.ratio')
+            const isMobileViewport = window.matchMedia('(max-width: 767.9px)').matches
             const sourceAspectRatio = sourcePicture
-              ? sourcePicture.style.getPropertyValue('--aspect-ratio-desktop').trim() || null
+              ? sourcePicture.style.getPropertyValue(
+                  isMobileViewport ? '--aspect-ratio-mobile' : '--aspect-ratio-desktop',
+                ).trim()
+                || sourcePicture.style.getPropertyValue('--aspect-ratio-desktop').trim()
+                || null
               : null
               
             altTransitionRef.current = {
@@ -1106,12 +1110,15 @@ export default function TransitionFrame({ children }) {
       // (before paint) so there is no visible jump.
       scrollToTopImmediate()
 
-      // For non-90% source cards (WorkCard at 64%), override the picture's padding-top
-      // ratio trick so the picture fills the altClone's explicitly-animated dimensions.
-      // This lets the card expand cleanly from 64% to 90% without letterboxing.
+      // For non-90% source cards (WorkCard at 64%, mobile at 65%), override the
+      // padding-top ratio trick so the picture fills the altClone's animated box.
+      const isMobile = window.matchMedia('(max-width: 767.9px)').matches
       const sourceAspectRatio = altTransition?.sourceAspectRatio
-      if (sourceAspectRatio && sourceAspectRatio !== '90%') {
-        //const clonePicture = altClone.querySelector('picture')
+      const shouldFlattenCloneRatio = Boolean(
+        sourceAspectRatio && sourceAspectRatio !== '90%',
+      ) || (isMobile && (isWorkCard || isWorkNext))
+
+      if (shouldFlattenCloneRatio) {
         const clonePicture = altClone.querySelector('.ratio')
         if (clonePicture) {
           Object.assign(clonePicture.style, {
@@ -1169,15 +1176,15 @@ export default function TransitionFrame({ children }) {
       const dockDuration = 1.5
       const dockStart = expandDuration + pauseDuration
       const width = window.innerWidth * 1.1
-      // Portrait on mobile — height-driven expansion so the clone fills the full screen.
-      const isPortrait = window.innerWidth < window.innerHeight
+      // Mobile (< md): height-driven expansion so the clone fills the viewport height.
+      const useHeightDrivenExpand = isMobile && !isServiceDockTransition
 
       const servicesSourceAspectRatio = altTransition?.width && altTransition?.height
         ? altTransition.width / altTransition.height
         : 16 / 9
 
       // Aspect ratio of the source card (width / height). Used for height-driven
-      // sizing on portrait mobile so the expanded clone fills the full viewport height
+      // sizing on mobile so the expanded clone fills the full viewport height
       // with the correct proportional width.
       const cardAspectRatio = altTransition?.width && altTransition?.height
         ? altTransition.width / altTransition.height
@@ -1185,26 +1192,26 @@ export default function TransitionFrame({ children }) {
 
       // For services, expand to a centered cover box that fills at least the
       // viewport height and width while preserving the source media ratio.
-      // For portrait mobile (non-service), expand height to 100vh and derive width
-      // from the card's aspect ratio so the clone fills the screen correctly.
+      // For mobile work cards, expand height to 100vh and derive width from
+      // the captured card aspect ratio.
       const expandedWidth = isServiceDockTransition
         ? Math.max(width, window.innerHeight * servicesSourceAspectRatio)
-        : isPortrait
+        : useHeightDrivenExpand
           ? window.innerHeight * 1.2 * cardAspectRatio
           : width
       const expandedHeight = isServiceDockTransition
         ? expandedWidth / servicesSourceAspectRatio
-        : isPortrait
+        : useHeightDrivenExpand
           ? window.innerHeight * 1.2
           : width * 0.9
       const expandedTop = isServiceDockTransition
         ? (window.innerHeight - expandedHeight) / 2
-        : isPortrait
+        : useHeightDrivenExpand
           ? 0
           : '-30%'
       const expandedLeft = isServiceDockTransition
         ? (window.innerWidth - expandedWidth) / 2
-        : isPortrait
+        : useHeightDrivenExpand
           ? (window.innerWidth - expandedWidth) / 2
           : 0
 

@@ -188,7 +188,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     >
       <div
         className="ratio overflow-hidden rounded-[10px] block thumb-swap"
-        style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': aspectRatio }}
+        style={{ '--aspect-ratio-desktop': aspectRatio, '--aspect-ratio-mobile': '65%' }}
       >
         
         <PictureImg
