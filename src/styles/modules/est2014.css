@@ -1,3 +1,17 @@
+/* Est. 2014 infinite canvas — hero sits over the WebGL layer like the original
+   demo frame: text is readable, but pan/zoom hits the canvas immediately. */
+.est2014-scene {
+  position: relative;
+}
+
+.est2014-scene .hero {
+  pointer-events: none;
+}
+
+.est2014-scene .hero .btn {
+  pointer-events: auto;
+}
+
 .beyond-grid {
   display: flex;
   flex-direction: column;

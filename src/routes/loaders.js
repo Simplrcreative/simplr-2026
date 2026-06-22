@@ -111,7 +111,11 @@ export function createContactPageLoader() {
 
 export function createEst2014PageLoader() {
   return async function Est2014PageLoader() {
-    return fetchBeyondData()
+    const [data] = await Promise.all([
+      fetchBeyondData(),
+      import('../infinite-canvas/scene.jsx'),
+    ])
+    return data
   }
 }
 

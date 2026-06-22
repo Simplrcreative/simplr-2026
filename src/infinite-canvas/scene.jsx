@@ -216,25 +216,10 @@ function MediaPlane({ position, scale, media, chunkCx, chunkCy, chunkCz, cameraG
 }
 
 function Chunk({ cx, cy, cz, media, cameraGridRef }) {
-  const [planes, setPlanes] = React.useState(null)
+  const [planes, setPlanes] = React.useState(() => generateChunkPlanesCached(cx, cy, cz))
 
   React.useEffect(() => {
-    let canceled = false
-    const run = () => !canceled && setPlanes(generateChunkPlanesCached(cx, cy, cz))
-
-    if (typeof requestIdleCallback !== 'undefined') {
-      const id = requestIdleCallback(run, { timeout: 100 })
-      return () => {
-        canceled = true
-        cancelIdleCallback(id)
-      }
-    }
-
-    const id = setTimeout(run, 0)
-    return () => {
-      canceled = true
-      clearTimeout(id)
-    }
+    setPlanes(generateChunkPlanesCached(cx, cy, cz))
   }, [cx, cy, cz])
 
   if (!planes) return null
@@ -293,6 +278,9 @@ function SceneController({ media, onTextureProgress }) {
   React.useEffect(() => {
     maxProgress.current = 0
     media.forEach((item) => getTexture(item))
+    CHUNK_OFFSETS.forEach((o) => {
+      generateChunkPlanesCached(o.dx, o.dy, o.dz)
+    })
   }, [media])
 
   React.useEffect(() => {
@@ -491,16 +479,12 @@ function SceneController({ media, onTextureProgress }) {
     const s = state.current
     s.basePos = { x: camera.position.x, y: camera.position.y, z: camera.position.z }
 
-    const cx = Math.floor(camera.position.x / CHUNK_SIZE)
-    const cy = Math.floor(camera.position.y / CHUNK_SIZE)
-    const cz = Math.floor(camera.position.z / CHUNK_SIZE)
-
     setChunks(
       CHUNK_OFFSETS.map((o) => ({
-        key: `${cx + o.dx},${cy + o.dy},${cz + o.dz}`,
-        cx: cx + o.dx,
-        cy: cy + o.dy,
-        cz: cz + o.dz,
+        key: `${o.dx},${o.dy},${o.dz}`,
+        cx: o.dx,
+        cy: o.dy,
+        cz: o.dz,
       }))
     )
   }, [camera])

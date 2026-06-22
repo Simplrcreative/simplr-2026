@@ -3,7 +3,7 @@ import { Link, useLoaderData, useParams } from 'react-router-dom'
 import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
-import { createSplitTextAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, refreshSmoothScroll } from '../lib/animations/index.js'
 import { buildEntryPath, fetchThinkingPostsData, getThinkingTopicSlug } from '../lib/wp-api.js'
 import PictureImg from '../components/PictureImg.jsx'
 
@@ -177,6 +177,15 @@ export default function ThinkingPage() {
   }, [hasMorePosts, loadNextPostsBatch])
 
   useEffect(() => createSplitTextAnimation(), [])
+
+  useEffect(() => {
+    const rafId = requestAnimationFrame(() => {
+      refreshScrollTriggers()
+      refreshSmoothScroll()
+    })
+
+    return () => cancelAnimationFrame(rafId)
+  }, [activeFilter, posts.length, filteredPosts.length])
 
   useEffect(() => {
     const container = postsResultsRef.current

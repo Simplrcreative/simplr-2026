@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { webPageSchema } from '../lib/seo.js'
-import { InfiniteCanvas, refreshInfiniteCanvasSize } from '../infinite-canvas/index.jsx'
+import { InfiniteCanvasScene } from '../infinite-canvas/scene.jsx'
+import { refreshInfiniteCanvasSize } from '../infinite-canvas/resize.js'
+import { getTexture } from '../infinite-canvas/texture-manager.js'
 import { resetInfiniteCanvas } from '../infinite-canvas/reset.js'
 import { PageLoader } from '../loader/index.jsx'
 import { createSplitTextAnimation, createBtnHoverAnimation, createEst2014HeroScrollAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
@@ -58,6 +60,10 @@ export default function Est2014PageInfinite() {
   const { beyondItems = [], page, siteSettings } = useLoaderData() ?? {}
   const [textureProgress, setTextureProgress] = useState(0)
   const media = mapBeyondItemsToMedia(beyondItems)
+
+  useLayoutEffect(() => {
+    media.forEach((item) => getTexture(item))
+  }, [media])
 
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => {
@@ -131,7 +137,7 @@ export default function Est2014PageInfinite() {
             onComplete={handleLoaderComplete}
             minVisibleMs={isReturnVisit.current ? 0 : 1500}
           />
-          <InfiniteCanvas
+          <InfiniteCanvasScene
             media={media}
             onTextureProgress={setTextureProgress}
             backgroundColor="#FFF"
