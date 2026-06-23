@@ -209,13 +209,13 @@
     line-height: 0.9;
   }
   .swag-unit.pre {
-    font-size: 5rem;
+    font-size: 3.5rem;
   }
   .swag-number {
-    font-size: 10rem;
+    font-size: 7rem;
   }
   .swag-detail {
-    font-size: 1.375rem;
+    font-size: 1.2rem;
   }
   .landing-page .swag-numbers {
     width: 100%
@@ -226,5 +226,17 @@
   .text-only-section {
     font-size: clamp(2.5rem, 4vw, 3.125rem);
     line-height: 1.2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .swag-unit.pre {
+    font-size: 5rem;
+  }
+  .swag-number {
+    font-size: 10rem;
+  }
+  .swag-detail {
+    font-size: 1.375rem;
   }
 }

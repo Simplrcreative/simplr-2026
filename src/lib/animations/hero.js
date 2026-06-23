@@ -65,7 +65,7 @@ function getHeroStart() {
 function getHeroEndDistance() {
   return `+=${window.innerHeight}`
 }
-const isDesktop = window.matchMedia('(min-width: 768px)').matches
+const isDesktop = window.matchMedia('(min-width: 1024px)').matches
 const NAV_LIGHT_TOP = 95
 const LOGO_LIGHT_LEFT = 130
 const LIGHT_RELEASE_OFFSET = 12
@@ -517,7 +517,7 @@ export function createHeroScrollAnimation(scope) {
     // })
 
     const screenWidth = window.innerWidth
-    const isMobile = screenWidth < 768
+    const isMobile = screenWidth < 1024
     let shouldPin = section
     if(isMobile) {
       shouldPin = false

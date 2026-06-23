@@ -53,11 +53,6 @@
 }
 @media (min-width: 768px) {
     .stat-no {
-        font-size: 30rem;
-    }
-}
-@media (min-width: 1024px) {
-    .stat-no {
         font-size: 25rem;
     }
 }
@@ -129,6 +124,30 @@
     transition: transform 0.3s ease-out*/
 }
 @media (min-width: 768px) {
+    .client-name.active {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .client-name.active:first-child {
+        margin-bottom: 1.5rem;
+    }
+    .client-name.active:last-child {
+        margin-top: 1.5rem;
+    }
+}
+@media (min-width: 1024px) {
+    .client-name.active {
+        margin-top: 2.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .client-name.active:first-child {
+        margin-bottom: 2.5rem;
+    }
+    .client-name.active:last-child {
+        margin-top: 2.5rem;
+    }
+}
+@media (min-width: 1280px) {
     .client-name.active {
         margin-top: 6.5rem;
         margin-bottom: 6.5rem;

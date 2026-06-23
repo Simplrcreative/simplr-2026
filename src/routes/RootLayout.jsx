@@ -173,7 +173,7 @@ export default function RootLayout() {
 
     // Scope all GSAP targets to layoutRef.current so body-appended header/compact-logo
     // clones (used for the outgoing animation) aren't clobbered by these sets.
-    const isDesktop = window.matchMedia('(min-width: 768px)').matches
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
     const layout = layoutRef.current
     gsap.set(layout?.querySelector('.compact-logo'), { clearProps: 'all' })
 
@@ -472,7 +472,7 @@ export default function RootLayout() {
         <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
       </div>
 
-      <nav id="mobile-nav" className={`z-[1003] main flex flex-col md:hidden flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
+      <nav id="mobile-nav" className={`z-[1003] main flex flex-col lg:hidden flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
         {navigation.map((item) => {
           const prefetch = useRoutePrefetch(item.path)
           return (
@@ -516,7 +516,7 @@ export default function RootLayout() {
             
           </div>
 
-          <nav id="desktop-nav" className="main hidden md:flex flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]">
+          <nav id="desktop-nav" className="main hidden lg:flex flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]">
             {navigation.map((item) => {
               const prefetch = useRoutePrefetch(item.path)
               return (

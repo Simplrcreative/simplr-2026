@@ -685,7 +685,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       <section className="brands-grow px-5 bg-white py-20 section-light relative z-1 change-logo">
         <div className="grid grid-cols-12">
-          <div className="trigger-split-text-coffee col-start-1 md:col-start-4 col-span-12 md:col-span-5 lead max-w-[47ch] "> 
+          <div className="trigger-split-text-coffee col-start-1 lg:col-start-4 col-span-12 lg:col-span-5 lead max-w-[47ch] "> 
               <div className="split-text-coffee">We help brands grow through creativity, craft, and intelligent design. From strategy and branding to digital experiences, motion, and presentation systems, we create work that connects purpose with performance.</div>
           </div>
         </div>
@@ -723,10 +723,10 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-10 md:pt-20">
-          <div className="stat-item flex flex-col md:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
+          <div className="stat-item flex flex-col sm:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
             <div data-initial="62" className="stat-no text-strategy md:min-w-[32rem] xl:min-w-auto">0</div>
             <div className="flex flex-col">
-              <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-40 text-strategy text-[5rem]">+</div>
+              <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-20 lg:mb-40 text-strategy text-[5rem]">+</div>
               <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Successfully launched brands since 2015 </div>
             </div>
           </div>
@@ -764,7 +764,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       onMouseEnter={() => prefetchWorkEntry(study.slug)}
                     >
                       {study.client}
-                      <div className="client-detail font-literata text-3xl md:text-5xl font-light pb-3">
+                      <div className="client-detail font-literata text-3xl lg:text-5xl font-light pb-3">
                         <span className="client-detail-text">{study.detail}</span>
                       </div>
                     </Link>
@@ -772,7 +772,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 )
               })}
             </div>
-            <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 order-1 md:order-2 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
+            <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-8 lg:col-span-5 order-1 md:order-2 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 

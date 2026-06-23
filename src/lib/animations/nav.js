@@ -77,10 +77,10 @@ export function createLogoScrollAnimation(scope) {
   } else if (screenWidth >= 768) {
     logoY = -10
     logoDuration = 0.5
-    logoScale = 0.55
-    taglineScale = 0.68
-    taglineY = -155
-    taglineX = 65
+    logoScale = 0.65
+    taglineScale = 0.60
+    taglineY = -125
+    taglineX = 60
   }
 
   timeline.to(
@@ -162,7 +162,7 @@ export function createLogoPageAnimation(scope) {
     return () => undefined
   }
 
-  const isDesktop = window.matchMedia('(min-width: 768px)').matches
+  const isDesktop = window.matchMedia('(min-width: 1024px)').matches
 
   const timeline = gsap.timeline({
     defaults: {

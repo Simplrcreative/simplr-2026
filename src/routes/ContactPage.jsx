@@ -123,9 +123,9 @@ export default function ContactPage() {
       <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back mb-[9rem]" />
-          <div className="col-span-11 md:col-span-7 text-white change-logo">
+          <div className="col-span-11 lg:col-span-7 text-white change-logo">
             <h1 className="hero-title large my-10">Let’s make it simplr.<br/><span>Come say <i>hello.</i></span></h1>
-            <div className="md:flex gap-20">
+            <div className="lg:flex gap-20">
               <div className="eyebrow">Our Office</div>
               <div className="text-[22px]">
               <p className="font-bold">Cape Town</p>
@@ -137,7 +137,7 @@ export default function ContactPage() {
             </div>
             </div>
           </div>
-          <div className="contact-form col-start-1 md:col-start-8 col-span-12 md:col-span-5 pt-20">
+          <div className="contact-form col-start-1 lg:col-start-8 col-span-12 lg:col-span-5 pt-20">
             {status === 'success' ? (
               <div className="flex flex-col gap-6 text-white py-10">
                 <p className="text-[22px] leading-6 font-medium">Thank you — we&apos;ll be in touch shortly.</p>

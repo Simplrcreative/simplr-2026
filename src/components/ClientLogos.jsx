@@ -198,7 +198,7 @@ export default function ClientLogos({ innerRef, shouldAnimate = false }) {
         </div>
       </section>
 
-      <section className="trigger-split-text bg-coffee section-dark px-5 py-20">
+      <section className="trigger-split-text bg-coffee section-dark px-5 md:py-10 xl:py-20">
         <div className="grid grid-cols-12">
           <div className="quote col-start-3 col-span-8 flex justify-center">
             <div className=" max-w-[36ch]  text-white split-text text-center">
