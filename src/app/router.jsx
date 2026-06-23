@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet } from 'react-router-dom'
+import { createBrowserRouter, Outlet, useOutletContext } from 'react-router-dom'
 import HomePage from '../routes/HomePage.jsx'
 import WorkPage from '../routes/WorkPage.jsx'
 import WorkSinglePage from '../routes/WorkSinglePage.jsx'
@@ -29,6 +29,11 @@ import {
   createRootLoader,
 } from '../routes/loaders.js'
 
+function PageOutlet() {
+  const context = useOutletContext()
+  return <Outlet context={context} />
+}
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -37,7 +42,7 @@ export const router = createBrowserRouter([
     hydrateFallbackElement: <div className="shell py-10" />,
     children: [
       {
-        element: <Outlet />,
+        element: <PageOutlet />,
         errorElement: <NotFoundPage />,
         handle: { pageBg: 'light' },
         children: [
