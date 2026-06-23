@@ -26,7 +26,7 @@ const contentNodeFields = `
     }
   }
   ... on NodeWithFeaturedImage {
-    acfFeaturedImage {
+    featuredImage {
       node {
         sourceUrl(size: LARGE)
         altText
