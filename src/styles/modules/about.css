@@ -87,13 +87,29 @@
   filter: grayscale(0)
 }
 
-/* Scale/fade image as soon as close starts — desktop had no rule here before,
-   so the image waited for createBioAnimation onComplete (~1.1s) before is-visible dropped. */
+@keyframes person-hover-img-close {
+  0% {
+    opacity: 1;
+    scale: 1;
+    filter: grayscale(0);
+  }
+  20% {
+    opacity: 1;
+    rotate: -0.5deg;
+    scale: 1.1;
+    filter: grayscale(0);
+  }
+  100% {
+    opacity: 0;
+    scale: 0.5;
+    filter: grayscale(0.5);
+  }
+}
+
+/* Blip up, then scale/fade out as soon as close starts */
 .people--bio-closing .person-hover-img.is-visible {
-  opacity: 0;
-  scale: 0.5;
-  filter: grayscale(0.5);
-  transition: opacity 0.75s ease 0.75s, scale 0.75s ease 0.75s, filter 0.75s ease 0.75s;
+  animation: person-hover-img-close 0.75s ease-in-out forwards;
+  transition: none;
 }
 
 /* ─── Bio overlay ────────────────────────────────────────── */
@@ -198,14 +214,8 @@
   .people--bio-closing .person-hover-img.is-visible {
     top: 50% !important;
     transform: translate(-50%, -50%);
-    opacity: 0;
-    scale: 0.85;
-    transition:
-      opacity 0.35s ease,
-      scale 0.35s ease,
-      filter 0.35s ease,
-      top 0.35s ease,
-      transform 0.35s ease;
+    animation: person-hover-img-close 0.55s ease forwards;
+    transition: none;
   }
 
   .people--bio-open .people-grid {
