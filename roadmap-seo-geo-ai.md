@@ -1,166 +1,144 @@
-# SEO, GEO, and AI Optimisation Roadmap
+# SEO, GEO, AEO, and LLMS Roadmap
 
-Status: Active
-Primary domain target: https://simplr.co.za
-Priority direction: GEO and AI optimisation first, then deep technical SEO hardening.
+Status: Active  
+Primary domain: https://simplr.co.za  
+Indexing: **blocked** (`VITE_ALLOW_INDEXING=false`) until launch
 
-## Quick Access
+## How to use this
 
-- Main roadmap file: roadmap-seo-geo-ai.md
-- Supporting overview: readme.md
-- SEO asset generator: scripts/generate-seo-assets.mjs
-- Crawl assets:
-  - public/sitemap.xml
-  - public/robots.txt
-  - public/llms.txt
-  - public/llms-full.txt
+- `[ ]` Not started · `[~]` In progress · `[x]` Done
+- **S** = 0.5–1 day · **M** = 1–3 days · **L** = 3+ days
+- Re-prioritise weekly by business impact
 
-## How To Use This Roadmap
+## Where we are
 
-- Status legend:
-  - [ ] Not started
-  - [~] In progress
-  - [x] Done
-- Effort legend:
-  - S = 0.5 to 1 day
-  - M = 1 to 3 days
-  - L = 3+ days
-- Update rule: when starting work, mark item [~] and add owner/date in the Sprint Board.
-- Review cadence: revisit weekly and re-order by business impact.
+**Start here:** Phase 0 foundation → Phase 1 schema → Phase 2 LLMS/GEO → launch (Phase 4).
 
-## Sprint Board (GEO/AI First)
+Sprint 1 (meta + schema wiring) is largely **done in code**. Next up: validate in prerendered HTML, then Phase 2 llms.txt rewrite.
 
-| Priority | Item                                                                            | Effort | Status | Owner | Target Sprint |
-| -------- | ------------------------------------------------------------------------------- | ------ | ------ | ----- | ------------- |
-| P1       | Expand llms-full.txt with route purpose summaries and machine-readable entities | M      | [ ]    | TBD   | Sprint 1      |
-| P1       | Schema audit and fixes for home/services/work/thinking route types              | M      | [ ]    | TBD   | Sprint 1      |
-| P1       | Thinking article template for answer-first intro and explicit entities          | M      | [ ]    | TBD   | Sprint 1      |
-| P1       | GEO manual QA pack (prompt set + citation scoring sheet)                        | S      | [ ]    | TBD   | Sprint 1      |
-| P2       | Sitemap lastmod support for static and dynamic routes                           | M      | [ ]    | TBD   | Sprint 2      |
-| P2       | CI guardrail: fail on localhost URLs in crawl assets                            | S      | [ ]    | TBD   | Sprint 2      |
-| P2       | CI guardrail: internal link check and report                                    | M      | [ ]    | TBD   | Sprint 2      |
-| P2       | Canonical/trailing slash policy lock and consistency pass                       | S      | [ ]    | TBD   | Sprint 2      |
-| P3       | Evaluate pre-render or SSR for top value routes                                 | L      | [ ]    | TBD   | Sprint 3      |
+---
 
-## Recommended Execution Order (Next 2 Weeks)
+## Completed baseline
 
-1. llms-full entity and route summary upgrade.
-2. Schema audit plus route-level fixes.
-3. Thinking and case-study content template hardening.
-4. GEO QA prompt pack and baseline run.
-5. Add CI checks for localhost and link integrity.
-6. Add sitemap lastmod and canonical policy pass.
+- [x] Production site URL defaults (`simplr.co.za`)
+- [x] Trailing-slash URLs across router and links
+- [x] Build-time sitemap, robots.txt, llms.txt, llms-full.txt
+- [x] Vercel prerender pipeline (Playwright + `@sparticuz/chromium`)
+- [x] `VITE_ALLOW_INDEXING` flag — noindex while testing
+- [x] Shared SEO helpers (`Seo.jsx`, `src/lib/seo.js`, `src/lib/page-seo.js`)
+- [x] Loaders fetch WP page meta for static routes
+- [x] Page-specific `<Seo />` on all main templates
+- [x] Schema types: CollectionPage (work/thinking), AboutPage, ContactPage, CreativeWork (work singles), Article (thinking singles), Service (service singles)
 
-## Goals
+---
 
-- Make site content easy for search engines and AI systems to discover, parse, cite, and trust.
-- Preserve current motion-rich UX while improving crawlability and index reliability.
-- Build repeatable quality checks so regressions are caught during development.
+## Phase 0 — Foundation (SEO)
 
-## Completed Baseline (Done)
+| # | Task | Status | Effort |
+|---|------|--------|--------|
+| 0.1 | Replace placeholder meta with WP/fallback content on all routes | [x] | M |
+| 0.2 | Trailing-slash canonicals site-wide | [x] | S |
+| 0.3 | Pass featured/OG images into `<Seo />` where available | [~] | M |
+| 0.4 | Fix schema `@type` mismatches (Contact, Work index, etc.) | [x] | S |
+| 0.5 | Shared `page-seo.js` helpers for meta + schema | [x] | M |
+| 0.6 | Verify prerender HTML on 5 sample URLs (view-source audit) | [ ] | S |
 
-- [x] Production-safe default site URL updated to simplr.co.za in config.
-- [x] Sitemap generator aligned with real dynamic route structure:
-  - Work singles: /work/:slug
-  - Thinking singles: /thinking/:topic/:slug
-- [x] SEO asset generation hardened to support relative GraphQL endpoint setups.
-- [x] Crawl assets regenerated with production domain:
-  - robots.txt
-  - sitemap.xml
-  - llms.txt
-  - llms-full.txt
+**Exit:** View-source shows correct title, description, canonical, OG, JSON-LD from real content.
 
-## Phase 1: GEO and AI Optimisation (Do First)
+---
 
-### 1. AI Discoverability and Citation Readiness
+## Phase 1 — Structured data (SEO + AEO)
 
-- [ ] Expand llms-full.txt with stronger content summaries by section and route purpose.
-- [ ] Add a concise "facts and entities" section (brand, services, location, capabilities, contact) for machine extraction.
-- [ ] Ensure all key service/work/thinking pages have clear, non-ambiguous H1 and intro summaries.
-- [ ] Add editorial guidance for writing answer-first intros that improve LLM snippet quality.
+| # | Task | Status | Effort |
+|---|------|--------|--------|
+| 1.1 | Home — WebPage + ItemList/FAQ schema | [x] | S |
+| 1.2 | Work index — CollectionPage | [x] | S |
+| 1.3 | Work singles — CreativeWork + breadcrumbs | [x] | M |
+| 1.4 | Thinking singles — Article (author, date, image) | [x] | M |
+| 1.5 | Services index — ServicesPage + ItemList | [~] | M |
+| 1.6 | Service singles — Service schema | [x] | M |
+| 1.7 | About — AboutPage | [x] | S |
+| 1.8 | Contact — ContactPage | [x] | S |
+| 1.9 | Validate in Rich Results Test + Schema.org validator | [ ] | S |
+| 1.10 | Audit Organization/WebSite values against live brand facts | [ ] | S |
 
-### 2. Structured Data for AI + Search Understanding
+**Exit:** No schema errors; each template has the correct type.
 
-- [ ] Audit schema coverage route by route (home, services, service single, work single, thinking single).
-- [ ] Strengthen Article schema for thinking entries (author, datePublished, dateModified, image, canonical consistency).
-- [ ] Add/verify Service schema on service pages and Organization consistency across all routes.
-- [ ] Validate rich results using Google Rich Results Test and Schema Markup Validator.
+---
 
-### 3. Content Architecture for Retrieval
+## Phase 2 — LLMS & AI discovery (GEO + LLMS)
 
-- [ ] Create content templates for thinking posts that enforce:
-  - Summary paragraph near top
-  - Clear section headings
-  - Explicit terms and entities
-- [ ] Create case study template with measurable outcomes fields (challenge, approach, result).
-- [ ] Add internal links from summary/list pages to priority conversion pages.
+| # | Task | Status | Effort |
+|---|------|--------|--------|
+| 2.1 | Rewrite `buildLlms()` to llmstxt.org spec (H1, blockquote, sections) | [ ] | S |
+| 2.2 | Rewrite `buildLlmsFull()` — Facts & entities block | [ ] | M |
+| 2.3 | Generate llms links from WP at build (curated, not all 73 URLs) | [ ] | M |
+| 2.4 | Link llms.txt → llms-full.txt | [ ] | S |
+| 2.5 | Answer-first intros on thinking posts (WP editorial guideline) | [ ] | M |
+| 2.6 | Case study template: challenge → approach → result fields | [ ] | M |
+| 2.7 | GEO QA prompt pack (10–15 brand questions + scoring sheet) | [ ] | S |
+| 2.8 | Baseline GEO audit before launch | [ ] | S |
 
-### 4. AI-Focused QA
+**Exit:** `/llms.txt` reads like a Simplr briefing doc; LLM can answer basic brand questions from it.
 
-- [ ] Add a quarterly manual GEO audit:
-  - Ask top AI assistants targeted brand/service questions
-  - Record whether responses cite correct pages and facts
-  - Patch weak pages with clearer summaries/entities
+---
 
-## Phase 2: Technical SEO Hardening
+## Phase 3 — Technical SEO hardening
 
-### 1. Crawl and Index Hygiene
+| # | Task | Status | Effort |
+|---|------|--------|--------|
+| 3.1 | Sitemap `lastmod` from WP modified dates | [ ] | M |
+| 3.2 | CI: fail build if localhost URLs in crawl assets | [ ] | S |
+| 3.3 | CI: broken internal link check | [ ] | M |
+| 3.4 | Trailing-slash redirect policy (non-trailing → trailing) | [ ] | S |
+| 3.5 | OG/Twitter images on all singles (not default social-card) | [~] | M |
+| 3.6 | Lighthouse baseline (home, work, thinking — mobile) | [ ] | M |
+| 3.7 | Confirm production URLs in prerender canonicals/OG | [ ] | S |
 
-- [ ] Ensure sitemap includes all intended indexable dynamic URLs (including service singles if required).
-- [ ] Add optional lastmod support to sitemap output.
-- [ ] Add CI check that fails build if sitemap/robots/llms contain localhost URLs.
-- [ ] Add CI check for broken internal links.
+---
 
-### 2. Rendering Strategy Improvements
+## Phase 4 — Launch & post-launch
 
-- [ ] Evaluate pre-render or SSR for high-value routes:
-  - /
-  - /services
-  - /work
-  - /thinking
-  - Top N work/thinking singles
-- [ ] Compare LCP, crawl rendering reliability, and deployment complexity before committing.
+| # | Task | Status | Effort |
+|---|------|--------|--------|
+| 4.1 | Set `VITE_ALLOW_INDEXING=true` in Vercel Production | [ ] | S |
+| 4.2 | Redeploy; confirm robots.txt allows crawl + sitemap | [ ] | S |
+| 4.3 | Submit sitemap — Google Search Console + Bing | [ ] | S |
+| 4.4 | Social preview tests (Facebook, LinkedIn) on 5 URLs | [ ] | S |
+| 4.5 | Weekly index coverage check (first 30 days) | [ ] | Ongoing |
+| 4.6 | Monthly GEO QA re-run | [ ] | Ongoing |
+| 4.7 | Search Console CTR review; improve weak titles/descriptions | [ ] | Ongoing |
 
-### 3. Metadata and Canonical Consistency
+---
 
-- [ ] Verify canonical URL format consistency (trailing slash policy).
-- [ ] Ensure one clear canonical per route variant.
-- [ ] Audit Open Graph and Twitter image consistency for social previews.
+## Recommended sprint order
 
-### 4. Performance and Core Web Vitals
+| Sprint | Focus | Outcome |
+|--------|-------|---------|
+| **Sprint 1** ✅ | Phase 0 + Phase 1 wiring | Real meta and schema on every template |
+| **Sprint 2** | Phase 0.6 + 1.9 + Phase 2.1–2.4 + Phase 3.1–3.4 | llms files + crawl hygiene + validation |
+| **Sprint 3** | Phase 2.5–2.8 + Phase 3.5–3.7 | Content templates + performance baseline |
+| **Launch** | Phase 4 | Go live, monitor, iterate |
 
-- [ ] Establish Lighthouse baseline for mobile and desktop.
-- [ ] Optimise largest above-the-fold media per template.
-- [ ] Review JS and animation cost on first load for key landing routes.
+---
 
-## Phase 3: Launch and Post-Launch Operations
+## Key files
 
-### Pre-Launch
+| File | Role |
+|------|------|
+| `src/components/Seo.jsx` | Helmet meta + OG/Twitter + JSON-LD |
+| `src/lib/seo.js` | Schema builders, robots helpers |
+| `src/lib/page-seo.js` | Per-route meta/schema assembly |
+| `src/config/site.js` | Route definitions, schema types, fallbacks |
+| `scripts/generate-seo-assets.mjs` | sitemap, robots, llms generation |
+| `scripts/prerender.mjs` | Static HTML for crawlers |
+| `.env` | `VITE_ALLOW_INDEXING`, `VITE_SITE_URL` |
 
-- [ ] Verify production env vars and regenerate crawl assets in CI.
-- [ ] Submit sitemap in Google Search Console and Bing Webmaster Tools.
-- [ ] Run final schema/canonical/crawlability pass on staging domain.
+---
 
-### First 30 Days Post-Launch
+## Change log
 
-- [ ] Weekly index coverage check (submitted vs indexed URLs).
-- [ ] Weekly crawl error and redirect chain review.
-- [ ] Review query impressions for service and case-study intent.
-- [ ] Patch weak CTR pages with improved title and description copy.
-
-## Nice-to-Have Enhancements
-
-- [ ] Add route-level content freshness indicators where editorially appropriate.
-- [ ] Add OG image automation for dynamic entries.
-- [ ] Add editorial checklist to CMS workflow for SEO + GEO quality gates.
-
-## Working Notes
-
-- This roadmap is intended as a living checklist.
-- Update checkboxes as items are completed.
-- Re-prioritise every sprint based on performance, indexing, and business goals.
-
-## Change Log
-
-- 2026-06-04: Initial phased roadmap created.
-- 2026-06-04: Added Sprint Board with effort sizing and next-2-weeks execution order.
+- 2026-06-04: Initial phased roadmap
+- 2026-06-19: Added prerender on Vercel, noindex testing flag
+- 2026-06-19: Sprint 1 — `page-seo.js`, loader meta fetch, schema fixes on all main routes
+- 2026-06-19: Expanded to SEO / GEO / AEO / LLMS checklist

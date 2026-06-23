@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildStaticPageSeo } from '../lib/page-seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
 
@@ -25,7 +25,8 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSiz
 }
 
 export default function Est2014Page() {
-  const { beyondItems = [] } = useLoaderData() ?? {}
+  const { beyondItems = [], page } = useLoaderData() ?? {}
+  const seo = buildStaticPageSeo('est2014', page)
   const btnRef = useRef(null)
   const galleryRef = useRef(null)
   const [videoRatios, setVideoRatios] = useState({})
@@ -70,24 +71,9 @@ export default function Est2014Page() {
     return () => observer.disconnect()
   }, [])
 
-  const pathname = '/est-2014'
-  const title = 'Est 2014'
-  const description = 'Est 2014 Page'
-
   return (
     <>
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({ pathname, title, description, type: 'WorkPage' }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <section className="page-hero px-5 bg-coffee section-dark min-h-[80vh] flex items-end relative">
         <div className="grid grid-cols-12 w-full">

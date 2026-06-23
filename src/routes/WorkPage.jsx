@@ -5,10 +5,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import PictureImg from '../components/PictureImg.jsx'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildStaticPageSeo } from '../lib/page-seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, fetchTestimonialData, fetchWorksData } from '../lib/wp-api.js'
-import { routeDefinitions } from '../config/site.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -373,7 +372,8 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
 
 export default function WorkPage() {
   const pageRef = useRef(null)
-  const { works: initialWorks = [], testimonials: initialTestimonials = {} } = useLoaderData() ?? {}
+  const { works: initialWorks = [], testimonials: initialTestimonials = {}, page } = useLoaderData() ?? {}
+  const seo = buildStaticPageSeo('work', page)
   const [activeFilter, setActiveFilter] = useState('all')
   const [displayedFilter, setDisplayedFilter] = useState('all')
   const [isFilterAnimating, setIsFilterAnimating] = useState(false)
@@ -595,24 +595,9 @@ export default function WorkPage() {
     })
   }
 
-  const pathname = routeDefinitions.work.path
-  const title = 'Work'
-  const description = 'Work Page'
-
   return (
     <div ref={pageRef}>
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({ pathname, title, description, type: 'WorkPage' }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12">

@@ -84,7 +84,7 @@ export const routeDefinitions = {
     label: 'Thinking',
     path: '/thinking/',
     uri: '/thinking/',
-    schemaType: 'ArticlePage',
+    schemaType: 'CollectionPage',
   },
   contact: {
     key: 'contact',

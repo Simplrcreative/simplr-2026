@@ -9,6 +9,7 @@ import {
   breadcrumbSchema,
   collectionSchema,
   faqSchema,
+  normaliseDescription,
   serviceCatalogSchema,
   webPageSchema,
 } from '../lib/seo.js'
@@ -582,15 +583,16 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   return (
     <div ref={pageRef}>
       <Seo
-        title="Home"
-        description={page.intro}
+        title={page.title || 'Home'}
+        description={normaliseDescription(page.intro)}
         pathname="/"
         type="website"
+        image={page.image?.sourceUrl}
         schema={[
           webPageSchema({
             pathname: '/',
             title: page.title,
-            description: page.intro,
+            description: normaliseDescription(page.intro),
             type: routeDefinitions.home.schemaType,
           }),
           breadcrumbSchema([{ name: 'Home', path: '/' }]),

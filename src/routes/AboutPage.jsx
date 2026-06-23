@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildStaticPageSeo } from '../lib/page-seo.js'
 import {
   createSplitTextAnimation,
   createBulletsAnimation,
@@ -27,10 +27,8 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSi
 
 export default function AboutPage() {
   useEffect(() => createSplitTextAnimation(), [])
-  const pathname = '/about'
-  const title = 'About Us'
-  const description = 'Blank About Us page template ready for studio story, team, and positioning content.'
-  const { people } = useLoaderData()
+  const { people, page } = useLoaderData()
+  const seo = buildStaticPageSeo('about', page)
 
   const [activeBio, setActiveBio] = useState(null)
   const [bioLayoutOpen, setBioLayoutOpen] = useState(false)
@@ -109,23 +107,7 @@ export default function AboutPage() {
 
   return (
     <>
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({
-            pathname,
-            title,
-            description,
-            type: 'AboutPage',
-          }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12">

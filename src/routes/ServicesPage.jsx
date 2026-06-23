@@ -3,7 +3,8 @@ import { useLoaderData } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildStaticPageSeo } from '../lib/page-seo.js'
+import { serviceCatalogSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
 import { routeDefinitions } from '../config/site.js'
@@ -170,8 +171,11 @@ function ServiceCard({ service }) {
 }
 
 export default function ServicesPage() {
-  const { services } = useLoaderData() ?? {}
+  const { services, page } = useLoaderData() ?? {}
   const servicesCards = services?.acfServices || []
+  const seo = buildStaticPageSeo('services', page, [
+    serviceCatalogSchema(routeDefinitions.services.path, page?.sections || []),
+  ])
 
   useEffect(() => {
     let cleanupSplitText = null
@@ -207,29 +211,10 @@ export default function ServicesPage() {
       cardTweens.forEach((t) => t?.scrollTrigger?.kill())
     }
   }, [])
-  const pathname = routeDefinitions.services.path
-  const title = 'Services'
-  const description = 'Services Page'
 
   return (
     <>
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({
-            pathname,
-            title,
-            description,
-            type: 'ServicesPage',
-          }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">

@@ -3,7 +3,7 @@ import emailjs from '@emailjs/browser'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildContactPageSeo } from '../lib/page-seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -45,6 +45,8 @@ function validate(fields) {
 
 export default function ContactPage() {
   const btnRef = useRef(null)
+  const { page } = useLoaderData()
+  const seo = buildContactPageSeo(page)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [enquiry, setEnquiry] = useState([])
   const [errors, setErrors] = useState({})
@@ -101,24 +103,10 @@ export default function ContactPage() {
       setStatus('error')
     }
   }
-  const pathname = '/contact'
-  const title = 'Contact'
-  const description = 'Contact Page'
 
   return (
     <>
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({ pathname, title, description, type: 'WorkPage' }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">

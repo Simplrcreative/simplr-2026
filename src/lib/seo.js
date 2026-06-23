@@ -115,7 +115,7 @@ export function collectionSchema({ pathname, title, description, items }) {
   }
 }
 
-export function articleSchema({ pathname, title, description, image, datePublished, author }) {
+export function articleSchema({ pathname, title, description, image, datePublished, dateModified, author }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -123,7 +123,7 @@ export function articleSchema({ pathname, title, description, image, datePublish
     headline: title,
     description,
     datePublished,
-    dateModified: datePublished,
+    dateModified: dateModified || datePublished,
     image: image ? [absoluteUrl(image)] : [absoluteUrl(siteConfig.defaultSocialImage)],
     author: {
       '@type': 'Person',
@@ -135,6 +135,46 @@ export function articleSchema({ pathname, title, description, image, datePublish
     mainEntityOfPage: absoluteUrl(pathname),
     inLanguage: siteConfig.locale,
     isAccessibleForFree: true,
+  }
+}
+
+export function creativeWorkSchema({ pathname, title, description, image, datePublished, client }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    '@id': `${absoluteUrl(pathname)}#creativework`,
+    name: title,
+    headline: title,
+    description,
+    datePublished: datePublished || undefined,
+    image: image ? absoluteUrl(image) : absoluteUrl(siteConfig.defaultSocialImage),
+    creator: {
+      '@id': `${siteConfig.siteUrl}#organization`,
+    },
+    ...(client
+      ? {
+          about: {
+            '@type': 'Organization',
+            name: client,
+          },
+        }
+      : {}),
+    inLanguage: siteConfig.locale,
+  }
+}
+
+export function serviceItemSchema({ pathname, title, description }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${absoluteUrl(pathname)}#service`,
+    name: title,
+    description,
+    url: absoluteUrl(pathname),
+    provider: {
+      '@id': `${siteConfig.siteUrl}#organization`,
+    },
+    areaServed: siteConfig.contact.country,
   }
 }
 

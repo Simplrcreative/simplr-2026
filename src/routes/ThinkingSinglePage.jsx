@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Link, useLoaderData} from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
+import { buildThinkingSingleSeo } from '../lib/page-seo.js'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import { createNextWorkAnimation, createSlideUpAnimations, refreshScrollTriggers } from '../lib/animations/index.js'
@@ -39,6 +40,8 @@ export default function ThinkingSinglePage() {
     || profileImageSizes.find((size) => size?.name === 'medium')?.sourceUrl
     || profileImageSizes[0]?.sourceUrl
     || ''
+
+  const seo = buildThinkingSingleSeo(page, pathname)
 
   useEffect(() => {
     const cleanupNextWork = createNextWorkAnimation()
@@ -165,11 +168,7 @@ export default function ThinkingSinglePage() {
   return (
     <>
       <div ref={pageRef}>
-      <Seo
-        title={title || 'Thinking'}
-        description=""
-        pathname={pathname}
-      />
+      <Seo {...seo} />
 
       <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">

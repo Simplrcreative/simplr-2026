@@ -1,6 +1,7 @@
 import { Fragment, useEffect } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
+import { buildWorkSingleSeo } from '../lib/page-seo.js'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
@@ -54,8 +55,9 @@ export default function WorkSinglePage() {
   const nextMobile2Src  = getThumbnail(nextThumb2Node, 'medium') + '.webp'
   const nextDesktop2Src = getThumbnail(nextThumb2Node) + '.webp'
 
+  const seo = buildWorkSingleSeo(work, pathname)
+
   useEffect(() => {
-    // Lock scroll during the featured-image dock transition; unlock on completion.
     if (document.documentElement.classList.contains('page-transitioning')) {
       lockScroll('work-single-dock')
       const unlock = () => { unlockScroll('work-single-dock') }
@@ -82,11 +84,7 @@ export default function WorkSinglePage() {
 
   return (
     <>
-      <Seo
-        title={title}
-        description=""
-        pathname={pathname}
-      />
+      <Seo {...seo} />
     
       <section className="page-hero px-5 pb-10 md:pb-20 bg-white section-light min-h-screen flex items-end">
         <div className="grid grid-cols-12 w-full">

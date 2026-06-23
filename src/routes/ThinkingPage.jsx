@@ -2,10 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData, useParams } from 'react-router-dom'
 import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildStaticPageSeo } from '../lib/page-seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, refreshSmoothScroll } from '../lib/animations/index.js'
 import { buildEntryPath, fetchThinkingPostsData, getThinkingTopicSlug } from '../lib/wp-api.js'
-import { routeDefinitions } from '../config/site.js'
 import PictureImg from '../components/PictureImg.jsx'
 
 const FILTER_COLOR_MAP = {
@@ -48,7 +47,8 @@ function postMatchesFilter(post, filterId) {
 }
 
 export default function ThinkingPage() {
-  const { posts: initialPosts = [] } = useLoaderData() ?? {}
+  const { posts: initialPosts = [], page } = useLoaderData() ?? {}
+  const seo = buildStaticPageSeo('thinking', page)
   const { filterSlug } = useParams()
   const postsResultsRef = useRef(null)
   const postsLoadSentinelRef = useRef(null)
@@ -250,24 +250,9 @@ export default function ThinkingPage() {
     return () => context.revert()
   }, [filteredPosts])
 
-  const pathname = routeDefinitions.thinking.path
-  const title = 'Thinking'
-  const description = 'Thinking Page'
-
   return (
     <>
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({ pathname, title, description, type: 'WorkPage' }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12">

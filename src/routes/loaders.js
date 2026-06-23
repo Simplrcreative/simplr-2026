@@ -1,4 +1,4 @@
-import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchLandingPageData, fetchNavigationData, fetchNextWorkData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
+import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchLandingPageData, fetchNavigationData, fetchNextWorkData, fetchPageData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -19,7 +19,10 @@ export function createHomeLoader() {
 
 export function createWorkLoader() {
   return async function workLoader() {
-    const { works } = await fetchWorksData()
+    const [{ works }, pagePayload] = await Promise.all([
+      fetchWorksData(),
+      fetchPageData('work'),
+    ])
 
     const testimonialIds = [
       ...new Set(
@@ -37,6 +40,7 @@ export function createWorkLoader() {
       works,
       workCount: works.length,
       testimonials: Object.fromEntries(testimonialEntries),
+      page: pagePayload.page,
     }
   }
 }
@@ -56,13 +60,29 @@ export function createWorkSingleLoader() {
 
 export function createAboutLoader() {
   return async function aboutLoader() {
-    return fetchPeopleData()
+    const [peoplePayload, pagePayload] = await Promise.all([
+      fetchPeopleData(),
+      fetchPageData('about'),
+    ])
+
+    return {
+      ...peoplePayload,
+      page: pagePayload.page,
+    }
   }
 }
 
 export function createServicesLoader() {
   return async function servicesLoader() {
-    return fetchServicesData()
+    const [servicesPayload, pagePayload] = await Promise.all([
+      fetchServicesData(),
+      fetchPageData('services'),
+    ])
+
+    return {
+      ...servicesPayload,
+      page: pagePayload.page,
+    }
   }
 }
 
@@ -74,7 +94,15 @@ export function createServicesSinglePageLoader() {
 
 export function createThinkingPageLoader() {
   return async function ThinkingPageLoader() {
-    return fetchThinkingPostsData({ first: 8 })
+    const [postsPayload, pagePayload] = await Promise.all([
+      fetchThinkingPostsData({ first: 8 }),
+      fetchPageData('thinking'),
+    ])
+
+    return {
+      ...postsPayload,
+      page: pagePayload.page,
+    }
   }
 }
 
@@ -106,16 +134,23 @@ export function createThinkingSinglePageLoader() {
 
 export function createContactPageLoader() {
   return async function ContactPageLoader() {
+    const pagePayload = await fetchPageData('contact')
+    return { page: pagePayload.page }
   }
 }
 
 export function createEst2014PageLoader() {
   return async function Est2014PageLoader() {
-    const [data] = await Promise.all([
+    const [data, pagePayload] = await Promise.all([
       fetchBeyondData(),
+      fetchPageData('est2014'),
       import('../infinite-canvas/scene.jsx'),
     ])
-    return data
+
+    return {
+      ...data,
+      page: pagePayload.page,
+    }
   }
 }
 

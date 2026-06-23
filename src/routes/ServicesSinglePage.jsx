@@ -5,7 +5,7 @@ import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
-import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
+import { buildServiceSingleSeo } from '../lib/page-seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import PictureImg from '../components/PictureImg.jsx'
@@ -84,7 +84,7 @@ export default function ServicesSinglePage() {
   const featuredImage = page?.acfServiceBuilder?.acfFeaturedImage?.node?.guid || ''
   const accentColor = getServiceColor(service?.acfService || title || slug)
   const pathname = buildEntryPath('services', slug)
-  const description = acfHeading || ''
+  const seo = buildServiceSingleSeo(page, slug, pathname)
   const [openAccordions, setOpenAccordions] = useState({})
   const testimonial = service?.acfTestimonial?.nodes?.[0] || ''
   const testimonialData = testimonial?.acfTestimonials || ''
@@ -170,24 +170,7 @@ export default function ServicesSinglePage() {
 
   return (
     <div ref={pageRef} className="relative">
-      <Seo
-        title={title}
-        description={description}
-        pathname={pathname}
-        schema={[
-          webPageSchema({
-            pathname,
-            title,
-            description,
-            type: 'WebPage',
-          }),
-          breadcrumbSchema([
-            { name: 'Home', path: '/' },
-            { name: 'Services', path: buildCollectionPath('services') },
-            { name: title, path: pathname },
-          ]),
-        ]}
-      />
+      <Seo {...seo} />
 
       <div className="bottom-menu hidden md:block fixed z-10 right-5 bottom-5">
         <Link

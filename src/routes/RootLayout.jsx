@@ -32,7 +32,22 @@ function setNavLinkPointer(target, clientX, clientY) {
   target.style.setProperty('--nav-y', `${pointerY - bounds.top}px`)
 }
 
+function suppressTitleTooltip(target) {
+  if (target.title) {
+    target.dataset.savedTitle = target.title
+    target.removeAttribute('title')
+  }
+}
+
+function restoreTitleTooltip(target) {
+  if (target.dataset.savedTitle) {
+    target.title = target.dataset.savedTitle
+    delete target.dataset.savedTitle
+  }
+}
+
 function showNavLinkOrb(event) {
+  suppressTitleTooltip(event.currentTarget)
   setNavLinkPointer(event.currentTarget, event.clientX, event.clientY)
   event.currentTarget.style.setProperty('--nav-orb-opacity', '1')
   event.currentTarget.style.setProperty('--nav-orb-scale', '1')
@@ -43,6 +58,7 @@ function hideNavLinkOrb(event) {
   setNavLinkPointer(currentTarget, event.clientX, event.clientY)
   currentTarget.style.setProperty('--nav-orb-opacity', '0')
   currentTarget.style.setProperty('--nav-orb-scale', '0.2')
+  restoreTitleTooltip(currentTarget)
 }
 
 function navLinkClassName({ isActive }) {
@@ -448,7 +464,7 @@ export default function RootLayout() {
         <Link
           id="compact-logo-link"
           to="/"
-          title="Simplr"
+          title="Simplr | Creative. Applied. Intelligence."
           onPointerDown={requestTransitionCapture}
           onClick={handleLogoTransitionClick}
         >
@@ -482,6 +498,7 @@ export default function RootLayout() {
             <NavLink
               key={item.key}
               to={item.path}
+              title={item.label}
               className={navLinkClassName}
               onPointerDown={requestTransitionCapture}
               onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
@@ -508,6 +525,7 @@ export default function RootLayout() {
                 to="/"
                 onPointerDown={requestTransitionCapture}
                 onClick={handleLogoTransitionClick}
+                title="Simplr | Creative. Applied. Intelligence."
               >
                 <BrandLogo />
                 <div className="tagline">
@@ -526,6 +544,7 @@ export default function RootLayout() {
                 <NavLink
                   key={item.key}
                   to={item.path}
+                  title={item.label}
                   className={navLinkClassName}
                   onPointerDown={requestTransitionCapture}
                   onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
@@ -571,6 +590,7 @@ export default function RootLayout() {
                 className="btn relative mt-5 xl:mt-10"
                 onPointerDown={requestTransitionCapture}
                 onClick={handleFooterTransitionLinkClick}
+                title="Contact Simplr"
               >
                 <span className="btn-fill" aria-hidden="true" />
                 <span className="btn-inner">
@@ -590,6 +610,7 @@ export default function RootLayout() {
                     className="inline-flex items-start gap-[0.125rem] transition-opacity duration-200 hover:opacity-70"
                     onPointerDown={requestTransitionCapture}
                     onClick={handleFooterTransitionLinkClick}
+                    title={item.label}
                   >
                     <span>{item.label}</span>
                     {Number(item.count) > 0 ? <sup className="font-normal text-[0.75rem] leading-[0.875rem]">{item.count}</sup> : null}
