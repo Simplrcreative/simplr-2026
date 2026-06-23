@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import http from 'node:http'
+import { fileURLToPath } from 'node:url'
 
 // Ensure Playwright looks for browsers in the same location where
 // `npm run postinstall` installs them (inside node_modules).
@@ -206,6 +207,13 @@ function toPrerenderUrl(serverUrl, routePath) {
 }
 
 async function launchBrowser() {
+  const isVercel = Boolean(process.env.VERCEL)
+
+  function resolveSparticuzBinPath() {
+    const entryPath = fileURLToPath(import.meta.resolve('@sparticuz/chromium'))
+    return path.join(path.dirname(entryPath), '..', 'bin')
+  }
+
   function getSystemChromePath() {
     const platform = process.platform
     if (platform === 'darwin') {
@@ -220,27 +228,39 @@ async function launchBrowser() {
     return null
   }
 
-  // Try @sparticuz/chromium first (works on Vercel / serverless Linux)
+  // @sparticuz/chromium bundles Linux binaries + AL2023 libs for Vercel/Lambda.
+  // Do NOT overwrite LD_LIBRARY_PATH — the package sets it to /tmp/al2023/lib on Vercel.
   try {
     console.log('🔍  Trying @sparticuz/chromium...')
     const chromiumMod = await import('@sparticuz/chromium')
     const sparticuz = chromiumMod.default || chromiumMod
-    const executablePath = await sparticuz.executablePath()
-    const execDir = path.dirname(executablePath)
-    console.log(`   executablePath: ${executablePath}`)
+    sparticuz.setGraphicsMode = false
 
-    process.env.LD_LIBRARY_PATH = execDir
+    const binPath = resolveSparticuzBinPath()
+    console.log(`   binPath: ${binPath}`)
+
+    const executablePath = await sparticuz.executablePath(binPath)
+    console.log(`   executablePath: ${executablePath}`)
+    console.log(`   LD_LIBRARY_PATH: ${process.env.LD_LIBRARY_PATH || '(unset)'}`)
 
     const browser = await chromium.launch({
-      args: [...sparticuz.args, '--no-sandbox', '--disable-dev-shm-usage'],
+      args: sparticuz.args,
       executablePath,
-      headless: sparticuz.headless,
+      headless: true,
     })
 
     console.log('✅  @sparticuz/chromium launched successfully')
     return { browser, source: '@sparticuz/chromium' }
   } catch (sparticuzErr) {
     console.error('⚠️  @sparticuz/chromium failed:', sparticuzErr.message)
+    if (sparticuzErr.stack) {
+      console.error(sparticuzErr.stack.split('\n').slice(0, 6).join('\n'))
+    }
+  }
+
+  if (isVercel) {
+    console.error('⚠️  Skipping Playwright/system Chrome on Vercel (bundled browsers need OS libs).')
+    return null
   }
 
   try {

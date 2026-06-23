@@ -49,7 +49,11 @@ Already added to `package.json`:
 
 ### `@sparticuz/chromium` (Vercel Linux)
 
-On Vercel’s Linux build containers, Playwright’s bundled Chromium often fails to launch. The postbuild script tries `@sparticuz/chromium` first, then Playwright, then system Chrome. It is listed in **`dependencies`** (not `devDependencies`) so it is always available during the build.
+On Vercel’s Linux build containers, Playwright’s bundled Chromium fails with missing system libraries (`libnspr4.so`). The postbuild script uses `@sparticuz/chromium` instead, which ships its own binary plus AL2023 shared libs.
+
+**Important:** Do not overwrite `LD_LIBRARY_PATH` after calling `executablePath()` — `@sparticuz/chromium` sets it to `/tmp/al2023/lib` on Vercel. Overwriting it breaks launch with the same `libnspr4.so` error you see from Playwright.
+
+The package is listed in **`dependencies`** so it is always installed during the Vercel build. Playwright’s browser download is skipped on Vercel (`VERCEL=1`); only the Node API is used to drive `@sparticuz/chromium`.
 
 ### Build fails if prerender fails
 
