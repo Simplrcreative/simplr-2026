@@ -258,7 +258,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     // Handle when video loops
     const onLoop = () => {
       loopCount += 1
-      if (loopCount >= MAX_LOOPS && document.hidden) {
+      if (loopCount >= MAX_LOOPS) {
         video.pause()
       }
     }

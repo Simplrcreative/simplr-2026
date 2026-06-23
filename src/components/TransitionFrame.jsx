@@ -8,6 +8,7 @@ import { createSurfaceColorTransitions, createSlideUpAnimations, scrollToTopImme
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
 const PAGE_TRANSITION_PREPARE_CAPTURE_EVENT = 'page-transition:prepare-capture'
+const PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT = 'page-transition:capture-complete'
 const COFFEE = '#300F1D'
 const WHITE = '#FFFFFF'
 const DARK_PATHS = new Set(['/about', '/contact', '/est-2014'])
@@ -18,6 +19,41 @@ const ALT_DOCK_POLL_MS = 50
 
 function resolveBgFromPath(pathname) {
   return DARK_PATHS.has(pathname) ? 'dark' : 'light'
+}
+
+function normalizePathname(pathname) {
+  if (!pathname) return '/'
+  const path = pathname.split('?')[0].split('#')[0]
+  if (path.length > 1 && path.endsWith('/')) return path.slice(0, -1)
+  return path || '/'
+}
+
+function transitionPathsMatch(capturedPath, currentPath) {
+  return normalizePathname(capturedPath) === normalizePathname(currentPath)
+}
+
+function shouldMountAltTransitionClone(altTransition, currentPathname) {
+  if (!altTransition?.clone) return false
+
+  if (transitionPathsMatch(altTransition.pathname, currentPathname)) {
+    return true
+  }
+
+  // Fallback for work-detail transitions if pathname formatting differs slightly.
+  return WORK_SINGLE_PATH_RE.test(normalizePathname(currentPathname))
+    && altTransition.variant === 'work-card'
+}
+
+function hideCaseStudyThumbnailInRoot(root, sourceKey) {
+  if (!root || !sourceKey) return
+
+  const escapedKey = escapeAttributeValue(sourceKey)
+  const thumb = root.querySelector(`#${escapedKey} .client-work-img`)
+  if (!thumb) return
+
+  thumb.style.visibility = 'hidden'
+  thumb.style.opacity = '0'
+  thumb.style.pointerEvents = 'none'
 }
 
 function escapeAttributeValue(value) {
@@ -63,8 +99,28 @@ function mountFixedSectionClone({ clone, rect }, zIndex = '10000') {
   return clone
 }
 
+const CASE_STUDY_FULL_CLIP = 'inset(0% 0% 0% 0% round 10px)'
+
+function applyCaseStudyCloneEndState(clone) {
+  clone.querySelectorAll('.ratio').forEach((ratio) => {
+    gsap.set(ratio, { y: 0, clearProps: 'transform,clipPath' })
+    ratio.style.transform = 'none'
+    ratio.style.clipPath = CASE_STUDY_FULL_CLIP
+    ratio.style.webkitClipPath = CASE_STUDY_FULL_CLIP
+  })
+
+  clone.querySelectorAll('picture, img').forEach((node) => {
+    gsap.set(node, { clearProps: 'transform,clipPath' })
+    node.style.transform = 'none'
+    node.style.clipPath = 'none'
+    node.style.opacity = '1'
+    node.style.visibility = 'visible'
+    node.style.filter = 'none'
+  })
+}
+
 function normalizeCaseStudyCaptureTransforms(altSource) {
-  const nodes = Array.from(altSource.querySelectorAll('.ratio, .thumb-primary, .thumb-secondary'))
+  const nodes = Array.from(altSource.querySelectorAll('.ratio, .ratio picture, .ratio img, .thumb-primary, .thumb-secondary'))
   if (!nodes.length) return () => undefined
 
   const saved = nodes.map((node) => ({
@@ -72,7 +128,7 @@ function normalizeCaseStudyCaptureTransforms(altSource) {
     y: gsap.getProperty(node, 'y'),
     yPercent: gsap.getProperty(node, 'yPercent'),
     scale: gsap.getProperty(node, 'scale'),
-    clipPath: node.style.clipPath,
+    clipPath: node.style.clipPath || gsap.getProperty(node, 'clipPath') || '',
   }))
 
   gsap.set(nodes, { clearProps: 'transform,clipPath' })
@@ -596,6 +652,7 @@ export default function TransitionFrame({ children }) {
           const rect = captureTarget.getBoundingClientRect()
 
           if (rect.width > 0 && rect.height > 0) {
+            const isCaseStudy = Boolean(altSource.closest('.case-studies'))
             const forceHoverSnapshot = nav.link?.dataset?.transitionSnapshotState === 'hover'
             const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant
               ?? nav.link?.dataset?.transitionVariant
@@ -605,10 +662,8 @@ export default function TransitionFrame({ children }) {
               preferSecondaryImage: forceHoverSnapshot && variant === 'work-card',
             })
 
-            if (altSource.closest('.case-studies')) {
-              clone.querySelectorAll('img, .ratio').forEach((node) => {
-                node.style.transform = 'none'
-              })
+            if (isCaseStudy) {
+              applyCaseStudyCloneEndState(clone)
             }
 
             restoreCaseStudyTransforms()
@@ -628,7 +683,7 @@ export default function TransitionFrame({ children }) {
               : null
               
             altTransitionRef.current = {
-              pathname: nav.url.pathname,
+              pathname: normalizePathname(nav.url.pathname),
               variant,
               mediaKind: hasVideoSource ? 'video' : 'image',
               mediaSelector: forceHoverSnapshot && variant === 'work-card'
@@ -639,14 +694,16 @@ export default function TransitionFrame({ children }) {
               left: rect.left,
               width: rect.width,
               height: rect.height,
-              borderRadius: getComputedStyle(altSource).borderRadius,
+              borderRadius: getComputedStyle(captureTarget).borderRadius || getComputedStyle(altSource).borderRadius,
               clone,
               sourceAspectRatio,
+              isCaseStudy,
+              caseStudySourceKey,
             }
 
-            // For work-card: capture the parent work section so it can animate out
-            // independently while the snapshot is hidden.
-            if (variant === 'work-card') {
+            // Work-page cards hide the snapshot and use section clones instead.
+            // Case studies keep the snapshot visible (minus the expanding thumbnail).
+            if (variant === 'work-card' && !isCaseStudy) {
               const workSection = altSource.closest('.case-studies') || altSource.closest('section')
               if (workSection) {
                 const sRect = workSection.getBoundingClientRect()
@@ -857,8 +914,14 @@ export default function TransitionFrame({ children }) {
         })
         clone.appendChild(footerClone)
       }
+      if (caseStudySourceKey) {
+        hideCaseStudyThumbnailInRoot(clone, caseStudySourceKey)
+      }
+
       snapshotRef.current = clone
     }
+
+    window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
 
     const canCaptureFromEventTarget = (target) => Boolean(extractSameOriginLink(target))
 
@@ -886,21 +949,21 @@ export default function TransitionFrame({ children }) {
 
     document.addEventListener('pointerdown', handlePointerDown, { capture: true })
     document.addEventListener('click', handleClick, { capture: true })
-    window.addEventListener(PAGE_TRANSITION_CAPTURE_EVENT, capture)
-    window.addEventListener('popstate', capture)
+    const handleCaptureEvent = () => capture()
+    const handlePopState = () => capture()
+
+    window.addEventListener(PAGE_TRANSITION_CAPTURE_EVENT, handleCaptureEvent)
+    window.addEventListener('popstate', handlePopState)
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown, { capture: true })
       document.removeEventListener('click', handleClick, { capture: true })
-      window.removeEventListener(PAGE_TRANSITION_CAPTURE_EVENT, capture)
-      window.removeEventListener('popstate', capture)
+      window.removeEventListener(PAGE_TRANSITION_CAPTURE_EVENT, handleCaptureEvent)
+      window.removeEventListener('popstate', handlePopState)
     }
   }, [])
 
   // MAIN TRANSITION — synchronous before browser paint on every route change.
   useLayoutEffect(() => {
-    // Reset the capture guard so the next navigation can take a fresh snapshot.
-    hasCapturedRef.current = false
-
     const isFirst = isFirstMount.current
     if (isFirst) isFirstMount.current = false
 
@@ -910,9 +973,6 @@ export default function TransitionFrame({ children }) {
     const snapshot = snapshotRef.current
     const altTransition = altTransitionRef.current
     if (!el || (!snapshot && !altTransition)) return
-
-    snapshotRef.current = null
-    altTransitionRef.current = null
 
     // Child layout effects run before parent (React bottom-up order), so at
     // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
@@ -973,6 +1033,38 @@ export default function TransitionFrame({ children }) {
       height: '100%',
       transformOrigin: '50% 50%',
     })
+
+    let altClone = null
+    if (shouldMountAltTransitionClone(altTransition, location.pathname)) {
+      altClone = altTransition.clone
+      Object.assign(altClone.style, {
+        position: 'fixed',
+        top: `${altTransition.top}px`,
+        left: `${altTransition.left}px`,
+        width: `${altTransition.width}px`,
+        height: `${altTransition.height}px`,
+        borderRadius: altTransition.borderRadius,
+        margin: '0',
+        zIndex: '10001',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        display: 'block',
+      })
+      if (altTransition.isCaseStudy) {
+        applyCaseStudyCloneEndState(altClone)
+      }
+      gsap.set(altClone, { autoAlpha: 1, visibility: 'visible', clearProps: 'transform' })
+      document.body.appendChild(altClone)
+    }
+
+    const hideSnapshotForAltClone = Boolean(
+      altClone && (
+        isWorkNext
+        || isServiceDockTransition
+        || (isWorkCard && !altTransition?.isCaseStudy)
+      ),
+    )
+
     if (snapshot) {
       Object.assign(snapshot.style, {
         position: 'absolute',
@@ -989,10 +1081,9 @@ export default function TransitionFrame({ children }) {
         })
       }
 
-      // For variants that replace the outgoing page visual immediately,
-      // hide the snapshot so only the transitioning clone is visible.
-      // immediately — hide the outgoing snapshot to keep the transition clean.
-      if (isWorkNext || isWorkCard || isServiceDockTransition) {
+      // Only hide the snapshot when the alt clone is mounted — otherwise the
+      // outgoing page disappears with nothing to replace it.
+      if (hideSnapshotForAltClone) {
         snapshot.style.opacity = '0'
         snapshot.style.visibility = 'hidden'
       }
@@ -1001,24 +1092,6 @@ export default function TransitionFrame({ children }) {
     }
     wrapper.appendChild(content)
     document.body.appendChild(wrapper)
-
-    let altClone = null
-    if (altTransition?.pathname === location.pathname) {
-      altClone = altTransition.clone
-      Object.assign(altClone.style, {
-        position: 'fixed',
-        top: `${altTransition.top}px`,
-        left: `${altTransition.left}px`,
-        width: `${altTransition.width}px`,
-        height: `${altTransition.height}px`,
-        borderRadius: altTransition.borderRadius,
-        margin: '0',
-        zIndex: '10001',
-        overflow: 'hidden',
-        pointerEvents: 'none',
-      })
-      document.body.appendChild(altClone)
-    }
 
     // --- Compact-logo clone (icon-only logo state) ---
     // Animate the compact-logo out when it was the active logo at capture time.
@@ -1083,7 +1156,12 @@ export default function TransitionFrame({ children }) {
       gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
     }
 
+    let transitionFinished = false
+
     const done = () => {
+      if (transitionFinished) return
+      transitionFinished = true
+
       document.documentElement.classList.remove('page-transitioning')
 
       // Immediately pin the real header off-screen so it doesn't snap
@@ -1134,6 +1212,10 @@ export default function TransitionFrame({ children }) {
       if (realHeader) {
         gsap.to(realHeader, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out', clearProps: 'all' })
       }
+
+      snapshotRef.current = null
+      altTransitionRef.current = null
+      hasCapturedRef.current = false
     }
 
     let nextTitleEl = null
@@ -1142,7 +1224,7 @@ export default function TransitionFrame({ children }) {
     let prefixSectionEls = []
     let dockPollTimeoutId = 0
     let dockPollCancelled = false
-    const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
+    const tl = gsap.timeline({ onComplete: done })
 
     if (altClone) {
       // Scroll to 0 before reading dock coordinates. getBoundingClientRect() is
@@ -1161,7 +1243,9 @@ export default function TransitionFrame({ children }) {
       ) || (isMobile && (isWorkCard || isWorkNext))
 
       if (shouldFlattenCloneRatio) {
-        const clonePicture = altClone.querySelector('.ratio')
+        const clonePicture = altClone.matches?.('.ratio')
+          ? altClone
+          : altClone.querySelector('.ratio')
         if (clonePicture) {
           Object.assign(clonePicture.style, {
             position: 'absolute',
@@ -1277,6 +1361,16 @@ export default function TransitionFrame({ children }) {
         duration: expandDuration,
         ease: smoothEase,
       }, 0)
+
+      // Case studies keep the page snapshot visible; slide it out with the expand.
+      if (altTransition?.isCaseStudy && snapshot && !hideSnapshotForAltClone) {
+        tl.to(content, {
+          y: -72,
+          autoAlpha: 0,
+          duration: expandDuration * 0.7,
+          ease: 'power2.in',
+        }, 0)
+      }
 
       // For work-next: animate the captured 'Next Case Study' title clone upward
       // so it swipes off-screen with the transition rather than snapping away.
@@ -1514,6 +1608,8 @@ export default function TransitionFrame({ children }) {
     }
 
     return () => {
+      if (transitionFinished) return
+
       dockPollCancelled = true
       window.clearTimeout(dockPollTimeoutId)
       tl.kill()
@@ -1566,7 +1662,10 @@ export default function TransitionFrame({ children }) {
   // registered before the "fire immediately" effect that follows.
   useEffect(() => {
     let cleanup = null
-    const handler = () => { cleanup = createSurfaceColorTransitions(ref.current) }
+    const handler = () => {
+      if (location.pathname === '/') return
+      cleanup = createSurfaceColorTransitions(ref.current)
+    }
     window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler, { once: true })
     return () => {
       window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)
@@ -1576,7 +1675,10 @@ export default function TransitionFrame({ children }) {
 
   useEffect(() => {
     let cleanup = null
-    const handler = () => { cleanup = createSlideUpAnimations(ref.current) }
+    const handler = () => {
+      if (location.pathname === '/') return
+      cleanup = createSlideUpAnimations(ref.current)
+    }
     window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler, { once: true })
     return () => {
       window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, handler)

@@ -5,6 +5,7 @@ const SCROLL_HEIGHT_FIRST_CHANGE = window.innerHeight * 0.35
 const SCROLL_HEIGHT_PER_CLIENT = window.innerHeight * 0.85
 const WORK_MASK_RADIUS = '10px'
 const PAGE_TRANSITION_PREPARE_CAPTURE_EVENT = 'page-transition:prepare-capture'
+const PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT = 'page-transition:capture-complete'
 
 function createWorkMaskClip(topInset, bottomInset) {
   return `inset(${topInset} 0% ${bottomInset} 0% round ${WORK_MASK_RADIUS})`
@@ -41,6 +42,7 @@ export function createCaseStudiesScrollAnimation(scope) {
     if (!clientNames.length) return undefined
 
     let currentIndex = -1
+    let isCapturing = false
     let ro
 
     const syncHeightForIndex = (index) => {
@@ -130,6 +132,7 @@ export function createCaseStudiesScrollAnimation(scope) {
     })
 
     function setActiveClient(index, direction = 1) {
+      if (isCapturing) return
       if (index === currentIndex) return
 
       const previousIndex = currentIndex
@@ -259,17 +262,44 @@ export function createCaseStudiesScrollAnimation(scope) {
     }
 
     const onPrepareCapture = (event) => {
+      isCapturing = true
+      trigger.disable(false, false)
+
       const sourceKey = event?.detail?.caseStudySourceKey
         || clientNames[currentIndex]?.dataset?.client
       const targetWork = sourceKey
         ? (clientWorksById.get(sourceKey) || document.getElementById(sourceKey))
-        : clientWorks[currentIndex]
+        : clientWorks[currentIndex >= 0 ? currentIndex : 0]
+      const targetIndex = targetWork ? clientWorks.indexOf(targetWork) : currentIndex
       const fullyOpenClip = createWorkMaskClip('0%', '0%')
       const closedClip = createWorkMaskClip('87%', '0%')
 
+      if (targetIndex >= 0) {
+        currentIndex = targetIndex
+        syncHeightForIndex(targetIndex)
+      }
+
+      clientNames.forEach((name, index) => {
+        const detail = clientDetails[index]
+        const isActive = clientWorks[index] === targetWork
+
+        name.classList.toggle('active', isActive)
+
+        if (detail) {
+          gsap.killTweensOf(detail)
+          gsap.set(detail, isActive
+            ? { height: 'auto', opacity: 1, overflow: 'hidden' }
+            : { height: 0, opacity: 0, overflow: 'hidden' },
+          )
+        }
+      })
+
       clientWorks.forEach((work) => {
         const mediaFrame = work.querySelector('.client-work-img .ratio')
-        const targets = [work, mediaFrame].filter(Boolean)
+        const mediaNodes = mediaFrame
+          ? [mediaFrame, ...Array.from(mediaFrame.querySelectorAll('picture, img'))]
+          : []
+        const targets = [work, ...mediaNodes].filter(Boolean)
         const isTarget = targetWork ? work === targetWork : false
 
         gsap.killTweensOf(targets)
@@ -277,7 +307,7 @@ export function createCaseStudiesScrollAnimation(scope) {
         if (isTarget) {
           gsap.set(work, { opacity: 1, zIndex: 2 })
           if (mediaFrame) {
-            gsap.set(mediaFrame, { clearProps: 'transform' })
+            gsap.set(mediaFrame, { clearProps: 'transform,clipPath,y' })
             gsap.set(mediaFrame, {
               y: 0,
               clipPath: fullyOpenClip,
@@ -298,7 +328,13 @@ export function createCaseStudiesScrollAnimation(scope) {
       })
     }
 
+    const onCaptureComplete = () => {
+      isCapturing = false
+      trigger.enable(false, false)
+    }
+
     window.addEventListener(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, onPrepareCapture)
+    window.addEventListener(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT, onCaptureComplete)
 
     const trigger = ScrollTrigger.create({
       trigger: section,
@@ -324,6 +360,7 @@ export function createCaseStudiesScrollAnimation(scope) {
 
     return () => {
       window.removeEventListener(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, onPrepareCapture)
+      window.removeEventListener(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT, onCaptureComplete)
       trigger.kill(true)
       gsap.set(section, { clearProps: 'transform,top,left,width,maxWidth,maxHeight,padding,margin' })
       section.classList.remove('case-studies--unpinned')

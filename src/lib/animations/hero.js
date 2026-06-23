@@ -626,12 +626,17 @@ export function createHeroScrollAnimation(scope) {
       })
     }
 
+    let initAttempts = 0
+    const MAX_INIT_ATTEMPTS = 120
+
     function initialise() {
       if (isDisposed) {
         return
       }
 
       if (!isMeasurableMedia(heroImage)) {
+        initAttempts += 1
+        if (initAttempts >= MAX_INIT_ATTEMPTS) return
         requestAnimationFrame(initialise)
         return
       }
@@ -667,6 +672,8 @@ export function createHeroScrollAnimation(scope) {
     return () => {
       isDisposed = true
       window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, refreshTrigger)
+      heroImage.removeEventListener('loadedmetadata', initialise)
+      heroImage.removeEventListener('load', initialise)
       timeline?.kill()
       changeLogoWatcher?.kill()
       sectionThemeWatcher?.kill()

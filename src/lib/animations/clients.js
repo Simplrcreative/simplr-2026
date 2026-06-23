@@ -153,11 +153,24 @@ export function createClientsScrollAnimation(scope) {
           },
           ease: 'none',
           repeat: -1,
-          paused: false,
+          paused: true,
           repeatRefresh: true,
           immediateRender: false,
           onUpdate: applyTransforms
         })
+
+        const visibilityObserver = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              tickerTween.play()
+            } else {
+              tickerTween.pause()
+            }
+          },
+          { threshold: 0 },
+        )
+
+        visibilityObserver.observe(section)
 
         const handleRefreshInit = () => {
           tickerTween.pause(0)
@@ -169,6 +182,7 @@ export function createClientsScrollAnimation(scope) {
         ScrollTrigger.addEventListener('refreshInit', handleRefreshInit)
 
         return () => {
+          visibilityObserver.disconnect()
           ScrollTrigger.removeEventListener('refreshInit', handleRefreshInit)
           tickerTween?.kill()
           delete logos.dataset.tickerReady
