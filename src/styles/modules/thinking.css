@@ -11,7 +11,13 @@
 .thinking-post-card {
   min-width: 0;
 }
-
+.thinking-post-card .ratio {
+  transition: padding-top 0.6s ease-out;
+}
+.thinking-post-card:hover .ratio {
+  padding-top: 50%!important;
+  transition: padding-top 0.3s ease-in;
+}
 .thinking-post-link {
   display: flex;
   flex-direction: column;
@@ -38,6 +44,18 @@
   line-height: 1.55;
   font-weight: 500;
   color: var(--color-coffee);
+  text-decoration-line: underline;
+  text-decoration-color: transparent; /* underline exists, just invisible */
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-decoration-skip-ink: auto;
+  transition:
+    opacity 0.3s ease,
+    text-decoration-color 0.3s ease
+  }
+
+.thinking-post-card:hover .thinking-post__title {
+  text-decoration-color: currentColor;
 }
 
 @media (max-width: 1024px) {
@@ -55,6 +73,11 @@
 
   .thinking-post__image-frame {
     height: clamp(13.75rem, 56vw, 25rem);
+  }
+}
+@media (min-width: 768px) {
+  .thinking-post-card:hover .ratio {
+    padding-top: 122%!important;
   }
 }
 
