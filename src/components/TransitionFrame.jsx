@@ -28,6 +28,41 @@ function escapeAttributeValue(value) {
   return value.replace(/(["\\])/g, '\\$1')
 }
 
+function captureFixedSectionClones(container, selectors) {
+  if (!container) return []
+
+  return selectors.flatMap((selector) => {
+    const section = container.querySelector(selector)
+    if (!section) return []
+
+    const rect = section.getBoundingClientRect()
+    return [{
+      clone: section.cloneNode(true),
+      rect: {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+      },
+    }]
+  })
+}
+
+function mountFixedSectionClone({ clone, rect }, zIndex = '10000') {
+  Object.assign(clone.style, {
+    position: 'fixed',
+    top: `${rect.top}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    pointerEvents: 'none',
+    zIndex,
+    margin: '0',
+  })
+  document.body.appendChild(clone)
+  return clone
+}
+
 function normalizeCaseStudyCaptureTransforms(altSource) {
   const nodes = Array.from(altSource.querySelectorAll('.ratio, .thumb-primary, .thumb-secondary'))
   if (!nodes.length) return () => undefined
@@ -622,6 +657,11 @@ export default function TransitionFrame({ children }) {
                   width: sRect.width,
                 }
               }
+
+              altTransitionRef.current.prefixSectionClones = captureFixedSectionClones(
+                ref.current,
+                ['.page-hero', '.work-filter'],
+              )
             }
 
             // For service-card: capture the service card container so it can
@@ -1064,6 +1104,7 @@ export default function TransitionFrame({ children }) {
       nextTitleEl?.remove()
       workSectionEl?.remove()
       serviceCardEl?.remove()
+      prefixSectionEls.forEach((el) => el.remove())
       wrapper.remove()
       document.documentElement.style.overflowX = ''
 
@@ -1098,6 +1139,7 @@ export default function TransitionFrame({ children }) {
     let nextTitleEl = null
     let workSectionEl = null
     let serviceCardEl = null
+    let prefixSectionEls = []
     let dockPollTimeoutId = 0
     let dockPollCancelled = false
     const tl = gsap.timeline({ onComplete: done, onInterrupt: done })
@@ -1265,6 +1307,19 @@ export default function TransitionFrame({ children }) {
 
       // For work-card: animate the captured work section clone upward so the
       // grid of cards exits smoothly rather than snapping away instantly.
+      if (isWorkCard && altTransition.prefixSectionClones?.length) {
+        prefixSectionEls = altTransition.prefixSectionClones.map((entry) => {
+          const el = mountFixedSectionClone(entry)
+          tl.to(el, {
+            y: -80,
+            autoAlpha: 0,
+            duration: expandDuration * 0.6,
+            ease: 'power2.in',
+          }, 0)
+          return el
+        })
+      }
+
       if (isWorkCard && altTransition.workSectionClone) {
         workSectionEl = altTransition.workSectionClone
         const sRect = altTransition.workSectionRect
@@ -1486,6 +1541,10 @@ export default function TransitionFrame({ children }) {
         gsap.killTweensOf(workSectionEl)
         workSectionEl.remove()
       }
+      prefixSectionEls.forEach((el) => {
+        gsap.killTweensOf(el)
+        el.remove()
+      })
       if (serviceCardEl) {
         gsap.killTweensOf(serviceCardEl)
         serviceCardEl.remove()
