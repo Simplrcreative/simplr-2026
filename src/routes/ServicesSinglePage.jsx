@@ -4,7 +4,7 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation, scrollToTopImmediate } from '../lib/animations/index.js'
 import { buildServiceSingleSeo } from '../lib/page-seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -14,29 +14,28 @@ import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
 gsap.registerPlugin(ScrollTrigger)
 
 function initBottomMenu() {
-  
-  const tl = gsap.timeline();
+  const menu = document.querySelector('.bottom-menu')
+  const trigger = document.querySelector('.bottom-menu-trigger')
+  if (!menu || !trigger) return null
 
-  gsap.set('.bottom-menu', {
-    y: 50,
-    opacity: 0
-  })
+  gsap.set(menu, { y: 50, opacity: 0 })
 
-  tl.to('.bottom-menu',{
+  const tl = gsap.timeline()
+  tl.to(menu, {
     y: 0,
     opacity: 1,
     duration: 0.75,
-    ease: 'power4.inOut'
+    ease: 'power4.inOut',
   })
 
-  ScrollTrigger.create({
-    trigger: ".bottom-menu-trigger",
-    start: "top 100%",
-    paused: true,
-    //markers: true,
-    animation: tl, 
-    toggleActions: "play reverse play reverse" 
+  const scrollTrigger = ScrollTrigger.create({
+    trigger,
+    start: 'top 100%',
+    animation: tl,
+    toggleActions: 'play reverse play reverse',
   })
+
+  return { menu, scrollTrigger }
 }
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
@@ -74,8 +73,28 @@ function ServiceLabelIcon({ color }) {
   )
 }
 
+function killBottomMenuScrollTrigger() {
+  ScrollTrigger.getAll().forEach((instance) => {
+    if (instance.trigger?.matches?.('.bottom-menu-trigger')) {
+      instance.kill()
+    }
+  })
+}
+
+function setupBottomMenuScrollTrigger() {
+  killBottomMenuScrollTrigger()
+
+  const menu = document.querySelector('.bottom-menu')
+  if (menu) {
+    gsap.killTweensOf(menu)
+  }
+
+  return initBottomMenu()
+}
+
 export default function ServicesSinglePage() {
   const pageRef = useRef(null)
+  const bottomMenuRef = useRef(null)
   const { slug, page } = useLoaderData() ?? {}
   const service = page?.acfServiceBuilder ?? null
   const { acfHeading, acfSections } = service ?? {}
@@ -139,7 +158,34 @@ export default function ServicesSinglePage() {
   }, [acfSections])
 
   useEffect(() => {
-    initBottomMenu()
+    bottomMenuRef.current = setupBottomMenuScrollTrigger()
+
+    const syncBottomMenuAfterTransition = (event) => {
+      if (!event.detail?.fromBottomMenuNav) return
+
+      scrollToTopImmediate()
+
+      requestAnimationFrame(() => {
+        const menu = document.querySelector('.bottom-menu')
+        if (menu) {
+          gsap.killTweensOf(menu)
+          gsap.set(menu, { clearProps: 'all' })
+          gsap.set(menu, { y: 50, opacity: 0, visibility: 'visible' })
+        }
+
+        bottomMenuRef.current = setupBottomMenuScrollTrigger()
+        ScrollTrigger.refresh()
+      })
+    }
+
+    window.addEventListener('page-transition:complete', syncBottomMenuAfterTransition)
+
+    return () => {
+      window.removeEventListener('page-transition:complete', syncBottomMenuAfterTransition)
+      bottomMenuRef.current?.scrollTrigger?.kill()
+      const menu = document.querySelector('.bottom-menu')
+      if (menu) gsap.killTweensOf(menu)
+    }
   }, [])
 
   function isAccordionOpen(sectionIndex, accordionIndex) {

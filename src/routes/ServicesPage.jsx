@@ -157,8 +157,8 @@ function ServiceCard({ service }) {
                           >
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
-                              <span className="btn-text text-coffee">Explore <span className="hidden md:inline">{acfService}</span></span>
-                              Explore <span className="hidden md:inline">{acfService}</span>
+                              <span className="btn-text text-coffee">Explore <span className="hidden md:inline-block ps-1">{acfService}</span></span>
+                              Explore <span className="hidden md:inline ps-1"> {acfService}</span>
                           </span>
                       </Link>
                   </div>

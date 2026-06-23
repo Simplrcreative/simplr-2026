@@ -6,18 +6,30 @@ export default function NotFoundPage() {
   const status = isRouteErrorResponse(error) ? error.status : 404
 
   return (
-    <section className="shell pt-20">
+    <>
       <Seo title="Not found" pathname="/404" robots="noindex,nofollow" />
-      <div className="surface-card px-6 py-10 md:px-10 md:py-14">
-        <p className="eyebrow">{status}</p>
-        <h1 className="section-title mt-4">This content is not available.</h1>
-        <p className="body-copy mt-6 max-w-2xl">
-          The page may not exist yet in WordPress, or the route definition does not match the expected URI structure.
-        </p>
-        <Link className="mt-8 inline-flex rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-sand-50" to="/work">
-          Go to Work
-        </Link>
-      </div>
-    </section>
+      <section className="px-5 py-20 bg-white section-light">
+        <div className="grid grid-cols-12 w-full">
+          <div className="col-start-1  col-span-12 text-coffee mt-40">
+              <div className="eyebrow">{status}</div>
+              <h1 className="section-title mt-4">Yikes! That's not great</h1>
+              <p className="body-copy my-10">
+                The page may not exist, may have been moved or deleted. Let's get you back on track.
+              </p>
+              <div className="flex gap-4">
+              <Link className="inline-flex rounded-full bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/work/">
+                View our work
+              </Link>
+              <Link className="inline-flex rounded-full bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/services/">
+                View our services
+              </Link>
+              <Link className="inline-flex rounded-full bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/contact/">
+                Get in touch
+              </Link>
+              </div>
+          </div>
+        </div>
+      </section>
+    </>
   )
 }

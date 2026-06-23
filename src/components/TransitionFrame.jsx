@@ -138,6 +138,43 @@ function mountFixedSectionClone({ clone, rect }, zIndex = '10000') {
   return clone
 }
 
+function captureBottomMenuClone(liveBottomMenu) {
+  const rect = liveBottomMenu.getBoundingClientRect()
+  if (rect.width <= 0 || rect.height <= 0) return null
+
+  const computed = getComputedStyle(liveBottomMenu)
+  const clone = liveBottomMenu.cloneNode(true)
+
+  clone.classList.remove('hidden')
+  clone.dataset.frozenClone = 'true'
+
+  Object.assign(clone.style, {
+    position: 'fixed',
+    top: `${rect.top}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+    height: `${rect.height}px`,
+    margin: '0',
+    pointerEvents: 'none',
+    zIndex: '10001',
+    visibility: 'visible',
+    display: computed.display === 'none' ? 'block' : computed.display,
+    transform: 'none',
+  })
+
+  gsap.set(clone, { y: 0, opacity: 1, clearProps: 'transform' })
+
+  return clone
+}
+
+function killBottomMenuScrollTrigger() {
+  ScrollTrigger.getAll().forEach((instance) => {
+    if (instance.trigger?.matches?.('.bottom-menu-trigger')) {
+      instance.kill()
+    }
+  })
+}
+
 const CASE_STUDY_FULL_CLIP = 'inset(0% 0% 0% 0% round 10px)'
 
 function applyCaseStudyCloneEndState(clone) {
@@ -452,6 +489,8 @@ export default function TransitionFrame({ children }) {
   const altTransitionRef = useRef(null)
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
+  const bottomMenuSnapshotRef = useRef(null)
+  const bottomMenuNavCaptureRef = useRef(false)
   const capturedScrollYRef = useRef(0)
   const capturedScrollHeightRef = useRef(0)
   const hasCapturedRef = useRef(false)
@@ -657,6 +696,7 @@ export default function TransitionFrame({ children }) {
       capturedPathRef.current = window.location.pathname || null
 
       altTransitionRef.current = null
+      bottomMenuNavCaptureRef.current = false
 
       let caseStudySourceKey = null
 
@@ -839,7 +879,23 @@ export default function TransitionFrame({ children }) {
         compactLogoSnapshotRef.current = null
       }
 
+      bottomMenuSnapshotRef.current = null
+      const navForBottomMenu = target ? extractSameOriginLink(target) : null
+      if (navForBottomMenu?.link?.closest?.('.bottom-menu')) {
+        bottomMenuNavCaptureRef.current = true
+        killBottomMenuScrollTrigger()
+        const liveBottomMenu = document.querySelector('.bottom-menu')
+        if (liveBottomMenu) {
+          gsap.killTweensOf(liveBottomMenu)
+          bottomMenuSnapshotRef.current = captureBottomMenuClone(liveBottomMenu)
+        }
+      }
+
       const clone = ref.current.cloneNode(true)
+
+      clone.querySelectorAll('.bottom-menu').forEach((menu) => {
+        menu.style.visibility = 'hidden'
+      })
 
       Array.from(clone.querySelectorAll('video')).forEach((video) => {
         video.muted = true
@@ -1180,6 +1236,16 @@ export default function TransitionFrame({ children }) {
       })
     }
 
+    const bottomMenuClone = bottomMenuSnapshotRef.current
+    bottomMenuSnapshotRef.current = null
+    if (bottomMenuClone) {
+      document.body.appendChild(bottomMenuClone)
+      const liveBottomMenu = document.querySelector('.bottom-menu:not([data-frozen-clone])')
+      if (liveBottomMenu) {
+        gsap.set(liveBottomMenu, { opacity: 0, pointerEvents: 'none' })
+      }
+    }
+
     const isHomePage = location.pathname === '/'
 
     // Signal an in-progress route handoff so RootLayout can defer incoming
@@ -1244,10 +1310,19 @@ export default function TransitionFrame({ children }) {
         logoHolder?.classList.remove('light')
       }
 
+      const fromBottomMenuNav = bottomMenuNavCaptureRef.current
+      bottomMenuNavCaptureRef.current = false
+
+      if (fromBottomMenuNav) {
+        scrollToTopImmediate()
+      }
+
       // Recalculate all scroll-trigger positions now that the transition is
       // complete and elements are in their final layout positions.
       requestAnimationFrame(() => ScrollTrigger.refresh())
-      window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT))
+      window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_COMPLETE_EVENT, {
+        detail: { fromBottomMenuNav },
+      }))
 
       // Slide the incoming header in from above.
       if (realHeader) {
@@ -1266,6 +1341,16 @@ export default function TransitionFrame({ children }) {
     let dockPollTimeoutId = 0
     let dockPollCancelled = false
     const tl = gsap.timeline({ onComplete: done })
+
+    if (bottomMenuClone) {
+      tl.to(bottomMenuClone, {
+        y: 50,
+        autoAlpha: 0,
+        duration: 0.75,
+        ease: 'power4.inOut',
+        onComplete: () => bottomMenuClone.remove(),
+      }, 0)
+    }
 
     if (altClone) {
       // Scroll to 0 before reading dock coordinates. getBoundingClientRect() is
@@ -1669,6 +1754,10 @@ export default function TransitionFrame({ children }) {
       if (headerClone) {
         gsap.killTweensOf(headerClone)
         headerClone.remove()
+      }
+      if (bottomMenuClone) {
+        gsap.killTweensOf(bottomMenuClone)
+        bottomMenuClone.remove()
       }
       if (nextTitleEl) {
         gsap.killTweensOf(nextTitleEl)

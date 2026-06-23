@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Outlet } from 'react-router-dom'
 import HomePage from '../routes/HomePage.jsx'
 import WorkPage from '../routes/WorkPage.jsx'
 import WorkSinglePage from '../routes/WorkSinglePage.jsx'
@@ -35,91 +35,97 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     loader: createRootLoader(),
     hydrateFallbackElement: <div className="shell py-10" />,
-    errorElement: <NotFoundPage />,
     children: [
       {
-        index: true,
-        element: <HomePage />,
-        loader: createHomeLoader(),
+        element: <Outlet />,
+        errorElement: <NotFoundPage />,
         handle: { pageBg: 'light' },
-      },
-      {
-        path: 'work/',
-        element: <WorkPage />,
-        loader: createWorkLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'work/:slug/',
-        element: <WorkSinglePage />,
-        loader: createWorkSingleLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'about/',
-        element: <AboutPage />,
-        loader: createAboutLoader(),
-        handle: { pageBg: 'dark' },
-      },
-      {
-        path: 'services/',
-        element: <ServicesPage />,
-        loader: createServicesLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'services/:slug/',
-        element: <ServicesSinglePage />,
-        loader: createServicesSinglePageLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'thinking/',
-        element: <ThinkingPage />,
-        loader: createThinkingPageLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'thinking/:filterSlug/',
-        element: <ThinkingPage />,
-        loader: createThinkingPageLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'thinking/:topic/:slug/',
-        element: <ThinkingSinglePage />,
-        loader: createThinkingSinglePageLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'contact/',
-        element: <ContactPage />,
-        loader: createContactPageLoader(),
-        handle: { pageBg: 'dark' },
-      },
-      {
-        path: 'est-2014/',
-        element: <Est2014PageInfinite />,
-        loader: createEst2014PageLoader(),
-        handle: { pageBg: 'light', hideFooter: true },
-      },
-      {
-        path: 'privacy-policy/',
-        element: <DefaultPage />,
-        loader: createDefaultPageLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: 'site-map/',
-        element: <DefaultPage />,
-        loader: createDefaultPageLoader(),
-        handle: { pageBg: 'light' },
-      },
-      {
-        path: '*',
-        element: <LandingPage />,
-        loader: createLandingPageLoader(),
-        handle: { pageBg: 'light' },
+        children: [
+          {
+            index: true,
+            element: <HomePage />,
+            loader: createHomeLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'work/',
+            element: <WorkPage />,
+            loader: createWorkLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'work/:slug/',
+            element: <WorkSinglePage />,
+            loader: createWorkSingleLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'about/',
+            element: <AboutPage />,
+            loader: createAboutLoader(),
+            handle: { pageBg: 'dark' },
+          },
+          {
+            path: 'services/',
+            element: <ServicesPage />,
+            loader: createServicesLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'services/:slug/',
+            element: <ServicesSinglePage />,
+            loader: createServicesSinglePageLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'thinking/',
+            element: <ThinkingPage />,
+            loader: createThinkingPageLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'thinking/:filterSlug/',
+            element: <ThinkingPage />,
+            loader: createThinkingPageLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'thinking/:topic/:slug/',
+            element: <ThinkingSinglePage />,
+            loader: createThinkingSinglePageLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'contact/',
+            element: <ContactPage />,
+            loader: createContactPageLoader(),
+            handle: { pageBg: 'dark' },
+          },
+          {
+            path: 'est-2014/',
+            element: <Est2014PageInfinite />,
+            loader: createEst2014PageLoader(),
+            handle: { pageBg: 'light', hideFooter: true },
+          },
+          {
+            path: 'privacy-policy/',
+            element: <DefaultPage />,
+            loader: createDefaultPageLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: 'site-map/',
+            element: <DefaultPage />,
+            loader: createDefaultPageLoader(),
+            handle: { pageBg: 'light' },
+          },
+          {
+            path: '*',
+            element: <LandingPage />,
+            loader: createLandingPageLoader(),
+            handle: { pageBg: 'light' },
+          },
+        ],
       },
     ],
   },
