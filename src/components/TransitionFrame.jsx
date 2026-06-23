@@ -1338,9 +1338,9 @@ export default function TransitionFrame({ children }) {
       const hasTargetAtStart = Boolean(dock)
       const isVideoTransition = altTransition?.mediaKind === 'video'
       const smoothEase = 'power3.inOut'
-      const expandDuration = 1
+      const expandDuration = 0.75
       const pauseDuration = 0
-      const dockDuration = 1.5
+      const dockDuration = 1.25
       const dockStart = expandDuration + pauseDuration
       const width = window.innerWidth * 1.1
       // Mobile (< md): height-driven expansion so the clone fills the viewport height.

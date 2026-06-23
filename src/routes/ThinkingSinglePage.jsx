@@ -193,7 +193,7 @@ export default function ThinkingSinglePage() {
                     <img
                         src={profileImage}
                         alt={author || 'Author profile image'}
-                        className="w-[5.625rem] h-[5.625rem] rounded-full object-cover"
+                        className="w-[4.25rem] h-[4.25rem] rounded-full object-cover"
                         loading="lazy"
                       />
                   ) : null}

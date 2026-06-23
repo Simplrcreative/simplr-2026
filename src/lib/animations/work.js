@@ -41,7 +41,8 @@ export function createNextWorkAnimation() {
     const vw = window.innerWidth
     const pinDuration = window.innerHeight
     const startX = (vw + titleWidth) / 3
-    const endX = -startX
+    //const endX = -startX
+    const endX = '-15%'
 
     if (tween) { tween.kill(); tween = null }
     if (st) { st.kill(); st = null }
