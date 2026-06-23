@@ -762,6 +762,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       data-transition-source-key={study.slug}
                       data-transition-variant="work-card"
                       onMouseEnter={() => prefetchWorkEntry(study.slug)}
+                      title={study.detail}
                     >
                       {study.client}
                       <div className="client-detail font-literata text-3xl lg:text-5xl font-light pb-3">
@@ -785,6 +786,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       data-transition-source-key={study.slug}
                       data-transition-variant="work-card"
                       onMouseEnter={() => prefetchWorkEntry(study.slug)}
+                      title={study.detail}
                     >
                       <div
                         className="ratio overflow-hidden test"
@@ -795,7 +797,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                           mobileSrc={study.secondaryThumbnail + '.webp'}
                           desktopSrc={study.secondaryThumbnail + '.webp'}
                           imgClass="rounded-[10px]"
-                          altText=""
+                          altText={study.detail}
                         />
                       </div>
                     </Link>
@@ -828,6 +830,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   data-transition-source="media"
                   data-transition-variant="work-card"
                   data-transition-snapshot-state="hover"
+                  title={linkedCaseStudyClient + ' Testimonial'}
                 >
                   {/*
                   <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
@@ -840,14 +843,14 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       mobileSrc = {linkedCaseStudyImage + '.webp'}
                       desktopSrc = {linkedCaseStudyImage + '.webp'}
                       imgClass = 'thumb-primary rounded-[10px]'
-                      altText = ''
+                      altText = {linkedCaseStudyClient + 'Testimonial 1'}
                     />
                     <PictureImg
                       loaderSrc = {linkedCaseStudyLoaderImg + '.webp'}
                       mobileSrc = {linkedCaseStudyImage + '.webp'}
                       desktopSrc = {linkedCaseStudyImage + '.webp'}
                       imgClass = 'thumb-secondary rounded-[10px]'
-                      altText = ''
+                      altText = {linkedCaseStudyClient + ' Testimonial 2'}
                     />
                   </div>
                 </Link>
