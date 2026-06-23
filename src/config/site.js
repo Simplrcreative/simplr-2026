@@ -10,6 +10,7 @@ export const siteConfig = {
   locale: 'en_GB',
   foundingDate: '2014-01-01',
   defaultSocialImage: '/social-card.svg',
+  allowIndexing: import.meta.env.VITE_ALLOW_INDEXING === 'true',
   social: {
     instagram: 'https://www.instagram.com/',
     linkedin: 'https://www.linkedin.com/',

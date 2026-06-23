@@ -1,6 +1,14 @@
 import { siteConfig } from '../config/site.js'
 import { stripHtml } from './wp-api.js'
 
+export const ROBOTS_INDEX =
+  'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
+export const ROBOTS_NOINDEX = 'noindex,nofollow'
+
+export function getDefaultRobots() {
+  return siteConfig.allowIndexing ? ROBOTS_INDEX : ROBOTS_NOINDEX
+}
+
 export function absoluteUrl(pathname = '/') {
   return new URL(pathname, siteConfig.siteUrl).toString()
 }

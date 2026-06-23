@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import { siteConfig } from '../config/site.js'
 import {
   absoluteUrl,
+  getDefaultRobots,
   normaliseDescription,
   organizationSchema,
   websiteSchema,
@@ -18,7 +19,7 @@ export default function Seo({
   image,
   type = 'website',
   schema = [],
-  robots = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1',
+  robots = getDefaultRobots(),
 }) {
   const fullTitle = toFullTitle(title)
   const canonical = absoluteUrl(pathname)

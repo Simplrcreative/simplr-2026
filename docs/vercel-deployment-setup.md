@@ -14,6 +14,9 @@ Go to your Vercel project → **Settings → Environment Variables**.
 | Variable | Value | Scope |
 |---|---|---|
 | `VITE_SITE_URL` | `https://simplr.co.za` | Production |
+| `VITE_ALLOW_INDEXING` | `false` until launch, then `true` | Production |
+
+While testing, leave `VITE_ALLOW_INDEXING` unset or set to `false`. That emits `noindex,nofollow` on every page and writes `Disallow: /` in `robots.txt`.
 
 ### Preview / Staging
 

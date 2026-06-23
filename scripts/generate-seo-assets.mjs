@@ -236,7 +236,11 @@ function buildSitemap(siteUrl, routes) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urlEntries}</urlset>`
 }
 
-function buildRobots(siteUrl) {
+function buildRobots(siteUrl, allowIndexing) {
+  if (!allowIndexing) {
+    return 'User-agent: *\nDisallow: /\n'
+  }
+
   return `User-agent: *\nAllow: /\n\nSitemap: ${new URL('/sitemap.xml', siteUrl).toString()}\n`
 }
 
@@ -251,12 +255,13 @@ function buildLlmsFull(siteUrl) {
 async function main() {
   const env = await loadEnv()
   const siteUrl = env.VITE_SITE_URL || 'https://simplr.co.za'
+  const allowIndexing = env.VITE_ALLOW_INDEXING === 'true'
   const dynamicRoutes = await getDynamicRoutes(env)
   const allRoutes = uniqueRoutes([...staticRoutes, ...dynamicRoutes])
 
   await fs.mkdir(publicDir, { recursive: true })
   await fs.writeFile(path.join(publicDir, 'sitemap.xml'), buildSitemap(siteUrl, allRoutes), 'utf8')
-  await fs.writeFile(path.join(publicDir, 'robots.txt'), buildRobots(siteUrl), 'utf8')
+  await fs.writeFile(path.join(publicDir, 'robots.txt'), buildRobots(siteUrl, allowIndexing), 'utf8')
   await fs.writeFile(path.join(publicDir, 'llms.txt'), buildLlms(siteUrl), 'utf8')
   await fs.writeFile(path.join(publicDir, 'llms-full.txt'), buildLlmsFull(siteUrl), 'utf8')
 }
