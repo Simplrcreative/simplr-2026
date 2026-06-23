@@ -9,6 +9,7 @@ import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import PictureImg from '../components/PictureImg.jsx'
+import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -82,7 +83,7 @@ export default function ServicesSinglePage() {
   const featuredVideo = page?.acfServiceBuilder?.acfFeaturedVideo?.node?.guid || ''
   const featuredImage = page?.acfServiceBuilder?.acfFeaturedImage?.node?.guid || ''
   const accentColor = getServiceColor(service?.acfService || title || slug)
-  const pathname = `/services/${slug}`
+  const pathname = buildEntryPath('services', slug)
   const description = acfHeading || ''
   const [openAccordions, setOpenAccordions] = useState({})
   const testimonial = service?.acfTestimonial?.nodes?.[0] || ''
@@ -182,7 +183,7 @@ export default function ServicesSinglePage() {
           }),
           breadcrumbSchema([
             { name: 'Home', path: '/' },
-            { name: 'Services', path: '/services' },
+            { name: 'Services', path: buildCollectionPath('services') },
             { name: title, path: pathname },
           ]),
         ]}
@@ -190,32 +191,32 @@ export default function ServicesSinglePage() {
 
       <div className="bottom-menu hidden md:block fixed z-10 right-5 bottom-5">
         <Link
-          to='/services/strategy'
-          className={`category border leading-none font-medium rounded-full ${pathname === '/services/strategy' ? 'border-strategy bg-strategy text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          to={buildEntryPath('services', 'strategy')}
+          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'strategy') ? 'border-strategy bg-strategy text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Strategy
         </Link>
         <Link
-          to='/services/branding-design'
-          className={`category border leading-none font-medium rounded-full ${pathname === '/services/branding-design' ? 'border-branding-design bg-branding-design text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          to={buildEntryPath('services', 'branding-design')}
+          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'branding-design') ? 'border-branding-design bg-branding-design text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Branding & Design
         </Link>
         <Link
-          to='/services/web-design-development'
-          className={`category border leading-none font-medium rounded-full ${pathname === '/services/web-design-development' ? 'border-web-design-development bg-web-design-development text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          to={buildEntryPath('services', 'web-design-development')}
+          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'web-design-development') ? 'border-web-design-development bg-web-design-development text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Web Design & Development
         </Link>
         <Link
-          to='/services/motion'
-          className={`category border leading-none font-medium rounded-full ${pathname === '/services/motion' ? 'border-motion bg-motion text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          to={buildEntryPath('services', 'motion')}
+          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'motion') ? 'border-motion bg-motion text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Motion
         </Link>
         <Link
-          to='/services/templates'
-          className={`category border leading-none font-medium rounded-full ${pathname === '/services/templates' ? 'border-templates bg-templates text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          to={buildEntryPath('services', 'templates')}
+          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'templates') ? 'border-templates bg-templates text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Templates
         </Link>
@@ -350,7 +351,7 @@ export default function ServicesSinglePage() {
                 {caseStudy && (
                 <div className="client-work">
                   <Link
-                    to={`/work/${caseStudySlug}`}
+                    to={buildEntryPath('work', caseStudySlug)}
                     className="alt-transition-img thumb-swap-trigger"
                     data-card-key=''
                     data-transition-source="media"

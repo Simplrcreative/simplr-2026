@@ -6,14 +6,12 @@ import { fetchHomeData, fetchPeopleData, fetchServicesData, fetchWorksData } fro
 // Map route paths to their prefetch functions
 const prefetchMap = {
   '/': fetchHomeData,
-  '/work': fetchWorksData,
-  '/about': fetchPeopleData,
-  '/services': fetchServicesData,
-  // For dynamic routes, you can extend this to accept params
-  // '/services/:slug': (slug) => fetchServicesSinglePageData(slug),
-  '/thinking': () => {}, // Add as needed
-  '/contact': () => {}, // Add as needed
-  '/est-2014': () => {}, // Add as needed
+  '/work/': fetchWorksData,
+  '/about/': fetchPeopleData,
+  '/services/': fetchServicesData,
+  '/thinking/': () => {},
+  '/contact/': () => {},
+  '/est-2014/': () => {},
 }
 
 export function useRoutePrefetch(path) {

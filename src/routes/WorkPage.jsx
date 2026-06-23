@@ -7,7 +7,8 @@ import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
-import { fetchTestimonialData, fetchWorksData } from '../lib/wp-api.js'
+import { buildEntryPath, fetchTestimonialData, fetchWorksData } from '../lib/wp-api.js'
+import { routeDefinitions } from '../config/site.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -179,7 +180,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   return (
     <div className="work-card mb-5 md:mb-0">
     <Link 
-      to={`/work/${work.slug}`} 
+      to={buildEntryPath('work', work.slug)} 
       className="block alt-transition-img thumb-swap-trigger" 
       data-card-key={cardKey} 
       data-transition-source="media"
@@ -244,7 +245,7 @@ function WorkFeatured({ work, cardKey }) {
 
   return (
     <Link
-      to={`/work/${work.slug}`}
+      to={buildEntryPath('work', work.slug)}
       className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img thumb-swap-trigger"
       data-card-key={cardKey}
       data-transition-source="media"
@@ -327,7 +328,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
         </div>
         <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 mt-10 md:mt-0">
           <Link 
-            to={`/work/${work.slug}`} 
+            to={buildEntryPath('work', work.slug)} 
             className="client-work block alt-transition-img thumb-swap-trigger" 
             data-card-key={cardKey}
             data-transition-source="media"
@@ -594,7 +595,7 @@ export default function WorkPage() {
     })
   }
 
-  const pathname = '/work'
+  const pathname = routeDefinitions.work.path
   const title = 'Work'
   const description = 'Work Page'
 

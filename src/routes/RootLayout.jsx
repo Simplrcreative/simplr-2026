@@ -80,10 +80,10 @@ function createMobileNavLinkClickHandler(closeMobileNav) {
 
 const socials = {
   linkedin: 'https://www.linkedin.com/company/simplrcreative/',
-  instagram: 'https://www.instagram.com/simplrcreative',
-  awwwards: 'https://www.awwwards.com/Simplr-Creative',
-  vimeo: 'https://vimeo.com/simplrcreative',
-  facebook: 'https://www.facebook.com/simplrcreative',
+  instagram: 'https://www.instagram.com/simplrcreative/',
+  awwwards: 'https://www.awwwards.com/Simplr-Creative/',
+  vimeo: 'https://vimeo.com/simplrcreative/',
+  facebook: 'https://www.facebook.com/simplrcreative/',
 }
 
 export default function RootLayout() {

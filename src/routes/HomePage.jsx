@@ -822,7 +822,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
               <div className="client-work">
                 <Link
-                  to={`/work/${linkedCaseStudySlug}`}
+                  to={buildEntryPath('work', linkedCaseStudySlug)}
                   className="alt-transition-img thumb-swap-trigger"
                   data-card-key=''
                   data-transition-source="media"

@@ -5,6 +5,7 @@ import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, refreshSmoothScroll } from '../lib/animations/index.js'
 import { buildEntryPath, fetchThinkingPostsData, getThinkingTopicSlug } from '../lib/wp-api.js'
+import { routeDefinitions } from '../config/site.js'
 import PictureImg from '../components/PictureImg.jsx'
 
 const FILTER_COLOR_MAP = {
@@ -249,7 +250,7 @@ export default function ThinkingPage() {
     return () => context.revert()
   }, [filteredPosts])
 
-  const pathname = '/thinking'
+  const pathname = routeDefinitions.thinking.path
   const title = 'Thinking'
   const description = 'Thinking Page'
 

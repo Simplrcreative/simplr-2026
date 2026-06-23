@@ -5,6 +5,7 @@ import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
+import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
   const thumbnailNode = acfFeaturedThumbnail?.node
@@ -21,7 +22,7 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSiz
 export default function WorkSinglePage() {
   const { work } = useLoaderData() ?? {}
   const title = work?.title || 'Work'
-  const pathname = work?.slug ? `/work/${work.slug}` : '/work'
+  const pathname = work?.slug ? buildEntryPath('work', work.slug) : buildCollectionPath('work')
   const categories = work?.acfWorkBuilder?.acfCategory?.nodes ?? []
   //const thumbnail = work?.thumbnail || ''
   //const thumbnail2 = work?.thumbnail2 || thumbnail
@@ -388,7 +389,7 @@ export default function WorkSinglePage() {
             <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">
                 <Link
-                  to={`/work/${nextWork.slug}`}
+                  to={buildEntryPath('work', nextWork.slug)}
                   className="client-work-img block alt-transition-img thumb-swap-trigger"
                   data-card-key={nextWork.slug}
                   data-transition-source="media"

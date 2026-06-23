@@ -4,7 +4,7 @@ import Seo from '../components/Seo.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import { createNextWorkAnimation, createSlideUpAnimations, refreshScrollTriggers } from '../lib/animations/index.js'
-import { buildEntryPath, getThinkingTopicSlug } from '../lib/wp-api.js'
+import { buildCollectionPath, buildEntryPath, buildThinkingFilterPath, getThinkingTopicSlug } from '../lib/wp-api.js'
 import PictureImg from '../components/PictureImg.jsx'
 
 function categoryToFilterSlug(category) {
@@ -29,7 +29,7 @@ export default function ThinkingSinglePage() {
   const topicSlug = getThinkingTopicSlug(page)
   const pathname = page?.slug
     ? buildEntryPath('thinking', page.slug, { topicSlug })
-    : '/thinking'
+    : buildCollectionPath('thinking')
   const categories = page?.topics?.nodes ?? []
   const author = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.name || page?.author?.node?.name || ''
   const profileImageSizes = page?.acfPostBuilder?.acfAuthor?.nodes[0]?.acfUserBuilder?.acfProfileImage?.node?.mediaDetails?.sizes
@@ -180,7 +180,7 @@ export default function ThinkingSinglePage() {
                   if (!filterSlug) return null
 
                   return (
-                    <Link key={category.slug ?? category.name} to={`/thinking/${filterSlug}`} title={category.name}>
+                    <Link key={category.slug ?? category.name} to={buildThinkingFilterPath(filterSlug)} title={category.name}>
                       <CategoryBadge name={category.name} />
                     </Link>
                   )
@@ -236,7 +236,7 @@ export default function ThinkingSinglePage() {
             <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">
                 <Link
-                  to={`/work/${linkedWork[0].slug}`}
+                  to={buildEntryPath('work', linkedWork[0].slug)}
                   className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
                   data-card-key={linkedWork[0].slug}
                   data-transition-variant="work-next"

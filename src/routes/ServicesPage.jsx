@@ -5,6 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { breadcrumbSchema, webPageSchema } from '../lib/seo.js'
 import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
+import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
+import { routeDefinitions } from '../config/site.js'
 import { Link } from 'react-router-dom'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
@@ -125,7 +127,7 @@ function ServiceCard({ service }) {
   const linkedServicePage = acfLinkToService?.nodes?.[0] ?? null
   const videoUrl = linkedServicePage?.acfServiceBuilder?.acfFeaturedVideo?.node?.guid ?? ''
   const posterUrl = linkedServicePage?.acfServiceBuilder?.acfFeaturedImage?.node?.guid ?? ''
-  const servicePath = `/services/${toSlug(acfService)}`
+  const servicePath = buildEntryPath('services', toSlug(acfService))
   const accentColor = getServiceColor(acfService)
   const btnRef = useRef(null)
   useEffect(() => createBtnHoverAnimation(btnRef.current), [])
@@ -205,7 +207,7 @@ export default function ServicesPage() {
       cardTweens.forEach((t) => t?.scrollTrigger?.kill())
     }
   }, [])
-  const pathname = '/services'
+  const pathname = routeDefinitions.services.path
   const title = 'Services'
   const description = 'Services Page'
 

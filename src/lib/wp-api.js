@@ -1253,7 +1253,7 @@ export async function fetchHomeData() {
 
   const fallbackFeaturedWork = (worksPayload.works || []).slice(0, 3).map((work) => ({
     title: work?.title || '',
-    uri: work?.slug ? `/work/${work.slug}/` : '/work/',
+    uri: work?.slug ? buildEntryPath('work', work.slug) : buildCollectionPath('work'),
     date: undefined,
   }))
 
@@ -1447,15 +1447,38 @@ export function getThinkingTopicSlug(entry) {
   return normalizedTopicSlug || 'news'
 }
 
+function normalizePathSegment(segment) {
+  return String(segment ?? '')
+    .trim()
+    .replace(/^\/+|\/+$/g, '')
+}
+
+export function joinRoutePath(...segments) {
+  const parts = segments
+    .flatMap((segment) => normalizePathSegment(segment).split('/'))
+    .filter(Boolean)
+
+  if (!parts.length) return '/'
+  return `/${parts.join('/')}/`
+}
+
+export function buildCollectionPath(collectionKey) {
+  return routeDefinitions[collectionKey]?.path ?? '/'
+}
+
+export function buildThinkingFilterPath(filterSlug) {
+  return joinRoutePath(routeDefinitions.thinking.path, filterSlug)
+}
+
 export function buildEntryPath(collectionKey, slug, options = {}) {
-  const basePath = routeDefinitions[collectionKey].path
+  const basePath = routeDefinitions[collectionKey]?.path ?? '/'
 
   if (collectionKey === 'thinking') {
-    const topicSlug = String(options.topicSlug || 'news')
-    return `${basePath}/${topicSlug}/${slug}`
+    const topicSlug = normalizePathSegment(options.topicSlug || 'news')
+    return joinRoutePath(basePath, topicSlug, slug)
   }
 
-  return `${basePath}/${slug}`
+  return joinRoutePath(basePath, slug)
 }
 
 /**
@@ -1559,6 +1582,8 @@ export async function fetchWorkEntryData(slug) {
       .replace(/\/+$/g, '')
 
     const uriCandidates = [
+      buildEntryPath('work', cleanSlug),
+      joinRoutePath(workBaseUri, cleanSlug).replace(/\/$/, ''),
       `${workBaseUri}/${cleanSlug}/`,
       `${workBaseUri}/${cleanSlug}`,
       `/work/${cleanSlug}/`,
