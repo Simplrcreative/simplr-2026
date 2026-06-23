@@ -47,9 +47,13 @@ Already added to `package.json`:
 
 `PLAYWRIGHT_BROWSERS_PATH=0` installs the browser inside `node_modules` so Vercel caches it between builds. The first deploy after this change will download Chromium (~50–100 MB), which adds roughly 30–60 seconds to the build. Subsequent builds reuse the cached browser.
 
-### Fallback — skip prerendering if the browser is missing
+### `@sparticuz/chromium` (Vercel Linux)
 
-If you ever want the build to succeed even when Chromium can’t be installed, change `postbuild` to log a warning instead of exiting with an error. (Not recommended—you’ll silently lose prerendered HTML.)
+On Vercel’s Linux build containers, Playwright’s bundled Chromium often fails to launch. The postbuild script tries `@sparticuz/chromium` first, then Playwright, then system Chrome. It is listed in **`dependencies`** (not `devDependencies`) so it is always available during the build.
+
+### Build fails if prerender fails
+
+If no browser can launch, or zero routes prerender successfully, **`postbuild` exits with code 1** and the deploy fails. That is intentional: a deploy without prerendered HTML would look exactly like your live `/about/` view-source today (empty `#root`, generic `<title>Simplr</title>`). Check the Vercel build log for `Prerender complete: N/N routes` or `PRERENDER FAILED`.
 
 ---
 

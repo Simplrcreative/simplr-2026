@@ -134,13 +134,19 @@ function createServer(rootDir, graphqlEndpoint) {
       }
 
       // Static file serving
-      let filePath = path.join(rootDir, decodeURIComponent(req.url))
-      if (req.url.endsWith('/')) {
+      const requestPath = new URL(req.url, 'http://127.0.0.1').pathname
+      let filePath = path.join(rootDir, decodeURIComponent(requestPath))
+      if (requestPath.endsWith('/')) {
         filePath = path.join(filePath, 'index.html')
       }
 
       try {
-        const stat = await fs.stat(filePath)
+        let stat = await fs.stat(filePath)
+        if (stat.isDirectory()) {
+          filePath = path.join(filePath, 'index.html')
+          stat = await fs.stat(filePath)
+        }
+
         if (stat.isFile()) {
           const ext = path.extname(filePath)
           const contentType =
@@ -184,6 +190,110 @@ function createServer(rootDir, graphqlEndpoint) {
   })
 }
 
+function normalizeRoutePath(pathname) {
+  if (!pathname || pathname === '/') return '/'
+  return pathname.endsWith('/') ? pathname : `${pathname}/`
+}
+
+function routePathToOutputDir(rootDir, routePath) {
+  const segments = routePath.split('/').filter(Boolean)
+  return segments.length ? path.join(rootDir, ...segments) : rootDir
+}
+
+function toPrerenderUrl(serverUrl, routePath) {
+  const normalized = normalizeRoutePath(routePath)
+  return normalized === '/' ? `${serverUrl}/` : `${serverUrl}${normalized}`
+}
+
+async function launchBrowser() {
+  function getSystemChromePath() {
+    const platform = process.platform
+    if (platform === 'darwin') {
+      return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    }
+    if (platform === 'linux') {
+      return '/usr/bin/google-chrome'
+    }
+    if (platform === 'win32') {
+      return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+    }
+    return null
+  }
+
+  // Try @sparticuz/chromium first (works on Vercel / serverless Linux)
+  try {
+    console.log('🔍  Trying @sparticuz/chromium...')
+    const chromiumMod = await import('@sparticuz/chromium')
+    const sparticuz = chromiumMod.default || chromiumMod
+    const executablePath = await sparticuz.executablePath()
+    const execDir = path.dirname(executablePath)
+    console.log(`   executablePath: ${executablePath}`)
+
+    process.env.LD_LIBRARY_PATH = execDir
+
+    const browser = await chromium.launch({
+      args: [...sparticuz.args, '--no-sandbox', '--disable-dev-shm-usage'],
+      executablePath,
+      headless: sparticuz.headless,
+    })
+
+    console.log('✅  @sparticuz/chromium launched successfully')
+    return { browser, source: '@sparticuz/chromium' }
+  } catch (sparticuzErr) {
+    console.error('⚠️  @sparticuz/chromium failed:', sparticuzErr.message)
+  }
+
+  try {
+    console.log('🔍  Falling back to standard Playwright chromium...')
+    const browser = await chromium.launch()
+    console.log('✅  Standard Playwright chromium launched successfully')
+    return { browser, source: 'playwright' }
+  } catch (err) {
+    console.error('⚠️  Standard Playwright chromium failed:', err.message)
+  }
+
+  const systemChrome = getSystemChromePath()
+  if (systemChrome) {
+    try {
+      const browser = await chromium.launch({ executablePath: systemChrome })
+      console.log(`🧭  Using system Chrome: ${systemChrome}`)
+      return { browser, source: 'system' }
+    } catch (systemErr) {
+      console.error('⚠️  System Chrome failed:', systemErr.message)
+    }
+  }
+
+  return null
+}
+
+function reportPrerenderSkipped(reason) {
+  console.error('\n┌────────────────────────────────────────────────────────────┐')
+  console.error('│  ❌  PRERENDER FAILED — BUILD CANNOT SHIP SEO HTML         │')
+  console.error('│                                                            │')
+  console.error('│  No Chromium browser could be launched during postbuild.  │')
+  console.error('│  Live bots will only see the empty SPA shell.             │')
+  console.error('│                                                            │')
+  console.error('│  Fix on Vercel:                                           │')
+  console.error('│    • Project Settings → Node.js Version → 22.x            │')
+  console.error('│    • Ensure postinstall runs (playwright + sparticuz)     │')
+  console.error('└────────────────────────────────────────────────────────────┘\n')
+  console.error(`   Details: ${reason}`)
+}
+
+async function waitForRenderedPage(page) {
+  await page.waitForFunction(() => {
+    const root = document.getElementById('root')
+    return Boolean(root?.innerHTML?.trim())
+  }, { timeout: 20000 })
+
+  await page.waitForFunction(() => {
+    const title = document.title.trim()
+    return title.length > 0 && title !== 'Simplr'
+  }, { timeout: 20000 }).catch(() => undefined)
+
+  await page.waitForTimeout(500)
+}
+
 /* ------------------------------------------------------------------ */
 // Main
 /* ------------------------------------------------------------------ */
@@ -214,94 +324,13 @@ async function main() {
   console.log(`🔗  GraphQL proxy: ${graphqlEndpoint || '(none)'}`)
   console.log('')
 
-  function getSystemChromePath() {
-    const platform = process.platform
-    if (platform === 'darwin') {
-      return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    }
-    if (platform === 'linux') {
-      return '/usr/bin/google-chrome'
-    }
-    if (platform === 'win32') {
-      return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-    }
-    return null
+  const launched = await launchBrowser()
+  if (!launched) {
+    reportPrerenderSkipped('All Chromium launch strategies failed.')
+    process.exit(1)
   }
 
-  let browser
-  let browserSource = 'playwright'
-
-  // Try @sparticuz/chromium first (works on Vercel / serverless Linux)
-  try {
-    console.log('🔍  Trying @sparticuz/chromium...')
-    const chromiumMod = await import('@sparticuz/chromium')
-    const sparticuz = chromiumMod.default || chromiumMod
-    const executablePath = await sparticuz.executablePath()
-    const execDir = path.dirname(executablePath)
-    console.log(`   executablePath: ${executablePath}`)
-    console.log(`   execDir: ${execDir}`)
-
-    // Point the dynamic linker to the bundled shared libraries
-    // (libnspr4.so, libnss3.so, etc. live next to the binary)
-    process.env.LD_LIBRARY_PATH = execDir
-
-    browser = await chromium.launch({
-      args: [...sparticuz.args, '--no-sandbox'],
-      executablePath,
-      headless: sparticuz.headless,
-    })
-    browserSource = '@sparticuz/chromium'
-    console.log('✅  @sparticuz/chromium launched successfully')
-  } catch (sparticuzErr) {
-    console.error('⚠️  @sparticuz/chromium failed:', sparticuzErr.message)
-    if (sparticuzErr.stack) {
-      console.error('   Stack:', sparticuzErr.stack.split('\n').slice(0, 3).join('\n'))
-    }
-
-    // Fall back to standard Playwright chromium (local dev)
-    try {
-      console.log('🔍  Falling back to standard Playwright chromium...')
-      browser = await chromium.launch()
-      console.log('✅  Standard Playwright chromium launched successfully')
-    } catch (err) {
-      console.error('⚠️  Standard Playwright chromium failed:', err.message)
-      const systemChrome = getSystemChromePath()
-      if (systemChrome) {
-        try {
-          browser = await chromium.launch({ executablePath: systemChrome })
-          console.log(`🧭  Using system Chrome: ${systemChrome}\n`)
-          browserSource = 'system'
-        } catch (systemErr) {
-          // NO BROWSER AVAILABLE — skip prerendering so build doesn't fail
-          console.error('\n┌────────────────────────────────────────────────────────────┐')
-          console.error('│  ⚠️  BROWSER UNAVAILABLE — SKIPPING PRERENDER              │')
-          console.error('│                                                            │')
-          console.error('│  No Chromium browser could be launched.                   │')
-          console.error('│  The site will still work as an SPA.                      │')
-          console.error('│  To fix prerendering, try:                                │')
-          console.error('│    • Set Node.js 22.x in Vercel project settings          │')
-          console.error('│    • Or run locally: npm run postinstall && npm run build │')
-          console.error('└────────────────────────────────────────────────────────────┘\n')
-          console.error('   Details:', err.message)
-          return
-        }
-      } else {
-        // NO BROWSER AVAILABLE — skip prerendering so build doesn't fail
-        console.error('\n┌────────────────────────────────────────────────────────────┐')
-        console.error('│  ⚠️  BROWSER UNAVAILABLE — SKIPPING PRERENDER              │')
-        console.error('│                                                            │')
-        console.error('│  No Chromium browser could be launched.                   │')
-        console.error('│  The site will still work as an SPA.                      │')
-        console.error('│  To fix prerendering, try:                                │')
-        console.error('│    • Set Node.js 22.x in Vercel project settings          │')
-        console.error('│    • Or run locally: npm run postinstall && npm run build │')
-        console.error('└────────────────────────────────────────────────────────────┘\n')
-        console.error('   Details:', err.message)
-        return
-      }
-    }
-  }
-
+  const { browser, source: browserSource } = launched
   if (browserSource === '@sparticuz/chromium') {
     console.log('🚀  Using @sparticuz/chromium\n')
   }
@@ -312,26 +341,31 @@ async function main() {
   console.log(`🖥️   Local server: ${serverUrl}\n`)
 
   const context = await browser.newContext()
+  await context.addInitScript(() => {
+    window.__PRERENDER__ = true
+  })
+
+  let successCount = 0
+  let failureCount = 0
 
   for (const routePath of paths) {
     const page = await context.newPage()
-    const url = `${serverUrl}${routePath}`
+    const url = toPrerenderUrl(serverUrl, routePath)
 
     try {
-      await page.goto(url, { waitUntil: 'load', timeout: 20000 })
-
-      // Give React Helmet and any post-load layout effects time to settle
-      await page.waitForTimeout(2000)
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 })
+      await waitForRenderedPage(page)
 
       const html = await page.content()
-
-      const outputDir = routePath === '/' ? distDir : path.join(distDir, routePath)
+      const outputDir = routePathToOutputDir(distDir, routePath)
       await fs.mkdir(outputDir, { recursive: true })
       await fs.writeFile(path.join(outputDir, 'index.html'), html, 'utf8')
 
-      console.log(`✅  ${routePath}`)
+      successCount += 1
+      console.log(`✅  ${normalizeRoutePath(routePath)}`)
     } catch (err) {
-      console.error(`❌  ${routePath}: ${err.message}`)
+      failureCount += 1
+      console.error(`❌  ${normalizeRoutePath(routePath)}: ${err.message}`)
     } finally {
       await page.close()
     }
@@ -341,7 +375,19 @@ async function main() {
   await browser.close()
   server.close()
 
-  console.log('\n✨  Prerender complete.\n')
+  console.log(`\n✨  Prerender complete: ${successCount}/${paths.length} routes.`)
+
+  if (successCount === 0) {
+    console.error('❌  No routes were prerendered successfully.')
+    process.exit(1)
+  }
+
+  if (failureCount > 0) {
+    console.error(`⚠️  ${failureCount} route(s) failed to prerender.`)
+    process.exit(1)
+  }
+
+  console.log('')
 }
 
 main().catch((err) => {

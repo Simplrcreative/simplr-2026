@@ -6,13 +6,22 @@ const publicDir = path.join(projectRoot, 'public')
 
 const staticRoutes = [
   { path: '/', changefreq: 'weekly', priority: '1.0' },
-  { path: '/work', changefreq: 'weekly', priority: '0.9' },
-  { path: '/about', changefreq: 'monthly', priority: '0.7' },
-  { path: '/services', changefreq: 'monthly', priority: '0.8' },
-  { path: '/thinking', changefreq: 'weekly', priority: '0.9' },
-  { path: '/contact', changefreq: 'monthly', priority: '0.7' },
-  { path: '/est-2014', changefreq: 'monthly', priority: '0.6' },
+  { path: '/work/', changefreq: 'weekly', priority: '0.9' },
+  { path: '/about/', changefreq: 'monthly', priority: '0.7' },
+  { path: '/services/', changefreq: 'monthly', priority: '0.8' },
+  { path: '/thinking/', changefreq: 'weekly', priority: '0.9' },
+  { path: '/contact/', changefreq: 'monthly', priority: '0.7' },
+  { path: '/est-2014/', changefreq: 'monthly', priority: '0.6' },
 ]
+
+function joinRoutePath(...segments) {
+  const parts = segments
+    .flatMap((segment) => String(segment ?? '').trim().split('/'))
+    .filter(Boolean)
+
+  if (!parts.length) return '/'
+  return `/${parts.join('/')}/`
+}
 
 function normalizeBasePath(value, fallback) {
   const base = String(value || fallback || '').trim()
@@ -185,7 +194,7 @@ async function getDynamicRoutes(env) {
     .map((node) => node?.slug)
     .filter(Boolean)
     .map((slug) => ({
-      path: `${workBasePath}/${slug}`,
+      path: joinRoutePath(workBasePath, slug),
       changefreq: 'weekly',
       priority: '0.8',
     }))
@@ -196,7 +205,7 @@ async function getDynamicRoutes(env) {
       if (!slug) return null
       const topicSlug = normalizeTopicSlug(node?.topics?.nodes?.[0]?.slug)
       return {
-        path: `${thinkingBasePath}/${topicSlug}/${slug}`,
+        path: joinRoutePath(thinkingBasePath, topicSlug, slug),
         changefreq: 'weekly',
         priority: '0.8',
       }
@@ -207,7 +216,8 @@ async function getDynamicRoutes(env) {
     .map((item) => item?.acfLinkToService?.nodes?.[0]?.uri)
     .filter(Boolean)
     .map((uri) => {
-      const path = String(uri).replace(/\/+$/, '') || '/'
+      const segments = String(uri).split('/').filter(Boolean)
+      const path = segments.length ? joinRoutePath(...segments) : '/'
       return { path, changefreq: 'monthly', priority: '0.7' }
     })
 

@@ -95,7 +95,10 @@ export default function RootLayout() {
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
-  const [isIntroVisible, setIsIntroVisible] = useState(() => window.location.pathname === '/')
+  const [isIntroVisible, setIsIntroVisible] = useState(() => {
+    if (typeof window !== 'undefined' && window.__PRERENDER__) return false
+    return window.location.pathname === '/'
+  })
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [introComplete, setIntroComplete] = useState(false)
   const [shouldFadeOutIntro, setShouldFadeOutIntro] = useState(false)
