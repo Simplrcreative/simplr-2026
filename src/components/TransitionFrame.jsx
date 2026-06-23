@@ -64,6 +64,45 @@ function escapeAttributeValue(value) {
   return value.replace(/(["\\])/g, '\\$1')
 }
 
+function applyThinkingCardHoverSnapshot(liveRoot, cloneRoot, target) {
+  const liveCard = target?.closest?.('[data-post-card]')
+  if (!liveCard || !liveRoot?.contains?.(liveCard) || !cloneRoot) return
+
+  const liveLink = liveCard.querySelector('.thinking-post-link')
+  const isHovered = (
+    liveCard.matches(':hover')
+    || liveCard.classList.contains('hover-active')
+    || liveLink?.matches?.(':hover')
+  )
+
+  if (!isHovered) return
+
+  const cardKey = liveCard.dataset.postCardKey
+  if (!cardKey) return
+
+  const cloneCard = cloneRoot.querySelector(
+    `[data-post-card-key="${escapeAttributeValue(cardKey)}"]`,
+  )
+  if (!cloneCard) return
+
+  cloneCard.classList.add('hover-active')
+
+  const liveRatio = liveCard.querySelector('.ratio')
+  const cloneRatio = cloneCard.querySelector('.ratio')
+  if (liveRatio && cloneRatio) {
+    const ratioStyles = getComputedStyle(liveRatio)
+    cloneRatio.style.paddingTop = ratioStyles.paddingTop
+  }
+
+  const liveTitle = liveCard.querySelector('[data-post-title]')
+  const cloneTitle = cloneCard.querySelector('[data-post-title]')
+  if (liveTitle && cloneTitle) {
+    const titleStyles = getComputedStyle(liveTitle)
+    cloneTitle.style.textDecorationColor = titleStyles.textDecorationColor
+    cloneTitle.style.opacity = titleStyles.opacity
+  }
+}
+
 function captureFixedSectionClones(container, selectors) {
   if (!container) return []
 
@@ -917,6 +956,8 @@ export default function TransitionFrame({ children }) {
       if (caseStudySourceKey) {
         hideCaseStudyThumbnailInRoot(clone, caseStudySourceKey)
       }
+
+      applyThinkingCardHoverSnapshot(ref.current, clone, target)
 
       snapshotRef.current = clone
     }

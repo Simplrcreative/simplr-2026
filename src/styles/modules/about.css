@@ -106,12 +106,6 @@
   }
 }
 
-/* Blip up, then scale/fade out as soon as close starts */
-.people--bio-closing .person-hover-img.is-visible {
-  animation: person-hover-img-close 0.75s ease-in-out forwards;
-  transition: none;
-}
-
 /* ─── Bio overlay ────────────────────────────────────────── */
 .bio-overlay {
   opacity: 0;
@@ -214,8 +208,15 @@
   .people--bio-closing .person-hover-img.is-visible {
     top: 50% !important;
     transform: translate(-50%, -50%);
-    animation: person-hover-img-close 0.55s ease forwards;
-    transition: none;
+    opacity: 0;
+    scale: 0.85;
+    animation: none;
+    transition:
+      opacity 0.55s ease 0.35s,
+      scale 0.55s ease 0.35s,
+      filter 0.55s ease 0.35s,
+      top 0.55s ease 0.35s,
+      transform 0.55s ease 0.35s;
   }
 
   .people--bio-open .people-grid {
@@ -345,6 +346,11 @@
   .person-hover-img {
     top: 90px!important;
     aspect-ratio: 3 / 4;
+  }
+
+  .people--bio-closing .person-hover-img.is-visible {
+    animation: person-hover-img-close 0.75s ease-in-out forwards;
+    transition: none;
   }
 }
 

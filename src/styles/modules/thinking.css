@@ -14,7 +14,8 @@
 .thinking-post-card .ratio {
   transition: padding-top 0.6s ease-out;
 }
-.thinking-post-card:hover .ratio {
+.thinking-post-card:hover .ratio,
+.thinking-post-card.hover-active .ratio {
   padding-top: 50%!important;
   transition: padding-top 0.3s ease-in;
 }
@@ -54,7 +55,8 @@
     text-decoration-color 0.3s ease
   }
 
-.thinking-post-card:hover .thinking-post__title {
+.thinking-post-card:hover .thinking-post__title,
+.thinking-post-card.hover-active .thinking-post__title {
   text-decoration-color: currentColor;
 }
 
@@ -76,7 +78,8 @@
   }
 }
 @media (min-width: 768px) {
-  .thinking-post-card:hover .ratio {
+  .thinking-post-card:hover .ratio,
+  .thinking-post-card.hover-active .ratio {
     padding-top: 122%!important;
   }
 }

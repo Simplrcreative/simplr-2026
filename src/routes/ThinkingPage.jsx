@@ -303,10 +303,13 @@ export default function ThinkingPage() {
                 className="thinking-post-card"
                 data-post-card
                 data-post-card-key={post.databaseId ?? post.slug}
+                onMouseEnter={(event) => event.currentTarget.classList.add('hover-active')}
+                onMouseLeave={(event) => event.currentTarget.classList.remove('hover-active')}
               >
                 <Link
                   to={buildEntryPath('thinking', post.slug, { topicSlug: getThinkingTopicSlug(post) })}
                   className="thinking-post-link"
+                  data-transition-snapshot-state="hover"
                 >
                   <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '54%' }} >
                     <PictureImg
