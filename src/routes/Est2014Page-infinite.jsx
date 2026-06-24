@@ -1,10 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { webPageSchema } from '../lib/seo.js'
 import { InfiniteCanvasScene } from '../infinite-canvas/scene.jsx'
-import { refreshInfiniteCanvasSize } from '../infinite-canvas/resize.js'
-import { getTexture } from '../infinite-canvas/texture-manager.js'
+import { scheduleInfiniteCanvasResize } from '../infinite-canvas/resize.js'
+import { getTexture, getMediaLoadProgress } from '../infinite-canvas/texture-manager.js'
 import { resetInfiniteCanvas } from '../infinite-canvas/reset.js'
 import { PageLoader } from '../loader/index.jsx'
 import { createSplitTextAnimation, createBtnHoverAnimation, createEst2014HeroScrollAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
@@ -55,50 +56,75 @@ const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 export default function Est2014PageInfinite() {
   const btnRef = useRef(null)
   const sceneRef = useRef(null)
+  const canvasLayerRef = useRef(null)
   const canPlayAnimationRef = useRef(false)
   const isReturnVisit = useRef(sessionStorage.getItem(LOADER_SESSION_KEY) === '1')
   const { beyondItems = [], page, siteSettings } = useLoaderData() ?? {}
   const [textureProgress, setTextureProgress] = useState(0)
+  const [showCanvas, setShowCanvas] = useState(false)
   const media = mapBeyondItemsToMedia(beyondItems)
 
   useLayoutEffect(() => {
     media.forEach((item) => getTexture(item))
   }, [media])
 
+  useEffect(() => {
+    if (!media.length) {
+      setTextureProgress(100)
+      return undefined
+    }
+
+    const update = () => setTextureProgress(getMediaLoadProgress(media))
+    update()
+    const id = window.setInterval(update, 100)
+    return () => window.clearInterval(id)
+  }, [media])
+
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
   }, [])
+
   useEffect(() => {
     canPlayAnimationRef.current = false
     lockScroll('est2014-loader')
 
-    const destroyAnimation = createEst2014HeroScrollAnimation(sceneRef.current, {
-      canPlay: () => canPlayAnimationRef.current,
-    })
-
-    const syncCanvasSize = () => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(refreshInfiniteCanvasSize)
-      })
-    }
-
-    syncCanvasSize()
-    window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, syncCanvasSize)
-
     return () => {
-      window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, syncCanvasSize)
-      destroyAnimation?.()
       unlockScroll('est2014-loader')
       resetInfiniteCanvas()
     }
   }, [])
 
+  useEffect(() => {
+    if (!showCanvas) return undefined
+
+    const syncCanvasSize = () => {
+      scheduleInfiniteCanvasResize(() => ScrollTrigger.refresh())
+    }
+
+    window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, syncCanvasSize)
+
+    return () => window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, syncCanvasSize)
+  }, [showCanvas])
+
+  useEffect(() => {
+    if (!showCanvas) return undefined
+
+    const destroyAnimation = createEst2014HeroScrollAnimation(sceneRef.current, {
+      canPlay: () => canPlayAnimationRef.current,
+      canvasLayer: canvasLayerRef.current,
+    })
+
+    scheduleInfiniteCanvasResize(() => ScrollTrigger.refresh())
+
+    return () => destroyAnimation?.()
+  }, [showCanvas])
+
   const handleLoaderComplete = () => {
     canPlayAnimationRef.current = true
     sessionStorage.setItem(LOADER_SESSION_KEY, '1')
     unlockScroll('est2014-loader')
-    refreshInfiniteCanvasSize()
+    setShowCanvas(true)
   }
 
   return (
@@ -111,7 +137,7 @@ export default function Est2014PageInfinite() {
       />
       <section ref={sceneRef} className="est2014-scene min-h-screen">
         <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
-          <div className="hero px-5 relative z-2">
+          <div className="hero est2014-hero px-5 relative z-2 min-h-[80vh] flex items-end">
             <div className="grid grid-cols-12 w-full">
               <div className="col-start-1 col-span-12 md:col-span-9 text-coffee mt-40 max-w-[115ch] ">
                 <div className="eyebrow">Beyond the work</div>
@@ -136,14 +162,19 @@ export default function Est2014PageInfinite() {
             progress={textureProgress}
             onComplete={handleLoaderComplete}
             minVisibleMs={isReturnVisit.current ? 0 : 1500}
+            staticHint={isReturnVisit.current}
+            hintText="Start scrolling to explore."
           />
-          <InfiniteCanvasScene
-            media={media}
-            onTextureProgress={setTextureProgress}
-            backgroundColor="#FFF"
-            fogColor="#FFF"
-            //showControls
-          />
+          {showCanvas && (
+            <div ref={canvasLayerRef} className="est2014-canvas-layer">
+              <InfiniteCanvasScene
+                media={media}
+                backgroundColor="#FFF"
+                fogColor="#FFF"
+                showControls
+              />
+            </div>
+          )}
         </div>
       </section>
     </>

@@ -125,6 +125,7 @@ export default function RootLayout() {
   const btnRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
+  const playHomeHeroIntro = shouldRunHomeIntroAnimations || cameFromNonHome
 
   const closeMobileNav = useCallback(() => {
     setIsNavOpen(false)
@@ -143,15 +144,22 @@ export default function RootLayout() {
   useEffect(() => {
     if (!isHomePage) {
       setShouldRunHomeIntroAnimations(false)
+      setIsIntroVisible(false)
     }
   }, [isHomePage])
 
-  // Latch whether the current Home visit actually includes the intro overlay flow.
+  // Latch whether the current Home visit includes intro overlay or a return visit.
   useEffect(() => {
     if (isHomePage && isIntroVisible) {
       setShouldRunHomeIntroAnimations(true)
     }
   }, [isHomePage, isIntroVisible])
+
+  useEffect(() => {
+    if (isHomePage && cameFromNonHome) {
+      setShouldRunHomeIntroAnimations(true)
+    }
+  }, [isHomePage, cameFromNonHome])
 
   // When landing on Home from a non-home start, there is no intro overlay.
   // Mark intro as complete so HomePage animation effects can initialize.
@@ -570,7 +578,7 @@ export default function RootLayout() {
 
       <main>
         <TransitionFrame>
-          <Outlet context={{ introComplete, shouldRunHomeIntroAnimations }} />
+          <Outlet context={{ introComplete, shouldRunHomeIntroAnimations: playHomeHeroIntro }} />
         </TransitionFrame>
       </main>
 

@@ -21,6 +21,83 @@ function resolveBgFromPath(pathname) {
   return DARK_PATHS.has(pathname) ? 'dark' : 'light'
 }
 
+function computeSnapshotTop(scrollY, snapshotHeight) {
+  const minSnapshotTop = Math.min(0, window.innerHeight - snapshotHeight)
+  return Math.max(-scrollY, minSnapshotTop)
+}
+
+function resolveOutgoingOverlayBg(capturedPageBg, capturedPath, fallbackPageBg) {
+  const outgoingPageBg = capturedPageBg
+    || resolveBgFromPath(capturedPath || '')
+    || fallbackPageBg
+  return outgoingPageBg === 'dark' ? COFFEE : WHITE
+}
+
+function createTransitionOverlayShell(bgColor) {
+  const wrapper = document.createElement('div')
+  const content = document.createElement('div')
+
+  Object.assign(wrapper.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '150vh',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    zIndex: '9999',
+    background: bgColor,
+  })
+  Object.assign(content.style, {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    transformOrigin: '50% 50%',
+  })
+
+  wrapper.appendChild(content)
+  return { wrapper, content }
+}
+
+function mountSnapshotInOverlay(snapshot, content, snapshotTop) {
+  Object.assign(snapshot.style, {
+    position: 'absolute',
+    top: `${snapshotTop}px`,
+    left: '0',
+    width: '100%',
+    pointerEvents: 'none',
+  })
+
+  if (snapshot.parentElement !== content) {
+    content.appendChild(snapshot)
+  }
+}
+
+function mountFrozenHeaderClone(headerClone) {
+  if (!headerClone || headerClone.isConnected) return
+
+  headerClone.classList.remove('header')
+  headerClone.dataset.frozenClone = 'true'
+  Object.assign(headerClone.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: '100%',
+    zIndex: '10001',
+    pointerEvents: 'none',
+  })
+  document.body.appendChild(headerClone)
+}
+
+function mountFrozenCompactLogoClone(compactLogoClone) {
+  if (!compactLogoClone || compactLogoClone.isConnected) return
+
+  compactLogoClone.dataset.frozenClone = 'true'
+  document.body.appendChild(compactLogoClone)
+}
+
 function normalizePathname(pathname) {
   if (!pathname) return '/'
   const path = pathname.split('?')[0].split('#')[0]
@@ -287,6 +364,35 @@ function appendFixedCaptureCanvas(clone, liveCanvas, frozenCanvas) {
   })
 }
 
+function isVisuallyHiddenForCapture(element) {
+  if (!element) return false
+
+  const style = getComputedStyle(element)
+  if (style.visibility === 'hidden' || style.display === 'none') return true
+  if (parseFloat(style.opacity) < 0.01) return true
+
+  return false
+}
+
+function hideHiddenCanvasLayersInClone(liveRoot, clone) {
+  if (!liveRoot || !clone) return
+
+  liveRoot.querySelectorAll('.est2014-canvas-layer').forEach((liveLayer, index) => {
+    if (!isVisuallyHiddenForCapture(liveLayer)) return
+
+    const cloneLayers = clone.querySelectorAll('.est2014-canvas-layer')
+    const cloneLayer = cloneLayers[index] ?? clone.querySelector('.est2014-canvas-layer')
+    if (!cloneLayer) return
+
+    cloneLayer.style.visibility = 'hidden'
+    cloneLayer.style.opacity = '0'
+    cloneLayer.style.pointerEvents = 'none'
+    cloneLayer.querySelectorAll('canvas').forEach((node) => {
+      node.style.visibility = 'hidden'
+    })
+  })
+}
+
 function createFrozenVideoNode(video, options = {}) {
   const { fillContainer = false } = options
 
@@ -496,6 +602,7 @@ export default function TransitionFrame({ children }) {
   const hasCapturedRef = useRef(false)
   const capturedPageBgRef = useRef(null)
   const capturedPathRef = useRef(null)
+  const immediateOverlayRef = useRef(null)
   const isFirstMount = useRef(true)
   // Separate ref so we can detect the first useEffect run independently of
   // useLayoutEffect (which runs before effects and would already have cleared isFirstMount).
@@ -879,6 +986,9 @@ export default function TransitionFrame({ children }) {
         compactLogoSnapshotRef.current = null
       }
 
+      mountFrozenHeaderClone(headerSnapshotRef.current)
+      mountFrozenCompactLogoClone(compactLogoSnapshotRef.current)
+
       bottomMenuSnapshotRef.current = null
       const navForBottomMenu = target ? extractSameOriginLink(target) : null
       if (navForBottomMenu?.link?.closest?.('.bottom-menu')) {
@@ -892,6 +1002,8 @@ export default function TransitionFrame({ children }) {
       }
 
       const clone = ref.current.cloneNode(true)
+
+      hideHiddenCanvasLayersInClone(ref.current, clone)
 
       clone.querySelectorAll('.bottom-menu').forEach((menu) => {
         menu.style.visibility = 'hidden'
@@ -967,7 +1079,16 @@ export default function TransitionFrame({ children }) {
 
       const liveCaptureCanvases = Array.from(ref.current.querySelectorAll('canvas.transition-capture-canvas'))
 
+      if (liveCaptureCanvases.length > 0) {
+        window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, {
+          detail: { caseStudySourceKey },
+        }))
+      }
+
       liveCaptureCanvases.forEach((liveCanvas) => {
+        const canvasLayer = liveCanvas.closest('.est2014-canvas-layer')
+        if (isVisuallyHiddenForCapture(canvasLayer)) return
+
         const frozenCanvas = createFrozenWebGLCanvasNode(liveCanvas)
         if (frozenCanvas) {
           appendFixedCaptureCanvas(clone, liveCanvas, frozenCanvas)
@@ -1016,6 +1137,24 @@ export default function TransitionFrame({ children }) {
       applyThinkingCardHoverSnapshot(ref.current, clone, target)
 
       snapshotRef.current = clone
+
+      // Mount the overlay synchronously on pointerdown so the frozen snapshot
+      // covers the viewport before React unmounts the outgoing page (WebGL canvas).
+      if (!altTransitionRef.current) {
+        immediateOverlayRef.current?.remove()
+        const bgColor = resolveOutgoingOverlayBg(
+          capturedPageBgRef.current,
+          capturedPathRef.current,
+        )
+        const snapshotTop = computeSnapshotTop(
+          capturedScrollYRef.current,
+          capturedScrollHeightRef.current || 0,
+        )
+        const { wrapper, content } = createTransitionOverlayShell(bgColor)
+        mountSnapshotInOverlay(clone, content, snapshotTop)
+        document.body.appendChild(wrapper)
+        immediateOverlayRef.current = wrapper
+      }
     }
 
     window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
@@ -1056,6 +1195,8 @@ export default function TransitionFrame({ children }) {
       document.removeEventListener('click', handleClick, { capture: true })
       window.removeEventListener(PAGE_TRANSITION_CAPTURE_EVENT, handleCaptureEvent)
       window.removeEventListener('popstate', handlePopState)
+      immediateOverlayRef.current?.remove()
+      immediateOverlayRef.current = null
     }
   }, [])
 
@@ -1064,20 +1205,29 @@ export default function TransitionFrame({ children }) {
     const isFirst = isFirstMount.current
     if (isFirst) isFirstMount.current = false
 
-    if (!siteConfig.transitions.enabled || isFirst) return
+    if (!siteConfig.transitions.enabled || isFirst) {
+      immediateOverlayRef.current?.remove()
+      immediateOverlayRef.current = null
+      return
+    }
 
     const el = ref.current
     const snapshot = snapshotRef.current
     const altTransition = altTransitionRef.current
-    if (!el || (!snapshot && !altTransition)) return
+    if (!el || (!snapshot && !altTransition)) {
+      immediateOverlayRef.current?.remove()
+      immediateOverlayRef.current = null
+      return
+    }
 
     // Child layout effects run before parent (React bottom-up order), so at
     // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
     // the OUTGOING page's value. Use it to colour the overlay background.
-    const outgoingPageBg = capturedPageBgRef.current
-      || resolveBgFromPath(capturedPathRef.current || '')
-      || document.documentElement.dataset.pageBg
-    const bgColor = outgoingPageBg === 'dark' ? COFFEE : WHITE
+    const bgColor = resolveOutgoingOverlayBg(
+      capturedPageBgRef.current,
+      capturedPathRef.current,
+      document.documentElement.dataset.pageBg,
+    )
     capturedPageBgRef.current = null
     capturedPathRef.current = null
 
@@ -1095,41 +1245,18 @@ export default function TransitionFrame({ children }) {
     capturedScrollYRef.current = 0
     const snapshotHeight = capturedScrollHeightRef.current || 0
     capturedScrollHeightRef.current = 0
-    const minSnapshotTop = Math.min(0, window.innerHeight - snapshotHeight)
-    const snapshotTop = Math.max(-scrollY, minSnapshotTop)
+    const snapshotTop = computeSnapshotTop(scrollY, snapshotHeight)
 
-    // Two-layer overlay:
-    //   wrapper  — full-screen, z-9999, overflow:hidden, solid background.
-    //              NEVER scales, so the real header (z-5) is always fully
-    //              covered. The solid bgColor fills any transparent gaps in
-    //              the snapshot (e.g. the padding area that sits behind the
-    //              fixed header on every page).
-    //   content  — receives scale/blur/opacity animation. Contains the page
-    //              snapshot AND a frozen header clone positioned at viewport-
-    //              top (top:0 of content), so the outgoing nav/logo state is
-    //              always visible and animates out together with the page.
-    const wrapper = document.createElement('div')
-    const content = document.createElement('div')
+    // Reuse the overlay mounted synchronously during capture when available.
+    let wrapper = immediateOverlayRef.current
+    let content
 
-    Object.assign(wrapper.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100%',
-      height: '150vh',
-      overflow: 'hidden',
-      pointerEvents: 'none',
-      zIndex: '9999',
-      background: bgColor,
-    })
-    Object.assign(content.style, {
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      width: '100%',
-      height: '100%',
-      transformOrigin: '50% 50%',
-    })
+    if (wrapper) {
+      immediateOverlayRef.current = null
+      content = wrapper.firstElementChild
+    } else {
+      ;({ wrapper, content } = createTransitionOverlayShell(bgColor))
+    }
 
     let altClone = null
     if (shouldMountAltTransitionClone(altTransition, location.pathname)) {
@@ -1163,13 +1290,7 @@ export default function TransitionFrame({ children }) {
     )
 
     if (snapshot) {
-      Object.assign(snapshot.style, {
-        position: 'absolute',
-        top: `${snapshotTop}px`,
-        left: '0',
-        width: '100%',
-        pointerEvents: 'none',
-      })
+      mountSnapshotInOverlay(snapshot, content, snapshotTop)
 
       if (location.pathname === '/') {
         snapshot.querySelectorAll('.compact-logo').forEach((node) => {
@@ -1184,21 +1305,21 @@ export default function TransitionFrame({ children }) {
         snapshot.style.opacity = '0'
         snapshot.style.visibility = 'hidden'
       }
-
-      content.appendChild(snapshot)
     }
-    wrapper.appendChild(content)
-    document.body.appendChild(wrapper)
+
+    if (!wrapper.isConnected) {
+      wrapper.appendChild(content)
+      document.body.appendChild(wrapper)
+    }
 
     // --- Compact-logo clone (icon-only logo state) ---
     // Animate the compact-logo out when it was the active logo at capture time.
     const compactLogoClone = compactLogoSnapshotRef.current
     compactLogoSnapshotRef.current = null
     if (compactLogoClone) {
-      // Use data-frozen-clone so html.page-transitioning .compact-logo:not([data-frozen-clone])
-      // doesn't fire, while keeping the class so fill/mix-blend-mode CSS still applies.
-      compactLogoClone.dataset.frozenClone = 'true'
-      document.body.appendChild(compactLogoClone)
+      if (!compactLogoClone.isConnected) {
+        mountFrozenCompactLogoClone(compactLogoClone)
+      }
       gsap.to(compactLogoClone, {
         autoAlpha: 0,
         y: -20,
@@ -1215,18 +1336,9 @@ export default function TransitionFrame({ children }) {
     const headerClone = headerSnapshotRef.current
     headerSnapshotRef.current = null
     if (headerClone) {
-      // Remove 'header' class so html.page-transitioning .header { opacity:0 !important }
-      // doesn't instantly kill the clone when we add the page-transitioning class below.
-      headerClone.classList.remove('header')
-      Object.assign(headerClone.style, {
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '100%',
-        zIndex: '10000',
-        pointerEvents: 'none',
-      })
-      document.body.appendChild(headerClone)
+      if (!headerClone.isConnected) {
+        mountFrozenHeaderClone(headerClone)
+      }
       gsap.to(headerClone, {
         autoAlpha: 0,
         y: -30,

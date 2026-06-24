@@ -22,5 +22,6 @@ export const CHUNK_OFFSETS = (() => {
       }
     }
   }
-  return offsets
+  // Nearest chunks first so visible planes mount before dist-3 fade shells (gridFade = 0).
+  return offsets.sort((a, b) => a.dist - b.dist || a.dx - b.dx || a.dy - b.dy || a.dz - b.dz)
 })()

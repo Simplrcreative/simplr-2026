@@ -13,4 +13,4 @@ export function InfiniteCanvas(props) {
 }
 
 export { resetInfiniteCanvas } from './reset.js'
-export { refreshInfiniteCanvasSize } from './resize.js'
+export { refreshInfiniteCanvasSize, scheduleInfiniteCanvasResize } from './resize.js'

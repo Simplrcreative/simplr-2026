@@ -34,3 +34,55 @@
   transform-origin: left;
   background-color: #300F1D;
 }
+
+.bootLoader {
+  position: fixed;
+  left: 1.25rem;
+  bottom: 2.5rem;
+  z-index: 3;
+  color: #300F1D;
+  font-family: var(--font-aeonik);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-1rem);
+}
+
+.static {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.enter {
+  animation: bootLoaderIn 0.5s ease-out 0.25s forwards;
+}
+
+.exit {
+  animation: bootLoaderOut 0.5s ease-out forwards;
+}
+
+@keyframes bootLoaderIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bootLoaderOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}

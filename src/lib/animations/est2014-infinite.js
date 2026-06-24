@@ -32,7 +32,7 @@ function bindUserScrollGate(onUserScroll) {
   }
 }
 
-export function createEst2014HeroScrollAnimation(scope, { canPlay = () => true } = {}) {
+export function createEst2014HeroScrollAnimation(scope, { canPlay = () => true, canvasLayer = null } = {}) {
   if (!scope) return () => undefined
 
   registerPlugins()
@@ -40,23 +40,23 @@ export function createEst2014HeroScrollAnimation(scope, { canPlay = () => true }
   const hero = scope.querySelector('.hero')
   if (!hero) return () => undefined
 
-  gsap.set(hero, { y: 250, willChange: 'transform' })
-
-  let hasPlayed = false
-  let tween
-
-  const playOnce = () => {
-    if (hasPlayed || !tween || !canPlay()) return
-    hasPlayed = true
-    tween.restart()
+  //gsap.set(hero, { y: 250, willChange: 'transform' })
+  if (canvasLayer) {
+    gsap.set(canvasLayer, { opacity: 0, willChange: 'opacity' })
   }
 
-  tween = gsap.to(hero, {
-    y: -500,
-    duration: 2,
-    ease: 'power4.out',
+  let hasPlayed = false
+  let timeline
+
+  const playOnce = () => {
+    if (hasPlayed || !timeline || !canPlay()) return
+    hasPlayed = true
+    timeline.restart()
+  }
+
+  timeline = gsap.timeline({
     paused: true,
-    delay:1,
+    delay: 1,
     scrollTrigger: {
       trigger: scope,
       start: 'top top+=1',
@@ -64,19 +64,28 @@ export function createEst2014HeroScrollAnimation(scope, { canPlay = () => true }
       pin: true,
       invalidateOnRefresh: true,
       onRefresh: () => {
-        if (!hasPlayed && tween) {
-          tween.pause(0)
+        if (!hasPlayed && timeline) {
+          timeline.pause(0)
         }
       },
     },
   })
 
+  timeline.to(hero, { y: '-80vh', duration: 1.5, ease: 'power4.out' }, 0)
+
+  if (canvasLayer) {
+    timeline.to(canvasLayer, { opacity: 1, duration: 2, ease: 'power4.out' }, 0)
+  }
+
   const unbindUserScrollGate = bindUserScrollGate(playOnce)
 
   return () => {
     unbindUserScrollGate()
-    tween.scrollTrigger?.kill()
-    tween.kill()
+    timeline.scrollTrigger?.kill()
+    timeline.kill()
     gsap.set(hero, { clearProps: 'transform' })
+    if (canvasLayer) {
+      gsap.set(canvasLayer, { clearProps: 'opacity,willChange' })
+    }
   }
 }

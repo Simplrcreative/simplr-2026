@@ -37,6 +37,7 @@ function TransitionCaptureSync() {
   React.useEffect(() => {
     const onPrepareCapture = () => {
       gl.render(scene, camera)
+      gl.finish()
     }
 
     window.addEventListener(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, onPrepareCapture)
@@ -145,7 +146,11 @@ function MediaPlane({ position, scale, media, chunkCx, chunkCy, chunkCz, cameraG
 
     const target = Math.min(gridFade, depthFade * depthFade)
 
-    state.opacity = target < INVIS_THRESHOLD && state.opacity < INVIS_THRESHOLD ? 0 : lerp(state.opacity, target, 0.18)
+    if (state.opacity < INVIS_THRESHOLD && target > 0.5) {
+      state.opacity = target
+    } else {
+      state.opacity = target < INVIS_THRESHOLD && state.opacity < INVIS_THRESHOLD ? 0 : lerp(state.opacity, target, 0.18)
+    }
 
     const isFullyOpaque = state.opacity > 0.99
     material.opacity = isFullyOpaque ? 1 : state.opacity
@@ -247,6 +252,19 @@ function Chunk({ cx, cy, cz, media, cameraGridRef }) {
   )
 }
 
+function buildChunksForCamera(camera) {
+  const cx = Math.floor(camera.x / CHUNK_SIZE)
+  const cy = Math.floor(camera.y / CHUNK_SIZE)
+  const cz = Math.floor(camera.z / CHUNK_SIZE)
+
+  return CHUNK_OFFSETS.map((o) => ({
+    key: `${cx + o.dx},${cy + o.dy},${cz + o.dz}`,
+    cx: cx + o.dx,
+    cy: cy + o.dy,
+    cz: cz + o.dz,
+  }))
+}
+
 const createInitialState = (camZ) => ({
   velocity: { x: 0, y: 0, z: 0 },
   targetVel: { x: 0, y: 0, z: 0 },
@@ -271,15 +289,17 @@ function SceneController({ media, onTextureProgress }) {
   const state = React.useRef(createInitialState(INITIAL_CAMERA_Z))
   const cameraGridRef = React.useRef({ cx: 0, cy: 0, cz: 0, camZ: camera.position.z })
 
-  const [chunks, setChunks] = React.useState([])
+  const [chunks, setChunks] = React.useState(() =>
+    buildChunksForCamera({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
+  )
 
   const maxProgress = React.useRef(0)
 
   React.useEffect(() => {
     maxProgress.current = 0
     media.forEach((item) => getTexture(item))
-    CHUNK_OFFSETS.forEach((o) => {
-      generateChunkPlanesCached(o.dx, o.dy, o.dz)
+    buildChunksForCamera({ x: 0, y: 0, z: INITIAL_CAMERA_Z }).forEach((chunk) => {
+      generateChunkPlanesCached(chunk.cx, chunk.cy, chunk.cz)
     })
   }, [media])
 
@@ -464,29 +484,14 @@ function SceneController({ media, onTextureProgress }) {
       s.pendingChunk = null
       s.lastChunkUpdate = now
 
-      setChunks(
-        CHUNK_OFFSETS.map((o) => ({
-          key: `${ucx + o.dx},${ucy + o.dy},${ucz + o.dz}`,
-          cx: ucx + o.dx,
-          cy: ucy + o.dy,
-          cz: ucz + o.dz,
-        }))
-      )
+      setChunks(buildChunksForCamera(s.basePos))
     }
   })
 
   React.useEffect(() => {
     const s = state.current
     s.basePos = { x: camera.position.x, y: camera.position.y, z: camera.position.z }
-
-    setChunks(
-      CHUNK_OFFSETS.map((o) => ({
-        key: `${o.dx},${o.dy},${o.dz}`,
-        cx: o.dx,
-        cy: o.dy,
-        cz: o.dz,
-      }))
-    )
+    setChunks(buildChunksForCamera(camera.position))
   }, [camera])
 
   return (
@@ -525,8 +530,16 @@ export function InfiniteCanvasScene({
           flat
           gl={{ antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
           className={`${styles.canvas} transition-capture-canvas`}
-          onCreated={({ gl: renderer }) => {
+          onCreated={({ gl: renderer, setSize }) => {
             renderer.domElement.classList.add('transition-capture-canvas')
+            requestAnimationFrame(() => {
+              const container = getCanvasContainer(renderer.domElement)
+              if (!container) return
+              const { width, height } = container.getBoundingClientRect()
+              if (width <= 0 || height <= 0) return
+              setSize(Math.round(width), Math.round(height))
+              window.dispatchEvent(new Event(INFINITE_CANVAS_RESIZE_EVENT))
+            })
           }}
         >
           <TransitionCaptureSync />

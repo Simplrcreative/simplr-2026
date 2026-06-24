@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLoaderData } from 'react-router-dom'
 import emailjs from '@emailjs/browser'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -45,7 +46,7 @@ function validate(fields) {
 
 export default function ContactPage() {
   const btnRef = useRef(null)
-  const { page } = useLoaderData()
+  const { page } = useLoaderData() ?? {}
   const seo = buildContactPageSeo(page)
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [enquiry, setEnquiry] = useState([])

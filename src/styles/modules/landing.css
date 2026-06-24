@@ -1,4 +1,13 @@
 /* --- HERO VIDEO --- */
+[data-intro-visible='true'] .landing .hero-title,
+[data-intro-visible='true'] .landing .hero-video,
+[data-intro-visible='true'] .landing .hero-video-holder,
+[data-intro-visible='true'] .landing .hero-video-trigger,
+[data-intro-visible='true'] .landing .play-icon {
+    visibility: hidden !important;
+    pointer-events: none;
+}
+
 .hero-video {
     cursor: none;
 }

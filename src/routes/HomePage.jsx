@@ -21,6 +21,8 @@ const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 const HOME_SCROLL_INIT_DELAY_MS = 200
 const HOME_SCROLL_INIT_AFTER_INTRO_MS = 1400
 const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
+const HOME_HERO_TITLE_INTRO_EVENT = 'home-hero:title-intro-start'
+const HOME_HERO_VIDEO_INTRO_EVENT = 'home-hero:video-intro-start'
 const HOME_HERO_TITLE_AFTER_NAV_MS = 300
 const HOME_HERO_VIDEO_AFTER_NAV_MS = 350
 const HOME_HERO_INTRO_GLOBAL_FALLBACK_MS = 500
@@ -94,7 +96,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   // Stage hero title/video while loader is active so they don't flash before intro animation.
   useLayoutEffect(() => {
-      if (!shouldRunHomeIntroAnimations || introAnimationsPlayedRef.current) return
+    if (introAnimationsPlayedRef.current) return
+    if (!shouldRunHomeIntroAnimations && introComplete) return
     setIntroHeroInitialState(heroRef.current)
   }, [introComplete, shouldRunHomeIntroAnimations])
 
@@ -200,6 +203,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     }
 
     window.addEventListener(HOME_NAV_INTRO_START_EVENT, handleNavIntroStart, { once: true })
+    window.addEventListener(HOME_HERO_TITLE_INTRO_EVENT, startTitleIntro, { once: true })
+    window.addEventListener(HOME_HERO_VIDEO_INTRO_EVENT, startVideoIntro, { once: true })
 
     const navStartTimestamp = Number(window.__homeNavIntroStartedAt)
     if (Number.isFinite(navStartTimestamp)) {
@@ -212,6 +217,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
     return () => {
       window.removeEventListener(HOME_NAV_INTRO_START_EVENT, handleNavIntroStart)
+      window.removeEventListener(HOME_HERO_TITLE_INTRO_EVENT, startTitleIntro)
+      window.removeEventListener(HOME_HERO_VIDEO_INTRO_EVENT, startVideoIntro)
       window.clearTimeout(titleTimer)
       window.clearTimeout(videoTimer)
       window.clearTimeout(globalFallbackTimer)
