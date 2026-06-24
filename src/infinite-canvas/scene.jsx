@@ -37,7 +37,7 @@ function TransitionCaptureSync() {
   React.useEffect(() => {
     const onPrepareCapture = () => {
       gl.render(scene, camera)
-      gl.finish()
+      gl.getContext()?.finish?.()
     }
 
     window.addEventListener(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, onPrepareCapture)
