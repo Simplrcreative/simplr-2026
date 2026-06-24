@@ -17,6 +17,14 @@ html.page-transitioning .compact-logo:not([data-frozen-clone]) {
     visibility: hidden !important;
 }
 
+[data-intro-visible='true'] .header,
+[data-intro-visible='true'] .compact-logo,
+[data-intro-visible='true'] .menu-icon,
+[data-intro-visible='true'] #mobile-nav {
+    visibility: hidden !important;
+    pointer-events: none;
+}
+
 .spacer {
     height: 520px;
 }

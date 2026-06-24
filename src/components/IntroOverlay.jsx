@@ -63,7 +63,7 @@ export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete 
   return (
     <div
       ref={overlayRef}
-      className="fixed z-[10] inset-0 flex items-center justify-center overflow-hidden px-6 text-white"
+      className="fixed z-[10050] inset-0 flex items-center justify-center overflow-hidden px-6 text-white"
       style={{ backgroundColor: '#FFF', opacity: 1 }}
       aria-hidden="true"
     > 
