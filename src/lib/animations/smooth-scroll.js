@@ -6,6 +6,7 @@ let lenisInstance
 let scrollTriggerRegistered = false
 let subscriberCount = 0
 let tickerCallback
+let visibilityListenerAdded = false
 const activeScrollLocks = new Set()
 const scrollLockOptions = new Map()
 let nativeLockApplied = false
@@ -98,7 +99,16 @@ function ensureLenis() {
   }
 
   gsap.ticker.add(tickerCallback)
-  gsap.ticker.lagSmoothing(0)
+
+  if (!visibilityListenerAdded && typeof document !== 'undefined') {
+    visibilityListenerAdded = true
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible' || !lenisInstance) return
+      gsap.ticker.wake()
+      lenisInstance.resize()
+      ScrollTrigger.refresh()
+    })
+  }
 
   requestAnimationFrame(() => {
     lenisInstance?.resize()

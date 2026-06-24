@@ -49,7 +49,7 @@ nav a {
     text-decoration: none;
     transition: color 500ms ease;
 }
-nav a.is-active {
+nav a.no-children.is-active {
     pointer-events: none;
 }
 nav a.is-active .nav-link__content span {

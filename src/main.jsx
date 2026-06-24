@@ -23,9 +23,18 @@ function hideBootLoader() {
   }, 260)
 }
 
-if (bootLoader) {
-  window.addEventListener('app-shell-ready', hideBootLoader, { once: true })
+function isHomePath() {
+  const path = window.location.pathname
+  return path === '/' || path === ''
+}
 
-  // Fallback in case shell-ready event is missed.
+if (bootLoader) {
+  if (isHomePath()) {
+    window.addEventListener('intro-overlay-ready', hideBootLoader, { once: true })
+  } else {
+    window.addEventListener('app-shell-ready', hideBootLoader, { once: true })
+  }
+
+  // Fallback in case shell-ready / intro events are missed.
   window.setTimeout(hideBootLoader, 6000)
 }

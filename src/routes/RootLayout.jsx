@@ -61,8 +61,14 @@ function hideNavLinkOrb(event) {
   restoreTitleTooltip(currentTarget)
 }
 
-function navLinkClassName({ isActive }) {
-  return isActive ? 'nav-link is-active' : 'nav-link'
+const NO_CHILDREN_NAV_KEYS = new Set(['about', 'contact', 'est2014'])
+
+function navLinkClassName({ isActive }, navKey) {
+  return [
+    'nav-link',
+    NO_CHILDREN_NAV_KEYS.has(navKey) ? 'no-children' : '',
+    isActive ? 'is-active' : '',
+  ].filter(Boolean).join(' ')
 }
 
 function NavLinkLabel({ label, count, inverted = false }) {
@@ -140,12 +146,11 @@ export default function RootLayout() {
     previousPathRef.current = location.pathname
   }, [location.pathname])
 
-  // Reset intro state when leaving home page
-  useEffect(() => {
-    if (!isHomePage) {
-      setShouldRunHomeIntroAnimations(false)
-      setIsIntroVisible(false)
-    }
+  useLayoutEffect(() => {
+    if (isHomePage) return
+    setShouldRunHomeIntroAnimations(false)
+    setIsIntroVisible(false)
+    document.documentElement.removeAttribute('data-home-intro-pending')
   }, [isHomePage])
 
   // Latch whether the current Home visit includes intro overlay or a return visit.
@@ -446,12 +451,13 @@ export default function RootLayout() {
     <div 
       ref={layoutRef} 
       className="relative min-h-screen"
-      data-intro-visible={isIntroVisible ? 'true' : 'false'}
+      data-intro-visible={isHomePage && isIntroVisible ? 'true' : 'false'}
     >
       {isIntroVisible ? (
         <IntroOverlay 
           shouldFadeOut={shouldFadeOutIntro}
           onFadeOutComplete={() => {
+            document.documentElement.removeAttribute('data-home-intro-pending')
             setIsIntroVisible(false)
             if (isHomePage) {
               setTimeout(() => setIntroComplete(true), 100)
@@ -507,7 +513,7 @@ export default function RootLayout() {
               key={item.key}
               to={item.path}
               title={item.label}
-              className={navLinkClassName}
+              className={(classState) => navLinkClassName(classState, item.key)}
               onPointerDown={requestTransitionCapture}
               onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
               onPointerMove={showNavLinkOrb}
@@ -553,7 +559,7 @@ export default function RootLayout() {
                   key={item.key}
                   to={item.path}
                   title={item.label}
-                  className={navLinkClassName}
+                  className={(classState) => navLinkClassName(classState, item.key)}
                   onPointerDown={requestTransitionCapture}
                   onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
                   onPointerMove={showNavLinkOrb}

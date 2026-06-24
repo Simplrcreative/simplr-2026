@@ -1,10 +1,14 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { lockScroll, unlockScroll } from '../lib/animations/index.js'
 
 export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete }) {
   const overlayRef = useRef(null)
   const hasStartedFadeOut = useRef(false)
+
+  useLayoutEffect(() => {
+    window.dispatchEvent(new Event('intro-overlay-ready'))
+  }, [])
 
   useEffect(() => {
     if (!overlayRef.current) {

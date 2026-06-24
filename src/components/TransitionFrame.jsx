@@ -603,6 +603,7 @@ export default function TransitionFrame({ children }) {
   const capturedPageBgRef = useRef(null)
   const capturedPathRef = useRef(null)
   const immediateOverlayRef = useRef(null)
+  const captureResetTimerRef = useRef(null)
   const isFirstMount = useRef(true)
   // Separate ref so we can detect the first useEffect run independently of
   // useLayoutEffect (which runs before effects and would already have cleared isFirstMount).
@@ -611,6 +612,45 @@ export default function TransitionFrame({ children }) {
   const logo = layoutRef.current?.querySelector('.logo')
   const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
   const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
+  function clearCaptureResetTimer() {
+    if (!captureResetTimerRef.current) return
+    window.clearTimeout(captureResetTimerRef.current)
+    captureResetTimerRef.current = null
+  }
+
+  function resetCaptureState() {
+    const hadCapture = hasCapturedRef.current
+    clearCaptureResetTimer()
+    hasCapturedRef.current = false
+    snapshotRef.current = null
+    altTransitionRef.current = null
+    headerSnapshotRef.current = null
+    compactLogoSnapshotRef.current = null
+    bottomMenuSnapshotRef.current = null
+    bottomMenuNavCaptureRef.current = false
+    capturedScrollYRef.current = 0
+    capturedScrollHeightRef.current = 0
+    capturedPageBgRef.current = null
+    capturedPathRef.current = null
+    immediateOverlayRef.current?.remove()
+    immediateOverlayRef.current = null
+    document.querySelectorAll('[data-frozen-clone="true"]').forEach((node) => node.remove())
+    if (hadCapture) {
+      window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
+    }
+  }
+
+  function scheduleCaptureResetIfAborted(delayMs = 3000) {
+    const pathAtCapture = window.location.pathname
+    clearCaptureResetTimer()
+    captureResetTimerRef.current = window.setTimeout(() => {
+      captureResetTimerRef.current = null
+      if (hasCapturedRef.current && window.location.pathname === pathAtCapture) {
+        resetCaptureState()
+      }
+    }, delayMs)
+  }
 
   //RESPONSIVE VALUES
     let logoScale = 1
@@ -789,6 +829,9 @@ export default function TransitionFrame({ children }) {
       if (hasCapturedRef.current) return
       hasCapturedRef.current = true
 
+      let didPrepareCapture = false
+
+      try {
       // Record scroll position at click time. window.scrollY at useLayoutEffect
       // time may already be 0 (browser clamps scroll for new page DOM).
       capturedScrollYRef.current = window.scrollY
@@ -821,6 +864,7 @@ export default function TransitionFrame({ children }) {
         window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, {
           detail: { caseStudySourceKey },
         }))
+        didPrepareCapture = true
 
         const shouldUseAltTransition = Boolean(
           nav
@@ -945,6 +989,7 @@ export default function TransitionFrame({ children }) {
         window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, {
           detail: { caseStudySourceKey: null },
         }))
+        didPrepareCapture = true
       }
 
       // --- Header clone ---
@@ -1083,6 +1128,7 @@ export default function TransitionFrame({ children }) {
         window.dispatchEvent(new CustomEvent(PAGE_TRANSITION_PREPARE_CAPTURE_EVENT, {
           detail: { caseStudySourceKey },
         }))
+        didPrepareCapture = true
       }
 
       liveCaptureCanvases.forEach((liveCanvas) => {
@@ -1155,9 +1201,14 @@ export default function TransitionFrame({ children }) {
         document.body.appendChild(wrapper)
         immediateOverlayRef.current = wrapper
       }
-    }
 
-    window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
+      scheduleCaptureResetIfAborted(3000)
+      } finally {
+        if (didPrepareCapture) {
+          window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
+        }
+      }
+    }
 
     const canCaptureFromEventTarget = (target) => Boolean(extractSameOriginLink(target))
 
@@ -1195,10 +1246,14 @@ export default function TransitionFrame({ children }) {
       document.removeEventListener('click', handleClick, { capture: true })
       window.removeEventListener(PAGE_TRANSITION_CAPTURE_EVENT, handleCaptureEvent)
       window.removeEventListener('popstate', handlePopState)
-      immediateOverlayRef.current?.remove()
-      immediateOverlayRef.current = null
+      clearCaptureResetTimer()
+      resetCaptureState()
     }
   }, [])
+
+  useLayoutEffect(() => {
+    clearCaptureResetTimer()
+  }, [location.pathname])
 
   // MAIN TRANSITION — synchronous before browser paint on every route change.
   useLayoutEffect(() => {
@@ -1206,8 +1261,7 @@ export default function TransitionFrame({ children }) {
     if (isFirst) isFirstMount.current = false
 
     if (!siteConfig.transitions.enabled || isFirst) {
-      immediateOverlayRef.current?.remove()
-      immediateOverlayRef.current = null
+      resetCaptureState()
       return
     }
 
@@ -1215,10 +1269,11 @@ export default function TransitionFrame({ children }) {
     const snapshot = snapshotRef.current
     const altTransition = altTransitionRef.current
     if (!el || (!snapshot && !altTransition)) {
-      immediateOverlayRef.current?.remove()
-      immediateOverlayRef.current = null
+      resetCaptureState()
       return
     }
+
+    clearCaptureResetTimer()
 
     // Child layout effects run before parent (React bottom-up order), so at
     // this point RootLayout has NOT yet updated dataset.pageBg — it still holds
@@ -1443,6 +1498,7 @@ export default function TransitionFrame({ children }) {
 
       snapshotRef.current = null
       altTransitionRef.current = null
+      clearCaptureResetTimer()
       hasCapturedRef.current = false
     }
 

@@ -16,7 +16,23 @@
     <meta name="robots" content="noindex,nofollow" />
     <title>Simplr</title>
     <script>history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
+    <script>
+      (function () {
+        var path = window.location.pathname;
+        if (path === '/' || path === '') {
+          document.documentElement.setAttribute('data-home-intro-pending', 'true');
+        }
+      })();
+    </script>
     <style>
+      html[data-home-intro-pending='true'] .header,
+      html[data-home-intro-pending='true'] .compact-logo,
+      html[data-home-intro-pending='true'] .menu-icon,
+      html[data-home-intro-pending='true'] #mobile-nav {
+        visibility: hidden !important;
+        pointer-events: none;
+      }
+
       #boot-loader {
         position: fixed;
         inset: 0;
