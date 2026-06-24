@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
@@ -57,6 +57,9 @@ export default function Est2014PageInfinite() {
   const btnRef = useRef(null)
   const sceneRef = useRef(null)
   const canvasLayerRef = useRef(null)
+  const travelXRef = useRef(null)
+  const travelYRef = useRef(null)
+  const travelZRef = useRef(null)
   const canPlayAnimationRef = useRef(false)
   const isReturnVisit = useRef(sessionStorage.getItem(LOADER_SESSION_KEY) === '1')
   const { beyondItems = [], page, siteSettings } = useLoaderData() ?? {}
@@ -127,6 +130,12 @@ export default function Est2014PageInfinite() {
     setShowCanvas(true)
   }
 
+  const handleTravelUpdate = useCallback(({ x, y, z }) => {
+    if (travelXRef.current) travelXRef.current.textContent = x.toFixed(1)
+    if (travelYRef.current) travelYRef.current.textContent = y.toFixed(1)
+    if (travelZRef.current) travelZRef.current.textContent = z.toFixed(1)
+  }, [])
+
   return (
     <>
       <Seo
@@ -136,6 +145,7 @@ export default function Est2014PageInfinite() {
         schema={[webPageSchema({ pathname: '/est-2014/', title: page?.title ?? 'Est. 2014', description: page?.intro ?? '', type: 'WorkPage' })]}
       />
       <section ref={sceneRef} className="est2014-scene min-h-screen">
+        
         <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
           <div className="hero est2014-hero px-5 relative z-2 min-h-[80vh] flex items-end">
             <div className="grid grid-cols-12 w-full">
@@ -172,7 +182,17 @@ export default function Est2014PageInfinite() {
                 backgroundColor="#FFF"
                 fogColor="#FFF"
                 showControls
+                onTravelUpdate={handleTravelUpdate}
               />
+              <div
+                className="est2014-widget fixed z-1000 bottom-[1.25rem] right-[1.25rem] bg-white text-coffee leading-none px-5 py-2 rounded-full flex items-center gap-3 tabular-nums"
+                aria-live="polite"
+                aria-label="Canvas travel distance"
+              >
+                <span ref={travelXRef}>0.0</span>
+                <span ref={travelYRef}>0.0</span>
+                <span ref={travelZRef}>0.0</span>
+              </div>
             </div>
           )}
         </div>

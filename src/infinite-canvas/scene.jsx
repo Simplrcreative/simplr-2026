@@ -281,13 +281,17 @@ const createInitialState = (camZ) => ({
   pendingChunk: null,
 })
 
-function SceneController({ media, onTextureProgress }) {
+function SceneController({ media, onTextureProgress, onTravelUpdate }) {
   const { camera, gl } = useThree()
   const isTouchDevice = useIsTouchDevice()
   const [, getKeys] = useKeyboardControls()
 
   const state = React.useRef(createInitialState(INITIAL_CAMERA_Z))
   const cameraGridRef = React.useRef({ cx: 0, cy: 0, cz: 0, camZ: camera.position.z })
+  const lastTravelRef = React.useRef({ x: 0, y: 0, z: 0, t: 0 })
+  const onTravelUpdateRef = React.useRef(onTravelUpdate)
+
+  onTravelUpdateRef.current = onTravelUpdate
 
   const [chunks, setChunks] = React.useState(() =>
     buildChunksForCamera({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
@@ -486,6 +490,22 @@ function SceneController({ media, onTextureProgress }) {
 
       setChunks(buildChunksForCamera(s.basePos))
     }
+
+    const travel = {
+      x: s.basePos.x,
+      y: s.basePos.y,
+      z: s.basePos.z - INITIAL_CAMERA_Z,
+    }
+    const lastTravel = lastTravelRef.current
+    const travelChanged =
+      Math.abs(travel.x - lastTravel.x) > 0.05 ||
+      Math.abs(travel.y - lastTravel.y) > 0.05 ||
+      Math.abs(travel.z - lastTravel.z) > 0.05
+
+    if (onTravelUpdateRef.current && (travelChanged || now - lastTravel.t > 150)) {
+      lastTravelRef.current = { ...travel, t: now }
+      onTravelUpdateRef.current(travel)
+    }
   })
 
   React.useEffect(() => {
@@ -506,6 +526,7 @@ function SceneController({ media, onTextureProgress }) {
 export function InfiniteCanvasScene({
   media,
   onTextureProgress,
+  onTravelUpdate,
   showFps = false,
   showControls = false,
   cameraFov = 60,
@@ -546,7 +567,7 @@ export function InfiniteCanvasScene({
           <CanvasResizeSync />
           <color attach="background" args={[backgroundColor]} />
           <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
-          <SceneController media={media} onTextureProgress={onTextureProgress} />
+          <SceneController media={media} onTextureProgress={onTextureProgress} onTravelUpdate={onTravelUpdate} />
           {showFps && <Stats className={styles.stats} />}
         </Canvas>
 

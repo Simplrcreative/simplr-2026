@@ -1,8 +1,11 @@
 import * as React from 'react'
+import gsap from 'gsap'
 import styles from './style.module.css'
 
-const HINT_MOUNT_MS = 200
+const OVERLAY_FADE_MS = 500
 const HINT_EXIT_MS = 500
+const HINT_ENTER_DELAY = 0.35
+const HINT_ENTER_DURATION = 0.75
 
 export function PageLoader({ progress, onComplete, minVisibleMs = 1500, hintText, staticHint = false }) {
   const [showOverlay, setShowOverlay] = React.useState(true)
@@ -13,6 +16,8 @@ export function PageLoader({ progress, onComplete, minVisibleMs = 1500, hintText
   const hasCompletedRef = React.useRef(false)
   const hasScheduledRef = React.useRef(false)
   const onCompleteRef = React.useRef(onComplete)
+  const hintRef = React.useRef(null)
+  const hintTweenRef = React.useRef(null)
   const [visualProgress, setVisualProgress] = React.useState(0)
 
   onCompleteRef.current = onComplete
@@ -54,11 +59,11 @@ export function PageLoader({ progress, onComplete, minVisibleMs = 1500, hintText
 
     hasScheduledRef.current = true
 
-    const hintMountMs = staticHint ? 0 : HINT_MOUNT_MS
+    const mountMs = staticHint ? 0 : OVERLAY_FADE_MS
     let hintTimer
 
     if (hintText) {
-      hintTimer = window.setTimeout(() => setShowHint(true), hintMountMs)
+      hintTimer = window.setTimeout(() => setShowHint(true), mountMs)
     }
 
     const overlayTimer = window.setTimeout(() => {
@@ -67,13 +72,49 @@ export function PageLoader({ progress, onComplete, minVisibleMs = 1500, hintText
         hasCompletedRef.current = true
         onCompleteRef.current?.()
       }
-    }, hintMountMs)
+    }, mountMs)
 
     return () => {
       if (hintTimer) window.clearTimeout(hintTimer)
       window.clearTimeout(overlayTimer)
     }
   }, [isComplete, hintText, staticHint])
+
+  React.useLayoutEffect(() => {
+    hintTweenRef.current?.kill()
+
+    if (!showHint || !hintRef.current || hintExiting) return undefined
+
+    if (staticHint) {
+      gsap.set(hintRef.current, { opacity: 1, y: 0 })
+      return undefined
+    }
+
+    gsap.set(hintRef.current, { opacity: 0, y: 8 })
+    hintTweenRef.current = gsap.to(hintRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: HINT_ENTER_DURATION,
+      delay: HINT_ENTER_DELAY,
+      ease: 'power2.out',
+    })
+
+    return () => hintTweenRef.current?.kill()
+  }, [showHint, staticHint, hintExiting])
+
+  React.useLayoutEffect(() => {
+    if (!hintExiting || !hintRef.current) return undefined
+
+    hintTweenRef.current?.kill()
+    hintTweenRef.current = gsap.to(hintRef.current, {
+      opacity: 0,
+      y: 8,
+      duration: HINT_EXIT_MS / 1000,
+      ease: 'power2.out',
+    })
+
+    return () => hintTweenRef.current?.kill()
+  }, [hintExiting])
 
   React.useEffect(() => {
     if (!showHint) {
@@ -86,7 +127,7 @@ export function PageLoader({ progress, onComplete, minVisibleMs = 1500, hintText
       window.setTimeout(() => setShowHint(false), HINT_EXIT_MS)
     }
 
-    const scrollGraceMs = staticHint ? 400 : 0
+    const scrollGraceMs = staticHint ? 400 : 600
     const graceTimer = window.setTimeout(() => {
       window.addEventListener('wheel', dismiss, { once: true, passive: true })
       window.addEventListener('touchmove', dismiss, { once: true, passive: true })
@@ -111,11 +152,7 @@ export function PageLoader({ progress, onComplete, minVisibleMs = 1500, hintText
         </div>
       )}
       {showHint && hintText && (
-        <div
-          className={`${styles.bootLoader} ${
-            hintExiting ? styles.exit : staticHint ? styles.static : styles.enter
-          }`}
-        >
+        <div ref={hintRef} className={styles.bootLoader}>
           {hintText}
         </div>
       )}
