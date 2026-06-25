@@ -170,9 +170,10 @@ export default function ThinkingSinglePage() {
       <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex md:items-end">
-        <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-20 md:mt-40 flex flex-col items-center change-logo-back">
+      <section className="post-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex md:items-end">
+        <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+          <div className="col-span-12 change-logo-back" aria-hidden="true" />
+          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-40 flex flex-col items-center">
               <div className="eyebrow">Thinking {categories.length > 0 && (
                 categories.map((category) => {
                   const filterSlug = categoryToFilterSlug(category)
@@ -202,8 +203,8 @@ export default function ThinkingSinglePage() {
               )}
           </div>
           {thumb && ( 
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 pt-20">
-            <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }} >
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 py-10 md:pt-20">
+            <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '65%' }} >
               <PictureImg
                 loaderSrc = {loaderThumb + '.webp'}
                 mobileSrc = {thumb + '.webp'}

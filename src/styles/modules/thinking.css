@@ -45,7 +45,7 @@
 }
 .thinking-post__title {
   font-family: var(--font-aeonik);
-  font-size: 0.75rem;
+  font-size: 1rem;
   line-height: 1.2;
   font-weight: 500;
   color: var(--color-coffee);

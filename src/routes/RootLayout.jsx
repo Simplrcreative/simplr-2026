@@ -219,7 +219,7 @@ export default function RootLayout() {
     let logoY = 0
     let logoDuration = 0
 
-    let taglineScale = 0.65
+    let taglineScale = 0.66
     let taglineY = -88
     let taglineX = 65
 

@@ -87,8 +87,8 @@ export default function WorkSinglePage() {
       <Seo {...seo} />
     
       <section className="page-hero px-5 pb-10 md:pb-20 bg-white section-light min-h-[80vh] flex md:items-end">
-        <div className="grid grid-cols-12 w-full">
-          <div className="col-span-12 change-logo-back" />
+        <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+          <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>

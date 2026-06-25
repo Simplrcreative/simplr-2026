@@ -633,7 +633,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-[80vh] md:min-h-screen flex flex-col md:justify-end change-logo-back">
           <div className="grid grid-cols-12 min-h-[80vh] md:min-h-0 items-start gap-x-5 w-full">
-            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[95ch] mt-70 md:mt-0"> 
+            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[95ch] mt-60 mb-10 md:my-0"> 
               <h1 className="hero-title text-coffee">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
             <div className="hero-video-holder col-start-1 md:col-start-8 col-span-12 md:col-span-5 section-dark md:flex md:items-end md:justify-end pb-5 relative"> 
@@ -643,7 +643,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 aria-label={hasHeroFullVideo ? 'Play full hero video' : 'Hero video preview'}
                 onClick={openHeroVideoModal}
               > 
-                <div className="play-icon-mobile absolute z-[1000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-branding-design w-[50px] h-[50px] md:hidden rounded-full flex items-center justify-center">
+                <div className="play-icon-mobile">
                   <svg xmlns="http://www.w3.org/2000/svg" className="ms-1" width="16" height="auto" viewBox="0 0 18 20" fill="white">
                     <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
                   </svg>
@@ -760,7 +760,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
           <div className="grid grid-cols-12 items-emd slide-up md:pt-10">
-            <div className="col-start-1 col-span-11 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
+            <div className="col-start-1 col-span-12 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 

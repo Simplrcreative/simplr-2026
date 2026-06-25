@@ -53,6 +53,20 @@
     .stat-detail {
         min-height: 57px;
     }
+    .play-icon-mobile {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -55%);
+        background: var(--color-branding-design);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
 }
 @media (min-width: 768px) {
     .stat-detail {

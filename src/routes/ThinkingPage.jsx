@@ -254,10 +254,10 @@ export default function ThinkingPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex md:items-end">
-        <div className="grid grid-cols-12">
-          <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-20 md:mt-40 max-w-[115ch]">
+      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex flex-col md:items-end">
+        <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+          <div className="col-span-12 change-logo-back" aria-hidden="true" />
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
             <div className="eyebrow">
               Thinking
               {activeFilterLabel ? (
@@ -311,7 +311,7 @@ export default function ThinkingPage() {
                   className="thinking-post-link"
                   data-transition-snapshot-state="hover"
                 >
-                  <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '54%' }} >
+                  <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '65%' }} >
                     <PictureImg
                       loaderSrc = {loaderThumb + '.webp'}
                       mobileSrc = {thumb + '.webp'}

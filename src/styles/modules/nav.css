@@ -44,7 +44,6 @@ nav a {
     color: white;
     font-family: var(--font-aeonik);
     font-size: 2rem;
-    font-weight: 500;
     line-height: 1;
     text-decoration: none;
     transition: color 500ms ease;
@@ -97,11 +96,12 @@ nav.light a.is-active .nav-link__orb {
        border-radius: 0 0 0 10px;
        pointer-events: none;
        padding: 2.5rem;
+       transition: transform 0.7s ease;
     }
 
     #mobile-nav.active {
         transform: translateX(0)!important;
-        transition: transform 0.3s ease;
+        transition: transform 0.5s ease;
         pointer-events: all
     }
 
@@ -131,30 +131,41 @@ nav.light a.is-active .nav-link__orb {
         gap: 0.3rem;
     }
     .menu-icon.active .menu-icon-dot {
-        width: 100%;
+        width: 50%;
     }
-    .menu-icon.active .menu-icon-dot-alt {
-        width: 0;
-    }
+    
     .menu-icon-dot, .menu-icon-dot-alt {
         transition: width 0.3s ease;
     }
-    nav a {
+    #mobile-nav a {
         transform: translateX(100px)!important;
-        transition: transform 0.5s ease-out
+        transition: transform 0.35s ease-out;
+        transition-delay: 0s;
     }
-    html[data-page-bg="dark"] nav.active a {
+
+    #mobile-nav.active a:nth-child(1) { transition-delay: 0s; }
+    #mobile-nav.active a:nth-child(2) { transition-delay: 0.1s; }
+    #mobile-nav.active a:nth-child(3) { transition-delay: 0.15s; }
+    #mobile-nav.active a:nth-child(4) { transition-delay: 0.2s; }
+    #mobile-nav.active a:nth-child(5) { transition-delay: 0.25s; }
+    #mobile-nav.active a:nth-child(6) { transition-delay: 0.3s; }
+    #mobile-nav.active a:nth-child(7) { transition-delay: 0.35s; }
+    #mobile-nav.active a:nth-child(8) { transition-delay: 0.4s; }
+    #mobile-nav.active a:nth-child(9) { transition-delay: 0.45s; }
+    #mobile-nav.active a:nth-child(10) { transition-delay: 0.5s; }
+
+    html[data-page-bg="dark"] #mobile-nav.active a {
         transform: translateX(0)!important;
         color: var(--color-coffee);
     }
-    html[data-page-bg="dark"] nav a.is-active {
+    html[data-page-bg="dark"] #mobile-nav a.is-active {
         color: var(--color-coffee);
     }
-    html[data-page-bg="light"] nav.active a {
+    html[data-page-bg="light"] #mobile-nav.active a {
         transform: translateX(0)!important;
         color: white;
     }
-    html[data-page-bg="light"] nav a.is-active {
+    html[data-page-bg="light"] #mobile-nav a.is-active {
         color: white;
     }
 }

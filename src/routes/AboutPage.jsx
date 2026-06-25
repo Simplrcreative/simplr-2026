@@ -109,10 +109,10 @@ export default function AboutPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex md:items-end">
-        <div className="grid grid-cols-12">
-          <div className="col-span-12 change-logo-back" />
-          <div className="col-span-11 md:col-span-6 text-white change-logo mt-20 md:mt-40 max-w-[85ch]">
+      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex flex-col md:items-end">
+        <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+          <div className="col-span-12 change-logo-back" aria-hidden="true" />
+          <div className="col-span-12 md:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
             <h1 className="hero-title">A <span>brand and digital design agency</span> partnering with <span><i>forward-thinking</i></span> clients around the world</h1>
           </div>
