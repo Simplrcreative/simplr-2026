@@ -8,13 +8,7 @@
     pointer-events: none;
 }
 
-.hero-video {
-    cursor: none;
-}
-.hero-video-holder,
-.hero-video-holder * {
-    cursor: none !important;
-}
+
 .hero-video-trigger {
     border: 0;
     background: transparent;
@@ -66,6 +60,13 @@
     }
     .stat-no {
         font-size: 25rem;
+    }
+    .hero-video {
+        cursor: none;
+    }
+    .hero-video-holder,
+    .hero-video-holder * {
+        cursor: none !important;
     }
 }
 @media (min-width: 1280px) {

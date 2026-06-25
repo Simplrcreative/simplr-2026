@@ -320,6 +320,7 @@ export function createHeroScrollAnimation(scope) {
     const section = scope.matches?.('.landing') ? scope : scope.querySelector('.landing')
     const heroTitle = section?.querySelector('.hero-title')
     const heroImage = section?.querySelector('.hero-video')
+    const mobilePlayIcon = section?.querySelector('.play-icon-mobile')
     const heroVideoHolder = section?.querySelector('.hero-video-holder')
     const navHolder = document.querySelector('.nav-holder')
     const nav = document.querySelector('#desktop-nav')
@@ -585,6 +586,12 @@ export function createHeroScrollAnimation(scope) {
         filter: 'blur(20px)',
         duration: 1,
         delay: 0.1,
+      }, 'hero-start')
+
+      timeline.to(mobilePlayIcon, {
+        scale: 0.9,
+        y: 150,
+        duration: 1,
       }, 'hero-start')
 
       /*timeline.to(navHolder, {

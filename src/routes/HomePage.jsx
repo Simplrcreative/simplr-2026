@@ -614,7 +614,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         ]}
       />
       <div
-        className={`play-icon text-white bg-branding-design fixed z-[999999] w-[100px] h-[100px] rounded-full hidden md:flex items-center justify-center transition-[background-color] duration-200 ${isHeroModalVisible ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
+        className={`play-icon text-white bg-branding-design fixed z-[999999] w-[50px] h-[50px] md:w-[100px] md:h-[100px] rounded-full hidden md:flex items-center justify-center transition-[background-color] duration-200 ${isHeroModalVisible ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
         onClick={isHeroModalVisible ? () => closeHeroVideoModal({ scrollToNextSection: true }) : undefined}
         role={isHeroModalVisible ? 'button' : undefined}
         aria-label={isHeroModalVisible ? 'Close video' : undefined}
@@ -631,18 +631,23 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         )}
       </div>
       
-      <section ref={heroRef} className="landing relative w-full px-5 min-h-screen flex flex-col md:justify-end change-logo-back">
-          <div className="grid grid-cols-12 min-h-screen md:min-h-0 items-start gap-x-5 w-full">
-            <div className="col-start-1 col-span-12 md:col-span-7 pb-8 max-w-[95ch] mt-60 md:mt-0"> 
+      <section ref={heroRef} className="landing relative w-full px-5 min-h-[80vh] md:min-h-screen flex flex-col md:justify-end change-logo-back">
+          <div className="grid grid-cols-12 min-h-[80vh] md:min-h-0 items-start gap-x-5 w-full">
+            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[95ch] mt-70 md:mt-0"> 
               <h1 className="hero-title text-coffee">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
-            <div className="hero-video-holder col-start-1 md:col-start-8 col-span-12 md:col-span-5 section-dark md:flex items-end justify-end pb-5"> 
+            <div className="hero-video-holder col-start-1 md:col-start-8 col-span-12 md:col-span-5 section-dark md:flex md:items-end md:justify-end pb-5 relative"> 
               <button
                 type="button"
                 className="hero-video-trigger block w-full text-left"
                 aria-label={hasHeroFullVideo ? 'Play full hero video' : 'Hero video preview'}
                 onClick={openHeroVideoModal}
-              >
+              > 
+                <div className="play-icon-mobile absolute z-[1000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-branding-design w-[50px] h-[50px] md:hidden rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="ms-1" width="16" height="auto" viewBox="0 0 18 20" fill="white">
+                    <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
+                  </svg>
+                </div>
                 <video
                   ref={heroVideoRef}
                   className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden rounded-[10px]"
@@ -660,7 +665,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       {isHeroModalVisible && hasHeroFullVideo ? (
         <div
-          className={`hero-video-modal fixed inset-0 z-[10000] flex items-center justify-center bg-black transition-opacity ease-out ${isHeroModalOpen ? 'opacity-100' : 'opacity-0'}`}
+          className={`hero-video-modal fixed inset-0 z-[100000] flex items-center justify-center bg-black transition-opacity ease-out ${isHeroModalOpen ? 'opacity-100' : 'opacity-0'}`}
           style={{ transitionDuration: `${HERO_MODAL_FADE_DURATION_MS}ms` }}
           role="dialog"
           aria-modal="true"
