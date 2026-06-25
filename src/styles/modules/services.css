@@ -19,7 +19,7 @@
   box-shadow: 0 -8px 32px rgba(48, 15, 29, 0.06);
   padding-left: 1.25rem;
   padding-right: 1.25rem;
-  padding-bottom: 1.25rem;
+  padding-bottom: 3rem;
 }
 
 .service-card__header {
@@ -82,10 +82,9 @@
 
 .service-card__title {
   font-family: var(--font-literata);
-  font-size: clamp(2rem, 3.5vw, 3.125rem);
+  font-size: 1.5rem;
   font-weight: 300;
   line-height: 1.2;
-  color: var(--color-coffee);
 }
 
 .service-card__body {
@@ -104,9 +103,8 @@
 
 .service-card__description {
   font-family: var(--font-aeonik);
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  color: rgba(0, 0, 0, 0.9);
+  font-size: 1rem;
+  line-height: 1.2rem;
 }
 
 .service-card__video {
@@ -178,6 +176,13 @@
   .service-card__label-text {
     white-space: nowrap;
   }
+  .service-card__title {
+    font-size: clamp(2rem, 3.5vw, 3.125rem);
+  }
+  .service-card__description {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
 }
 
 /* --- SERVICE DETAIL ACCORDION --- */
@@ -214,10 +219,10 @@
 .service-accordion-title,
 .service-accordion-symbol {
   font-family: var(--font-aeonik);
-  font-size: 1.375rem;
+  font-size: 1rem;
   font-weight: 500;
-  line-height: 1.625rem;
-  color: #000;
+  line-height: 1.2rem;
+  color: var(--color-coffee);
 }
 
 .service-accordion-symbol {
@@ -244,9 +249,8 @@
 }
 
 .service-richtext {
-  font-family: var(--font-aeonik);
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  font-size: 1rem;
+  line-height: 1.2rem;
 }
 
 .service-richtext p {
@@ -257,15 +261,22 @@
   .service-accordion-list {
     gap: 1.25rem;
   }
-
-  .service-accordion-title,
-  .service-accordion-symbol {
-    font-size: 1.1875rem;
-    line-height: 1.45;
-  }
-
   .service-accordion-content {
     padding-top: 1rem;
     padding-bottom: 0.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .service-richtext {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  .service-accordion-title,
+  .service-accordion-symbol {
+    font-family: var(--font-aeonik);
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1.625rem;
+    color: #000;
   }
 }

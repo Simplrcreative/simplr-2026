@@ -251,11 +251,11 @@ export default function ServicesSinglePage() {
         </Link>
       </div>
 
-      <section className="page-hero px-5 pb-5 mb-15 bg-white section-light min-h-[90vh] md:min-h-screen flex items-end">
+      <section className="page-hero px-5 py-20 md:pt-0 md:pb-5 md:mb-15 bg-white section-light min-h-[80vh] md:min-h-screen flex md:items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-start-1 col-span-12 md:col-span-5 text-coffee mb-10 md:mb-0 change-logo">
-            <div className="service-card__label mb-5">
+          <div className="col-start-1 col-span-11 md:col-span-5 text-coffee mt-20 md:mt-0 mb-12 md:mb-0 change-logo">
+            <div className="service-card__label mb-10 md:mb-5">
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
             </div>
@@ -306,15 +306,15 @@ export default function ServicesSinglePage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-5 pb-20 md:py-20 bg-white section-light">
+          <section key={`section-${sectionIndex}`} className="px-5 pb-10 md:py-20 bg-white section-light">
             <div className="grid grid-cols-12 ">
               {sectionHeading && (
-                <div className="col-start-1 col-span-12 md:col-span-9 md:pe-40 slide-up-subtle">
+                <div className="col-start-1 col-span-11 md:col-span-9 md:pe-40 slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="section-heading" />
                 </div>
               )}
               {sectionContent && (
-                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 slide-up-subtle">
+                <div className="col-start-1 md:col-start-4 col-span-11 md:col-span-5 slide-up-subtle">
                   <RichText html={sectionContent} className="service-richtext pt-10 md:pt-20" />
                 </div>
               )}

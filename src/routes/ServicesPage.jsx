@@ -158,7 +158,7 @@ function ServiceCard({ service }) {
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
                               <span className="btn-text text-coffee">Explore <span className="hidden md:inline-block ps-1">{acfService}</span></span>
-                              Explore <span className="hidden md:inline ps-1"> {acfService}</span>
+                              Explore {acfService}
                           </span>
                       </Link>
                   </div>
@@ -216,10 +216,10 @@ export default function ServicesPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
+      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[90ch]">
+          <div className="col-span-11 md:col-span-9 text-coffee change-logo mt-20 md:mt-40 max-w-[90ch]">
             <div className="eyebrow">{services.acfHeading}</div>
             <RichHeading as="h1" html={services.acfIntroductionLead} className="hero-title" />
           </div>
