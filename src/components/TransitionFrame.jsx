@@ -1422,12 +1422,17 @@ export default function TransitionFrame({ children }) {
     // Suppress scrollbar flash while content is translated off-screen.
     document.documentElement.style.overflowX = 'hidden'
 
+    let ySnapShotOff = window.innerHeight * 2;
+    if(isDesktop) {
+      ySnapShotOff = window.innerHeight * 1.5;
+    }
+
     if (altClone) {
       // Alt transitions should not inherit any previous page transform state.
       gsap.set(el, { y: 0, scale: 1, autoAlpha: 1 })
     } else {
-      // Entering page starts below the viewport at 0.85 scale.
-      gsap.set(el, { y: window.innerHeight * 1.5, scale: 0.9, autoAlpha: 1 })
+      // Entering page starts below the viewport at 0.9 scale.
+      gsap.set(el, { y: ySnapShotOff, scale: 0.9, autoAlpha: 1 })
     }
 
     let transitionFinished = false
@@ -1896,7 +1901,7 @@ export default function TransitionFrame({ children }) {
       }
     } else {
       tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
-      tl.to(wrapper, { y: -window.innerHeight * 1.5, duration: 1, ease: 'power4.in' }, 0.1)
+      tl.to(wrapper, { y: -ySnapShotOff, duration: 1, ease: 'power4.in' }, 0.1)
       tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
       tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
     }
