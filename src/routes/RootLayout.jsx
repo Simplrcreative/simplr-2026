@@ -491,7 +491,7 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[1rem] flex flex-col items-end gap-2${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((open) => {
+      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[3.125rem] h-[3.125rem] flex justify-end ${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((open) => {
           const next = !open
           if (next) {
             lockScroll('nav')
@@ -500,12 +500,12 @@ export default function RootLayout() {
           }
           return next
         })}>
-        <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
-        <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
-        <div className="w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+        <div className="menu-icon-dot-alt w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+        <div className="menu-icon-dot w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+        <div className="menu-icon-dot-alt w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
       </div>
 
-      <nav id="mobile-nav" className={`z-[1003] main flex flex-col lg:hidden flex-wrap items-start gap-[2.5rem] pt-[1.875rem]${isNavOpen ? ' active' : ''}`}>
+      <nav id="mobile-nav" className={`z-[1003] main flex flex-col lg:hidden flex-wrap items-start gap-[2.5rem] ${isNavOpen ? ' active' : ''}`}>
         {navigation.map((item) => {
           const prefetch = useRoutePrefetch(item.path)
           return (
@@ -575,8 +575,6 @@ export default function RootLayout() {
               )
             })}
           </nav>
-
-          <div className={`nav-background${isNavOpen ? ' active' : ''}`}></div>
         </div>
       </header>
 
