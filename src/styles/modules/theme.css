@@ -101,8 +101,8 @@
 
 
 .category {
-  font-size: 0.75rem;
-  padding: 7px 14px 7.5px 14px
+  font-size: 0.5rem;
+  padding: 5px 10px 6px 10px
 }
 
 .footer-details-meta {
@@ -142,5 +142,9 @@
 @media (min-width: 768px) {
   .footer-off {
     min-height: calc(70vh - 54px)
+  }
+  .category {
+    font-size: 0.75rem;
+    padding: 7px 14px 7.5px 14px
   }
 }

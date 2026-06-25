@@ -31,7 +31,7 @@ export default function CategoryBadge({ name }) {
 
   return (
     <span
-      className={`category ${bgClass} ${textClass} border leading-none font-medium rounded-full mb-1 md:mb-0`}
+      className={`category ${bgClass} ${textClass} border leading-none font-medium rounded-full`}
       style={{ borderColor }}
     >
       {name}

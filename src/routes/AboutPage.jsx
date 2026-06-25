@@ -109,17 +109,17 @@ export default function AboutPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
+          <div className="col-span-12 md:col-span-6 text-white change-logo mt-20 md:mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
             <h1 className="hero-title">A <span>brand and digital design agency</span> partnering with <span><i>forward-thinking</i></span> clients around the world</h1>
           </div>
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee section-dark trigger-split-text">
+      <section className="px-5 py-5 md:py-20 bg-coffee section-dark trigger-split-text">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-white md:pt-20">
             <div className="lead split-text">Guided by creative intelligence, we simplify complexity to help brands connect, adapt, and grow.</div>

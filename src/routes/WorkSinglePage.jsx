@@ -86,7 +86,7 @@ export default function WorkSinglePage() {
     <>
       <Seo {...seo} />
     
-      <section className="page-hero px-5 pb-10 md:pb-20 bg-white section-light min-h-screen flex items-end">
+      <section className="page-hero px-5 pb-10 md:pb-20 bg-white section-light min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
@@ -101,7 +101,7 @@ export default function WorkSinglePage() {
             )}
           </div>
           <div className="col-start-1 md:col-start-9 col-span-12 md:col-span-5">
-            <div className="featured-image section-dark__ thumb-swap-trigger">
+            <div className="featured-image thumb-swap-trigger">
               {loaderSrc && (
                 <div
                   className="ratio overflow-hidden rounded-[10px] thumb-swap"
@@ -130,9 +130,9 @@ export default function WorkSinglePage() {
         </div>
       </section>
 
-      <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo section-light__">
+      <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo">
         <div className="grid grid-cols-12">
-          <div className="work-types flex flex-col flex-wrap md:block col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle">
+          <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle" data-mobile-slide="none">
              {types.map(({ name }, index) => {
               const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
               return (
@@ -267,7 +267,7 @@ export default function WorkSinglePage() {
                     <RichText html={content} className="split-text-coffee"/>
                   </div>
                   
-                  <div className={`col-start-1 md:col-start-9 col-span-12 md:col-span-4 flex flex-col justify-end`}>
+                  <div className={`col-start-1 md:col-start-9 col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
                     <RichText html={content2} className="split-text-coffee"/>
                   </div>
                   {/* END TWO TEXT BOXES SECTION */}
@@ -363,12 +363,12 @@ export default function WorkSinglePage() {
             <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-4 md:ps-2 slide-up-subtle">
               {testimonial.acfTestimonials?.acfTestimonial && (
                 <blockquote
-                  className="testimonial-quote mb-10"
+                  className="testimonial-quote mb-5 md:mb-10"
                   dangerouslySetInnerHTML={{ __html: testimonial.acfTestimonials.acfTestimonial }}
                 />
               )}
               <cite className="testimonial-cite">
-                {testimonial.title}
+                <strong>{testimonial.title}</strong>
                 {testimonial.acfTestimonials?.acfRole && (
                   <>
                   <br/><span className="testimonial-role">{testimonial.acfTestimonials.acfRole}</span>

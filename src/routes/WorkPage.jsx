@@ -599,10 +599,10 @@ export default function WorkPage() {
     <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-20 md:mt-40 max-w-[115ch]">
             <div className="eyebrow">Explore our work</div>
             <h1 className="hero-title">Simplr&apos;s work is a reflection of <span>passion, dedication and craft,</span> spanning numerous industries both <span><i>locally and internationally.</i></span> See how our work has transformed businesses and partnerships.</h1>
           </div>

@@ -15,8 +15,8 @@ export default function ClientLogos({ innerRef, shouldAnimate = false }) {
   }, [innerRef, shouldAnimate])
 
   return (
-      <div ref={innerRef} className="bg-coffee section-dark min-h-screen">
-      <section className="clients pt-40 pb-20 overflow-hidden text-white">
+      <div ref={innerRef} className="bg-coffee section-dark md:min-h-screen">
+      <section className="clients py-10 md:pt-40 md:pb-10 overflow-hidden text-white">
         <div className="client-logos logo-slider-1 flex flex-nowrap items-center gap-[7rem]">
           <div className="client-logo">
             <svg xmlns="http://www.w3.org/2000/svg" width="187" height="99" viewBox="0 0 187 99" fill="currentColor">
@@ -208,7 +208,7 @@ export default function ClientLogos({ innerRef, shouldAnimate = false }) {
         </div>
       </section>
 
-      <section className="clients py-20 bg-coffee section-dark overflow-hidden text-white">
+      <section className="clients py-10 md:py-20 bg-coffee section-dark overflow-hidden text-white">
         <div className="client-logos logo-slider-2 flex flex-nowrap items-center gap-[7rem]">
           <div className="client-logo">
             <svg xmlns="http://www.w3.org/2000/svg" width="187" height="99" viewBox="0 0 187 99" fill="currentColor">

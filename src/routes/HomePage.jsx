@@ -732,8 +732,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-10 md:pt-20">
-          <div className="stat-item flex flex-col sm:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[75rem] relative">
-            <div data-initial="62" className="stat-no text-strategy md:min-w-[32rem] xl:min-w-auto">0</div>
+          <div className="stat-item flex flex-col sm:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[68rem] relative">
+            <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem] xl:min-w-auto">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-20 lg:mb-40 text-strategy text-[5rem]">+</div>
               <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Successfully launched brands since 2015 </div>
@@ -828,9 +828,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         <LazyClientLogos innerRef={clientsRef} shouldAnimate={introComplete} />
       </Suspense>
 
-      <section className="testimonials p-5 section-light bg-white footer-off">
+      <section className="testimonials p-5 section-light bg-white">
         <div id="testimonial-1" className="grid grid-cols-12">
-          <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
+          <div className="col-start-1 col-span-12 md:col-span-6 slide-up-from-left">
               <div className="client-work">
                 <Link
                   to={buildEntryPath('work', linkedCaseStudySlug)}
@@ -877,13 +877,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
           </div>
-          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
-            <div className="testimonial lead max-w-[38ch] mb-5 md:mb-0">
+          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
+            <div className="testimonial lead max-w-[38ch] mt-5 md:mt-0">
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (
-                  <div className="mb-10 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
+                  <div className="mb-5 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
                 ) : (
-                  <p className="mb-10 md:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
+                  <p className="mb-5 md:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
                 )}
                 <p><b>{testimonial?.title || 'Daniel Hulme'}</b><br/>{testimonialData?.acfRole || 'CEO Satalia'}</p>
               </div>
@@ -892,8 +892,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
       </section>
 
-      <section className="faqs ps-5 pt-60 bg-white section-light flex flex-col justify-center">
-        <div className="grid grid-cols-1 gap-y-10 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
+      <section className="faqs ps-5 pt-20 md:pt-60 bg-white section-light flex flex-col justify-center">
+        <div className="grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
           <div className="trigger-split-text-coffee md:col-span-4">
             <div className="eyebrow">FAQs</div>
             <h1 className="split-text-coffee">Have questions?</h1>
@@ -901,8 +901,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
           {activeFaq && (
             <>
-              <div className="md:col-span-12 flex">
-
+              <div className="md:col-span-12 md:flex">
+                <div className="flex md:static">
                  <button
                     type="button"
                     onClick={showPreviousFaq}
@@ -924,11 +924,10 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       <path d="M6.5 3.5 11 8l-4.5 4.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
                     </svg>
                   </button>
+                </div>
 
                 <div ref={faqSliderRef} className="faq-slider flex items-center overflow-x-auto pb-2">
                   
-                 
-
                   {faqs.map((item, index) => {
                     const isActive = index === activeFaqIndex
 
@@ -940,10 +939,10 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                           faqButtonRefs.current[index] = element
                         }}
                         onClick={() => setActiveFaqIndex(index)}
-                        className={`lead faq-pill h-[3.125rem] shrink-0 rounded-full border px-5 flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
+                        className={`lead faq-pill h-[3.125rem] max-w-[90%] md:max-w-auto shrink-0 rounded-full border px-5 flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
                         aria-pressed={isActive}
                       >
-                        <span className="block whitespace-nowrap">{item.question}</span>
+                        <span className="block text-start md:text-center md:whitespace-nowrap">{item.question}</span>
                       </button>
                     )
                   })}
@@ -951,7 +950,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
               <div className="md:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[16rem] md:max-w-[32rem] text-[1.125rem] text-coffee">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[18rem] md:max-w-[32rem] text-[1rem] md:text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

@@ -6,9 +6,16 @@ gsap.registerPlugin(ScrollTrigger)
 export function createPeopleScatterAnimation(section, scatter) {
   if (!section || !scatter) return () => undefined
 
+  const isDesktop = window.matchMedia('(min-width: 1024px)').matches
+
+  let yScroll = 100
+  if(isDesktop) {
+    yScroll = 500
+  }
+
   const anim = gsap.fromTo(
     scatter,
-    { y: 500, opacity: 0.2 },
+    { y: yScroll, opacity: 0.2 },
     {
       y: 0,
       opacity: 1,

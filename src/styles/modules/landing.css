@@ -41,10 +41,7 @@
 .stat-plus {
     line-height: 0.28;
 }
-.stat-detail {
-    line-height: 1.2;
-    font-weight: 400
-}
+
 @media (max-width: 767.9px) {
     .stat-no {
         position: relative
@@ -59,8 +56,14 @@
     .stat-plus {
         display: none;
     }
+    .stat-detail {
+        min-height: 57px;
+    }
 }
 @media (min-width: 768px) {
+    .stat-detail {
+        line-height: 1.2;
+    }
     .stat-no {
         font-size: 25rem;
     }
@@ -171,7 +174,7 @@
 
 /* --- TESTIMONIALS --- */
 .quote {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 300;
     line-height: 1.2; 
 }
@@ -202,8 +205,14 @@
 }
 
 .faq-answer-fade {
-    line-height: 1.5;
+    line-height: 1.2;
     animation: faqAnswerFade 600ms ease-out;
+}
+
+@media (min-width: 768px) {
+    .faq-answer-fade {
+        line-height: 1.5;
+    }
 }
 
 @keyframes faqAnswerFade {
@@ -216,11 +225,6 @@
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .faq-answer-fade {
-        animation: none;
-    }
-}
 .hero-video-modal-close {
     cursor: pointer;
     transform: scale(1);
