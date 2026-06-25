@@ -254,10 +254,10 @@ export default function ThinkingPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
+      <section className="page-hero px-5 py-20 bg-white section-light min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-20 md:mt-40 max-w-[115ch]">
             <div className="eyebrow">
               Thinking
               {activeFilterLabel ? (

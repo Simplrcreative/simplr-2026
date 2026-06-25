@@ -109,14 +109,14 @@ export default function ContactPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex items-end">
+      <section className="page-hero px-5 py-20 bg-coffee section-dark min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-span-12 change-logo-back mb-[9rem]" />
-          <div className="col-span-11 lg:col-span-7 text-white change-logo">
-            <h1 className="hero-title large my-10">Let’s make it simplr.<br/><span>Come say <i>hello.</i></span></h1>
+          <div className="col-span-12 change-logo-back" />
+          <div className="col-span-11 lg:col-span-7 mt-20 md:mt-40 text-white change-logo">
+            <h1 className="hero-title large my-10">Let's make it simplr.<br/><span>Come say <i>hello.</i></span></h1>
             <div className="lg:flex gap-20">
               <div className="eyebrow">Our Office</div>
-              <div className="text-[22px]">
+              <div className="md:text-[22px]">
               <p className="font-bold">Cape Town</p>
               <p>
                 Unit AS02, The Forum<br/>
@@ -126,15 +126,15 @@ export default function ContactPage() {
             </div>
             </div>
           </div>
-          <div className="contact-form col-start-1 lg:col-start-8 col-span-12 lg:col-span-5 pt-20">
+          <div className="contact-form col-start-1 lg:col-start-8 col-span-12 lg:col-span-5 pt-10 md:pt-20">
             {status === 'success' ? (
               <div className="flex flex-col gap-6 text-white py-10">
-                <p className="text-[22px] leading-6 font-medium">Thank you — we&apos;ll be in touch shortly.</p>
+                <p className="md:text-[22px] font-medium">Thank you — we&apos;ll be in touch shortly.</p>
                 <p className="opacity-60 max-w-[48ch]">Your enquiry has been received. Someone from the Simplr team will reach out to you shortly.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-9 text-white">
-                <p className="text-[22px] leading-6">
+                <p className="md:text-[22px]">
                   <strong className="font-medium">Tell us about your project.&nbsp;&nbsp;</strong>
                   <span className="font-normal">We&apos;ll take it from there.</span>
                 </p>

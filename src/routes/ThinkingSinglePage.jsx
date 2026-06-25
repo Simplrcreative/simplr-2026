@@ -170,9 +170,9 @@ export default function ThinkingSinglePage() {
       <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex items-end">
+      <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex md:items-end">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-40 flex flex-col items-center change-logo-back">
+          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-20 md:mt-40 flex flex-col items-center change-logo-back">
               <div className="eyebrow">Thinking {categories.length > 0 && (
                 categories.map((category) => {
                   const filterSlug = categoryToFilterSlug(category)
@@ -271,7 +271,7 @@ export default function ThinkingSinglePage() {
       )}
 
       {morePosts.length > 0 && (
-        <section className="more-posts px-5 py-20 bg-white section-dark">
+        <section className="more-posts px-5 md:py-20 bg-white">
           <div className="thinking-posts-grid">
             {morePosts.map((post) => {
               const postLoader = getThumbnail(post.acfPostBuilder?.acfFeaturedImage, 'loader')
@@ -291,7 +291,7 @@ export default function ThinkingSinglePage() {
                     className="thinking-post-link"
                     data-transition-snapshot-state="hover"
                   >
-                    <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '54%' }} >
+                    <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '128%', '--aspect-ratio-mobile': '65%' }} >
                       <PictureImg
                         loaderSrc = {postLoader + '.webp'}
                         mobileSrc = {postThumb + '.webp'}
@@ -301,7 +301,7 @@ export default function ThinkingSinglePage() {
                         attributes = {{ 'data-post-image-frame': true }}
                       />
                     </div>
-                    <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
+                    <h2 className="thinking-post__title pe-3 md:pe-10" data-post-title>{postTitle}</h2>
                   </Link>
                 </article>
               )
