@@ -353,7 +353,7 @@ nav.light a.is-active .nav-link__orb {
 }
 @media (min-width: 1180px) {
     .logo-holder {
-        max-width: 33rem;
+        max-width: 26rem;
     }
 }
 

@@ -593,7 +593,7 @@ export default function RootLayout() {
         <footer ref={footerRef} className="px-5 pt-5 md:pt-0 min-h-[50vh] bg-white z-[1002] relative">
         
         <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-12 md:col-span-6">
+          <div className="col-start-1 col-span-12 md:col-span-8">
             <h1>Let&apos;s build something that works.</h1>
             <div className="button-wrapper">
               <Link 
@@ -633,7 +633,7 @@ export default function RootLayout() {
           </div>
         </div>
 
-        <div className="pt-10 pb-5 md:pb-0 xl:pt-32 grid grid-cols-1 gap-14 lg:grid-cols-12n">
+        <div className="pt-10 pb-5 md:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
                 <div className="socials flex flex-col md:flex-row gap-[1.25rem] md:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
                   {Object.entries(socials).map(([title, url]) => (
