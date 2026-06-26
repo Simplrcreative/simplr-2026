@@ -145,7 +145,7 @@ export default function WorkSinglePage() {
               )
              })}
           </div>
-          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 trigger-split-text-coffee">
+          <div className="intro-text col-start-1 md:col-start-8 col-span-12 md:col-span-5 trigger-split-text-coffee">
             <RichText html={introduction} className="split-text-coffee"/>
             {swags && (
               <div className="swags my-20">

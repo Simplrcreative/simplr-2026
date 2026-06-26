@@ -139,6 +139,14 @@
 .footer-off {
   min-height: 50vh
 }
+.intro-text p,
+.work-content p {
+  margin-bottom: 1.2rem;
+}
+.intro-text p:last-child,
+.work-content p:last-child {
+  margin-bottom: 0;
+}
 @media (min-width: 768px) {
   .footer-off {
     min-height: calc(70vh - 54px)
@@ -147,4 +155,10 @@
     font-size: 0.75rem;
     padding: 7px 14px 7.5px 14px
   }
+  .intro-text p,
+  .work-content p {
+    margin-bottom: 1.875rem;
+  }
 }
+
+
