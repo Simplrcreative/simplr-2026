@@ -14,11 +14,6 @@
 .thinking-post-card .ratio {
   transition: padding-top 0.6s ease-out;
 }
-.thinking-post-card:hover .ratio,
-.thinking-post-card.hover-active .ratio {
-  padding-top: 50%!important;
-  transition: padding-top 0.3s ease-in;
-}
 .thinking-post-card {
   transition: padding-bottom 0.6s ease-out;
 }
@@ -90,6 +85,7 @@
   .thinking-post-card:hover .ratio,
   .thinking-post-card.hover-active .ratio {
     padding-top: 122%!important;
+    transition: padding-top 0.3s ease-in;
   }
   .thinking-post-card:hover,
   .thinking-post-card.hover-active {
