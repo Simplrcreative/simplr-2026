@@ -29,9 +29,8 @@
 .stat-no {
     line-height: 0.69;
     color: var(--color-strategy);
-    font-size: 14rem;
+    font-size: 12rem;
 }
-
 .stat-plus {
     line-height: 0.28;
 }
@@ -42,8 +41,8 @@
     }
     .stat-no::after {
         content: '+';
-        font-size:  6rem;
-        transform: translateY(-7rem);
+        font-size:  5rem;
+        transform: translateY(-6rem);
         color: inherit;
         display: inline-block;
     }
