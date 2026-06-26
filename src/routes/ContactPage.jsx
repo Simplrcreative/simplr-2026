@@ -110,7 +110,7 @@ export default function ContactPage() {
       <Seo {...seo} />
 
       <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex md:items-end">
-        <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+        <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-span-12 lg:col-span-7 mt-20 text-white change-logo">
             <h1 className="hero-title large mb-10 md:mb-20">Let's make it simplr.<br/><span>Come say <i>hello.</i></span></h1>

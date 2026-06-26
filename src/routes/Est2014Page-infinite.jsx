@@ -148,13 +148,13 @@ export default function Est2014PageInfinite() {
         
         <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
           <div className="hero est2014-hero px-5 relative z-2 min-h-[80vh] flex md:items-end">
-            <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+            <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
               <div className="col-span-12 change-logo-back" aria-hidden="true" />
               <div className="col-start-1 col-span-12 md:col-span-9 text-coffee mt-40 max-w-[115ch] ">
                 <div className="eyebrow">Beyond the work</div>
                 <h1 className="hero-title">Simplr has never <span>just been about the work.</span> It&apos;s about the people, <span><i>the energy,</i></span> and the <span>shared ambition behind it.</span> Not everything we do is visible in the outcome - <span><i>some of it lives here.</i></span></h1>
               </div>
-              <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 text-coffee flex md:justify-end items-end">
+              <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 text-coffee flex md:justify-end items-end mt-5 md:mt-0">
                 <Link 
                   to="/about#our-people"
                   ref={btnRef}

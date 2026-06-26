@@ -600,7 +600,7 @@ export default function WorkPage() {
       <Seo {...seo} />
 
       <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex flex-col md:items-end">
-        <div className="grid grid-cols-12 w-full grid-rows-[60px_auto]">
+        <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
             <div className="eyebrow">Explore our work</div>
