@@ -53,10 +53,12 @@
         min-height: 57px;
     }
     .play-icon-mobile {
+        opacity: 0;
+        pointer-events: none;
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -55%);
+        /* centering handled by GSAP xPercent/yPercent once intro runs */
         background: var(--color-branding-design);
         width: 50px;
         height: 50px;
@@ -80,6 +82,9 @@
     .hero-video-holder,
     .hero-video-holder * {
         cursor: none !important;
+    }
+    .play-icon-mobile {
+        display: none;
     }
 }
 @media (min-width: 1280px) {

@@ -588,11 +588,14 @@ export function createHeroScrollAnimation(scope) {
         delay: 0.1,
       }, 'hero-start')
 
-      timeline.to(mobilePlayIcon, {
-        scale: 0.9,
-        y: 150,
-        duration: 1,
-      }, 'hero-start')
+      if (mobilePlayIcon && !isDesktop) {
+        timeline.to(mobilePlayIcon, {
+          autoAlpha: 0,
+          pointerEvents: 'none',
+          duration: 1,
+          immediateRender: false,
+        }, 'hero-start')
+      }
 
       /*timeline.to(navHolder, {
         y: -200,
@@ -648,7 +651,20 @@ export function createHeroScrollAnimation(scope) {
         return
       }
 
+      if (mobilePlayIcon && !isDesktop) {
+        const videoOpacity = parseFloat(window.getComputedStyle(heroImage).opacity)
+        if (videoOpacity > 0.5) {
+          gsap.set(mobilePlayIcon, {
+            autoAlpha: 1,
+            xPercent: -50,
+            yPercent: -50,
+            pointerEvents: 'auto',
+          })
+        }
+      }
+
       buildTimeline()
+
       ScrollTrigger.refresh()
     }
 
@@ -687,7 +703,7 @@ export function createHeroScrollAnimation(scope) {
       cursorCleanup?.()
       nav?.classList.remove('light')
       logo?.classList.remove('light')
-      gsap.set([heroTitle, heroImage], { clearProps: 'all' })
+      gsap.set([heroTitle, heroImage, mobilePlayIcon], { clearProps: 'all' })
     }
   })
 

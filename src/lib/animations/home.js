@@ -15,6 +15,8 @@ export function setIntroHeroInitialState(section) {
 
     const heroVideo = section.querySelector('.hero-video')
     const heroTitle = section.querySelector('.hero-title')
+    const mobilePlayIcon = section.querySelector('.play-icon-mobile')
+    const isMobile = window.matchMedia('(max-width: 767.9px)').matches
 
     if (heroVideo) {
         gsap.set(heroVideo, {
@@ -33,6 +35,15 @@ export function setIntroHeroInitialState(section) {
             willChange: 'transform, opacity',
         })
     }
+
+    if (mobilePlayIcon && isMobile) {
+        gsap.set(mobilePlayIcon, {
+            autoAlpha: 0,
+            xPercent: -50,
+            yPercent: -55,
+            willChange: 'opacity, transform',
+        })
+    }
 }
 
 export function createIntroVideoAnimation(section, delay = 0) {
@@ -41,6 +52,9 @@ export function createIntroVideoAnimation(section, delay = 0) {
     const heroVideo = section.querySelector('.hero-video')
     if (!heroVideo) return () => undefined
 
+    const mobilePlayIcon = section.querySelector('.play-icon-mobile')
+    const isMobile = window.matchMedia('(max-width: 767.9px)').matches
+
     gsap.set(heroVideo, {
         autoAlpha: 0,
         scale: 0.1,
@@ -48,19 +62,47 @@ export function createIntroVideoAnimation(section, delay = 0) {
         willChange: 'transform, opacity',
     })
 
-    const heroVideoIntro = gsap.to(heroVideo, {
+    if (mobilePlayIcon && isMobile) {
+        gsap.set(mobilePlayIcon, {
+            autoAlpha: 0,
+            xPercent: -50,
+            yPercent: -55,
+            willChange: 'opacity, transform',
+        })
+    }
+
+    const heroVideoIntro = gsap.timeline({ delay })
+
+    heroVideoIntro.to(heroVideo, {
         autoAlpha: 1,
         scale: 1,
         duration: 1,
-        delay,
         ease: 'power4.out',
         overwrite: 'auto',
         clearProps: 'opacity,visibility,transform,willChange',
     })
 
+    if (mobilePlayIcon && isMobile) {
+        heroVideoIntro.to(
+            mobilePlayIcon,
+            {
+                autoAlpha: 1,
+                xPercent: -50,
+                yPercent: -55,
+                duration: 0.4,
+                ease: 'power2.out',
+                pointerEvents: 'auto',
+            },
+            '-=0.25',
+        )
+    }
+
     return () => {
         heroVideoIntro.kill()
         gsap.set(heroVideo, { clearProps: 'opacity,visibility,transform,willChange' })
+        if (mobilePlayIcon && isMobile) {
+            gsap.set(mobilePlayIcon, { clearProps: 'opacity,visibility,transform,willChange' })
+        }
     }
 }
 
