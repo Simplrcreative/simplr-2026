@@ -101,10 +101,10 @@ export default function WorkSinglePage() {
             )}
           </div>
           <div className="col-start-1 md:col-start-9 col-span-12 md:col-span-5">
-            <div className="featured-image thumb-swap-trigger">
+            <div className="featured-image thumb-swap-trigger__">
               {loaderSrc && (
                 <div
-                  className="ratio overflow-hidden rounded-[10px] thumb-swap"
+                  className="ratio overflow-hidden rounded-[10px] thumb-swap__"
                   style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
                 >
                   <PictureImg
@@ -115,14 +115,14 @@ export default function WorkSinglePage() {
                     altText = {altText}
                     lazyLoad = {false}
                   />
-                  <PictureImg
+                  {/*<PictureImg
                     loaderSrc = {loaderSrc + '.webp'}
                     mobileSrc = {mobileSrc + '.webp'}
                     desktopSrc = {desktopSrc + '.webp'}
                     imgClass = 'thumb-secondary rounded-[10px]'
                     altText = ''
                     lazyLoad = {false}
-                  />
+                  />*/}
                 </div>
               )}
             </div>
@@ -210,10 +210,10 @@ export default function WorkSinglePage() {
         const ext2 = isGif2 ? '' : '.webp'
         const fImage1Loader = getThumbnail(section?.acfImage1, 'loader') + ext1
         const fImage1Mobile = getThumbnail(section?.acfImage1, 'medium') + ext1
-        const fImage1       = getThumbnail(section?.acfImage1) + ext1
+        const fImage1       = getThumbnail(section?.acfImage1, 'full', 'full') + ext1
         const fImage2Loader = getThumbnail(section?.acfImage2, 'loader') + ext2
         const fImage2Mobile = getThumbnail(section?.acfImage2, 'medium') + ext2
-        const fImage2       = getThumbnail(section?.acfImage2) + ext2
+        const fImage2       = getThumbnail(section?.acfImage2, 'full', 'full') + ext2
         const altText1 = section?.acfImage1?.node?.altText || 'Untitled'
         const altText2 = section?.acfImage2?.node?.altText || 'Untitled'
 

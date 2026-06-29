@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
+import PeopleSectionMobile from '../components/about/PeopleSectionMobile.jsx'
 import {
   createSplitTextAnimation,
   createBulletsAnimation,
@@ -58,15 +59,32 @@ export default function AboutPage() {
   useEffect(() => createBulletsAnimation(bulletsSectionRef.current), [])
 
   useEffect(
-    () => createPeopleScatterAnimation(peopleSectionRef.current, scatterRef.current),
+    () => {
+      if (!window.matchMedia('(min-width: 768px)').matches) {
+        return undefined
+      }
+
+      return createPeopleScatterAnimation(peopleSectionRef.current, scatterRef.current)
+    },
     [],
   )
 
   useEffect(
-    () => createPeopleSectionClear(peopleSectionRef.current, closeBio),
+    () => {
+      if (!window.matchMedia('(min-width: 768px)').matches) {
+        return undefined
+      }
+
+      return createPeopleSectionClear(peopleSectionRef.current, closeBio)
+    },
     [],
   )
+
   useEffect(() => {
+    if (!window.matchMedia('(min-width: 768px)').matches) {
+      return undefined
+    }
+
     return createBioAnimation(
       scatterRef.current,
       overlayRef.current,
@@ -82,8 +100,7 @@ export default function AboutPage() {
       return undefined
     }
 
-    const isMobile = window.matchMedia('(max-width: 767.9px)').matches
-    if (!isMobile) {
+    if (!window.matchMedia('(min-width: 768px)').matches) {
       return undefined
     }
 
@@ -128,10 +145,10 @@ export default function AboutPage() {
       </section>
 
       {/* People section */}
+      <div id="our-people">
       <section
-        id="our-people"
         ref={peopleSectionRef}
-        className={`people py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex flex-col justify-center items-center${bioLayoutOpen ? ' people--bio-open' : ''}${bioLayoutOpen && !activeBio ? ' people--bio-closing' : ''}${hoveredPerson && !activeBio && !bioLayoutOpen ? ' people--preview' : ''}`}
+        className={`people people-desktop hidden md:flex py-10 md:py-40 bg-coffee section-dark min-h-screen relative text-white overflow-hidden flex-col justify-center items-center${bioLayoutOpen ? ' people--bio-open' : ''}${bioLayoutOpen && !activeBio ? ' people--bio-closing' : ''}${hoveredPerson && !activeBio && !bioLayoutOpen ? ' people--preview' : ''}`}
       >
         <div
           className={`people-bio-backdrop${bioLayoutOpen ? ' active' : ''}`}
@@ -234,6 +251,9 @@ export default function AboutPage() {
         </div>
 
       </section>
+
+      <PeopleSectionMobile people={people} />
+      </div>
 
       <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden">
         <div className="grid grid-cols-12 gap-x-5 w-full">
