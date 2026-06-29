@@ -14,6 +14,7 @@
     font-weight: 500;
     isolation: isolate;
     overflow: visible;
+    line-height: 1.2;
 }
 .btn-fill {
     position: absolute;
@@ -56,7 +57,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
 }
 .btn::after {
     content: '';
@@ -79,4 +80,10 @@
 }
 .btn[data-transition-hover='true']::after {
     transform: scale(1) translate(-5px, 12.5px) rotate(45deg);
+}
+
+@media screen and (min-width: 768px) {
+    .btn-text {
+        white-space: nowrap;
+    }
 }

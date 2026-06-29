@@ -11,6 +11,10 @@ import { routeDefinitions } from '../config/site.js'
 import { Link } from 'react-router-dom'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
+import {
+  releaseMobileServiceVideo,
+  requestMobileServiceVideoPlay,
+} from '../lib/service-video-playback.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -50,47 +54,89 @@ function ServiceVideo({ src, poster, title, to }) {
 
   useEffect(() => {
     const video = videoRef.current
-    if (!video) return
+    if (!video || !src) return undefined
 
-    // Preload when the card is approaching the viewport (300px away)
-    const preloadObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          video.preload = 'auto'
-          video.load()
-          preloadObserver.disconnect()
-        }
-      },
-      { rootMargin: '300px 0px', threshold: 0 },
-    )
+    const isMobile = window.matchMedia('(max-width: 767.9px)').matches
+    const observers = []
 
-    // Play/pause based on visibility
-    const playObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          video.play().catch(() => {})
-        } else {
-          video.pause()
-        }
-      },
-      { threshold: 0.3 },
-    )
+    const pauseVideo = () => {
+      if (isMobile) {
+        releaseMobileServiceVideo(video)
+        return
+      }
 
-    preloadObserver.observe(video)
-    playObserver.observe(video)
+      video.pause()
+    }
+
+    const playVideo = () => {
+      if (document.hidden) return
+
+      if (isMobile) {
+        requestMobileServiceVideoPlay(video)
+        return
+      }
+
+      video.play().catch(() => {})
+    }
+
+    if (isMobile) {
+      // Mobile: load and play only while sufficiently in view; one clip at a time.
+      const mobileObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            if (video.preload === 'none') {
+              video.preload = 'auto'
+            }
+            playVideo()
+          } else {
+            pauseVideo()
+          }
+        },
+        { threshold: 0.5, rootMargin: '0px' },
+      )
+
+      mobileObserver.observe(video)
+      observers.push(mobileObserver)
+    } else {
+      const preloadObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            video.preload = 'auto'
+            video.load()
+            preloadObserver.disconnect()
+          }
+        },
+        { rootMargin: '300px 0px', threshold: 0 },
+      )
+
+      const playObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            playVideo()
+          } else {
+            pauseVideo()
+          }
+        },
+        { threshold: 0.3 },
+      )
+
+      preloadObserver.observe(video)
+      playObserver.observe(video)
+      observers.push(preloadObserver, playObserver)
+    }
 
     const onVisibilityChange = () => {
       if (document.hidden) {
-        video.pause()
+        pauseVideo()
       }
     }
+
     document.addEventListener('visibilitychange', onVisibilityChange)
 
     return () => {
-      preloadObserver.disconnect()
-      playObserver.disconnect()
+      observers.forEach((observer) => observer.disconnect())
       document.removeEventListener('visibilitychange', onVisibilityChange)
-      video.pause()
+      pauseVideo()
     }
   }, [src])
 
@@ -157,7 +203,7 @@ function ServiceCard({ service }) {
                           >
                           <span className="btn-fill" aria-hidden="true" />
                           <span className="btn-inner">
-                              <span className="btn-text text-coffee">Explore <span className="hidden md:inline-block ps-1">{acfService}</span></span>
+                              <span className="btn-text text-coffee">Explore {acfService}</span>
                               Explore {acfService}
                           </span>
                       </Link>

@@ -115,6 +115,7 @@
   position: relative;
   border: 1px solid var(--color-coffee);
   border-radius: 100px;
+  text-wrap: nowrap;
 }
 .work-type::after {
   content: '';
@@ -184,9 +185,8 @@
 
 @media (min-width: 768px) {
   .work-type {
+    display: inline-block;
     padding: 0 1.5rem 0 0;
-  }
-  .work-type {
     font-size: 0.75rem;
     padding: 7px 14px 7.5px 14px
   }

@@ -42,6 +42,7 @@
     line-height: 30px;
     margin-bottom: 3.25rem!important;
     font-size: 22px;
+    line-height: 1.2;
     @apply font-semibold relative;
   }
   .eyebrow span.category {

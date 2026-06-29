@@ -132,14 +132,14 @@ export default function WorkSinglePage() {
 
       <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo">
         <div className="grid grid-cols-12">
-          <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle" data-mobile-slide="none">
+          <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle flex md:inline-block flex-wrap" data-mobile-animation="false">
              {types.map(({ name }, index) => {
               const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
               return (
                 <Fragment key={name}>
-                  <span className={`work-type${insertBreak ? ' work-type--line-end' : ''}`}>
+                  <div className={`work-type${insertBreak ? ' work-type--line-end' : ''}`}>
                     {name}
-                  </span>
+                  </div>
                   {insertBreak && <br className="hidden md:block" />}
                 </Fragment>
               )
