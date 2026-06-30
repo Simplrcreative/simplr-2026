@@ -7,6 +7,10 @@ const getIsTouchDevice = () => {
   return hasTouchEvent || hasTouchPoints || hasCoarsePointer
 }
 
+export function getHasFinePointer() {
+  return window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? false
+}
+
 export function useIsTouchDevice() {
   const [isTouchDevice, setIsTouchDevice] = React.useState(() => getIsTouchDevice())
 
@@ -19,4 +23,18 @@ export function useIsTouchDevice() {
   }, [])
 
   return isTouchDevice
+}
+
+export function useHasFinePointer() {
+  const [hasFinePointer, setHasFinePointer] = React.useState(() => getHasFinePointer())
+
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const handleChange = () => setHasFinePointer(getHasFinePointer())
+    handleChange()
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  return hasFinePointer
 }

@@ -6,6 +6,7 @@ import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
 import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform } from '../lib/animations/index.js'
+import { useHasFinePointer } from '../lib/use-is-touch-device.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -101,6 +102,31 @@ function createMobileNavLinkClickHandler(closeMobileNav) {
   }
 }
 
+function createNavLinkHandlers({ prefetch, onClick, hasFinePointer }) {
+  const handlers = {
+    onPointerDown: requestTransitionCapture,
+    onClick,
+  }
+
+  if (hasFinePointer) {
+    handlers.onPointerEnter = (event) => {
+      showNavLinkOrb(event)
+      prefetch()
+    }
+    handlers.onPointerMove = showNavLinkOrb
+    handlers.onPointerLeave = hideNavLinkOrb
+    handlers.onFocus = (event) => {
+      showNavLinkOrb(event)
+      prefetch()
+    }
+    handlers.onBlur = hideNavLinkOrb
+  } else {
+    handlers.onTouchStart = () => prefetch()
+  }
+
+  return handlers
+}
+
 const socials = {
   linkedin: 'https://www.linkedin.com/company/simplrcreative/',
   instagram: 'https://www.instagram.com/simplrcreative/',
@@ -133,6 +159,7 @@ export default function RootLayout() {
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
   const playHomeHeroIntro = shouldRunHomeIntroAnimations || cameFromNonHome
+  const hasFinePointer = useHasFinePointer()
 
   const closeMobileNav = useCallback(() => {
     setIsNavOpen(false)
@@ -500,11 +527,13 @@ export default function RootLayout() {
             <NavLink
               key={item.key}
               to={item.path}
-              title={item.label}
+              title={hasFinePointer ? item.label : undefined}
               className={(classState) => navLinkClassName(classState, item.key)}
-              onPointerDown={requestTransitionCapture}
-              onTouchStart={() => prefetch()}
-              onClick={createMobileNavLinkClickHandler(closeMobileNav)}
+              {...createNavLinkHandlers({
+                prefetch,
+                onClick: createMobileNavLinkClickHandler(closeMobileNav),
+                hasFinePointer,
+              })}
             >
               <span className="nav-link__orb" aria-hidden="true" />
               <NavLinkLabel label={item.label} count={item.count} />
@@ -542,15 +571,13 @@ export default function RootLayout() {
                 <NavLink
                   key={item.key}
                   to={item.path}
-                  title={item.label}
+                  title={hasFinePointer ? item.label : undefined}
                   className={(classState) => navLinkClassName(classState, item.key)}
-                  onPointerDown={requestTransitionCapture}
-                  onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
-                  onPointerMove={showNavLinkOrb}
-                  onPointerLeave={hideNavLinkOrb}
-                  onFocus={e => { showNavLinkOrb(e); prefetch(); }}
-                  onBlur={hideNavLinkOrb}
-                  onClick={handleTransitionLinkClick}
+                  {...createNavLinkHandlers({
+                    prefetch,
+                    onClick: handleTransitionLinkClick,
+                    hasFinePointer,
+                  })}
                 >
                   <span className="nav-link__orb" aria-hidden="true" />
                   <NavLinkLabel label={item.label} count={item.count} />
