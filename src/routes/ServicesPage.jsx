@@ -143,7 +143,7 @@ function ServiceVideo({ src, poster, title, to }) {
   return (
     <Link
       to={to}
-      className="service-card__video col-start-1 md:col-start-8 col-span-8 md:col-span-5"
+      className="service-card__video col-start-1 md:col-start-4 lg:col-start-8 col-span-8 md:col-span-8 lg:col-span-5"
       data-transition-source-key={to}
       data-transition-dock-selector="[data-transition-dock='service-featured-media']"
       aria-label={`View ${title}`}
@@ -191,7 +191,7 @@ function ServiceCard({ service }) {
             </div>
 
             <div className="service-card__body grid grid-cols-12">
-              <div className="service-card__content col-start-1 col-span-8 md:col-start-2 md:col-span-5 xl:col-start-4 xl:col-span-3">
+              <div className="service-card__content col-start-1 col-span-8 md:col-start-4 md:col-span-8 lg:col-start-2 lg:col-span-5 xl:col-start-4 xl:col-span-3">
                   <div className="service-card__description">{acfDescription}</div>
                   <div className="button-wrapper mt-10">
                       <Link 
@@ -274,7 +274,7 @@ export default function ServicesPage() {
 
       <section className="px-5 pb-20 bg-white section-light trigger-split-text-coffee">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-coffee pt-20">
+          <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-8 lg:col-span-5 text-coffee pt-20">
             <RichText html={services.acfIntroduction} className="lead split-text-coffee" />
           </div>
         </div>

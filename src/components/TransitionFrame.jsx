@@ -4,6 +4,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { siteConfig } from '../config/site.js'
 import { createSurfaceColorTransitions, createSlideUpAnimations, scrollToTopImmediate } from '../lib/animations/index.js'
+import { getCompactLogoTransform, isCompactLogoTabletUp } from '../lib/animations/compact-logo-transform.js'
 
 const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -611,7 +612,6 @@ export default function TransitionFrame({ children }) {
   const location = useLocation()
   const logo = layoutRef.current?.querySelector('.logo')
   const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
-  const isDesktop = window.matchMedia('(min-width: 768px)').matches
 
   function clearCaptureResetTimer() {
     if (!captureResetTimerRef.current) return
@@ -652,26 +652,15 @@ export default function TransitionFrame({ children }) {
     }, delayMs)
   }
 
-  //RESPONSIVE VALUES
-    let logoScale = 1
-    let logoY = 0
-    let logoDuration = 0
-
-    let taglineScale = 0.66
-    let taglineY = -88
-    let taglineX = 65
-
-    if (isDesktop) {
-      logoY = -10
-      logoScale = 0.35
-      logoDuration = 0.5
-
-      taglineScale = 0.68
-      taglineY = -213
-      taglineX = 65
-    }
-
   function applyCompactLogoState() {
+    const {
+      logoScale,
+      logoY,
+      taglineScale,
+      taglineY,
+      taglineX,
+    } = getCompactLogoTransform()
+
     gsap.set('.logo', {
       scale: logoScale,
       y: logoY,
@@ -1423,7 +1412,7 @@ export default function TransitionFrame({ children }) {
     document.documentElement.style.overflowX = 'hidden'
 
     let ySnapShotOff = window.innerHeight * 2;
-    if(isDesktop) {
+    if (isCompactLogoTabletUp()) {
       ySnapShotOff = window.innerHeight * 1.5;
     }
 

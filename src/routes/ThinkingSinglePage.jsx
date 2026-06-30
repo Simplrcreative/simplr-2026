@@ -203,7 +203,7 @@ export default function ThinkingSinglePage() {
               )}
           </div>
           {thumb && ( 
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-6 py-10 md:pt-20">
+          <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-10 lg:col-span-6 py-10 md:pt-20">
             <div className="ratio overflow-hidden rounded-[10px]" style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '65%' }} >
               <PictureImg
                 loaderSrc = {loaderThumb + '.webp'}
@@ -220,7 +220,7 @@ export default function ThinkingSinglePage() {
 
       <section className="post-content px-5 pb-20 bg-white section-light slide-up-subtle">
         <div className="grid grid-cols-12 w-full">
-          <div ref={postContentRef} className="col-start-1 md:col-start-4 col-span-12 md:col-span-6">
+          <div ref={postContentRef} className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-10 lg:col-span-6">
             
             {content && (
             <RichText html={content} />

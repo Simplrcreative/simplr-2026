@@ -680,9 +680,7 @@
     pointer-events: auto;
   }
 
-  .bullet-item {
-    margin-bottom: 4.125rem;
-  }
+  
 }
 
 @media (max-width: 767.9px) and (prefers-reduced-motion: reduce) {
@@ -694,7 +692,13 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (max-width: 1023.9px) {
+  .bullet-item {
+    margin-bottom: 4.125rem;
+  }
+}
+
+@media (min-width: 1024px) {
   .bullets-grid {
     display: flex;
     gap: 4.125rem;

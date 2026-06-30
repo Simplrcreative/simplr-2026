@@ -633,10 +633,10 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-[80vh] md:min-h-screen flex flex-col md:justify-end change-logo-back">
           <div className="grid grid-cols-12 min-h-[80vh] md:min-h-0 items-start gap-x-5 w-full">
-            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[95ch] mt-60 mb-10 md:my-0"> 
+            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[95ch] mt-60 mb-10 lg:my-0"> 
               <h1 className="hero-title text-coffee">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
             </div>
-            <div className="hero-video-holder col-start-1 md:col-start-8 col-span-12 md:col-span-5 section-dark md:flex md:items-end md:justify-end pb-5 relative"> 
+            <div className="hero-video-holder col-start-1 lg:col-start-8 col-span-12 lg:col-span-5 section-dark lg:flex lg:items-end lg:justify-end pb-5 relative"> 
               <button
                 type="button"
                 className="hero-video-trigger block w-full text-left"

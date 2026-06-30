@@ -5,7 +5,7 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform } from '../lib/animations/index.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
 const PAGE_TRANSITION_CAPTURE_EVENT = 'page-transition:capture'
@@ -206,7 +206,6 @@ export default function RootLayout() {
 
     // Scope all GSAP targets to layoutRef.current so body-appended header/compact-logo
     // clones (used for the outgoing animation) aren't clobbered by these sets.
-    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
     const layout = layoutRef.current
     gsap.set(layout?.querySelector('.compact-logo'), { clearProps: 'all' })
 
@@ -214,25 +213,13 @@ export default function RootLayout() {
     // Non-home pages: logo is permanently in its compact end-state and visible.
     // This matches what TransitionFrame's applyCompactLogoState() does on routing,
     // so direct loads and client-side navigations behave identically.
-    
-    //RESPONSIVE VALUES
-    let logoScale = 1
-    let logoY = 0
-    let logoDuration = 0
-
-    let taglineScale = 0.66
-    let taglineY = -88
-    let taglineX = 65
-
-    if (isDesktop) {
-      logoY = -10
-      logoScale = 0.35
-      logoDuration = 0.5
-
-      taglineScale = 0.68
-      taglineY = -213
-      taglineX = 65
-    }
+    const {
+      logoScale,
+      logoY,
+      taglineScale,
+      taglineY,
+      taglineX,
+    } = getCompactLogoTransform()
 
     gsap.set(layout?.querySelector('.logo'), {
       autoAlpha: isHomePage ? 0 : 1,
@@ -587,7 +574,7 @@ export default function RootLayout() {
         <>
         <div className="bg-white section-light footer-off"></div>
 
-        <footer ref={footerRef} className="px-5 pt-5 md:pt-0 min-h-[50vh] bg-white z-[1002] relative">
+        <footer ref={footerRef} className="px-5 pt-5 md:pt-0 min-h-[50vh] bg-white z-[1002] relative relative flex flex-col justify-end">
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-8">
@@ -630,9 +617,9 @@ export default function RootLayout() {
           </div>
         </div>
 
-        <div className="pt-10 pb-5 md:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
+        <div className="pt-10 pb-5 lg:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
-                <div className="socials flex flex-col md:flex-row gap-[1.25rem] md:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
+                <div className="socials flex flex-col lg:flex-row gap-[1.25rem] lg:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
                   {Object.entries(socials).map(([title, url]) => (
                     <a
                       key={title}
@@ -654,7 +641,7 @@ export default function RootLayout() {
                 </div>
           </div>
 
-          <div className="hidden md:flex items-end text-coffee lg:col-start-7 lg:col-span-6 lg:justify-end pb-5 footer-logo-trigger">
+          <div className="hidden lg:flex items-end text-coffee lg:col-start-7 lg:col-span-6 lg:justify-end pb-5 footer-logo-trigger">
               <svg width="154" height="150" viewBox="0 0 154 150" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                   <g className="footer-logo-circle-text">
                     <path d="M33.1358 25.2879C33.0194 26.0637 32.6242 26.7639 31.95 27.3884C31.3882 27.9088 30.7906 28.2328 30.1459 28.3707C29.49 28.519 28.8519 28.4838 28.2109 28.2425C27.5586 28.0117 26.9779 27.6102 26.4367 27.0259C25.9058 26.4529 25.5498 25.8432 25.3694 25.1752C25.1995 24.5185 25.2243 23.8691 25.4223 23.2264C25.6202 22.5838 25.9889 22.0126 26.5507 21.4922C27.2248 20.8677 27.9419 20.5375 28.7131 20.4911C29.4844 20.4447 30.2232 20.6789 30.9184 21.204L29.9859 22.0679C29.5629 21.7916 29.1013 21.6764 28.6123 21.7119C28.1224 21.769 27.6812 21.9689 27.2768 22.3436C26.7262 22.8536 26.4641 23.4722 26.4809 24.1664C26.5082 24.8719 26.808 25.5337 27.3804 26.1516C27.9633 26.7808 28.6106 27.1415 29.312 27.2225C30.0133 27.3035 30.6397 27.0782 31.1902 26.5682C31.6059 26.1831 31.8606 25.7593 31.9445 25.264C32.0277 24.7903 31.9264 24.3204 31.6624 23.8551L32.5837 23.0017C33.0534 23.7566 33.2409 24.5224 33.1358 25.2879Z" />

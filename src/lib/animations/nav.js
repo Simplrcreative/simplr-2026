@@ -1,5 +1,6 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { getCompactLogoTransform, isCompactLogoTabletUp } from './compact-logo-transform.js'
 
 let pluginsRegistered = false
 
@@ -57,31 +58,14 @@ export function createLogoScrollAnimation(scope) {
     },
   })
 
-  const screenWidth = window.innerWidth
-
-  //RESPONSIVE VALUES
-  let logoScale = 1
-  let logoY = 0
-  let logoDuration = 0
-  let taglineScale = 0.66
-  let taglineY = -88
-  let taglineX = 65
-
-  if (screenWidth >= 1280) {
-    logoY = -10
-    logoDuration = 0.5
-    logoScale = 0.35
-    taglineScale = 0.68
-    taglineY = -213
-    taglineX = 65
-  } else if (screenWidth >= 768) {
-    logoY = -10
-    logoDuration = 0.5
-    logoScale = 0.65
-    taglineScale = 0.60
-    taglineY = -125
-    taglineX = 60
-  }
+  const {
+    logoScale,
+    logoY,
+    logoDuration,
+    taglineScale,
+    taglineY,
+    taglineX,
+  } = getCompactLogoTransform()
 
   timeline.to(
     logo,
@@ -117,7 +101,7 @@ export function createLogoScrollAnimation(scope) {
     0.3,
   )
 
-  if (screenWidth >= 768) {
+  if (isCompactLogoTabletUp()) {
     timeline.to(
       '.header',
       {

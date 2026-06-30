@@ -330,9 +330,12 @@ nav.light a.is-active .nav-link__orb {
     background-color: var(--color-coffee)!important;
     transition: color 0.6s ease 0.1s, background-color 0.4s ease
 }
-@media (max-width: 767.9px) {
+@media (max-width: 1023.9px) {
     .logo-holder.footer svg {
         fill: var(--color-coffee)
+    }
+    .footer .tagline {
+        color: var(--color-coffee)
     }
 }
 @media (min-width: 768px) {

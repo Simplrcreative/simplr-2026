@@ -257,7 +257,7 @@ export default function AboutPage() {
 
       <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden">
         <div className="grid grid-cols-12 gap-x-5 w-full">
-          <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-10">
+          <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-8 lg:col-span-10">
             <div className="bullets-grid">
 
               <div id="bullet-item-1" className="bullet-item">
@@ -291,7 +291,7 @@ export default function AboutPage() {
 
       <section className="px-5 pb-20 md:pt-10 md:pb-30 xl:py-40 bg-coffee trigger-split-text">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-white">
+          <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
             <div className="lead split-text">Guided by creative intelligence, we simplify complexity to help brands connect, adapt, and grow.</div>
           </div>
         </div>

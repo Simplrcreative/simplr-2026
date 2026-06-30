@@ -254,14 +254,14 @@ export default function ServicesSinglePage() {
       <section className="page-hero px-5 py-5 md:pt-0 md:pb-5 md:mb-15 bg-white section-light min-h-[80vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-5 text-coffee change-logo mt-40 mb-12 md:mb-0 change-logo">
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee change-logo mt-40 mb-12 md:mb-0 change-logo">
             <div className="service-card__label mb-10 md:mb-5">
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
             </div>
             <h1 className="service-card__title">{acfHeading}</h1>
           </div>
-          <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 parallax">
+          <div className="col-start-1 md:col-start-2 lg:col-start-7 col-span-12 md:col-span-11 lg:col-span-6 parallax">
             <div className="featured-image">
               {featuredVideo ? (
                   <div
@@ -309,12 +309,12 @@ export default function ServicesSinglePage() {
           <section key={`section-${sectionIndex}`} className="px-5 pb-10 md:py-20 bg-white section-light">
             <div className="grid grid-cols-12 ">
               {sectionHeading && (
-                <div className="col-start-1 col-span-12 md:col-span-9 md:pe-40 slide-up-subtle">
+                <div className="col-start-1 col-span-12 md:col-span-11 lg:col-span-9 md:pe-40 slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="section-heading" />
                 </div>
               )}
               {sectionContent && (
-                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 slide-up-subtle">
+                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-8 lg:col-span-5 slide-up-subtle">
                   <RichText html={sectionContent} className="service-richtext pt-10 md:pt-20" />
                 </div>
               )}
@@ -336,7 +336,7 @@ export default function ServicesSinglePage() {
                 </div>
               )}
               {sectionAccordion.length > 0 && (
-                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 pt-10 md:pt-20 service-accordion-list">
+                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-8 lg: pt-10 md:pt-20 service-accordion-list">
                   {sectionAccordion.map((accordion, accordionIndex) => {
                     const accordionTitle = accordion?.acfTitle || ''
                     const accordionContent = accordion?.acfContent || ''
