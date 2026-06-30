@@ -119,8 +119,10 @@ nav.light a.is-active .nav-link__orb {
     .nav-link__content--inverted {
         display: none;
     }
-    nav a:hover .nav-link__content span {
-    text-decoration: underline;
+    @media (hover: hover) and (pointer: fine) {
+        nav a:hover .nav-link__content span {
+            text-decoration: underline;
+        }
     }
     .menu-icon {
         cursor: pointer;
@@ -138,6 +140,8 @@ nav.light a.is-active .nav-link__orb {
         transition: width 0.3s ease;
     }
     #mobile-nav a {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
         transform: translateX(100px)!important;
         transition: transform 0.3s ease-out;
         transition-delay: 0s;

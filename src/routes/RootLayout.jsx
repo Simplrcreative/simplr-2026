@@ -95,8 +95,9 @@ function handleLogoTransitionClick() {
 
 function createMobileNavLinkClickHandler(closeMobileNav) {
   return (event) => {
-    closeMobileNav()
     handleTransitionLinkClick(event)
+    // Defer close so iOS Safari doesn't drop the navigation when the menu unmounts/repaints.
+    requestAnimationFrame(() => closeMobileNav())
   }
 }
 
@@ -515,11 +516,7 @@ export default function RootLayout() {
               title={item.label}
               className={(classState) => navLinkClassName(classState, item.key)}
               onPointerDown={requestTransitionCapture}
-              onPointerEnter={e => { showNavLinkOrb(e); prefetch(); }}
-              onPointerMove={showNavLinkOrb}
-              onPointerLeave={hideNavLinkOrb}
-              onFocus={e => { showNavLinkOrb(e); prefetch(); }}
-              onBlur={hideNavLinkOrb}
+              onTouchStart={() => prefetch()}
               onClick={createMobileNavLinkClickHandler(closeMobileNav)}
             >
               <span className="nav-link__orb" aria-hidden="true" />
