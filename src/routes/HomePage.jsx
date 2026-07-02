@@ -633,8 +633,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-[80vh] md:min-h-screen flex flex-col md:justify-end change-logo-back">
           <div className="grid grid-cols-12 min-h-[80vh] md:min-h-0 items-start gap-x-5 w-full">
-            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[95ch] mt-60 mb-10 lg:my-0"> 
-              <h1 className="hero-title text-coffee">Simplr is a <span>Brand Identity and Digital Design Agency</span> in <span><i>Cape Town.</i></span></h1>
+            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[70ch] mt-60 mb-10 lg:my-0"> 
+              <h1 className="hero-title text-coffee">Simplr turns <span>complexity</span> into <span><i>brand and digital clarity.</i></span></h1>
             </div>
             <div className="hero-video-holder col-start-1 lg:col-start-8 col-span-12 lg:col-span-5 section-dark lg:flex lg:items-end lg:justify-end pb-5 relative"> 
               <button
@@ -700,38 +700,41 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       <section className="brands-grow px-5 bg-white py-20 section-light relative z-1 change-logo">
         <div className="grid grid-cols-12">
           <div className="trigger-split-text-coffee col-start-1 lg:col-start-4 col-span-12 lg:col-span-5 lead max-w-[47ch] "> 
-              <div className="split-text-coffee">We help brands grow through creativity, craft, and intelligent design. From strategy and branding to digital experiences, motion, and presentation systems, we create work that connects purpose with performance.</div>
+              <div className="split-text-coffee">
+                <p className="mb-5">We help organisations make sense of who they are, what they need to say, and how their brand should work across identity, websites, motion, and communication systems.</p>
+                <p>From our Cape Town studio, we partner with clients in South Africa and around the world to create work that connects purpose with performance.</p>
+              </div>
           </div>
         </div>
       </section>
 
       <section ref={servicesRef} className="services py-10 md:py-20 section-light overflow-hidden relative w-full light-to-coffee-outgoing">
          <div className="services-titles flex flex-nowrap items-center text-[3rem] md:text-[5.5rem] gap-10">
-          <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Successfully launched brands since 2015" className="services-title font-literata font-[400] flex-shrink-0">
+          <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Brand and digital strategy projects completed." className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="branding-design" data-color="text-branding-design" data-stat="85" data-detail="Our branding is OK but wait till you see our websites" className="services-title font-light flex-shrink-0 mt-3">
+          <div id="branding-design" data-color="text-branding-design" data-stat="38" data-detail="Brand identity systems created and evolved." className="services-title font-light flex-shrink-0 mt-3">
             Branding&Design 
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="web-design-development" data-color="text-web-design-development" data-stat="43" data-detail="Web design and development are the mostest bestest" className="services-title font-literata flex-shrink-0">
+          <div id="web-design-development" data-color="text-web-design-development" data-stat="56" data-detail="Websites and digital platforms designed and built." className="services-title font-literata flex-shrink-0">
             Web Design&Development
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-           <div id="motion" data-color="text-motion" data-stat="16" data-detail="Awesome motion content to go in here." className="services-title font-light flex-shrink-0 mt-3">
+           <div id="motion" data-color="text-motion" data-stat="39" data-detail="Motion projects brought to life across screen and story." className="services-title font-light flex-shrink-0 mt-3">
             Motion
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="templates" data-color="text-templates" data-stat="28" data-detail="Templates detail to be written for this." className="services-title font-literata flex-shrink-0">
+          <div id="templates" data-color="text-templates" data-stat="89" data-detail="Template systems built for teams at scale." className="services-title font-literata flex-shrink-0">
             Templates
           </div>
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
@@ -741,7 +744,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
             <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem]">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-20 lg:mb-40 text-strategy text-[5rem]">+</div>
-              <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Successfully launched brands since 2015 </div>
+              <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
             </div>
           </div>
         </div>

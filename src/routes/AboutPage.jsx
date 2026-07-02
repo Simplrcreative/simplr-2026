@@ -138,8 +138,13 @@ export default function AboutPage() {
 
       <section className="px-5 py-5 md:py-20 bg-coffee section-dark trigger-split-text">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-4 text-white md:pt-20">
-            <div className="lead split-text">Guided by creative intelligence, we simplify complexity to help brands connect, adapt, and grow.</div>
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-white md:pt-20">
+            <div className="lead split-text">
+              <p>Guided by creative intelligence, we bring strategy, design, development, motion, and content together to turn complexity into work people can understand, trust, and use.</p>
+              <p className="mt-5">Simplr is a Cape Town-based brand identity and digital design agency working with clients in South Africa and around the world.</p>
+              <p className="mt-5">Since 2014, we have helped organisations define how they look, sound, work, and grow. Our team brings strategy, identity design, UX and UI, website design and development, motion, content, templates, and project leadership into one connected process.</p>
+              <p className="mt-5">The result is work with a clear idea behind it, a strong system beneath it, and the craft to hold up in the real world.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -255,6 +260,18 @@ export default function AboutPage() {
       <PeopleSectionMobile people={people} />
       </div>
 
+      <section className="px-5 pb-20 bg-coffee trigger-split-text">
+        <div className="grid grid-cols-12">
+          <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
+            <div className="lead split-text">
+              <p>Simplr brings together strategists, designers, developers, project leads, and makers who work as one team.</p>
+              <p className="mt-5">Our experience spans brand identity, UX and UI, website design and development, campaign systems, motion, packaging, environmental design, template systems, and large-scale brand implementation.</p>
+              <p className="mt-5">Different disciplines, one shared standard: make the complex feel clear, and make the clear feel compelling.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden">
         <div className="grid grid-cols-12 gap-x-5 w-full">
           <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-8 lg:col-span-10">
@@ -264,7 +281,10 @@ export default function AboutPage() {
                 <div className="bullet-dot bullet-dot-coral" />
                 <div className="bullet-body">
                   <h3 className="bullet-heading">Brand is where<br/>everything begins</h3>
-                  <p className="bullet-text">Every project begins with understanding your brand - who you are, what you stand for, and where you&apos;re going. That clarity informs every design, line of code, and creative decision we make.</p>
+                  <div className="bullet-text">
+                    <p>Every project starts with understanding the brand: what it stands for, who it serves, where it is going, and why people should care.</p>
+                    <p className="mt-5">That clarity shapes the strategy, identity, interface, message, motion, and technology behind the work.</p>
+                  </div>
                 </div>
               </div>
 
@@ -272,7 +292,9 @@ export default function AboutPage() {
                 <div className="bullet-dot bullet-dot-lavender" />
                 <div className="bullet-body">
                   <h3 className="bullet-heading">Design and development,<br/>seamlessly connected</h3>
-                  <p className="bullet-text">Our designers and developers work side by side from the start, ensuring every idea is beautifully designed, technically sound, and built for real-world performance.</p>
+                  <div className="bullet-text">
+                    <p>Our designers and developers work together from the start, so every idea is visually considered, technically sound, and built for real-world performance.</p>
+                  </div>
                 </div>
               </div>
 
@@ -280,7 +302,9 @@ export default function AboutPage() {
                 <div className="bullet-dot bullet-dot-lime" />
                 <div className="bullet-body">
                   <h3 className="bullet-heading">Built for<br/>lasting impact</h3>
-                  <p className="bullet-text">We&apos;re in it for the long run - building partnerships that grow with your business and deliver lasting impact over time.</p>
+                  <div className="bullet-text">
+                    <p>The work needs to adapt across teams, markets, channels, and time, while staying clear enough for people to recognise, use, and trust.</p>
+                  </div>
                 </div>
               </div>
 
