@@ -744,7 +744,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
             <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem]">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-20 lg:mb-40 text-strategy text-[5rem]">+</div>
-              <div className="stat-detail lead max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
+              <div className="stat-detail lead max-w-[26ch] md:max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
             </div>
           </div>
         </div>
