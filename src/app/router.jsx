@@ -9,6 +9,8 @@ import ThinkingPage from '../routes/ThinkingPage.jsx'
 import ThinkingSinglePage from '../routes/ThinkingSinglePage.jsx'
 import ContactPage from '../routes/ContactPage.jsx'
 import Est2014PageInfinite from '../routes/Est2014Page-infinite.jsx'
+import Est2014PageMasonary from '../routes/Est2014Page.jsx'
+import Est2014PageZoom from '../routes/Est2014Page-zoom.jsx'
 import LandingPage from '../routes/LandingPage.jsx'
 import DefaultPage from '../routes/DefaultPage.jsx'
 import NotFoundPage from '../routes/NotFoundPage.jsx'
@@ -109,6 +111,18 @@ export const router = createBrowserRouter([
           {
             path: 'est-2014/',
             element: <Est2014PageInfinite />,
+            loader: createEst2014PageLoader(),
+            handle: { pageBg: 'light', hideFooter: true },
+          },
+          {
+            path: 'est-2014-masonry/',
+            element: <Est2014PageMasonary />,
+            loader: createEst2014PageLoader(),
+            handle: { pageBg: 'light', hideFooter: true },
+          },
+          {
+            path: 'est-2014-zoom/',
+            element: <Est2014PageZoom/>,
             loader: createEst2014PageLoader(),
             handle: { pageBg: 'light', hideFooter: true },
           },
