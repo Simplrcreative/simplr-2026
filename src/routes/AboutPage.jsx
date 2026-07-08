@@ -10,6 +10,7 @@ import {
   createPeopleScatterAnimation,
   createPeopleSectionClear,
   createBioAnimation,
+  createHowWeWorkAnimation,
   createSlideUpAnimations,
   lenisScrollTo,
   lockScroll,
@@ -96,6 +97,7 @@ export default function AboutPage() {
   const closeRef = useRef(null)
   const peopleSectionRef = useRef(null)
   const bulletsSectionRef = useRef(null)
+  const howWeWorkSectionRef = useRef(null)
 
   // Keep last active person so the overlay content doesn't vanish during close animation
   const lastPersonRef = useRef(null)
@@ -113,6 +115,11 @@ export default function AboutPage() {
 
   // Bullets animation
   useEffect(() => createBulletsAnimation(bulletsSectionRef.current), [])
+
+  useEffect(() => {
+    if (!howWeWork.length) return undefined
+    return createHowWeWorkAnimation(howWeWorkSectionRef.current)
+  }, [howWeWork.length])
 
   useEffect(
     () => {
@@ -197,7 +204,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 bg-coffee section-dark ">
+      <section className="px-5 bg-coffee section-dark">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-white md:pt-20 ">
             {aboutContent?.acfLandingLead && (
@@ -333,7 +340,7 @@ export default function AboutPage() {
       <PeopleSectionMobile people={people} />
       </div>
 
-      <section className="px-5 pb-20 md:pt-10 md:pb-30 xl:py-20 bg-coffee trigger-split-text slide-up-subtle">
+      <section className="px-5 pb-20 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark trigger-split-text slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
             <div className="lead split-text mb-5">Different disciplines. One shared standard:</div>
@@ -377,7 +384,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee values-section trigger-split-text slide-up-subtle">
+      <section className="px-5 py-20 bg-coffee section-dark values-section trigger-split-text slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12">
             <div className="lead split-text mb-5 text-white">Our values</div>
@@ -426,52 +433,84 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-coffee min-h-screen how-we-work-section trigger-split-text slide-up-subtle overflow-hidden">
-        <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-12 md:col-span-4 px-5 mb-10">
+      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark trigger-split-text slide-up-subtle">
+        <div className="grid grid-cols-12 w-full">
+          <div className="col-start-1 col-span-12 md:col-span-4">
             <div className="lead split-text text-white">How we work</div>
-          </div>
-          <div className="col-start-1 col-span-12 flex">
-            {howWeWork.map((item, index) => {
-              const videoSrc = item?.acfVideo?.node?.sourceUrl ?? ''
-              const loaderSrc = getThumbnail(item?.acfImage, 'loader')
-              const mobileSrc = getThumbnail(item?.acfImage, 'medium')
-              const desktopSrc = getThumbnail(item?.acfImage, 'large')
-              const hasImage = Boolean(loaderSrc || mobileSrc || desktopSrc)
-
-              return (
-              <div key={`${item?.acfHeading ?? 'how-we-work'}-${index}`} className="how-we-work-item flex items-center relative">
-                <div className="how-we-work-item-media relative sticky top-0 left-0 shrink-0 z-1">
-                  <div className="lead how-we-work-heading" dangerouslySetInnerHTML={{ __html: item?.acfHeading ?? '' }} />
-                  {videoSrc ? (
-                    <video
-                      src={videoSrc}
-                      title={item?.acfHeading ?? ''}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                    />
-                  ) : hasImage ? (
-                    <PictureImg
-                      loaderSrc={loaderSrc ? `${loaderSrc}.webp` : ''}
-                      mobileSrc={mobileSrc ? `${mobileSrc}.webp` : ''}
-                      desktopSrc={desktopSrc ? `${desktopSrc}.webp` : ''}
-                      altText={item?.acfHeading ?? ''}
-                    />
-                  ) : null}
-                </div>
-                <div className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''} shrink-0`}>
-                  <div className="how-we-work-content max-w-[35ch]" dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }} />
-                </div>
-              </div>
-              )
-            })}
           </div>
         </div>
       </section>
 
+      <section
+        ref={howWeWorkSectionRef}
+        className="py-20 bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden"
+      >
+        <div className="grid grid-cols-12 w-full">
+          <div className="col-start-1 col-span-12 how-we-work-stage">
+            <div className="how-we-work-media-stack" aria-hidden="true">
+              {howWeWork.map((item, index) => {
+                const videoSrc = item?.acfVideo?.node?.sourceUrl ?? ''
+                const loaderSrc = getThumbnail(item?.acfImage, 'loader')
+                const mobileSrc = getThumbnail(item?.acfImage, 'medium')
+                const desktopSrc = getThumbnail(item?.acfImage, 'large')
+                const hasImage = Boolean(loaderSrc || mobileSrc || desktopSrc)
+
+                return (
+                  <div
+                    key={`${item?.acfHeading ?? 'how-we-work-media'}-${index}`}
+                    className="how-we-work-item-media"
+                  >
+                    <div
+                      className="lead how-we-work-heading"
+                      dangerouslySetInnerHTML={{ __html: item?.acfHeading ?? '' }}
+                    />
+                    {videoSrc ? (
+                      <video
+                        src={videoSrc}
+                        title={item?.acfHeading ?? ''}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : hasImage ? (
+                      <PictureImg
+                        loaderSrc={loaderSrc ? `${loaderSrc}.webp` : ''}
+                        mobileSrc={mobileSrc ? `${mobileSrc}.webp` : ''}
+                        desktopSrc={desktopSrc ? `${desktopSrc}.webp` : ''}
+                        altText={item?.acfHeading ?? ''}
+                      />
+                    ) : null}
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="how-we-work-track">
+              {howWeWork.map((item, index) => (
+                <div
+                  key={`${item?.acfHeading ?? 'how-we-work-content'}-${index}`}
+                  className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''}`}
+                >
+                  <div
+                    className="how-we-work-content max-w-[35ch]"
+                    dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-20 bg-coffee section-dark min-h-screen clients-section trigger-split-text slide-up-subtle">
+        <div className="grid grid-cols-12 w-full">
+          <div className="col-start-1 col-span-12">
+            <div className="lead split-text text-white">Our clients</div>
+          </div>
+        </div>
+      </section>
     </>
   )
 }

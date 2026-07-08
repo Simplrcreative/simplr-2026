@@ -92,6 +92,89 @@ export function createBulletsAnimation(section) {
   }
 }
 
+export function createHowWeWorkAnimation(section) {
+  if (!section) return () => undefined
+
+  const stage = section.querySelector('.how-we-work-stage')
+  const track = section.querySelector('.how-we-work-track')
+  const medias = Array.from(section.querySelectorAll('.how-we-work-item-media'))
+  const contents = Array.from(section.querySelectorAll('.how-we-work-item-content'))
+
+  if (!stage || !track || !medias.length || !contents.length) {
+    return () => undefined
+  }
+
+  const count = contents.length
+  const getViewportWidth = () => window.innerWidth
+  const mediaStack = section.querySelector('.how-we-work-media-stack')
+  const getMediaSize = () => mediaStack?.getBoundingClientRect().width || getViewportWidth() * 0.5
+  // Settled (screenshot 2): left edge flush with media right edge.
+  // Crossover (screenshot 1): outgoing at -50vw, incoming at settled.
+  // Fully out: left edge at -100vw.
+  const settledX = () => getMediaSize()
+  const crossoverX = () => getViewportWidth() * -0.5
+  const exitX = () => getViewportWidth() * -1
+  const entrantStartX = () => getViewportWidth() + getMediaSize()
+
+  const PHASE_A = 1
+  const PHASE_B = 0.5
+  const transitionCount = Math.max(count - 1, 0)
+  const mediaFade = Math.min(0.12, PHASE_A * 0.2)
+
+  gsap.set(medias, { autoAlpha: 0 })
+  gsap.set(medias[0], { autoAlpha: 1 })
+
+  contents.forEach((content, index) => {
+    gsap.set(content, {
+      x: index === 0 ? settledX : entrantStartX,
+      yPercent: -50,
+    })
+  })
+
+  const tl = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: {
+      trigger: section,
+      start: 'top top',
+      end: () => `+=${Math.max(transitionCount, 1) * getViewportWidth() * 1.5}`,
+      pin: true,
+      scrub: true,
+      invalidateOnRefresh: true,
+      anticipatePin: 1,
+    },
+  })
+
+  for (let index = 0; index < transitionCount; index += 1) {
+    const current = contents[index]
+    const next = contents[index + 1]
+    const currentMedia = medias[index]
+    const nextMedia = medias[index + 1]
+    const phaseAStart = index * (PHASE_A + PHASE_B)
+
+    // Phase A: current exits halfway, next enters halfway (screenshot 1).
+    tl.to(current, { x: crossoverX, duration: PHASE_A }, phaseAStart)
+    tl.fromTo(
+      next,
+      { x: entrantStartX, yPercent: -50 },
+      { x: settledX, yPercent: -50, duration: PHASE_A },
+      phaseAStart,
+    )
+
+    // Media swap only at the halfway crossover.
+    tl.to(currentMedia, { autoAlpha: 0, duration: mediaFade }, phaseAStart + PHASE_A - mediaFade)
+    tl.to(nextMedia, { autoAlpha: 1, duration: mediaFade }, phaseAStart + PHASE_A - mediaFade)
+
+    // Phase B: hold next at settled position while current finishes exiting (screenshot 2).
+    tl.to(current, { x: exitX, duration: PHASE_B }, phaseAStart + PHASE_A)
+  }
+
+  return () => {
+    tl.scrollTrigger?.kill()
+    tl.kill()
+    gsap.set([...contents, ...medias], { clearProps: 'transform,opacity,visibility' })
+  }
+}
+
 export function createBioAnimation(scatter, overlay, close, isOpen, onCloseComplete) {
   if (!scatter || !overlay) return () => undefined
 
