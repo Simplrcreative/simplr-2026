@@ -100,7 +100,7 @@ export default function WorkSinglePage() {
               </div>
             )}
           </div>
-          <div className="col-start-1 md:col-start-9 col-span-12 md:col-span-5">
+          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 md:mt-25">
             <div className="featured-image thumb-swap-trigger__">
               {loaderSrc && (
                 <div

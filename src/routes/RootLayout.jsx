@@ -564,7 +564,7 @@ export default function RootLayout() {
             
           </div>
 
-          <nav id="desktop-nav" className="main hidden lg:flex flex-row flex-wrap items-start gap-[2.5rem] pt-[1.875rem]">
+          <nav id="desktop-nav" className="main hidden lg:flex flex-row flex-wrap items-start gap-[2.5rem]__ pt-[1.875rem]__">
             {navigation.map((item) => {
               const prefetch = useRoutePrefetch(item.path)
               return (

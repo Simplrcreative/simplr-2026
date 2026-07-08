@@ -194,6 +194,52 @@ const peopleQuery = `
           }
         }
       }
+      acfAboutBuilder {
+        acfLandingHeading
+        acfLandingLead
+        acfLandingIntroduction
+        acfTeamIntroduction
+        acfPrinciplesHeading
+        acfPrinciples {
+          acfHeading
+          acfContent
+          acfColour
+        }
+        acfValues {
+          acfValue
+          acfContent
+          acfTitle
+        }
+        acfHowWeWork {
+          acfHeading
+          acfContent
+          acfColour
+          acfVideo {
+            node {
+              sourceUrl
+            }
+          }
+          acfImage {
+            node {
+              guid
+              mediaDetails {
+                sizes {
+                  name
+                  sourceUrl
+                }
+              }
+            }
+          }
+        }
+        acfClients {
+          acfClient
+          acfLogo {
+            node {
+              sourceUrl
+            }
+          }
+        }
+      }
     }
   }
 `
@@ -1310,18 +1356,19 @@ export async function fetchHomeData() {
 
 export async function fetchPeopleData() {
   if (!wpConfig.endpoint) {
-    return { people: [] }
+    return { people: [], aboutContent: [] }
   }
 
   try {
     const data = await remember('people', () => graphQlRequest(peopleQuery))
     const people = data.page?.acfPeople?.people ?? []
+    const aboutContent = data.page?.acfAboutBuilder ?? []
 
-    return { people }
+    return { people, aboutContent }
   } catch (error) {
-    reportError('Unable to load people data', error)
+    reportError('Unable to load about page data', error)
 
-    return { people: [] }
+    return { people: [], aboutContent: [] }
   }
 }
 

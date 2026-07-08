@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
+import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
 import PeopleSectionMobile from '../components/about/PeopleSectionMobile.jsx'
 import {
@@ -9,6 +10,7 @@ import {
   createPeopleScatterAnimation,
   createPeopleSectionClear,
   createBioAnimation,
+  createSlideUpAnimations,
   lenisScrollTo,
   lockScroll,
   unlockScroll,
@@ -28,12 +30,66 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSi
 
 export default function AboutPage() {
   useEffect(() => createSplitTextAnimation(), [])
-  const { people, page } = useLoaderData()
+  useEffect(() => createSlideUpAnimations(document.body), [])
+  const { people, aboutContent, page } = useLoaderData()
   const seo = buildStaticPageSeo('about', page)
+
+  //const aboutContent = page?.acfAboutBuilder ?? []
+  const principles = aboutContent?.acfPrinciples ?? []
+  const values = aboutContent?.acfValues ?? []
+  const howWeWork = aboutContent?.acfHowWeWork ?? []
 
   const [activeBio, setActiveBio] = useState(null)
   const [bioLayoutOpen, setBioLayoutOpen] = useState(false)
   const [hoveredPerson, setHoveredPerson] = useState(null)
+  const [activeValueIndex, setActiveValueIndex] = useState(0)
+  const [offValueIndex, setOffValueIndex] = useState(null)
+  const [resetValueIndex, setResetValueIndex] = useState(null)
+  const offValueTimeoutRef = useRef(null)
+  const resetValueTimeoutRef = useRef(null)
+
+  const VALUE_CONTENT_OFF_MS = 600
+
+  const activateValue = (index) => {
+    if (index === activeValueIndex) return
+
+    if (offValueTimeoutRef.current) {
+      window.clearTimeout(offValueTimeoutRef.current)
+      offValueTimeoutRef.current = null
+    }
+    if (resetValueTimeoutRef.current) {
+      window.clearTimeout(resetValueTimeoutRef.current)
+      resetValueTimeoutRef.current = null
+    }
+
+    const previousIndex = activeValueIndex
+    setResetValueIndex(null)
+    setOffValueIndex(previousIndex)
+    setActiveValueIndex(index)
+
+    offValueTimeoutRef.current = window.setTimeout(() => {
+      // Disable transition, drop .off, then clear reset so next enter starts from below.
+      setOffValueIndex(null)
+      setResetValueIndex(previousIndex)
+      offValueTimeoutRef.current = null
+
+      resetValueTimeoutRef.current = window.setTimeout(() => {
+        setResetValueIndex(null)
+        resetValueTimeoutRef.current = null
+      }, 50)
+    }, VALUE_CONTENT_OFF_MS)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (offValueTimeoutRef.current) {
+        window.clearTimeout(offValueTimeoutRef.current)
+      }
+      if (resetValueTimeoutRef.current) {
+        window.clearTimeout(resetValueTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const scatterRef = useRef(null)
   const overlayRef = useRef(null)
@@ -131,20 +187,37 @@ export default function AboutPage() {
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-span-12 md:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
-            <h1 className="hero-title">A <span>brand and digital design agency</span> partnering with <span><i>forward-thinking</i></span> clients around the world</h1>
+            {aboutContent?.acfLandingHeading && (
+              <h1
+                className="hero-title"
+                dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingHeading }}
+              />
+            )}
           </div>
         </div>
       </section>
 
-      <section className="px-5 py-5 md:py-20 bg-coffee section-dark trigger-split-text">
+      <section className="px-5 bg-coffee section-dark ">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-white md:pt-20">
-            <div className="lead split-text">
-              <p>Guided by creative intelligence, we bring strategy, design, development, motion, and content together to turn complexity into work people can understand, trust, and use.</p>
-              <p className="mt-5">Simplr is a Cape Town-based brand identity and digital design agency working with clients in South Africa and around the world.</p>
-              <p className="mt-5">Since 2014, we have helped organisations define how they look, sound, work, and grow. Our team brings strategy, identity design, UX and UI, website design and development, motion, content, templates, and project leadership into one connected process.</p>
-              <p className="mt-5">The result is work with a clear idea behind it, a strong system beneath it, and the craft to hold up in the real world.</p>
-            </div>
+          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-white md:pt-20 ">
+            {aboutContent?.acfLandingLead && (
+              <div
+                className="lead split-text trigger-split-text"
+                dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingLead}}
+              />
+            )}
+            {aboutContent?.acfLandingIntroduction && (
+              <div
+                className="article-content mt-10 split-text trigger-split-text"
+                dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingIntroduction }}
+              />
+            )}
+            {aboutContent?.acfTeamIntroduction && (
+              <div
+                className="article-content mt-10 split-text trigger-split-text"
+                dangerouslySetInnerHTML={{ __html: aboutContent.acfTeamIntroduction }}
+              />
+            )}
           </div>
         </div>
       </section>
@@ -260,63 +333,141 @@ export default function AboutPage() {
       <PeopleSectionMobile people={people} />
       </div>
 
-      <section className="px-5 pb-20 bg-coffee trigger-split-text">
+      <section className="px-5 pb-20 md:pt-10 md:pb-30 xl:py-20 bg-coffee trigger-split-text slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
-            <div className="lead split-text">
-              <p>Simplr brings together strategists, designers, developers, project leads, and makers who work as one team.</p>
-              <p className="mt-5">Our experience spans brand identity, UX and UI, website design and development, campaign systems, motion, packaging, environmental design, template systems, and large-scale brand implementation.</p>
-              <p className="mt-5">Different disciplines, one shared standard: make the complex feel clear, and make the clear feel compelling.</p>
-            </div>
+            <div className="lead split-text mb-5">Different disciplines. One shared standard:</div>
+            {aboutContent?.acfPrinciplesHeading && (
+              <h2
+                className="section-heading split-text"
+                dangerouslySetInnerHTML={{ __html: aboutContent.acfPrinciplesHeading }}
+              />
+            )}
           </div>
         </div>
       </section>
 
-      <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden">
+      <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden slide-up-subtle">
         <div className="grid grid-cols-12 gap-x-5 w-full">
-          <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-8 lg:col-span-10">
+          <div className="col-start-1 col-span-12 md:col-start-1 md:col-span-3 lead text-white">
+            Three core principles
+          </div>
+          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-9">
             <div className="bullets-grid">
 
-              <div id="bullet-item-1" className="bullet-item">
-                <div className="bullet-dot bullet-dot-coral" />
-                <div className="bullet-body">
-                  <h3 className="bullet-heading">Brand is where<br/>everything begins</h3>
-                  <div className="bullet-text">
-                    <p>Every project starts with understanding the brand: what it stands for, who it serves, where it is going, and why people should care.</p>
-                    <p className="mt-5">That clarity shapes the strategy, identity, interface, message, motion, and technology behind the work.</p>
+              {principles.map((principle, index) => {
+                return (
+                  <div id={`bullet-item-${index + 1}`} className="bullet-item" key={`${principle?.acfHeading ?? 'principle'}-${index}`}>
+                    <div className={`bullet-body bg-${principle?.acfColour ?? ''}`}>
+                      <h3
+                        className="bullet-heading"
+                        dangerouslySetInnerHTML={{ __html: principle?.acfHeading ?? '' }}
+                      />
+                      <div
+                        className="bullet-text"
+                        dangerouslySetInnerHTML={{ __html: principle?.acfContent ?? '' }}
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div id="bullet-item-2" className="bullet-item">
-                <div className="bullet-dot bullet-dot-lavender" />
-                <div className="bullet-body">
-                  <h3 className="bullet-heading">Design and development,<br/>seamlessly connected</h3>
-                  <div className="bullet-text">
-                    <p>Our designers and developers work together from the start, so every idea is visually considered, technically sound, and built for real-world performance.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div id="bullet-item-3" className="bullet-item">
-                <div className="bullet-dot bullet-dot-lime" />
-                <div className="bullet-body">
-                  <h3 className="bullet-heading">Built for<br/>lasting impact</h3>
-                  <div className="bullet-text">
-                    <p>The work needs to adapt across teams, markets, channels, and time, while staying clear enough for people to recognise, use, and trust.</p>
-                  </div>
-                </div>
-              </div>
+                )
+              })}
 
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-5 pb-20 md:pt-10 md:pb-30 xl:py-40 bg-coffee trigger-split-text">
+      <section className="px-5 py-20 bg-coffee values-section trigger-split-text slide-up-subtle">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
-            <div className="lead split-text">Guided by creative intelligence, we simplify complexity to help brands connect, adapt, and grow.</div>
+          <div className="col-start-1 col-span-12">
+            <div className="lead split-text mb-5 text-white">Our values</div>
+          </div>
+          <div className="col-start-1 col-span-12 md:col-span-4 text-white">
+            {values.map((value, index) => (
+              <div key={`${value?.acfValue ?? 'value'}-${index}`} className="flex gap-5 align-center mb-4">
+                <div className="font-literata flex flex-col items-center justify-center">0{index + 1}</div>
+                <div
+                  className={`value lead flex flex-col items-center justify-center${activeValueIndex === index ? ' active' : ''}`}
+                  onMouseEnter={() => activateValue(index)}
+                  onClick={() => activateValue(index)}
+                  dangerouslySetInnerHTML={{ __html: value?.acfValue ?? '' }}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="col-start-1 col-span-12 md:col-start-5 md:col-span-6 relative">
+            {values.map((value, index) => {
+              const isActive = activeValueIndex === index
+              const isOff = offValueIndex === index
+              const isReset = resetValueIndex === index
+
+              return (
+              <div
+                key={`${value?.acfContent ?? 'value-content'}-${index}`}
+                className={[
+                  'value-content-container text-white absolute top-0 left-0',
+                  isActive ? 'active' : '',
+                  isOff ? 'off' : '',
+                  isReset ? 'reset' : '',
+                ].filter(Boolean).join(' ')}
+              >
+                <div
+                  className="value-content lead mb-5 max-w-[25ch]"
+                  dangerouslySetInnerHTML={{ __html: value?.acfContent ?? '' }}
+                />
+                <h2
+                  className="value-title section-heading"
+                  dangerouslySetInnerHTML={{ __html: value?.acfTitle ?? '' }}
+                />
+              </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-coffee min-h-screen how-we-work-section trigger-split-text slide-up-subtle overflow-hidden">
+        <div className="grid grid-cols-12">
+          <div className="col-start-1 col-span-12 md:col-span-4 px-5 mb-10">
+            <div className="lead split-text text-white">How we work</div>
+          </div>
+          <div className="col-start-1 col-span-12 flex">
+            {howWeWork.map((item, index) => {
+              const videoSrc = item?.acfVideo?.node?.sourceUrl ?? ''
+              const loaderSrc = getThumbnail(item?.acfImage, 'loader')
+              const mobileSrc = getThumbnail(item?.acfImage, 'medium')
+              const desktopSrc = getThumbnail(item?.acfImage, 'large')
+              const hasImage = Boolean(loaderSrc || mobileSrc || desktopSrc)
+
+              return (
+              <div key={`${item?.acfHeading ?? 'how-we-work'}-${index}`} className="how-we-work-item flex items-center relative">
+                <div className="how-we-work-item-media relative sticky top-0 left-0 shrink-0 z-1">
+                  <div className="lead how-we-work-heading" dangerouslySetInnerHTML={{ __html: item?.acfHeading ?? '' }} />
+                  {videoSrc ? (
+                    <video
+                      src={videoSrc}
+                      title={item?.acfHeading ?? ''}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : hasImage ? (
+                    <PictureImg
+                      loaderSrc={loaderSrc ? `${loaderSrc}.webp` : ''}
+                      mobileSrc={mobileSrc ? `${mobileSrc}.webp` : ''}
+                      desktopSrc={desktopSrc ? `${desktopSrc}.webp` : ''}
+                      altText={item?.acfHeading ?? ''}
+                    />
+                  ) : null}
+                </div>
+                <div className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''} shrink-0`}>
+                  <div className="how-we-work-content max-w-[35ch]" dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }} />
+                </div>
+              </div>
+              )
+            })}
           </div>
         </div>
       </section>

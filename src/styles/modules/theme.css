@@ -164,3 +164,9 @@
 }
 
 
+.lead p, .article-content p {
+  margin-bottom: 2rem;
+}
+.lead p:last-child, .article-content p:last-child {
+  margin-bottom: 0;
+}

@@ -8,9 +8,9 @@ export function createPeopleScatterAnimation(section, scatter) {
 
   const isDesktop = window.matchMedia('(min-width: 1024px)').matches
 
-  let yScroll = 100
+  let yScroll = 50
   if(isDesktop) {
-    yScroll = 500
+    yScroll = 150
   }
 
   const anim = gsap.fromTo(
@@ -53,50 +53,16 @@ export function createPeopleSectionClear(section, onClear) {
 export function createBulletsAnimation(section) {
   if (!section) return () => undefined
 
-  const bullet1 = section.querySelector('#bullet-item-1')
-  const bullet2 = section.querySelector('#bullet-item-2')
-  const bullet3 = section.querySelector('#bullet-item-3')
+  const bullets = Array.from(section.querySelectorAll('.bullet-item'))
+  if (!bullets.length) return () => undefined
 
-  if (!bullet1 || !bullet2 || !bullet3) return () => undefined
+  const bodyNodes = bullets
+    .map((bullet) => bullet.querySelector('.bullet-body'))
+    .filter(Boolean)
 
-  const dot1 = bullet1.querySelector('.bullet-dot')
-  const dot2 = bullet2.querySelector('.bullet-dot')
-  const dot3 = bullet3.querySelector('.bullet-dot')
+  if (!bodyNodes.length) return () => undefined
 
-  const heading1 = bullet1.querySelector('.bullet-heading')
-  const text1    = bullet1.querySelector('.bullet-text')
-  const heading2 = bullet2.querySelector('.bullet-heading')
-  const text2    = bullet2.querySelector('.bullet-text')
-  const heading3 = bullet3.querySelector('.bullet-heading')
-  const text3    = bullet3.querySelector('.bullet-text')
-
-  const r1 = dot1.getBoundingClientRect()
-  const r2 = dot2.getBoundingClientRect()
-  const r3 = dot3.getBoundingClientRect()
-  const x2 = r1.left - r2.left
-  const x3 = r2.left - r3.left
-
-  gsap.set([bullet2, bullet3], { autoAlpha: 0 })
-  gsap.set([heading1, text1, heading2, text2, heading3, text3], { autoAlpha: 0, x: -50 })
-  gsap.set(dot1, { scale: 1, y: 0, x: -200, autoAlpha: 0,transformOrigin: 'top left' })
-  gsap.set(dot2, { x: x2, scale: 0.85, transformOrigin: 'center center' })
-  gsap.set(dot3, { x: x3, scale: 0.85, transformOrigin: 'center center' })
-
-  const dot1ST = gsap.to(dot1, {
-    scale: 1, 
-    x: 0, 
-    y: 0,
-    duration: 0.5,
-    autoAlpha: 1,
-    ease: 'power4.out',   
-    scrollTrigger: {
-      trigger: section,
-      start: 'top 100%',
-      //end: 'top 55%',
-      //scrub: 1,
-      //markers: true,
-    },
-  })
+  gsap.set(bodyNodes, { autoAlpha: 0, x: -50 })
 
   const tl = gsap.timeline({
     defaults: { ease: 'power4.out' },
@@ -112,27 +78,17 @@ export function createBulletsAnimation(section) {
     }
   })
 
-  tl.to([heading1, text1], { autoAlpha: 1, x: 0, duration: 1, stagger: 0.15 })
-
-  tl.to(bullet2,  { autoAlpha: 1, duration: 0.01 }, '-=1')
-  tl.to([dot2, heading2, text2], { x: 0, scale: 1, autoAlpha: 1, duration: 1, stagger: 0.15 }, '<')
-
-  tl.to(bullet3,  { autoAlpha: 1, duration: 0.01 }, '-=1')
-  tl.to([dot3, heading3, text3], { x: 0, scale: 1, autoAlpha: 1, duration: 1, stagger: 0.15 }, '<')
-  //tl.to({},       { duration: 1 }, '+=1')
-
-  const allEls = [
-    bullet1, bullet2, bullet3,
-    dot1, dot2, dot3,
-    heading1, text1, heading2, text2, heading3, text3,
-  ]
+  tl.to(bodyNodes, {
+    autoAlpha: 1,
+    x: 0,
+    duration: 1,
+    stagger: 0.12,
+  })
 
   return () => {
-    dot1ST.scrollTrigger?.kill()
-    dot1ST.kill()
     tl.scrollTrigger?.kill()
     tl.kill()
-    gsap.set(allEls, { clearProps: 'all' })
+    gsap.set(bodyNodes, { clearProps: 'all' })
   }
 }
 
