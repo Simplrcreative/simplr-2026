@@ -461,8 +461,10 @@ const workByUriQuery = `
             }
             acfSliderImages {
               nodes {
+                guid
                 mediaDetails {
                   sizes {
+                    name
                     sourceUrl
                   }
                 }

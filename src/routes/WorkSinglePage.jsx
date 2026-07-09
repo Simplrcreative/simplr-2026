@@ -6,6 +6,7 @@ import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
+import { initSlider } from '../lib/slider.js'
 import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
@@ -17,6 +18,17 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSiz
     sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
     thumbnailNode?.guid ??
     ''
+  )
+}
+
+function getSliderSource(image) {
+  const sizes = image?.mediaDetails?.sizes ?? []
+  return (
+    sizes.find((item) => item?.name === 'large')?.sourceUrl
+    ?? sizes.find((item) => item?.name === 'full')?.sourceUrl
+    ?? image?.guid
+    ?? sizes.find((item) => item?.sourceUrl)?.sourceUrl
+    ?? ''
   )
 }
 
@@ -74,13 +86,15 @@ export default function WorkSinglePage() {
     const cleanupWorkImages = createWorkImagesAnimation()
     const cleanupNextWork = createNextWorkAnimation()
     const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
+    const sliderCleanups = Array.from(document.querySelectorAll('.slider')).map((el) => initSlider(el))
     return () => {
       cleanupSplitText?.()
       cleanupWorkImages?.()
       cleanupNextWork?.()
       cleanupWorkThumbHover?.()
+      sliderCleanups.forEach((cleanup) => cleanup?.())
     }
-  }, [])
+  }, [sections])
 
   return (
     <>
@@ -222,6 +236,8 @@ export default function WorkSinglePage() {
         const stickyText2 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText2)
         const sliderImages = section?.acfSliderImages?.nodes ?? []
 
+        console.log(sliderImages)
+
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
             <div className="grid grid-cols-12">
@@ -359,22 +375,40 @@ export default function WorkSinglePage() {
               {layout === 'Slider' && (
                 <>
                 {/* SLIDER SECTION */}
-                <div className="col-span-12">
+                <div className="slider col-span-12" aria-label="Gallery Slider">
                   {sliderImages.map((image, imageIndex) => {
-                    const source = image?.mediaDetails?.sizes?.[0]?.sourceUrl ?? ''
-                    if (!source) return null
+                      const source = getSliderSource(image)
+                      if (!source) return null
 
-                    return (
-                      <PictureImg
-                        key={`slider-image-${imageIndex}`}
-                        loaderSrc={source}
-                        mobileSrc={source}
-                        desktopSrc={source}
-                        altText=""
-                        pictureClass="full-image overflow-hidden rounded-[10px]"
-                      />
-                    )
-                  })}
+                      return (
+                        <div className={`slide s${imageIndex + 1}`} key={`slider-image-${imageIndex}`}>
+                          <div className="slide-img" style={{ backgroundImage: `url(${source})` }}>
+                            {/*<PictureImg
+                              loaderSrc={source}
+                              mobileSrc={source}
+                              desktopSrc={source}
+                              altText=""
+                              pictureClass="full-image"
+                            />*/}
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                  <div className="hud">
+                    <div className="count font-litera"><span data-slider-current>01</span> / <span>{String(sliderImages.length).padStart(2, '0')}</span></div>
+                    <div className="bar"><i data-slider-progress></i></div>
+                  </div>
+
+                  <div className="drag-hint" data-slider-drag-hint>Drag</div>
+                  <div className="cursor">
+                    <div className="cursor-inner">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M8 5L15 12L8 19" stroke="white" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span className="ring" />
+                    </div>
+                  </div>
                 </div>
               {/* END SLIDER SECTION */}
               </>

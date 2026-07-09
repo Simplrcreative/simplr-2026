@@ -1,0 +1,136 @@
+.slider {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 2.5rem);      /* fallback */
+  height: calc(100dvh - 2.5rem);     /* mobile-safe viewport unit */
+  overflow: hidden;
+  background: #efefef;
+  cursor: none;
+  border-radius: 1rem;
+  touch-action: pan-y;  /* horizontal gestures belong to the slider, vertical scroll stays native */
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  will-change: transform;
+  border-radius: 1rem;
+}
+
+.slide-img {
+    position: absolute;
+    top: -5%; 
+    height: 110%;
+    width: 160%; 
+    left: -30%;   /* overhang must exceed the parallax factor */
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+}
+
+.hud {
+    position: absolute; 
+    right: 1.25rem; 
+    bottom: 1.25rem; 
+    z-index: 5; 
+    text-align: right; 
+    pointer-events: none;
+    color: white;
+    mix-blend-mode: difference;
+  }
+  .hud .count {
+    font-size: 1rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums; 
+    margin-bottom: 0.875rem;
+  }
+  .hud .bar {
+    width: 140px; height: 1px;
+    background: rgba(255,255,255,.15);
+    position: relative; 
+    margin-left: auto;
+  }
+  .hud .bar i {
+    position: absolute; 
+    left: 0; top: 0; height: 100%;
+    background: white; 
+    width: 25%;
+    transition: width .9s cubic-bezier(.65,0,.35,1);
+  }
+
+  /* ---- Custom cursor: outer node positions, inner node scales ---- */
+  .cursor {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    z-index: 100;
+    pointer-events: none;
+    will-change: transform;
+    mix-blend-mode: difference;
+  }
+  .cursor-inner {
+    width: 12.5rem; 
+    height: 12.5rem; 
+    margin: -6.25rem 0 0 -6.25rem;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    backdrop-filter: blur(3px);
+    border: 1px solid white;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    position: relative;
+    transform: scale(.35);
+    opacity: 0;
+    transition: transform .4s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+  }
+  .cursor.active .cursor-inner { transform: scale(1); opacity: 1; }
+  .cursor svg { width: 50px; height: 50px; transition: transform .45s cubic-bezier(.22,1,.36,1); }
+  .cursor.flip svg { transform: rotate(180deg); }
+  .cursor .ring {
+    position: absolute; inset: -1px; border-radius: 50%;
+    border: 1px solid rgba(236,236,234,.5);
+    transform: scale(1); opacity: 0;
+  }
+  .cursor.pulse .ring { animation: pulse .5s ease-out; }
+  @keyframes pulse {
+    from { transform: scale(1); opacity: .8; }
+    to   { transform: scale(1.5); opacity: 0; }
+  }
+
+  /* ---- Mobile drag hint ---- */
+  .drag-hint {
+    position: absolute; left: 50%; bottom: 8%;
+    transform: translateX(-50%);
+    z-index: 6;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: rgba(16,16,18,.45);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(236,236,234,.25);
+    color: var(--paper);
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    display: none;
+    transition: opacity .5s ease;
+  }
+  .drag-hint.hide { opacity: 0; }
+
+  /* ---- Mobile ---- */
+  @media (max-width: 768px) {
+    .slider {
+      height: 60vh;
+      height: 60dvh;   /* 60% of the visible screen, address-bar safe */
+      cursor: auto;
+    }
+    .cursor { display: none; }
+    .drag-hint { display: block; }
+    .hud .bar { width: 90px; }
+    /* Gentler parallax crop on small screens: narrower image = more of the frame visible */
+    .slide-img { width: 130%; left: -15%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-inner, .cursor svg, .hud .bar i { transition: none; }
+  }
