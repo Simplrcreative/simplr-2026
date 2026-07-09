@@ -41,6 +41,10 @@ function workMatchesFilter(work, filter) {
   )
 }
 
+function getWorkCardTitle(work) {
+  return work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || work?.title || ''
+}
+
 /**
  * Groups works chronologically into 6-item layout sections.
  * In each full group:
@@ -377,6 +381,7 @@ export default function WorkPage() {
   const [activeFilter, setActiveFilter] = useState('all')
   const [displayedFilter, setDisplayedFilter] = useState('all')
   const [isFilterAnimating, setIsFilterAnimating] = useState(false)
+  const [keywordFilter, setKeywordFilter] = useState('')
   const [works, setWorks] = useState(initialWorks)
   const [testimonials, setTestimonials] = useState(initialTestimonials)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -393,8 +398,15 @@ export default function WorkPage() {
   }, [initialTestimonials, initialWorks])
 
   const filteredWorks = useMemo(
-    () => works.filter((w) => workMatchesFilter(w, displayedFilter)),
-    [works, displayedFilter],
+    () => {
+      const keyword = keywordFilter.trim().toLowerCase()
+      return works.filter((work) => {
+        if (!workMatchesFilter(work, displayedFilter)) return false
+        if (!keyword) return true
+        return getWorkCardTitle(work).toLowerCase().includes(keyword)
+      })
+    },
+    [works, displayedFilter, keywordFilter],
   )
 
   const groups = useMemo(() => groupWorks(filteredWorks), [filteredWorks])
@@ -610,7 +622,15 @@ export default function WorkPage() {
       </section>
 
       <section className="work-filter px-5 py-8 bg-white section-light flex justify-end">
-        <div className="flex flex-wrap gap-0">
+        <div className="flex flex-wrap gap-0 items-center">
+          <input
+            type="text"
+            value={keywordFilter}
+            onChange={(event) => setKeywordFilter(event.target.value)}
+            placeholder="Keyword search"
+            className="work-filter-btn min-w-[12rem]"
+            aria-label="Filter work by title"
+          />
           {FILTERS.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
             return (
