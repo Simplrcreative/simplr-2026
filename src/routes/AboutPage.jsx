@@ -39,6 +39,9 @@ export default function AboutPage() {
   const principles = aboutContent?.acfPrinciples ?? []
   const values = aboutContent?.acfValues ?? []
   const howWeWork = aboutContent?.acfHowWeWork ?? []
+  const clients = aboutContent?.acfClients ?? []
+
+  console.log(clients)
 
   const [activeBio, setActiveBio] = useState(null)
   const [bioLayoutOpen, setBioLayoutOpen] = useState(false)
@@ -46,6 +49,7 @@ export default function AboutPage() {
   const [activeValueIndex, setActiveValueIndex] = useState(0)
   const [offValueIndex, setOffValueIndex] = useState(null)
   const [resetValueIndex, setResetValueIndex] = useState(null)
+  const [activeClientIndex, setActiveClientIndex] = useState(null)
   const offValueTimeoutRef = useRef(null)
   const resetValueTimeoutRef = useRef(null)
 
@@ -184,6 +188,17 @@ export default function AboutPage() {
     if (activeBio) return
     setHoveredPerson(person.acfName)
   }
+
+  const clientColumnCount = clients.length > 30 ? 3 : 2
+  const clientsPerColumn = Math.ceil(clients.length / clientColumnCount)
+  const clientColumns = Array.from({ length: clientColumnCount }, (_, columnIndex) => {
+    const start = columnIndex * clientsPerColumn
+    const end = start + clientsPerColumn
+    return clients.slice(start, end).map((client, rowIndex) => ({
+      client,
+      originalIndex: start + rowIndex,
+    }))
+  }).filter((column) => column.length > 0)
 
   return (
     <>
@@ -392,7 +407,9 @@ export default function AboutPage() {
           <div className="col-start-1 col-span-12 md:col-span-4 text-white">
             {values.map((value, index) => (
               <div key={`${value?.acfValue ?? 'value'}-${index}`} className="flex gap-5 align-center mb-4">
-                <div className="font-literata flex flex-col items-center justify-center">0{index + 1}</div>
+                <div className="font-literata flex flex-col items-center justify-center opacity-90">
+                  {index < 9 ? `0${index + 1}` : index + 1}
+                </div>
                 <div
                   className={`value lead flex flex-col items-center justify-center${activeValueIndex === index ? ' active' : ''}`}
                   onMouseEnter={() => activateValue(index)}
@@ -504,10 +521,46 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee section-dark min-h-screen clients-section trigger-split-text slide-up-subtle">
+      <section className="px-5 py-20 bg-coffee section-dark clients-section trigger-split-text slide-up-subtle">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1 col-span-12">
+          <div className="col-start-1 col-span-12 mb-10">
             <div className="lead split-text text-white">Our clients</div>
+          </div>
+          <div
+            className={`col-start-1 col-span-12 clients-list${clients.length > 30 ? ' clients-list--3' : ' clients-list--2'}`}
+          >
+            {clientColumns.map((column, columnIndex) => (
+              <div className="clients-column" key={`clients-column-${columnIndex}`}>
+                {column.map(({ client, originalIndex }) => (
+                  <div
+                    key={`${client?.acfClient ?? 'client'}-${originalIndex}`}
+                    className="client-item flex align-center justify-between gap-5 text-white"
+                  >
+                    <div className="flex align-center gap-5">
+                      <div className="font-literata flex flex-col items-center justify-center opacity-90">
+                        {originalIndex < 9 ? `0${originalIndex + 1}` : originalIndex + 1}
+                      </div>
+                      <div
+                        className="client lead"
+                        onMouseEnter={() => setActiveClientIndex(originalIndex)}
+                        onMouseLeave={() => setActiveClientIndex(null)}
+                      >
+                        {client?.acfClient}
+                      </div>
+                    </div>
+                    <div className={`client-logo-container${activeClientIndex === originalIndex ? ' active' : ''}`}>
+                      {client?.acfLogo && (
+                        <img
+                          src={client?.acfLogo?.node?.sourceUrl}
+                          alt={client?.acfClient}
+                          className="client-logo"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </section>

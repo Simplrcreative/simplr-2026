@@ -107,7 +107,9 @@ export function createHowWeWorkAnimation(section) {
   const count = contents.length
   const getViewportWidth = () => window.innerWidth
   const mediaStack = section.querySelector('.how-we-work-media-stack')
-  const getMediaSize = () => mediaStack?.getBoundingClientRect().width || getViewportWidth() * 0.5
+  // Use layout width (not bounding box) so parent scale transforms during route
+  // transitions don't shrink the measured settled position.
+  const getMediaSize = () => mediaStack?.offsetWidth || getViewportWidth() * 0.5
   // Settled (screenshot 2): left edge flush with media right edge.
   // Crossover (screenshot 1): outgoing at -50vw, incoming at settled.
   // Fully out: left edge at -100vw.
