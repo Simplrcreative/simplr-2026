@@ -621,7 +621,7 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section className="work-filter px-5 py-8 bg-white section-light flex justify-between">
+      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end">
         {/*<div className="flex flex-wrap justify-between items-center">*/}
           <input
             type="text"
