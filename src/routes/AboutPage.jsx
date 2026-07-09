@@ -553,7 +553,7 @@ export default function AboutPage() {
                         <img
                           src={client?.acfLogo?.node?.sourceUrl}
                           alt={client?.acfClient}
-                          className="client-logo"
+                          className={`client-logo ${client?.acfLogoFormat ?? 'landscape'}`}
                         />
                       )}
                     </div>

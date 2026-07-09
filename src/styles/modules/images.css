@@ -17,10 +17,17 @@ picture, video {
     position: relative;
     padding-top: var(--aspect-ratio-mobile);
 }
+.full-image.sticky,
+.text-box.sticky-text {
+    height: calc(100vh - 2.5rem);
+    position: sticky;
+    top: 1.25rem;
+}
 .full-image img, 
 .full-image video {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
 }
 img.lazy {
     will-change: filter;

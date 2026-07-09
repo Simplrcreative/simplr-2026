@@ -893,7 +893,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 ) : (
                   <p className="mb-5 md:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
                 )}
-                <p><b>{testimonial?.title || 'Daniel Hulme'}</b><br/>{testimonialData?.acfRole || 'CEO Satalia'}</p>
+                <p><b>{testimonialData?.acfName || testimonial?.title}</b><br/>{testimonialData?.acfRole}</p>
               </div>
             </div>
           </div>

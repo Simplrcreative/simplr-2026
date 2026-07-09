@@ -204,10 +204,10 @@ export default function WorkSinglePage() {
         const video2 = section?.acfVideo2?.node?.guid || ''
         const mimeType1 = section?.acfImage1?.node?.mimeType || ''
         const mimeType2 = section?.acfImage2?.node?.mimeType || ''
-        const isGif1 = mimeType1 === 'image/gif'
-        const isGif2 = mimeType2 === 'image/gif'
-        const ext1 = isGif1 ? '' : '.webp'
-        const ext2 = isGif2 ? '' : '.webp'
+        const isNativeFormat1 = mimeType1 === 'image/gif' || mimeType1 === 'image/webp'
+        const isNativeFormat2 = mimeType2 === 'image/gif' || mimeType2 === 'image/webp'
+        const ext1 = isNativeFormat1 ? '' : '.webp'
+        const ext2 = isNativeFormat2 ? '' : '.webp'
         const fImage1Loader = getThumbnail(section?.acfImage1, 'loader') + ext1
         const fImage1Mobile = getThumbnail(section?.acfImage1, 'medium') + ext1
         const fImage1       = getThumbnail(section?.acfImage1, 'full', 'full') + ext1
@@ -216,6 +216,10 @@ export default function WorkSinglePage() {
         const fImage2       = getThumbnail(section?.acfImage2, 'full', 'full') + ext2
         const altText1 = section?.acfImage1?.node?.altText || 'Untitled'
         const altText2 = section?.acfImage2?.node?.altText || 'Untitled'
+        const sticky1 = ['1', 1, true, 'true'].includes(section?.acfMakeSticky1)
+        const sticky2 = ['1', 1, true, 'true'].includes(section?.acfMakeSticky2)
+        const stickyText1 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText1)
+        const stickyText2 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText2)
 
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
@@ -231,13 +235,13 @@ export default function WorkSinglePage() {
               )}
               {layout === 'Image & Text' && (
                 <>
-                {/* IMAGE &TEXT SECTION */}
+                {/* IMAGE & TEXT SECTION */}
                   <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee mt-8 md:mt-0`}>
-                    <RichText html={content} className="split-text-coffee"/>
+                    <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
                     {video1 ? (
-                      <div className="full-image overflow-hidden rounded-[10px]">
+                      <div className={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}>
                         <video
                           src={video1}
                           poster={fImage1Mobile || undefined}
@@ -253,22 +257,22 @@ export default function WorkSinglePage() {
                         mobileSrc={fImage1Mobile}
                         desktopSrc={fImage1}
                         altText={altText1}
-                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                        pictureClass={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}
                       />
                     )}
                   </div>
-                  {/* END IMAGE &TEXT SECTION */}
+                  {/* END IMAGE & TEXT SECTION */}
                 </>
               )}
               {layout === 'Two Text Boxes' && (
                 <>
                 {/* TWO TEXT BOXES SECTION */}
                   <div className={`col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
-                    <RichText html={content} className="split-text-coffee"/>
+                    <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   
                   <div className={`col-start-1 md:col-start-9 col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
-                    <RichText html={content2} className="split-text-coffee"/>
+                    <RichText html={content2} className={`split-text-coffee text-box ${stickyText2 ? 'sticky-text' : ''}`} />
                   </div>
                   {/* END TWO TEXT BOXES SECTION */}
                 </>
@@ -278,7 +282,7 @@ export default function WorkSinglePage() {
                 {/* TWO IMAGES SECTION */}
                   <div className="col-start-1 col-span-12 md:col-span-6 pb-5 md:pb-0 md:pe-2">
                     {video1 ? (
-                      <div className="full-image overflow-hidden rounded-[10px]">
+                      <div className={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}>
                         <video
                           src={video1}
                           poster={fImage1Mobile || undefined}
@@ -294,13 +298,13 @@ export default function WorkSinglePage() {
                         mobileSrc={fImage1Mobile}
                         desktopSrc={fImage1}
                         altText={altText1}
-                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                        pictureClass={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}
                       />
                     )}
                   </div>
                   <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 md:ps-2">
                     {video2 ? (
-                      <div className="full-image overflow-hidden rounded-[10px]">
+                      <div className={`full-image overflow-hidden rounded-[10px] ${sticky2 ? 'sticky' : ''}`}>
                         <video
                           src={video2}
                           poster={fImage2Mobile || undefined}
@@ -316,7 +320,7 @@ export default function WorkSinglePage() {
                         mobileSrc={fImage2Mobile}
                         desktopSrc={fImage2}
                         altText={altText2}
-                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                        pictureClass={`full-image overflow-hidden rounded-[10px] ${sticky2 ? 'sticky' : ''}`}
                       />
                     )}
                   </div>
@@ -368,7 +372,7 @@ export default function WorkSinglePage() {
                 />
               )}
               <cite className="testimonial-cite">
-                <strong>{testimonial.title}</strong>
+                <strong>{testimonial.acfTestimonials?.acfName || testimonial.title}</strong>
                 {testimonial.acfTestimonials?.acfRole && (
                   <>
                   <br/><span className="testimonial-role">{testimonial.acfTestimonials.acfRole}</span>

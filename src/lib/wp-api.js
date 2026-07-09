@@ -131,6 +131,7 @@ const serviceSinglePageQuery = `
             ... on AcfTestimonial {
               title
               acfTestimonials {
+                acfName
                 acfRole
                 acfTestimonial
               }
@@ -238,6 +239,7 @@ const peopleQuery = `
               sourceUrl
             }
           }
+          acfLogoFormat
         }
       }
     }
@@ -457,6 +459,10 @@ const workByUriQuery = `
                 guid
               }
             }
+            acfMakeSticky1
+            acfMakeSticky2
+            acfMakeStickyText1
+            acfMakeStickyText2
           }
           acfTestimonial {
             nodes {
@@ -479,6 +485,7 @@ const testimonialQuery = `
         }
       }
       acfTestimonials {
+        acfName
         acfRole
         acfTestimonial
       }
@@ -852,6 +859,7 @@ const homeCaseStudiesQuery = `
             ... on AcfTestimonial {
               title
               acfTestimonials {
+                acfName
                 acfRole
                 acfTestimonial
               }

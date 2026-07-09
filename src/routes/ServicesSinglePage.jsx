@@ -422,7 +422,7 @@ export default function ServicesSinglePage() {
               <div className="testimonial lead max-w-[38ch]">
                 <div className="split-text-coffee trigger-split-text-coffee">
                   <div className="mb-10 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
-                  <div><b>{testimonial.title}</b><br/>{testimonialData.acfRole}</div>
+                  <div><b>{testimonialData.acfName || testimonial.title}</b><br/>{testimonialData.acfRole}</div>
                 </div>
               </div>
             </div>

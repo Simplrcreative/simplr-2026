@@ -302,10 +302,10 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
   //END NEW SOURCES
   const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
-  const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? fallbackTestimonial?.quote ?? ''
-  const role = testimonialData?.acfTestimonials?.acfRole ?? fallbackTestimonial?.role ?? ''
-  const author = testimonialData?.title
-    ?? fallbackTestimonial?.author
+  const quote = testimonialData?.acfTestimonials?.acfTestimonial ?? ''
+  const role = testimonialData?.acfTestimonials?.acfRole ?? ''
+  const author = testimonialData?.acfTestimonials?.acfName
+    ?? testimonialData?.title
     ?? ''
   const client = testimonialData?.acfClients?.nodes?.[0]?.name
     ?? builder.acfClient?.nodes?.[0]?.name
