@@ -621,8 +621,8 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end">
-        <div className="flex flex-wrap gap-0 items-center">
+      <section className="work-filter px-5 py-8 bg-white section-light flex justify-between">
+        {/*<div className="flex flex-wrap justify-between items-center">*/}
           <input
             type="text"
             value={keywordFilter}
@@ -631,6 +631,7 @@ export default function WorkPage() {
             className="work-filter-btn min-w-[12rem]"
             aria-label="Filter work by title"
           />
+          <div className="flex flex-wrap gap-0 items-center">
           {FILTERS.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
             return (
@@ -646,7 +647,8 @@ export default function WorkPage() {
               </button>
             )
           })}
-        </div>
+          </div>
+        {/*</div>*/}
       </section>
 
       <div ref={workResultsRef} className="work-results">
