@@ -459,6 +459,15 @@ const workByUriQuery = `
                 guid
               }
             }
+            acfSliderImages {
+              nodes {
+                mediaDetails {
+                  sizes {
+                    sourceUrl
+                  }
+                }
+              }
+            }
             acfMakeSticky1
             acfMakeSticky2
             acfMakeStickyText1

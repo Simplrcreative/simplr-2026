@@ -178,7 +178,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   //END NEW SOURCES
   const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
-  const clients = builder.acfClient?.nodes ?? []
+  const cardTitle = getWorkCardTitle(work)
 
   return (
     <div className="work-card mb-5 md:mb-0">
@@ -217,7 +217,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
       
     </Link>
     <div className="work-card__meta mt-3">
-      <h3 className="work-card__title">{clients[0].name}</h3>
+      <h3 className="work-card__title">{cardTitle}</h3>
       {categories.length > 0 && (
         <div className="work-card__categories mt-3 flex flex-wrap">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
@@ -244,7 +244,7 @@ function WorkFeatured({ work, cardKey }) {
   //END NEW SOURCES
   const thumbAlt = builder.acfFeaturedThumbnail?.node?.altText || work.title
   const categories = builder.acfCategory?.nodes ?? []
-  const clients = builder.acfClient?.nodes ?? []
+  const cardTitle = getWorkCardTitle(work)
 
   return (
     <Link
@@ -279,7 +279,7 @@ function WorkFeatured({ work, cardKey }) {
         */}
       </div>
       <div className="work-featured__meta mt-3">
-        <h3 className="work-card__title">{clients[0].name}</h3>
+        <h3 className="work-card__title">{cardTitle}</h3>
         {categories.length > 0 && (
           <div className="work-card__categories mt-3 flex flex-wrap">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}

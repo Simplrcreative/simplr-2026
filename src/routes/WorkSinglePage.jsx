@@ -220,6 +220,7 @@ export default function WorkSinglePage() {
         const sticky2 = ['1', 1, true, 'true'].includes(section?.acfMakeSticky2)
         const stickyText1 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText1)
         const stickyText2 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText2)
+        const sliderImages = section?.acfSliderImages?.nodes ?? []
 
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
@@ -353,6 +354,29 @@ export default function WorkSinglePage() {
                   )}
                 </div>
               {/* END FULL IMAGE SECTION */}
+              </>
+              )}
+              {layout === 'Slider' && (
+                <>
+                {/* SLIDER SECTION */}
+                <div className="col-span-12">
+                  {sliderImages.map((image, imageIndex) => {
+                    const source = image?.mediaDetails?.sizes?.[0]?.sourceUrl ?? ''
+                    if (!source) return null
+
+                    return (
+                      <PictureImg
+                        key={`slider-image-${imageIndex}`}
+                        loaderSrc={source}
+                        mobileSrc={source}
+                        desktopSrc={source}
+                        altText=""
+                        pictureClass="full-image overflow-hidden rounded-[10px]"
+                      />
+                    )
+                  })}
+                </div>
+              {/* END SLIDER SECTION */}
               </>
               )}
             </div>
