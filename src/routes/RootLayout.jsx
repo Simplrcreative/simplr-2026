@@ -438,6 +438,7 @@ export default function RootLayout() {
   const matches = useMatches()
   const pageBg = matches.findLast((m) => m.handle?.pageBg)?.handle.pageBg ?? 'light'
   const hideFooter = matches.findLast((m) => m.handle?.hideFooter !== undefined)?.handle.hideFooter ?? false
+  const isDarkPageBg = pageBg === 'dark'
 
   // Set html[data-page-bg] synchronously before the browser paints.
   useLayoutEffect(() => {
@@ -599,13 +600,13 @@ export default function RootLayout() {
 
       {!hideFooter ? (
         <>
-        <div className="bg-white section-light footer-off"></div>
+        <div className={`footer-off ${isDarkPageBg ? 'bg-coffee section-dark' : 'bg-white section-light'}`}></div>
 
-        <footer ref={footerRef} className="px-5 pt-5 md:pt-0 min-h-[50vh] bg-white z-[1002] relative relative flex flex-col justify-end">
+        <footer ref={footerRef} className={`px-5 pt-5 md:pt-0 min-h-[50vh] z-[1002] relative relative flex flex-col justify-end ${isDarkPageBg ? 'bg-coffee text-white' : 'bg-white text-coffee'}`}>
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-8">
-            <h1 className="text-coffee">Let&apos;s build something that works.</h1>
+            <h1 className={isDarkPageBg ? 'text-white' : 'text-coffee'}>Let&apos;s build something that works.</h1>
             <div className="button-wrapper">
               <Link 
                 to="contact"
@@ -617,14 +618,14 @@ export default function RootLayout() {
               >
                 <span className="btn-fill" aria-hidden="true" />
                 <span className="btn-inner">
-                  <span className="btn-text text-coffee">Let&apos;s chat</span>
+                  <span className={`btn-text ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>Let&apos;s chat</span>
                   Let&apos;s chat
                 </span>
               </Link>
             </div>
           </div>
           <div className="hidden col-start-1 col-span-12 mt-16 lg:col-start-7 lg:col-span-6">
-            <div className="flex flex-col items-end gap-6 pt-[0.875rem] text-right text-coffee">
+            <div className={`flex flex-col items-end gap-6 pt-[0.875rem] text-right ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>
               <nav className="flex flex-wrap justify-end gap-x-8 gap-y-3 font-medium text-[1.375rem] leading-[0.875rem]">
                 {footerNavigation.map((item) => (
                   <Link
@@ -646,7 +647,7 @@ export default function RootLayout() {
 
         <div className="pt-10 pb-5 lg:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
-                <div className="socials text-coffee flex flex-col lg:flex-row gap-[1.25rem] lg:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
+                <div className={`socials flex flex-col lg:flex-row gap-[1.25rem] lg:gap-[2.5rem] mb-5 xl:mb-[3.75rem] ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>
                   {Object.entries(socials).map(([title, url]) => (
                     <a
                       key={title}
@@ -659,7 +660,7 @@ export default function RootLayout() {
                     </a>
                   ))}
                 </div>
-                <div className="footer-details-meta text-coffee max-w-[20rem]">
+                <div className={`footer-details-meta max-w-[20rem] ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>
                   <div>Unit AS02, The Forum, Lifestyle House,<br/>Northbank Lane, Century City,<br/>South Africa</div>
                   <div className="mt-5 mb-0 xl:my-[3.75rem]">
                     Simplr © 2026<br/>
@@ -668,7 +669,7 @@ export default function RootLayout() {
                 </div>
           </div>
 
-          <div className="hidden lg:flex items-end text-coffee lg:col-start-7 lg:col-span-6 lg:justify-end pb-5 footer-logo-trigger">
+          <div className={`hidden lg:flex items-end lg:col-start-7 lg:col-span-6 lg:justify-end pb-5 footer-logo-trigger ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>
               <svg width="154" height="150" viewBox="0 0 154 150" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                   <g className="footer-logo-circle-text">
                     <path d="M33.1358 25.2879C33.0194 26.0637 32.6242 26.7639 31.95 27.3884C31.3882 27.9088 30.7906 28.2328 30.1459 28.3707C29.49 28.519 28.8519 28.4838 28.2109 28.2425C27.5586 28.0117 26.9779 27.6102 26.4367 27.0259C25.9058 26.4529 25.5498 25.8432 25.3694 25.1752C25.1995 24.5185 25.2243 23.8691 25.4223 23.2264C25.6202 22.5838 25.9889 22.0126 26.5507 21.4922C27.2248 20.8677 27.9419 20.5375 28.7131 20.4911C29.4844 20.4447 30.2232 20.6789 30.9184 21.204L29.9859 22.0679C29.5629 21.7916 29.1013 21.6764 28.6123 21.7119C28.1224 21.769 27.6812 21.9689 27.2768 22.3436C26.7262 22.8536 26.4641 23.4722 26.4809 24.1664C26.5082 24.8719 26.808 25.5337 27.3804 26.1516C27.9633 26.7808 28.6106 27.1415 29.312 27.2225C30.0133 27.3035 30.6397 27.0782 31.1902 26.5682C31.6059 26.1831 31.8606 25.7593 31.9445 25.264C32.0277 24.7903 31.9264 24.3204 31.6624 23.8551L32.5837 23.0017C33.0534 23.7566 33.2409 24.5224 33.1358 25.2879Z" />
