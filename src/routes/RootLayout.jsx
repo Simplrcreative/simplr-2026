@@ -646,7 +646,7 @@ export default function RootLayout() {
 
         <div className="pt-10 pb-5 lg:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
-                <div className="socials flex flex-col lg:flex-row gap-[1.25rem] lg:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
+                <div className="socials text-coffee flex flex-col lg:flex-row gap-[1.25rem] lg:gap-[2.5rem] mb-5 xl:mb-[3.75rem]">
                   {Object.entries(socials).map(([title, url]) => (
                     <a
                       key={title}
@@ -659,7 +659,7 @@ export default function RootLayout() {
                     </a>
                   ))}
                 </div>
-                <div className="footer-details-meta max-w-[20rem]">
+                <div className="footer-details-meta text-coffee max-w-[20rem]">
                   <div>Unit AS02, The Forum, Lifestyle House,<br/>Northbank Lane, Century City,<br/>South Africa</div>
                   <div className="mt-5 mb-0 xl:my-[3.75rem]">
                     Simplr © 2026<br/>
