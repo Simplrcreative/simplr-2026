@@ -52,9 +52,10 @@ const HOME_PAGE_FALLBACK = {
   featuredWork: [],
   caseStudies: [],
   testimonialBlock: null,
+  clients: [],
 }
 
-function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null }) {
+function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null, clients = [] }) {
   const pageRef = useRef(null)
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
@@ -230,11 +231,12 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
 
-  // SplitText animations — wait for intro to complete
+  // SplitText animations — wait for intro; re-run when client logos arrive
+  // (lazy ClientLogos mounts the mid-strip `.split-text` quote after first paint).
   useEffect(() => {
     if (!introComplete) return
     return createSplitTextAnimation()
-  }, [introComplete])
+  }, [introComplete, clients.length])
 
   // Slide-up / slide-from-left animations — content is deferred so TransitionFrame's
   // PAGE_TRANSITION_COMPLETE_EVENT fires before these elements exist. Re-run here.
@@ -254,55 +256,62 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     return () => clearTimeout(timer)
   }, [introComplete, shouldRunHomeIntroAnimations])
 
-  // Video visibility and loop management
+  // Video visibility and loop management.
+  // Native `loop` has no 'loop' event — use `ended` + manual replay to cap plays.
   useEffect(() => {
     const video = heroVideoRef.current
     if (!video) return
 
-    let loopCount = 0
-    const MAX_LOOPS = 3
-    let observer = null
+    let playCount = 0
+    const MAX_PLAYS = 3
+    let isInView = false
 
-    // Handle when video loops
-    const onLoop = () => {
-      loopCount += 1
-      if (loopCount >= MAX_LOOPS) {
-        video.pause()
-      }
+    const canPlay = () => isInView && !document.hidden && playCount < MAX_PLAYS
+
+    const playIfAllowed = () => {
+      if (!canPlay()) return
+      video.play().catch(() => {})
     }
 
-    // Handle tab visibility changes
+    const onEnded = () => {
+      playCount += 1
+      if (playCount >= MAX_PLAYS) {
+        video.pause()
+        return
+      }
+      video.currentTime = 0
+      playIfAllowed()
+    }
+
     const onVisibilityChange = () => {
       if (document.hidden) {
         video.pause()
-      } else if (loopCount < MAX_LOOPS) {
-        video.play().catch(() => {})
+        return
       }
+      playIfAllowed()
     }
 
-    // Intersection Observer to play only when video is in viewport
-    observer = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !document.hidden && loopCount < MAX_LOOPS) {
-          video.play().catch(() => {})
-        } else if (!entry.isIntersecting || document.hidden) {
-          video.pause()
-          // Reset loop count when video leaves viewport
-          if (!entry.isIntersecting) {
-            loopCount = 0
-          }
+        isInView = Boolean(entry?.isIntersecting)
+        if (isInView) {
+          playIfAllowed()
+          return
         }
+        video.pause()
+        // Fresh budget when the hero re-enters the viewport
+        playCount = 0
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     )
 
     observer.observe(video)
-    video.addEventListener('loop', onLoop)
+    video.addEventListener('ended', onEnded)
     document.addEventListener('visibilitychange', onVisibilityChange)
 
     return () => {
-      observer?.disconnect()
-      video.removeEventListener('loop', onLoop)
+      observer.disconnect()
+      video.removeEventListener('ended', onEnded)
       document.removeEventListener('visibilitychange', onVisibilityChange)
       video.pause()
     }
@@ -653,7 +662,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden rounded-[10px]"
                   muted
                   playsInline
-                  loop
                   poster={heroVideoPoster || undefined}
                 >
                   {heroVideoLoop ? <source src={heroVideoLoop} type="video/mp4" /> : null}
@@ -833,7 +841,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       </section>
 
       <Suspense fallback={<div ref={clientsRef} className="bg-coffee section-dark min-h-screen" />}>
-        <LazyClientLogos innerRef={clientsRef} shouldAnimate={introComplete} />
+        <LazyClientLogos
+          innerRef={clientsRef}
+          clients={clients}
+          shouldAnimate={introComplete}
+        />
       </Suspense>
 
       <section className="testimonials p-5 section-light bg-white">
@@ -999,6 +1011,7 @@ export default function HomePage() {
     featuredWork,
     caseStudies,
     testimonialBlock,
+    clients,
   } = resolvedHomeData
 
   return (
@@ -1007,6 +1020,7 @@ export default function HomePage() {
       featuredWork={featuredWork}
       caseStudies={caseStudies}
       testimonialBlock={testimonialBlock}
+      clients={clients}
     />
   )
 }

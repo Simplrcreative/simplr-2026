@@ -102,11 +102,37 @@ function ensureLenis() {
 
   if (!visibilityListenerAdded && typeof document !== 'undefined') {
     visibilityListenerAdded = true
+    let hiddenViewport = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    }
+
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState !== 'visible' || !lenisInstance) return
+      if (document.visibilityState === 'hidden') {
+        hiddenViewport = {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        }
+        return
+      }
+
+      if (!lenisInstance) return
+
       gsap.ticker.wake()
       lenisInstance.resize()
-      ScrollTrigger.refresh()
+
+      // Full refresh is expensive on pin-heavy pages (home). Only recalculate
+      // start/end when the viewport size changed while the tab was hidden
+      // (mobile chrome, rotation). Otherwise a cheap progress update is enough.
+      const sizeChanged =
+        window.innerWidth !== hiddenViewport.width
+        || window.innerHeight !== hiddenViewport.height
+
+      if (sizeChanged) {
+        ScrollTrigger.refresh()
+      } else {
+        ScrollTrigger.update()
+      }
     })
   }
 

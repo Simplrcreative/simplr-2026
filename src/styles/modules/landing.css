@@ -190,7 +190,15 @@
         margin-top: 6.5rem;
     }
 }
-
+/* --- CLIENT LOGOS --- */
+.client-logo {
+    opacity: 0.3;
+    transition: opacity 0.6s ease-out;
+}
+.client-logo:hover {
+    opacity: 1;
+    transition: opacity 0.3s ease-in;
+}
 /* --- TESTIMONIALS --- */
 .quote {
     font-size: 1.5rem;

@@ -103,19 +103,19 @@ export default function WorkSinglePage() {
       <section className="page-hero px-5 pb-10__ md:pb-20__ pb-5 bg-white section-light min-h-[80vh]__ min-h-screen flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-4 text-coffee mt-40__ max-w-[115ch] flex flex-col justify-between">
+          <div className="col-start-1 col-span-12 md:col-span-5 text-coffee mt-40__ max-w-[60ch] flex flex-col justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
               <h1 className="hero-title"><span>{title}</span></h1>
             </div>
             <div className="max-w-[80%]">
               {categories.length > 0 && (
-                <div className="categories my-10 md:mt-3__ md:mb-0 flex flex-wrap gap-0">
+                <div className="categories my-10 md:my-0 flex flex-wrap gap-0">
                   {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
                 </div>
               )}
               {types.length > 0 && (
-                <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 flex md:inline-block flex-wrap">
+                <div className="work-types mb-10 md:mb-0 flex flex-wrap gap-0">
                 {types.map(({ name }) => {
                   return (
                     <Fragment key={name}>

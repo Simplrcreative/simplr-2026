@@ -916,3 +916,41 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* Home marquee — GraphQL logo images (not About hover list) */
+.clients .client-logos,
+.clients .client-logo-group {
+  width: max-content;
+  gap: 12rem;
+}
+
+.clients .client-logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clients .client-logo img {
+  display: block;
+  width: auto;
+  max-width: 11rem;
+  object-fit: contain;
+  filter: grayscale(1) brightness(100);
+  opacity: 0.9;
+}
+
+.clients .client-logo img.landscape {
+  height: 2.75rem;
+}
+
+.clients .client-logo img.portrait {
+  height: 5.5rem;
+}
+
+@media (max-width: 767px) {
+  .clients .client-logos,
+  .clients .client-logo-group {
+    gap: 6rem;
+  }
+}

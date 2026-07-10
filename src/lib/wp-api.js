@@ -1309,11 +1309,12 @@ export async function fetchNavigationData() {
 }
 
 export async function fetchHomeData() {
-  const [pagePayload, worksPayload, homeFeatureData, homeHeroMedia] = await Promise.all([
+  const [pagePayload, worksPayload, homeFeatureData, homeHeroMedia, peoplePayload] = await Promise.all([
     fetchPageData('home'),
     fetchWorksData({ first: 24 }),
     fetchHomeCaseStudiesData(),
     fetchHomeHeroMediaData(),
+    fetchPeopleData(),
   ])
 
   const fallbackFeaturedWork = (worksPayload.works || []).slice(0, 3).map((work) => ({
@@ -1370,6 +1371,7 @@ export async function fetchHomeData() {
     featuredWork: fallbackFeaturedWork,
     caseStudies: homeFeatureData.caseStudies.length ? homeFeatureData.caseStudies : fallbackCaseStudies,
     testimonialBlock: homeFeatureData.testimonialBlock,
+    clients: peoplePayload?.aboutContent?.acfClients ?? [],
   }
 }
 
