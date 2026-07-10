@@ -201,11 +201,7 @@ function ServiceCard({ service }) {
                           data-transition-source-key={servicePath}
                           data-transition-dock-selector="[data-transition-dock='service-featured-media']"
                           >
-                          <span className="btn-fill" aria-hidden="true" />
-                          <span className="btn-inner">
-                              <span className="btn-text text-coffee">Explore {acfService}</span>
-                              Explore {acfService}
-                          </span>
+                          <span>Explore {acfService}</span>
                       </Link>
                   </div>
                 </div>

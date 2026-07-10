@@ -958,26 +958,12 @@ function normaliseHomeCaseStudy(study, index) {
   const caseStudy = study?.acfCaseStudy?.nodes?.[0]
   const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
   const slug = caseStudy?.slug || `case-study-${index + 1}`
-  const featuredThumbnailNode = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail?.node
-  const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
-  const primaryThumbnail = (
-    sizes.find((s) => s.name === 'large')
-    || sizes.find((s) => s.name === 'full')
-  )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
-  const secondaryThumbnailNode = caseStudy?.acfWorkBuilder?.acfSecondaryThumbnail?.node
-  const secondarySizes = secondaryThumbnailNode?.mediaDetails?.sizes ?? []
-  const secondaryThumbnail = (
-    secondarySizes.find((s) => s.name === 'large')
-    || secondarySizes.find((s) => s.name === 'full')
-  )?.sourceUrl ?? secondaryThumbnailNode?.sourceUrl ?? secondaryThumbnailNode?.guid ?? ''
-  const primaryLoaderImg = (
-    sizes.find((s) => s.name === 'loader')
-    || sizes.find((s) => s.name === 'thumbnail')
-  )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
-  const secondaryLoaderImg = (
-    secondarySizes.find((s) => s.name === 'loader')
-    || secondarySizes.find((s) => s.name === 'thumbnail')
-  )?.sourceUrl ?? primaryLoaderImg
+  const featuredThumbnailNode = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail
+  const secondaryThumbnailNode = caseStudy?.acfWorkBuilder?.acfSecondaryThumbnail
+  const primaryThumbnail = getMediaSourceUrl(featuredThumbnailNode, 'large')
+  const secondaryThumbnail = getMediaSourceUrl(secondaryThumbnailNode, 'large')
+  const primaryLoaderImg = getMediaSourceUrl(featuredThumbnailNode, 'loader')
+  const secondaryLoaderImg = getMediaSourceUrl(secondaryThumbnailNode, 'loader') || primaryLoaderImg
   const displayThumbnail = secondaryThumbnail || primaryThumbnail
   const displayLoaderImg = secondaryLoaderImg || primaryLoaderImg
   const categories = caseStudy?.acfWorkBuilder?.acfCategory?.nodes ?? []
@@ -1113,6 +1099,72 @@ function remember(key, producer) {
   }
 
   return cache.get(key)
+}
+
+/**
+ * Resolve a WP media node URL with a shared size fallback chain.
+ * Desktop featured/case-study images use large → full → guid (not medium_large),
+ * so Home case studies and Work Single heroes stay identical when "large" is missing.
+ */
+export function getMediaSourceUrl(media, preferredSize = 'large') {
+  const node = media?.node ?? media
+  if (!node) return ''
+
+  const sizes = node?.mediaDetails?.sizes ?? []
+  const chains = {
+    loader: ['loader', 'thumbnail', 'medium'],
+    thumbnail: ['thumbnail', 'loader', 'medium'],
+    medium: ['medium', 'medium_large', 'large', 'full'],
+    medium_large: ['medium_large', 'large', 'full'],
+    large: ['large', 'full'],
+    full: ['full', 'large'],
+  }
+
+  const chain = chains[preferredSize] ?? [preferredSize, 'large', 'full']
+
+  for (const name of chain) {
+    const url = sizes.find((size) => size?.name === name)?.sourceUrl
+    if (url) return url
+  }
+
+  return node?.guid ?? node?.sourceUrl ?? ''
+}
+
+function getCachedWorksPayload(minFirst) {
+  let bestKey = null
+  let bestFirst = Infinity
+
+  for (const key of cache.keys()) {
+    if (!key.startsWith('works:')) continue
+    const cachedFirst = Number.parseInt(key.slice('works:'.length), 10)
+    if (!Number.isFinite(cachedFirst) || cachedFirst < minFirst) continue
+    if (cachedFirst < bestFirst) {
+      bestFirst = cachedFirst
+      bestKey = key
+    }
+  }
+
+  return bestKey ? cache.get(bestKey) : null
+}
+
+/**
+ * Warm the Work index route: list + page + testimonials for the first batch.
+ * Fire-and-forget; results land in the GraphQL remember() cache.
+ */
+export function prefetchWorkRoute() {
+  Promise.all([fetchWorksData(), fetchPageData('work')])
+    .then(([{ works }]) => {
+      const testimonialIds = [
+        ...new Set(
+          (works ?? []).flatMap(
+            (work) => work.acfWorkBuilder?.acfTestimonial?.nodes?.map((n) => n.databaseId) ?? [],
+          ),
+        ),
+      ].filter(Boolean)
+
+      return Promise.all(testimonialIds.map((id) => fetchTestimonialData(id)))
+    })
+    .catch(() => {})
 }
 
 export function stripHtml(value = '') {
@@ -1324,26 +1376,12 @@ export async function fetchHomeData() {
   }))
 
   const fallbackCaseStudies = (worksPayload.works || []).slice(0, 6).map((work, index) => {
-    const featuredThumbnailNode = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node
-    const secondaryThumbnailNode = work?.acfWorkBuilder?.acfSecondaryThumbnail?.node
-    const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
-    const secondarySizes = secondaryThumbnailNode?.mediaDetails?.sizes ?? []
-    const primaryLoaderImg = (
-      sizes.find((s) => s.name === 'loader')
-      || sizes.find((s) => s.name === 'thumbnail')
-    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
-    const secondaryLoaderImg = (
-      secondarySizes.find((s) => s.name === 'loader')
-      || secondarySizes.find((s) => s.name === 'thumbnail')
-    )?.sourceUrl ?? primaryLoaderImg
-    const primaryThumbnail = (
-      sizes.find((s) => s.name === 'large')
-      || sizes.find((s) => s.name === 'full')
-    )?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
-    const secondaryThumbnail = (
-      secondarySizes.find((s) => s.name === 'large')
-      || secondarySizes.find((s) => s.name === 'full')
-    )?.sourceUrl ?? secondaryThumbnailNode?.guid ?? ''
+    const featuredThumbnailNode = work?.acfWorkBuilder?.acfFeaturedThumbnail
+    const secondaryThumbnailNode = work?.acfWorkBuilder?.acfSecondaryThumbnail
+    const primaryLoaderImg = getMediaSourceUrl(featuredThumbnailNode, 'loader')
+    const secondaryLoaderImg = getMediaSourceUrl(secondaryThumbnailNode, 'loader') || primaryLoaderImg
+    const primaryThumbnail = getMediaSourceUrl(featuredThumbnailNode, 'large')
+    const secondaryThumbnail = getMediaSourceUrl(secondaryThumbnailNode, 'large')
     const displayThumbnail = secondaryThumbnail || primaryThumbnail
 
     return {
@@ -1577,6 +1615,14 @@ export async function fetchWorksData(options = {}) {
   }
 
   try {
+    // Reuse a larger cached list (e.g. home warmed works:24) instead of refetching works:6.
+    const cachedPayload = getCachedWorksPayload(first)
+    if (cachedPayload) {
+      const data = await cachedPayload
+      const works = data.acfWorks?.nodes ?? []
+      return { works: works.slice(0, first) }
+    }
+
     const data = await remember(`works:${first}`, () => graphQlRequest(worksListQuery, { first }))
     const works = data.acfWorks?.nodes ?? []
 

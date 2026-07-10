@@ -30,16 +30,17 @@ export function createWorkLoader() {
           (w) => w.acfWorkBuilder?.acfTestimonial?.nodes?.map((n) => n.databaseId) ?? [],
         ),
       ),
-    ]
+    ].filter(Boolean)
 
-    const testimonialEntries = await Promise.all(
+    // Do not block route commit on N+1 testimonial requests — WorkPage resolves these.
+    const testimonials = Promise.all(
       testimonialIds.map(async (id) => [id, await fetchTestimonialData(id)]),
-    )
+    ).then((entries) => Object.fromEntries(entries))
 
     return {
       works,
       workCount: works.length,
-      testimonials: Object.fromEntries(testimonialEntries),
+      testimonials,
       page: pagePayload.page,
     }
   }

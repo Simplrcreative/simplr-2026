@@ -7,7 +7,7 @@ import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
-import { buildEntryPath, fetchTestimonialData, fetchWorksData } from '../lib/wp-api.js'
+import { buildEntryPath, fetchTestimonialData, fetchWorksData, getMediaSourceUrl } from '../lib/wp-api.js'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -22,16 +22,8 @@ const FILTERS = [
   { id: 'templates',              label: 'Templates',                bg: 'var(--color-templates)',              text: '#fff' },
 ]
 
-function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
-  const thumbnailNode = acfFeaturedThumbnail?.node
-  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
-
-  return (
-    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
-    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
-    thumbnailNode?.guid ??
-    ''
-  )
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large') {
+  return getMediaSourceUrl(acfFeaturedThumbnail, preferredSize)
 }
 
 function workMatchesFilter(work, filter) {
@@ -383,7 +375,7 @@ export default function WorkPage() {
   const [isFilterAnimating, setIsFilterAnimating] = useState(false)
   const [keywordFilter, setKeywordFilter] = useState('')
   const [works, setWorks] = useState(initialWorks)
-  const [testimonials, setTestimonials] = useState(initialTestimonials)
+  const [testimonials, setTestimonials] = useState({})
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [hasMoreWorks, setHasMoreWorks] = useState(true)
   const workResultsRef = useRef(null)
@@ -392,10 +384,35 @@ export default function WorkPage() {
 
   useEffect(() => {
     setWorks(initialWorks)
-    setTestimonials(initialTestimonials)
     setHasMoreWorks(initialWorks.length >= WORK_BATCH_SIZE)
     setIsLoadingMore(false)
-  }, [initialTestimonials, initialWorks])
+  }, [initialWorks])
+
+  // Testimonials are deferred from the loader so the grid can commit without waiting on N+1 fetches.
+  useEffect(() => {
+    let cancelled = false
+
+    setTestimonials(
+      initialTestimonials
+      && typeof initialTestimonials.then !== 'function'
+        ? initialTestimonials
+        : {},
+    )
+
+    Promise.resolve(initialTestimonials)
+      .then((data) => {
+        if (!cancelled && data && typeof data.then !== 'function') {
+          setTestimonials(data)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setTestimonials({})
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [initialTestimonials])
 
   const filteredWorks = useMemo(
     () => {

@@ -60,44 +60,100 @@
     transition: width .9s cubic-bezier(.65,0,.35,1);
   }
 
-  /* ---- Custom cursor: outer node positions, inner node scales ---- */
-  .cursor {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    z-index: 100;
+  /* ---- Custom cursor / play icon: outer node positions, inner node scales ---- */
+  .cursor,
+  .play-icon {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999999;
     pointer-events: none;
     will-change: transform;
     mix-blend-mode: difference;
   }
-  .cursor-inner {
-    width: 12.5rem; 
-    height: 12.5rem; 
+
+  .cursor-inner,
+  .play-icon-inner {
+    width: 12.5rem;
+    height: 12.5rem;
     margin: -6.25rem 0 0 -6.25rem;
     border-radius: 50%;
-    background: rgba(255,255,255,.15);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(3px);
     border: 1px solid white;
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    align-items: center;
     justify-content: center;
     position: relative;
-    transform: scale(.35);
+    transform: scale(0.35);
     opacity: 0;
-    transition: transform .4s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+    color: white;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
   }
-  .cursor.active .cursor-inner { transform: scale(1); opacity: 1; }
-  .cursor svg { width: 50px; height: 50px; transition: transform .45s cubic-bezier(.22,1,.36,1); }
-  .cursor.flip svg { transform: rotate(180deg); }
+
+  .cursor.active .cursor-inner,
+  .play-icon.active .play-icon-inner {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  /* Close-mode: visual circle must receive clicks (outer stays non-blocking). */
+  html[data-play-icon-close] .play-icon-inner {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .cursor svg,
+  .play-icon svg {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cursor.flip svg {
+    transform: rotate(180deg);
+  }
+
   .cursor .ring {
-    position: absolute; inset: -1px; border-radius: 50%;
-    border: 1px solid rgba(236,236,234,.5);
-    transform: scale(1); opacity: 0;
+    position: absolute;
+    inset: -1px;
+    border-radius: 50%;
+    border: 1px solid rgba(236, 236, 234, 0.5);
+    transform: scale(1);
+    opacity: 0;
   }
-  .cursor.pulse .ring { animation: pulse .5s ease-out; }
+
+  .cursor.pulse .ring {
+    animation: pulse 0.5s ease-out;
+  }
+
+  .play-icon-inner-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .play-icon-inner-content span {
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1;
+    color: white;
+  }
+  .play-icon-inner-content svg {
+    margin-top: 3px;
+    width: 12px;
+    height: auto;
+  }
+
   @keyframes pulse {
-    from { transform: scale(1); opacity: .8; }
-    to   { transform: scale(1.5); opacity: 0; }
+    from {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(1.5);
+      opacity: 0;
+    }
   }
 
   /* ---- Mobile drag hint ---- */
@@ -124,7 +180,10 @@
       height: 60dvh;   /* 60% of the visible screen, address-bar safe */
       cursor: auto;
     }
-    .cursor { display: none; }
+    .cursor,
+    .play-icon {
+      display: none;
+    }
     .drag-hint { display: block; }
     .hud .bar { width: 90px; }
     /* Gentler parallax crop on small screens: narrower image = more of the frame visible */
@@ -132,5 +191,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cursor-inner, .cursor svg, .hud .bar i { transition: none; }
+    .cursor-inner,
+    .play-icon-inner,
+    .cursor svg,
+    .play-icon svg,
+    .hud .bar i {
+      transition: none;
+    }
   }

@@ -1,6 +1,6 @@
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLoaderData, useLocation, useMatches, useNavigation } from 'react-router-dom'
-import { useRoutePrefetch } from '../lib/useRoutePrefetch.js'
+import { prefetchRoute, useRoutePrefetch } from '../lib/useRoutePrefetch.js'
 import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
@@ -611,16 +611,12 @@ export default function RootLayout() {
               <Link 
                 to="contact"
                 ref={btnRef}
-                className="btn relative mt-5 xl:mt-10"
+                className={`btn relative mt-5 xl:mt-10 ${isDarkPageBg ? 'alt' : ''}`}
                 onPointerDown={requestTransitionCapture}
                 onClick={handleFooterTransitionLinkClick}
                 title="Contact Simplr"
               >
-                <span className="btn-fill" aria-hidden="true" />
-                <span className="btn-inner">
-                  <span className={`btn-text ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>Let&apos;s chat</span>
-                  Let&apos;s chat
-                </span>
+                <span>Let&apos;s chat</span>
               </Link>
             </div>
           </div>
@@ -632,7 +628,10 @@ export default function RootLayout() {
                     key={item.key}
                     to={item.path}
                     className="inline-flex items-start gap-[0.125rem] transition-opacity duration-200 hover:opacity-70"
-                    onPointerDown={requestTransitionCapture}
+                    onPointerDown={(event) => {
+                      prefetchRoute(item.path)
+                      requestTransitionCapture(event)
+                    }}
                     onClick={handleFooterTransitionLinkClick}
                     title={item.label}
                   >

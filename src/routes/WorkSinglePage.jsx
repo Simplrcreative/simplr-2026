@@ -7,18 +7,10 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
 import { initSlider } from '../lib/slider.js'
-import { buildCollectionPath, buildEntryPath } from '../lib/wp-api.js'
+import { buildCollectionPath, buildEntryPath, getMediaSourceUrl } from '../lib/wp-api.js'
 
-function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
-  const thumbnailNode = acfFeaturedThumbnail?.node
-  const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
-
-  return (
-    sizes.find((s) => s.name === preferredSize)?.sourceUrl ??
-    sizes.find((s) => s.name === fallbackSize)?.sourceUrl ??
-    thumbnailNode?.guid ??
-    ''
-  )
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large') {
+  return getMediaSourceUrl(acfFeaturedThumbnail, preferredSize)
 }
 
 function getSliderSource(image) {

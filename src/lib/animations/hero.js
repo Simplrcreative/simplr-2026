@@ -363,11 +363,7 @@ export function createHeroScrollAnimation(scope) {
 
     if (heroVideoHolder && playIcon) {
       gsap.set(playIcon, {
-        xPercent: -50,
-        yPercent: -50,
-        autoAlpha: 0,
-        scale: 0.92,
-        willChange: 'transform, opacity',
+        willChange: 'transform',
       })
 
       const movePlayIconX = gsap.quickTo(playIcon, 'x', { duration: 0.18, ease: 'power3.out' })
@@ -388,13 +384,8 @@ export function createHeroScrollAnimation(scope) {
         if (nextVisible === isOver) return
 
         isOver = nextVisible
-        gsap.to(playIcon, {
-          autoAlpha: nextVisible ? 1 : 0,
-          scale: nextVisible ? 1 : 0.92,
-          duration: nextVisible ? 0.22 : 0.16,
-          ease: nextVisible ? 'power2.out' : 'power2.in',
-          overwrite: 'auto',
-        })
+        // Match slider cursor: CSS .active scales/fades the inner circle.
+        playIcon.classList.toggle('active', nextVisible)
       }
 
       const syncPlayIconState = () => {
@@ -493,7 +484,8 @@ export function createHeroScrollAnimation(scope) {
         brandsGrow?.removeEventListener('mouseleave', onBrandsGrowLeave)
         navHolder?.removeEventListener('mouseenter', onNavEnter)
         navHolder?.removeEventListener('mouseleave', onNavLeave)
-        gsap.set(playIcon, { autoAlpha: 0, scale: 0.92 })
+        gsap.set(playIcon, { clearProps: 'x,y' })
+        playIcon.classList.remove('active')
       }
     }
 

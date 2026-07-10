@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createBtnHoverAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, prefetchWorkEntry } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -67,7 +67,6 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const servicesRef = useRef(null)
   const caseStudiesRef = useRef(null)
   const clientsRef = useRef(null)
-  const btnRef = useRef(null)
   const faqSliderRef = useRef(null)
   const faqButtonRefs = useRef([])
   const introAnimationsPlayedRef = useRef(false)
@@ -108,20 +107,17 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     let destroyHeroAnimation = () => {}
     let destroyServicesAnimation = () => {}
     let destroyShowreelAnimation = () => {}
-    let destroyBtnAnimation = () => {}
     const shouldWaitForHeroIntro = shouldRunHomeIntroAnimations && !introAnimationsPlayedRef.current
     const timer = setTimeout(() => {
       destroyHeroAnimation = createHeroScrollAnimation(heroRef.current) ?? (() => {})
       destroyServicesAnimation = createServicesScrollAnimation(servicesRef.current) ?? (() => {})
       //destroyShowreelAnimation = createShowreelScrollAnimation(heroRef.current) ?? (() => {})
-      destroyBtnAnimation = createBtnHoverAnimation(btnRef.current) ?? (() => {})
     }, shouldWaitForHeroIntro ? HOME_SCROLL_INIT_AFTER_INTRO_MS : HOME_SCROLL_INIT_DELAY_MS)
     return () => {
       clearTimeout(timer)
       destroyHeroAnimation()
       destroyServicesAnimation()
       //destroyShowreelAnimation()
-      destroyBtnAnimation()
     }
   }, [introComplete, shouldRunHomeIntroAnimations])
 
@@ -623,21 +619,29 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         ]}
       />
       <div
-        className={`play-icon text-white bg-branding-design fixed z-[999999] w-[50px] h-[50px] md:w-[100px] md:h-[100px] rounded-full hidden md:flex items-center justify-center transition-[background-color] duration-200 ${isHeroModalVisible ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
+        className="play-icon"
         onClick={isHeroModalVisible ? () => closeHeroVideoModal({ scrollToNextSection: true }) : undefined}
         role={isHeroModalVisible ? 'button' : undefined}
         aria-label={isHeroModalVisible ? 'Close video' : undefined}
+        tabIndex={isHeroModalVisible ? 0 : undefined}
       >
-        {isHeroModalVisible ? (
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-            <line x1="3" y1="3" x2="19" y2="19"/>
-            <line x1="19" y1="3" x2="3" y2="19"/>
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="ms-2" width="22" height="20" viewBox="0 0 18 20" fill="currentColor">
-            <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
-          </svg>
-        )}
+        <div className="play-icon-inner">
+          <div className="play-icon-inner-content">
+          {isHeroModalVisible ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
+              <line x1="3" y1="3" x2="19" y2="19"/>
+              <line x1="19" y1="3" x2="3" y2="19"/>
+            </svg>
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 20" fill="currentColor" aria-hidden="true">
+                <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
+              </svg>
+              <span>showreel</span>
+            </>
+          )}
+          </div>
+        </div>
       </div>
       
       <section ref={heroRef} className="landing relative w-full px-5 min-h-[80vh] md:min-h-screen flex flex-col md:justify-end change-logo-back">
@@ -756,16 +760,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
             </div>
           </div>
         </div>
-        <Link 
+        <Link
           to="services"
-          ref={btnRef}
           className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-8 md:mt-0"
         >
-          <span className="btn-fill" aria-hidden="true" />
-          <span className="btn-inner">
-            <span className="btn-text text-coffee">Explore our services</span>
-            Explore our services
-          </span>
+          <span>Explore our services</span>
         </Link>
       </section>
 

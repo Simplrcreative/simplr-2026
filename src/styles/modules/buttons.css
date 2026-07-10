@@ -9,39 +9,23 @@
     gap: 10px;
     border-radius: 100px;
     background: var(--color-coffee);
-    color: white;
     margin-right: 30px;
     font-weight: 500;
     isolation: isolate;
     overflow: visible;
     line-height: 1.2;
+    height: 60px;
+    transition: background 1s cubic-bezier(.26,.32,.02,.94);
 }
-.btn-fill {
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
+.btn:hover {
+    background: white;
+    transition: background 0.35s cubic-bezier(.8,.0,.5,.6);
 }
-.btn-fill::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 160%;
-    aspect-ratio: 1;
-    transform-origin: center;
-    transform: translate(-50%, -50%) scale(0);
-    border-radius: 999px;
-    transition: transform 0.5s ease-out;
-    background-color: white;
+.btn.alt {
+    background: white;
 }
-.btn:hover .btn-fill::before {
-    transform: translate(-50%, -50%) scale(1);
-}
-.btn[data-transition-hover='true'] .btn-fill::before {
-    transform: translate(-50%, -50%) scale(1);
+.btn.alt:hover {
+    background: var(--color-coffee);
 }
 .btn-inner {
     position: relative;
@@ -59,6 +43,25 @@
     justify-content: center;
     /*white-space: nowrap;*/
 }
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: -15px;
+    width: 10px;
+    height: 10px;
+    transform-origin: top right;
+    transform: translate(0);
+    transition: transform 1s cubic-bezier(.26,.32,.02,.94);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M0.292893 9.29289C-0.0976311 9.68342 -0.0976311 10.3166 0.292893 10.7071C0.683418 11.0976 1.31658 11.0976 1.70711 10.7071L1 10L0.292893 9.29289ZM11 1C11 0.447715 10.5523 -3.74211e-07 10 4.72575e-08L1 -1.63477e-07C0.447715 -1.63477e-07 2.8711e-07 0.447715 2.8711e-07 1C2.8711e-07 1.55228 0.447715 2 1 2L9 2L9 10C9 10.5523 9.44772 11 10 11C10.5523 11 11 10.5523 11 10L11 1ZM1 10L1.70711 10.7071L10.7071 1.70711L10 1L9.29289 0.292893L0.292893 9.29289L1 10Z" fill="white"/></svg>');
+    z-index: 3;
+}
+.btn.alt::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M0.292893 9.29289C-0.0976311 9.68342 -0.0976311 10.3166 0.292893 10.7071C0.683418 11.0976 1.31658 11.0976 1.70711 10.7071L1 10L0.292893 9.29289ZM11 1C11 0.447715 10.5523 -3.74211e-07 10 4.72575e-08L1 -1.63477e-07C0.447715 -1.63477e-07 2.8711e-07 0.447715 2.8711e-07 1C2.8711e-07 1.55228 0.447715 2 1 2L9 2L9 10C9 10.5523 9.44772 11 10 11C10.5523 11 11 10.5523 11 10L11 1ZM1 10L1.70711 10.7071L10.7071 1.70711L10 1L9.29289 0.292893L0.292893 9.29289L1 10Z" fill="%23300F1D"/></svg>');
+}
 .btn::after {
     content: '';
     position: absolute;
@@ -67,21 +70,39 @@
     width: 30px;
     height: 30px;
     border-radius: 30px;
-    transform: scale(1) rotate(0deg);
-    transition: transform 0.5s ease-out;
+    transform-origin: top right;
+    transform: scale(1);
+    transition: transform 1s cubic-bezier(.26,.32,.02,.94);
     background-color: var(--color-coffee);
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M0.292893 9.29289C-0.0976311 9.68342 -0.0976311 10.3166 0.292893 10.7071C0.683418 11.0976 1.31658 11.0976 1.70711 10.7071L1 10L0.292893 9.29289ZM11 1C11 0.447715 10.5523 -3.74211e-07 10 4.72575e-08L1 -1.63477e-07C0.447715 -1.63477e-07 2.8711e-07 0.447715 2.8711e-07 1C2.8711e-07 1.55228 0.447715 2 1 2L9 2L9 10C9 10.5523 9.44772 11 10 11C10.5523 11 11 10.5523 11 10L11 1ZM1 10L1.70711 10.7071L10.7071 1.70711L10 1L9.29289 0.292893L0.292893 9.29289L1 10Z" fill="white"/></svg>');
-    z-index: 2;
+   z-index: 2;
+}
+.btn.alt::after {
+    background-color: white;
+}
+.btn:hover::before {
+    transform: scale(1.3) translate(-10px, 10px);
+    transition: transform 0.35s cubic-bezier(.8,.0,.5,.6);
 }
 .btn:hover::after {
-    transform: scale(1) translate(-5px, 12.5px) rotate(45deg);
+    transform: scale(2);
+    transition: transform 0.35s cubic-bezier(.8,.0,.5,.6);
 }
-.btn[data-transition-hover='true']::after {
-    transform: scale(1) translate(-5px, 12.5px) rotate(45deg);
+.btn span {
+    color: white;
+    transform: translateX(0);
+    transition: color 1s cubic-bezier(.26,.32,.02,.94), transform 1s cubic-bezier(.26,.32,.02,.94);
 }
-
+.btn:hover span {
+    color: var(--color-coffee);
+    transform: translateX(-20px);
+    transition: color 0.35s cubic-bezier(.8,.0,.5,.6), transform 0.35s cubic-bezier(.8,.0,.5,.6);
+}
+.btn.alt span {
+    color: var(--color-coffee);
+}
+.btn.alt:hover span {
+    color: white;
+}
 @media screen and (min-width: 768px) {
     .btn-text {
         white-space: nowrap;
