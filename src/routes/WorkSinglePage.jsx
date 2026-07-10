@@ -100,21 +100,36 @@ export default function WorkSinglePage() {
     <>
       <Seo {...seo} />
     
-      <section className="page-hero px-5 pb-10 md:pb-20 bg-white section-light min-h-[80vh] flex md:items-end">
+      <section className="page-hero px-5 pb-10__ md:pb-20__ pb-5 bg-white section-light min-h-[80vh]__ min-h-screen flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40 max-w-[115ch] flex flex-col justify-between">
+          <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40__ max-w-[115ch] flex flex-col justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
               <h1 className="hero-title"><span>{title}</span></h1>
             </div>
-            {categories.length > 0 && (
-              <div className="categories my-10 md:mt-3 md:mb-0 flex flex-wrap gap-0">
-                {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
-              </div>
-            )}
+            <div className="max-w-[80%]">
+              {categories.length > 0 && (
+                <div className="categories my-10 md:mt-3__ md:mb-0 flex flex-wrap gap-0">
+                  {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
+                </div>
+              )}
+              {types.length > 0 && (
+                <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 flex md:inline-block flex-wrap">
+                {types.map(({ name }) => {
+                  return (
+                    <Fragment key={name}>
+                      <div className="work-type leading-none">
+                        {name}
+                      </div>
+                    </Fragment>
+                  )
+                })}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 md:mt-25">
+          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-5 md:mt-25__">
             <div className="featured-image thumb-swap-trigger__">
               {loaderSrc && (
                 <div
@@ -146,12 +161,12 @@ export default function WorkSinglePage() {
 
       <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo">
         <div className="grid grid-cols-12">
-          <div className="work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle flex md:inline-block flex-wrap" data-mobile-animation="false">
+          <div className="hidden! work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle flex md:inline-block flex-wrap" data-mobile-animation="false">
              {types.map(({ name }, index) => {
               const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
               return (
                 <Fragment key={name}>
-                  <div className={`work-type${insertBreak ? ' work-type--line-end' : ''}`}>
+                  <div className={`work-type leading-none${insertBreak ? ' work-type--line-end' : ''}`}>
                     {name}
                   </div>
                   {insertBreak && <br className="hidden md:block" />}
