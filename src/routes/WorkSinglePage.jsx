@@ -103,7 +103,7 @@ export default function WorkSinglePage() {
       <section className="page-hero px-5 pb-10__ md:pb-20__ pb-5 bg-white section-light min-h-[80vh]__ min-h-screen flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-6 text-coffee mt-40__ max-w-[115ch] flex flex-col justify-between">
+          <div className="col-start-1 col-span-12 md:col-span-4 text-coffee mt-40__ max-w-[115ch] flex flex-col justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
               <h1 className="hero-title"><span>{title}</span></h1>
