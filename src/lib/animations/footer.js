@@ -277,10 +277,8 @@ export function createFooterAnimation(scope) {
     }
 
     // Footer logo: circle text spins in, pauses, spins out; icon fades in.
-    // The wrapper uses `items-end` — the SVG sits at the bottom of the div, but
-    // its overall height is set by the taller left column. `start: 'top …'` fires
-    // against the div's top edge, long before the SVG is visible. Switching to
-    // `bottom 95%` fires when the div's bottom (= the SVG) enters the viewport.
+    // Use restart (not play) so a completed timeline can run again on re-entry /
+    // route return. reset on leaveBack restores the pre-trigger state.
     const footerLogoTrigger = footer.querySelector('.footer-logo-trigger')
     const circleText = footer.querySelector('.footer-logo-circle-text')
     const logoIcon = footer.querySelector('.footer-logo-icon')
@@ -294,7 +292,7 @@ export function createFooterAnimation(scope) {
         scrollTrigger: {
           trigger: footerLogoTrigger,
           start: 'top 95%',
-          toggleActions: 'play none none none',
+          toggleActions: 'restart none restart reset',
           invalidateOnRefresh: true,
           refreshPriority: -30,
           //markers: true
@@ -330,7 +328,7 @@ export function createFooterAnimation(scope) {
         scrollTrigger: {
           trigger: footerLogoTrigger,
           start: 'top 95%',
-          toggleActions: 'play none none none',
+          toggleActions: 'restart none restart reset',
           invalidateOnRefresh: true,
           refreshPriority: -30,
         },
