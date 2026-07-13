@@ -954,3 +954,24 @@
     gap: 6rem;
   }
 }
+
+/* Awards — show case-study button on row hover */
+.awards-section .award-item .award-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: background 1s cubic-bezier(.26,.32,.02,.94), opacity 1s cubic-bezier(.26,.32,.02,.94);
+}
+
+.awards-section .award-item:hover .award-btn,
+.awards-section .award-item:focus-within .award-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transition: background 0.35s cubic-bezier(.8,.0,.5,.6), opacity 0.35s cubic-bezier(.8,.0,.5,.6);
+}
+
+@media (hover: none) {
+  .awards-section .award-item .award-btn {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

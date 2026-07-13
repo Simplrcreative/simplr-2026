@@ -241,6 +241,29 @@ const peopleQuery = `
           }
           acfLogoFormat
         }
+        acfAwards {
+          acfAward
+          acfProjects {
+            acfAwardDetails
+            acfYear
+            acfCaseStudy {
+              nodes {
+                ... on AcfWork {
+                  slug
+                  title
+                  date
+                  acfWorkBuilder {
+                    acfClient {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -454,11 +477,13 @@ const workByUriQuery = `
                 guid
               }
             }
+            acfClickToPlayVideo1
             acfVideo2 {
               node {
                 guid
               }
             }
+            acfClickToPlayVideo2
             acfSliderImages {
               nodes {
                 guid
@@ -816,17 +841,18 @@ const homeCaseStudiesQuery = `
     page(id: "5", idType: DATABASE_ID) {
       acfHomeBuilder {
         acfFeaturedCaseStudies {
-          acfClient {
-            nodes {
-              name
-            }
-          }
           acfClientDetail
           acfCaseStudy {
             nodes {
               ... on AcfWork {
+                title
                 slug
                 acfWorkBuilder {
+                  acfClient {
+                    nodes {
+                      name
+                    }
+                  }
                   acfFeaturedThumbnail {
                     node {
                       guid
@@ -956,8 +982,9 @@ const homeWorkCountQuery = `
 `
 function normaliseHomeCaseStudy(study, index) {
   const caseStudy = study?.acfCaseStudy?.nodes?.[0]
-  const client = study?.acfClient?.nodes?.[0]?.name || 'Case study'
+  const client = caseStudy?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || 'Case study'
   const slug = caseStudy?.slug || `case-study-${index + 1}`
+  const detail = study?.acfClientDetail || caseStudy?.title || client
   const featuredThumbnailNode = caseStudy?.acfWorkBuilder?.acfFeaturedThumbnail
   const secondaryThumbnailNode = caseStudy?.acfWorkBuilder?.acfSecondaryThumbnail
   const primaryThumbnail = getMediaSourceUrl(featuredThumbnailNode, 'large')
@@ -972,7 +999,7 @@ function normaliseHomeCaseStudy(study, index) {
     id: slug,
     slug,
     client,
-    detail: study?.acfClientDetail || '',
+    detail,
     loaderImg: displayLoaderImg,
     thumbnail: displayThumbnail,
     primaryThumbnail,
@@ -1007,7 +1034,7 @@ function normaliseHomeTestimonial(acfHomeBuilder) {
     testimonial,
     testimonialData,
     caseStudy,
-    caseStudyClient: caseStudyBuilder?.acfClient?.nodes?.[0]?.name ?? '',
+    //caseStudyClient: caseStudyBuilder?.acfClient?.nodes?.[0]?.name ?? '',
     caseStudyCategories: caseStudyBuilder?.acfCategory?.nodes ?? [],
     caseStudyLoaderImg: loaderImg,
     caseStudyImage: thumbnail,

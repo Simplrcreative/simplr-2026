@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
+import { buildEntryPath } from '../lib/wp-api.js'
 import PeopleSectionMobile from '../components/about/PeopleSectionMobile.jsx'
 import {
   createSplitTextAnimation,
@@ -40,9 +41,7 @@ export default function AboutPage() {
   const values = aboutContent?.acfValues ?? []
   const howWeWork = aboutContent?.acfHowWeWork ?? []
   const clients = aboutContent?.acfClients ?? []
-
-  console.log(clients)
-
+  const awards = aboutContent?.acfAwards ?? []
   const [activeBio, setActiveBio] = useState(null)
   const [bioLayoutOpen, setBioLayoutOpen] = useState(false)
   const [hoveredPerson, setHoveredPerson] = useState(null)
@@ -189,7 +188,8 @@ export default function AboutPage() {
     setHoveredPerson(person.acfName)
   }
 
-  const clientColumnCount = clients.length > 30 ? 3 : 2
+  const CLIENTS_THREE_COL_THRESHOLD = 9
+  const clientColumnCount = clients.length > CLIENTS_THREE_COL_THRESHOLD ? 3 : 2
   const clientsPerColumn = Math.ceil(clients.length / clientColumnCount)
   const clientColumns = Array.from({ length: clientColumnCount }, (_, columnIndex) => {
     const start = columnIndex * clientsPerColumn
@@ -527,7 +527,7 @@ export default function AboutPage() {
             <div className="lead split-text text-white">Our clients</div>
           </div>
           <div
-            className={`col-start-1 col-span-12 clients-list${clients.length > 30 ? ' clients-list--3' : ' clients-list--2'}`}
+            className={`col-start-1 col-span-12 clients-list clients-list--${clientColumnCount}`}
           >
             {clientColumns.map((column, columnIndex) => (
               <div className="clients-column" key={`clients-column-${columnIndex}`}>
@@ -564,6 +564,59 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {awards.length > 0 ? (
+        <section className="px-5 py-20 bg-coffee section-dark awards-section">
+          {awards.map((award, awardIndex) => {
+            const projects = Array.isArray(award?.acfProjects) ? award.acfProjects : []
+
+            return (
+              <div key={`${award?.acfAward ?? 'award'}-${awardIndex}`} className="award-group slide-up-subtle mb-15">
+                {projects.map((project, projectIndex) => {
+                  const caseStudy = project?.acfCaseStudy?.nodes?.[0]
+                  const slug = caseStudy?.slug || ''
+                  const client = caseStudy?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || 'Client'
+                  const detail = project?.acfAwardDetails || ''
+                  const year = project?.acfYear
+                    ? new Date(caseStudy.date).getFullYear()
+                    : ''
+                  
+                  return (
+                    <div
+                      key={`${slug}-${awardIndex}-${projectIndex}`}
+                      className="award-item grid grid-cols-12 w-full text-white"
+                    >
+                      <div className="col-start-1 col-span-12 md:col-span-4 lead flex flex-col justify-center mb-5">
+                        {projectIndex === 0 ? (award?.acfAward|| '') : null}
+                      </div>
+                      <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-2 lead flex flex-col justify-center mb-5">
+                        {client}
+                      </div>
+                      <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-3 flex flex-col justify-center mb-5">
+                        {detail}
+                      </div>
+                      <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 flex justify-between items-center mb-5">
+                        <div>{year}</div>
+                        {slug && (
+                          <div className="relative min-w-[210px]">
+                            <Link 
+                              to={buildEntryPath('work', slug)} 
+                              className="btn award-btn absolute right-0 top-[-30px] alt block"
+                              title="View case study"
+                            >
+                              <span>View case study</span>
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </section>
+      ) : null}
     </>
   )
 }

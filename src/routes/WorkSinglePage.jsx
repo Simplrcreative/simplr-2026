@@ -1,5 +1,6 @@
-import { Fragment, useEffect } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
+import { gsap } from 'gsap'
 import Seo from '../components/Seo.jsx'
 import { buildWorkSingleSeo } from '../lib/page-seo.js'
 import RichText from '../components/RichText.jsx'
@@ -21,6 +22,206 @@ function getSliderSource(image) {
     ?? image?.guid
     ?? sizes.find((item) => item?.sourceUrl)?.sourceUrl
     ?? ''
+  )
+}
+
+function isTruthyFlag(value) {
+  return ['1', 1, true, 'true'].includes(value)
+}
+
+function WorkSectionVideo({ src, poster, clickToPlay = false, className = '' }) {
+  const containerRef = useRef(null)
+  const videoRef = useRef(null)
+  const playIconRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isActive, setIsActive] = useState(false)
+  const isOverRef = useRef(false)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (!clickToPlay) {
+      setIsPlaying(true)
+      return
+    }
+
+    video.pause()
+    setIsPlaying(false)
+  }, [clickToPlay, src])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video || !clickToPlay) return
+
+    const onPlay = () => setIsPlaying(true)
+    const onPause = () => setIsPlaying(false)
+
+    video.addEventListener('play', onPlay)
+    video.addEventListener('pause', onPause)
+
+    return () => {
+      video.removeEventListener('play', onPlay)
+      video.removeEventListener('pause', onPause)
+    }
+  }, [clickToPlay, src])
+
+  // Mouse-follow play/close icon — same pattern as the home hero play-icon.
+  // Keep hover visibility in React state so re-renders (play ↔ close) don't wipe `.active`.
+  useEffect(() => {
+    if (!clickToPlay) return
+
+    const container = containerRef.current
+    const playIcon = playIconRef.current
+    if (!container || !playIcon) return
+
+    const movePlayIconX = gsap.quickTo(playIcon, 'x', { duration: 0.18, ease: 'power3.out' })
+    const movePlayIconY = gsap.quickTo(playIcon, 'y', { duration: 0.18, ease: 'power3.out' })
+
+    let hasPointer = false
+    let pointerX = 0
+    let pointerY = 0
+
+    const setVisible = (visible) => {
+      if (visible === isOverRef.current) return
+      isOverRef.current = visible
+      setIsActive(visible)
+    }
+
+    const syncVisibility = () => {
+      if (!hasPointer) {
+        setVisible(false)
+        return
+      }
+
+      const bounds = container.getBoundingClientRect()
+      const over = (
+        pointerX >= bounds.left
+        && pointerX <= bounds.right
+        && pointerY >= bounds.top
+        && pointerY <= bounds.bottom
+      )
+      setVisible(over)
+    }
+
+    const onPointerMove = (event) => {
+      hasPointer = true
+      pointerX = event.clientX
+      pointerY = event.clientY
+      movePlayIconX(pointerX)
+      movePlayIconY(pointerY)
+      syncVisibility()
+    }
+
+    const onPointerLeave = () => {
+      syncVisibility()
+    }
+
+    const onScrollOrResize = () => {
+      syncVisibility()
+    }
+
+    document.addEventListener('pointermove', onPointerMove)
+    container.addEventListener('pointerleave', onPointerLeave)
+    window.addEventListener('scroll', onScrollOrResize, { passive: true })
+    window.addEventListener('resize', onScrollOrResize)
+
+    return () => {
+      document.removeEventListener('pointermove', onPointerMove)
+      container.removeEventListener('pointerleave', onPointerLeave)
+      window.removeEventListener('scroll', onScrollOrResize)
+      window.removeEventListener('resize', onScrollOrResize)
+      isOverRef.current = false
+      setIsActive(false)
+      gsap.set(playIcon, { clearProps: 'x,y' })
+    }
+  }, [clickToPlay, src])
+
+  const togglePlayback = () => {
+    if (!clickToPlay) return
+    const video = videoRef.current
+    if (!video) return
+
+    // Click happens while hovering — keep the icon visible across the play/close swap.
+    isOverRef.current = true
+    setIsActive(true)
+
+    if (video.paused) {
+      video.play().catch(() => {})
+      return
+    }
+
+    video.pause()
+  }
+
+  if (!clickToPlay) {
+    return (
+      <div className={`work-video full-image overflow-hidden rounded-[10px]${className ? ` ${className}` : ''}`}>
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster || undefined}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className={`work-video full-image overflow-hidden rounded-[10px] is-click-to-play${className ? ` ${className}` : ''}`}
+      onClick={togglePlayback}
+      role="button"
+      tabIndex={0}
+      aria-label={isPlaying ? 'Pause video' : 'Play video'}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          togglePlayback()
+        }
+      }}
+    >
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster || undefined}
+        muted
+        loop
+        playsInline
+      />
+
+      <div
+        ref={playIconRef}
+        className={`play-icon work-video-play-icon${isPlaying ? ' is-close' : ''}${isActive ? ' active' : ''}`}
+        onClick={(event) => {
+          event.stopPropagation()
+          togglePlayback()
+        }}
+        aria-hidden="true"
+      >
+        <div className="play-icon-inner">
+          <div className="play-icon-inner-content">
+            {isPlaying ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                <line x1="3" y1="3" x2="19" y2="19" />
+                <line x1="19" y1="3" x2="3" y2="19" />
+              </svg>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 20" fill="currentColor">
+                  <path d="M18 10L0 20L9.08523e-07 0L18 10Z" />
+                </svg>
+                <span>play video</span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -223,6 +424,8 @@ export default function WorkSinglePage() {
         const content2 = section?.acfContent2 || ''
         const video1 = section?.acfVideo1?.node?.guid || ''
         const video2 = section?.acfVideo2?.node?.guid || ''
+        const clickToPlayVideo1 = isTruthyFlag(section?.acfClickToPlayVideo1)
+        const clickToPlayVideo2 = isTruthyFlag(section?.acfClickToPlayVideo2)
         const mimeType1 = section?.acfImage1?.node?.mimeType || ''
         const mimeType2 = section?.acfImage2?.node?.mimeType || ''
         const isNativeFormat1 = mimeType1 === 'image/gif' || mimeType1 === 'image/webp'
@@ -242,8 +445,6 @@ export default function WorkSinglePage() {
         const stickyText1 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText1)
         const stickyText2 = ['1', 1, true, 'true'].includes(section?.acfMakeStickyText2)
         const sliderImages = section?.acfSliderImages?.nodes ?? []
-
-        console.log(sliderImages)
 
         return (
           <section key={`section-${index}`} className="work-content px-5 pb-5">
@@ -265,16 +466,12 @@ export default function WorkSinglePage() {
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
                     {video1 ? (
-                      <div className={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}>
-                        <video
-                          src={video1}
-                          poster={fImage1Mobile || undefined}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                        />
-                      </div>
+                      <WorkSectionVideo
+                        src={video1}
+                        poster={fImage1Mobile}
+                        clickToPlay={clickToPlayVideo1}
+                        className={sticky1 ? 'sticky' : ''}
+                      />
                     ) : (
                       <PictureImg
                         loaderSrc={fImage1Loader}
@@ -306,16 +503,12 @@ export default function WorkSinglePage() {
                 {/* TWO IMAGES SECTION */}
                   <div className="col-start-1 col-span-12 md:col-span-6 pb-5 md:pb-0 md:pe-2">
                     {video1 ? (
-                      <div className={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}>
-                        <video
-                          src={video1}
-                          poster={fImage1Mobile || undefined}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                        />
-                      </div>
+                      <WorkSectionVideo
+                        src={video1}
+                        poster={fImage1Mobile}
+                        clickToPlay={clickToPlayVideo1}
+                        className={sticky1 ? 'sticky' : ''}
+                      />
                     ) : (
                       <PictureImg
                         loaderSrc={fImage1Loader}
@@ -328,16 +521,12 @@ export default function WorkSinglePage() {
                   </div>
                   <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-6 md:ps-2">
                     {video2 ? (
-                      <div className={`full-image overflow-hidden rounded-[10px] ${sticky2 ? 'sticky' : ''}`}>
-                        <video
-                          src={video2}
-                          poster={fImage2Mobile || undefined}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                        />
-                      </div>
+                      <WorkSectionVideo
+                        src={video2}
+                        poster={fImage2Mobile}
+                        clickToPlay={clickToPlayVideo2}
+                        className={sticky2 ? 'sticky' : ''}
+                      />
                     ) : (
                       <PictureImg
                         loaderSrc={fImage2Loader}
@@ -356,16 +545,11 @@ export default function WorkSinglePage() {
                 {/* FULL IMAGE SECTION */}
                 <div className="col-span-12">
                   {video1 ? (
-                    <div className="full-image overflow-hidden rounded-[10px]">
-                      <video
-                        src={video1}
-                        poster={fImage1Mobile || undefined}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    </div>
+                    <WorkSectionVideo
+                      src={video1}
+                      poster={fImage1Mobile}
+                      clickToPlay={clickToPlayVideo1}
+                    />
                   ) : (
                     <PictureImg
                       loaderSrc={fImage1Loader}

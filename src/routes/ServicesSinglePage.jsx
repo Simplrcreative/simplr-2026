@@ -111,7 +111,6 @@ export default function ServicesSinglePage() {
   const caseStudy = caseStudies[0] || ''
   const caseStudySlug = caseStudy?.slug || ''
   const caseStudyData = caseStudy?.acfWorkBuilder || ''
-  console.log(caseStudy);
   //const caseStudyImage = caseStudyData?.acfFeaturedThumbnail?.node?.guid || ''
   //NEW SOURCES
   const featuredThumbnail = caseStudyData?.acfFeaturedThumbnail

@@ -97,7 +97,7 @@
     transform: translateX(-20px);
     transition: color 0.35s cubic-bezier(.8,.0,.5,.6), transform 0.35s cubic-bezier(.8,.0,.5,.6);
 }
-.btn.alt span {
+.btn.alt span  {
     color: var(--color-coffee);
 }
 .btn.alt:hover span {
