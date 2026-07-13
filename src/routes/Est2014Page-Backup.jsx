@@ -187,11 +187,7 @@ export default function Est2014Page() {
               ref={btnRef}
               className="btn relative bg-white text-coffee md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
             >
-              <span className="btn-fill" aria-hidden="true" />
-              <span className="btn-inner">
-                <span className="btn-text text-coffee">Join our team</span>
-                Join our team
-              </span>
+              <span>Join our team</span>
             </Link>
           </div>
         </div>

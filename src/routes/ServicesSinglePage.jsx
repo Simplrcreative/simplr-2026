@@ -326,11 +326,7 @@ export default function ServicesSinglePage() {
                     target={sectionCta.target}
                     className="btn relative mt-10"
                   >
-                    <span className="btn-fill" aria-hidden="true" />
-                    <span className="btn-inner">
-                      <span className="btn-text text-coffee">{sectionCta.title}</span>
-                      {sectionCta.title}
-                    </span>
+                    <span>{sectionCta.title}</span>
                   </Link>
                 </div>
               )}

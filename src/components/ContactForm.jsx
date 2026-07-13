@@ -183,13 +183,7 @@ export default function ContactForm({ style='light', heading='' }) {
               disabled={status === 'submitting'}
               className="btn relative disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="btn-fill" aria-hidden="true" />
-              <span className="btn-inner">
-                <span className="btn-text text-coffee">
-                  {status === 'submitting' ? 'Sending…' : 'Send enquiry'}
-                </span>
-                {status === 'submitting' ? 'Sending…' : 'Send enquiry'}
-              </span>
+              <span>{status === 'submitting' ? 'Sending…' : 'Send enquiry'}</span>
             </button>
           </div>
         </form>
