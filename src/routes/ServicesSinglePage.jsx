@@ -252,7 +252,7 @@ export default function ServicesSinglePage() {
         </Link>
       </div>
 
-      <section className="page-hero px-5 py-5 md:pt-0 md:pb-5 md:mb-15__ bg-white section-light min-h-[80vh]__ min-h-screen flex flex-col__ md:items-end">
+      <section className="page-hero parallax-fill-section relative w-full px-5 py-5 md:pt-0 md:pb-5 bg-white section-light min-h-[80vh] md:min-h-screen flex flex-col md:justify-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee change-logo mt-40__ mb-12__ md:mb-0 change-logo">
@@ -262,11 +262,11 @@ export default function ServicesSinglePage() {
             </div>
             <h1 className="service-card__title">{acfHeading}</h1>
           </div>
-          <div className="col-start-1 md:col-start-2 lg:col-start-8 col-span-12 md:col-span-11 lg:col-span-5 parallax">
+          <div className="col-start-1 md:col-start-2 lg:col-start-8 col-span-12 md:col-span-11 lg:col-span-5">
             <div className="featured-image">
               {featuredVideo ? (
                   <div
-                    className="ratio service-featured-media overflow-hidden rounded-[10px]"
+                    className="ratio service-featured-media parallax-fill rounded-[10px]"
                     style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
                     data-transition-dock="service-featured-media"
                   >
@@ -281,7 +281,7 @@ export default function ServicesSinglePage() {
                   </div>
                 ) : (
                   <picture
-                    className="ratio service-featured-media overflow-hidden rounded-[10px]"
+                    className="ratio service-featured-media parallax-fill rounded-[10px]"
                     style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
                     data-transition-dock="service-featured-media"
                   >
@@ -294,7 +294,7 @@ export default function ServicesSinglePage() {
         </div>
       </section>
 
-      <div className="bottom-menu-trigger">
+      <div className="bottom-menu-trigger relative z-1">
 
       {acfSections?.map((section, sectionIndex) => {
         const sectionHeading = section?.acfSectionHeading || ''
@@ -371,7 +371,7 @@ export default function ServicesSinglePage() {
       })}
 
       {testimonial && (
-        <section className="testimonials p-5 section-light bg-white footer-off">
+        <section className="testimonials p-5 section-light bg-white">
                 <div id="testimonial-1" className="grid grid-cols-12">
             <div className="col-start-1 col-span-12 md:col-span-6 order-2 md:order-1 slide-up-from-left">
                 {caseStudy && (

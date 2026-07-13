@@ -10,6 +10,36 @@ function registerPlugins() {
   }
 }
 
+function getFillMetrics(element) {
+  // Must be measured at identity transform — same approach as home hero.
+  const bounds = element.getBoundingClientRect()
+
+  if (bounds.width <= 0 || bounds.height <= 0) {
+    return {
+      scale: 1,
+      x: 0,
+      y: 0,
+    }
+  }
+
+  return {
+    scale: window.innerWidth / bounds.width,
+    x: window.innerWidth - bounds.right,
+    y: window.innerHeight - bounds.bottom,
+  }
+}
+
+function resolveFillMedia(container) {
+  return (
+    container.matches?.('.service-featured-media, video, picture, img')
+      ? container
+      : null
+  )
+    || container.querySelector('.service-featured-media')
+    || container.querySelector('video, picture, img')
+    || container
+}
+
 export function createParallaxAnimation(
   target,
   fromVars = { y: 0, scale: 1 },
@@ -64,36 +94,197 @@ export function createParallaxAnimation(
   }
 }
 
-export function createParallaxAnimations(scope) {
-  if (!scope) {
+function isMeasurable(element) {
+  if (!element) return false
+  const bounds = element.getBoundingClientRect()
+  return bounds.width > 0 && bounds.height > 0
+}
+
+function whenMediaReady(element, callback) {
+  if (!element) {
+    callback()
     return () => undefined
   }
 
-  if (window.innerWidth < 768) {
-    return () => undefined
+  const video = element.matches?.('video')
+    ? element
+    : element.querySelector?.('video')
+  const image = element.matches?.('img')
+    ? element
+    : element.querySelector?.('img')
+
+  if (video) {
+    if (video.readyState >= 1 && isMeasurable(element)) {
+      callback()
+      return () => undefined
+    }
+
+    const onReady = () => {
+      if (isMeasurable(element)) callback()
+    }
+    video.addEventListener('loadedmetadata', onReady, { once: true })
+    return () => video.removeEventListener('loadedmetadata', onReady)
   }
 
-  registerPlugins()
+  if (image) {
+    if (image.complete && image.naturalWidth > 0 && isMeasurable(element)) {
+      callback()
+      return () => undefined
+    }
 
-  const ParallaxTargets = Array.from(scope.querySelectorAll('.parallax'))
-  const ParallaxSubtleTargets = Array.from(scope.querySelectorAll('.parallax-subtle'))
-  const targets = [ ...ParallaxTargets, ...ParallaxSubtleTargets]
+    const onReady = () => {
+      if (isMeasurable(element)) callback()
+    }
+    image.addEventListener('load', onReady, { once: true })
+    image.decode?.().then(onReady).catch(() => undefined)
+    return () => image.removeEventListener('load', onReady)
+  }
 
-  if (!targets.length) {
+  if (isMeasurable(element)) {
+    callback()
+  } else {
+    requestAnimationFrame(callback)
+  }
+
+  return () => undefined
+}
+
+function createParallaxFillAnimations(scope) {
+  const containers = Array.from(scope.querySelectorAll('.parallax-fill'))
+  if (!containers.length) {
     return () => undefined
   }
 
   const media = gsap.matchMedia()
 
   media.add('(prefers-reduced-motion: no-preference)', () => {
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
+    const cleanups = []
+
+    containers.forEach((container) => {
+      const mediaEl = resolveFillMedia(container)
+      // Pin the hero section that owns the fill media (same pattern as home .landing).
+      const section = container.closest('.parallax-fill-section, .page-hero, section') || container
+      if (!mediaEl || !section) return
+
+      let metrics = { scale: 1, x: 0, y: 0 }
+      let timeline
+      let resizeTimer
+
+      const measureAtRest = () => {
+        gsap.set(mediaEl, { x: 0, y: 0, scale: 1 })
+        metrics = getFillMetrics(mediaEl)
+      }
+
+      const build = () => {
+        timeline?.scrollTrigger?.kill()
+        timeline?.kill()
+
+        gsap.set(mediaEl, {
+          display: 'block',
+          transformOrigin: 'right bottom',
+          willChange: 'transform',
+          borderRadius: getComputedStyle(mediaEl).borderRadius || '10px',
+          zIndex: 0,
+          position: 'relative',
+        })
+
+        // Always measure from identity so end values stay correct on reverse scrub.
+        measureAtRest()
+
+        timeline = gsap.timeline({
+          defaults: {
+            ease: 'none',
+          },
+          scrollTrigger: {
+            id: 'parallax-fill',
+            trigger: section,
+            pin: isDesktop ? section : false,
+            start: 'top top',
+            end: () => `+=${window.innerHeight}`,
+            scrub: true,
+            // Do NOT invalidateOnRefresh — re-reading bounds while scaled
+            // collapses end values to ~identity and breaks reverse scrub.
+            invalidateOnRefresh: false,
+            anticipatePin: 0,
+            refreshPriority: 1,
+          },
+        })
+
+        // Static end values (captured at rest). Function values + refresh were
+        // remeasuring the scaled element and wiping the fill on the way back up.
+        timeline.to(mediaEl, {
+          x: metrics.x,
+          y: metrics.y,
+          scale: metrics.scale,
+          borderRadius: '0px',
+          duration: 1,
+        })
+      }
+
+      const onResize = () => {
+        window.clearTimeout(resizeTimer)
+        resizeTimer = window.setTimeout(build, 150)
+      }
+
+      const cancelReady = whenMediaReady(mediaEl, build)
+      window.addEventListener('resize', onResize)
+
+      cleanups.push(() => {
+        cancelReady()
+        window.removeEventListener('resize', onResize)
+        window.clearTimeout(resizeTimer)
+        timeline?.scrollTrigger?.kill()
+        timeline?.kill()
+        gsap.set(mediaEl, { clearProps: 'transform,willChange,borderRadius,zIndex,position' })
+      })
+    })
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup())
+    }
+  })
+
+  return () => {
+    media.revert()
+  }
+}
+
+export function createParallaxAnimations(scope) {
+  if (!scope) {
+    return () => undefined
+  }
+
+  registerPlugins()
+
+  const fillCleanup = createParallaxFillAnimations(scope)
+
+  if (window.innerWidth < 768) {
+    return () => {
+      fillCleanup()
+    }
+  }
+
+  const ParallaxTargets = Array.from(scope.querySelectorAll('.parallax'))
+  const ParallaxSubtleTargets = Array.from(scope.querySelectorAll('.parallax-subtle'))
+  const targets = [...ParallaxTargets, ...ParallaxSubtleTargets]
+
+  if (!targets.length) {
+    return () => {
+      fillCleanup()
+    }
+  }
+
+  const media = gsap.matchMedia()
+
+  media.add('(prefers-reduced-motion: no-preference)', () => {
     const createAnimations = (animationTargets, fromVars, toVars) => animationTargets.map((target) => {
-      gsap.set(targets, {
+      gsap.set(target, {
         scale: 1,
         y: 0,
         willChange: 'transform, opacity',
         ...fromVars,
       })
-     
 
       return gsap.to(target, {
         overwrite: 'auto',
@@ -106,7 +297,6 @@ export function createParallaxAnimations(scope) {
           stagger: 0.01,
           invalidateOnRefresh: true,
           refreshPriority: -15,
-          //markers: true,
         },
       })
     })
@@ -116,7 +306,7 @@ export function createParallaxAnimations(scope) {
         ParallaxTargets,
         {
           y: 0,
-          scale: 1
+          scale: 1,
         },
         {
           transformOrigin: 'top right',
@@ -129,7 +319,7 @@ export function createParallaxAnimations(scope) {
         ParallaxSubtleTargets,
         {
           y: -30,
-          scale: 1
+          scale: 1,
         },
         {
           y: 0,
@@ -141,10 +331,12 @@ export function createParallaxAnimations(scope) {
     ]
 
     return () => {
-      animations.forEach((animation, index) => {
+      animations.forEach((animation) => {
         animation.scrollTrigger?.kill()
         animation.kill()
-        gsap.set(targets[index], { clearProps: 'scale,transform,willChange' })
+      })
+      targets.forEach((target) => {
+        gsap.set(target, { clearProps: 'scale,transform,willChange' })
       })
     }
   })
@@ -158,6 +350,7 @@ export function createParallaxAnimations(scope) {
   })
 
   return () => {
+    fillCleanup()
     media.revert()
   }
 }

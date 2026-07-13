@@ -130,6 +130,11 @@
   border-radius: 0.5rem;
 }
 
+.service-featured-media.parallax-fill {
+  position: relative;
+  z-index: 0;
+}
+
 .service-featured-media video,
 .service-featured-media img {
   width: 100%;
