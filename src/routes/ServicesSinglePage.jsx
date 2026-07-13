@@ -194,8 +194,9 @@ export default function ServicesSinglePage() {
       return false
     }
 
+    // Default: first item open until the user toggles this section.
     if (openIndex === undefined) {
-      return false
+      return accordionIndex === 0
     }
 
     return openIndex === accordionIndex
@@ -204,10 +205,11 @@ export default function ServicesSinglePage() {
   function toggleAccordion(sectionIndex, accordionIndex) {
     setOpenAccordions((prev) => {
       const current = prev[sectionIndex]
+      const currentOpen = current === undefined ? 0 : current
 
       return {
         ...prev,
-        [sectionIndex]: current === accordionIndex ? null : accordionIndex,
+        [sectionIndex]: currentOpen === accordionIndex ? null : accordionIndex,
       }
     })
   }

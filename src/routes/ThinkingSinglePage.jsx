@@ -71,6 +71,11 @@ export default function ThinkingSinglePage() {
       const items = Array.from(group.querySelectorAll('.service-accordion-item'))
       if (items.length === 0) return
 
+      const hasExplicitOpen = items.some((item) => item.classList.contains('is-open'))
+      if (!hasExplicitOpen) {
+        items[0].classList.add('is-open')
+      }
+
       items.forEach((item) => {
         const trigger = item.querySelector('.service-accordion-trigger')
         const panel = item.querySelector('.service-accordion-panel')

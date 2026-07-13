@@ -110,19 +110,13 @@ export const router = createBrowserRouter([
           },
           {
             path: 'est-2014/',
-            element: <Est2014PageInfinite />,
-            loader: createEst2014PageLoader(),
-            handle: { pageBg: 'light', hideFooter: true },
-          },
-          {
-            path: 'est-2014-masonry/',
             element: <Est2014PageMasonary />,
             loader: createEst2014PageLoader(),
-            handle: { pageBg: 'light', hideFooter: true },
+            handle: { pageBg: 'dark' },
           },
           {
-            path: 'est-2014-zoom/',
-            element: <Est2014PageZoom/>,
+            path: 'est-2014-infinite/',
+            element: <Est2014PageInfinite />,
             loader: createEst2014PageLoader(),
             handle: { pageBg: 'light', hideFooter: true },
           },
