@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLoaderData } from 'react-router-dom'
+import { Link, useLoaderData, useNavigate } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
@@ -34,6 +34,7 @@ export default function AboutPage() {
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => createSlideUpAnimations(document.body), [])
   const { people, aboutContent, page } = useLoaderData()
+  const navigate = useNavigate()
   const seo = buildStaticPageSeo('about', page)
 
   //const aboutContent = page?.acfAboutBuilder ?? []
@@ -586,23 +587,46 @@ export default function AboutPage() {
                       key={`${slug}-${awardIndex}-${projectIndex}`}
                       className="award-item grid grid-cols-12 w-full text-white"
                     >
-                      <div className="col-start-1 col-span-12 md:col-span-4 lead flex flex-col justify-center mb-5">
+                      <div className="col-start-1 col-span-12 md:col-span-4 lead flex flex-col justify-center mb-3">
                         {projectIndex === 0 ? (award?.acfAward|| '') : null}
                       </div>
-                      <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-2 lead flex flex-col justify-center mb-5">
+                      <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-2 lead flex flex-col justify-center mb-3">
                         {client}
                       </div>
-                      <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-3 flex flex-col justify-center mb-5">
+                      <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-3 flex flex-col justify-center mb-3">
                         {detail}
                       </div>
-                      <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 flex justify-between items-center mb-5">
+                      <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 flex justify-between items-center mb-3">
                         <div>{year}</div>
                         {slug && (
-                          <div className="relative min-w-[210px]">
-                            <Link 
-                              to={buildEntryPath('work', slug)} 
-                              className="btn award-btn absolute right-0 top-[-30px] alt block"
+                          <div className="relative min-w-[210px] h-[60px] flex items-center justify-end">
+                            <Link
+                              to={buildEntryPath('work', slug)}
+                              className="btn award-btn alt relative"
                               title="View case study"
+                              onPointerDown={(event) => {
+                                if (
+                                  event.button !== 0
+                                  || event.metaKey
+                                  || event.ctrlKey
+                                  || event.shiftKey
+                                  || event.altKey
+                                ) {
+                                  return
+                                }
+
+                                // Document capture already snapped the page. Navigate here
+                                // because the overlay can clear :hover and set pointer-events:none
+                                // before the click event fires.
+                                const path = buildEntryPath('work', slug)
+                                event.currentTarget.dataset.transitionHover = 'true'
+                                event.currentTarget.closest('.award-item')?.classList.add('hover-active')
+                                navigate(path)
+                              }}
+                              onClick={(event) => {
+                                // Navigation already started on pointerdown.
+                                event.preventDefault()
+                              }}
                             >
                               <span>View case study</span>
                             </Link>

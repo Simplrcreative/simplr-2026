@@ -955,7 +955,9 @@
   }
 }
 
-/* Awards — show case-study button on row hover */
+/* Awards — show case-study button on row hover.
+   :active keeps the CTA clickable after the transition overlay clears :hover.
+   .hover-active / data-transition-hover are stamped onto transition clones. */
 .awards-section .award-item .award-btn {
   opacity: 0;
   pointer-events: none;
@@ -963,7 +965,9 @@
 }
 
 .awards-section .award-item:hover .award-btn,
-.awards-section .award-item:focus-within .award-btn {
+.awards-section .award-item:focus-within .award-btn,
+.awards-section .award-item.hover-active .award-btn,
+.awards-section .award-item .award-btn:active {
   opacity: 1;
   pointer-events: auto;
   transition: background 0.35s cubic-bezier(.8,.0,.5,.6), opacity 0.35s cubic-bezier(.8,.0,.5,.6);

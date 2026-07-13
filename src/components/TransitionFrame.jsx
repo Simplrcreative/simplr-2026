@@ -1039,6 +1039,27 @@ export default function TransitionFrame({ children }) {
 
       hideHiddenCanvasLayersInClone(ref.current, clone)
 
+      // Preserve :hover UI that CSS would lose on the detached clone (award CTAs, btns).
+      const liveAwardItems = Array.from(ref.current.querySelectorAll('.award-item'))
+      const clonedAwardItems = Array.from(clone.querySelectorAll('.award-item'))
+      liveAwardItems.forEach((item, index) => {
+        const clonedItem = clonedAwardItems[index]
+        if (!clonedItem) return
+        if (item.matches(':hover') || item.classList.contains('hover-active')) {
+          clonedItem.classList.add('hover-active')
+        }
+      })
+
+      const liveButtons = Array.from(ref.current.querySelectorAll('.btn'))
+      const clonedButtons = Array.from(clone.querySelectorAll('.btn'))
+      liveButtons.forEach((button, index) => {
+        const clonedButton = clonedButtons[index]
+        if (!clonedButton) return
+        if (button.matches(':hover') || button.dataset.transitionHover === 'true') {
+          clonedButton.dataset.transitionHover = 'true'
+        }
+      })
+
       clone.querySelectorAll('.bottom-menu').forEach((menu) => {
         menu.style.visibility = 'hidden'
       })
