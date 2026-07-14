@@ -144,6 +144,16 @@ export function createWorkImagesAnimation() {
  * - primary image slides up and out of frame
  */
 export function createWorkThumbHoverAnimation(scope = document) {
+  // Mobile taps fire pointerenter then click; handleClick preventDefaults while
+  // the hover timeline is incomplete, which blocks navigation. Skip entirely
+  // on coarse pointers / narrow viewports so cards link normally (test).
+  if (
+    window.matchMedia('(hover: none), (pointer: coarse)').matches
+    || window.matchMedia('(max-width: 1023.9px)').matches
+  ) {
+    return () => {}
+  }
+
   const root = scope && typeof scope.querySelectorAll === 'function' ? scope : document
   const triggers = Array.from(root.querySelectorAll('.thumb-swap-trigger'))
 

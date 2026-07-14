@@ -58,14 +58,15 @@
         top: 50%;
         left: 50%;
         /* centering handled by GSAP xPercent/yPercent once intro runs */
-        background: var(--color-branding-design);
-        width: 50px;
-        height: 50px;
+        border: 1px solid white;
+        width: 75px;
+        height: 75px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 1000;
+        mix-blend-mode: difference;
     }
 }
 @media (min-width: 768px) {
@@ -130,7 +131,7 @@
     text-underline-offset: auto;
     text-decoration-skip-ink: auto;
     transition:
-        opacity 0.3s ease,
+        opacity 0.6s ease,
         text-decoration-color 0.3s ease
     }
 .client-detail:hover,

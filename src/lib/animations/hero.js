@@ -565,7 +565,7 @@ export function createHeroScrollAnimation(scope) {
 
       timeline.to(heroImage, {
         x: () => getHeroImageMetrics(heroImage).x,
-        y: () => getHeroImageMetrics(heroImage).y,
+        y: () => (isMobile ? 0 : getHeroImageMetrics(heroImage).y),
         scale: () => getHeroImageMetrics(heroImage).scale,
         borderRadius: '0px',
         filter: 'brightness(20%)',

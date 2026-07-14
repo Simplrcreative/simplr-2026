@@ -112,7 +112,7 @@ export default function ContactPage() {
       <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 lg:col-span-7 mt-20 text-white change-logo">
+          <div className="col-span-12 lg:col-span-7 mt-50 md:mt-20 text-white change-logo">
             <h1 className="hero-title large mb-10 md:mb-20">Let's make it simplr.<br/><span>Come say <i>hello.</i></span></h1>
             <div className="lg:flex gap-20">
               <div className="eyebrow">Our Office</div>
@@ -164,7 +164,7 @@ export default function ContactPage() {
                     <span className="text-base shrink-0">Type of enquiry</span>
                     <div className="flex flex-col gap-[5px]">
                       {ENQUIRY_TYPES.map(({ name, value, bg, text }) => (
-                        <label key={value} className="flex items-center cursor-pointer">
+                        <label key={value} className="flex items-center cursor-pointer gap-1">
                           <input
                             type="checkbox"
                             name="enquiry"
@@ -202,7 +202,7 @@ export default function ContactPage() {
                     ref={btnRef}
                     type="submit"
                     disabled={status === 'submitting'}
-                    className="btn relative disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn alt relative disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span>{status === 'submitting' ? 'Sending…' : 'Send enquiry'}</span>
                   </button>

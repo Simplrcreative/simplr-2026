@@ -205,10 +205,10 @@ export default function AboutPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex flex-col md:items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark lg:min-h-[80vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 lg:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
+          <div className="col-span-12 lg:col-span-6 text-white change-logo my-50 md:mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
             {aboutContent?.acfLandingHeading && (
               <h1
@@ -222,22 +222,28 @@ export default function AboutPage() {
 
       <section className="px-5 bg-coffee section-dark">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-4 lg:col-span-5 text-white md:pt-20 ">
+          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-4 lg:col-span-5 text-white md:pt-20">
             {aboutContent?.acfLandingLead && (
               <div
                 className="lead split-text trigger-split-text"
+                data-split-start="top 70%"
+                data-split-end="top 50%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingLead}}
               />
             )}
             {aboutContent?.acfLandingIntroduction && (
               <div
                 className="article-content mt-10 split-text trigger-split-text"
+                data-split-start="top 60%"
+                data-split-end="top 40%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingIntroduction }}
               />
             )}
             {aboutContent?.acfTeamIntroduction && (
               <div
                 className="article-content mt-10 split-text trigger-split-text"
+                data-split-start="top 50%"
+                data-split-end="top 30%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfTeamIntroduction }}
               />
             )}
@@ -356,7 +362,7 @@ export default function AboutPage() {
       <PeopleSectionMobile people={people} />
       </div>
 
-      <section className="px-5 pb-20 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark trigger-split-text slide-up-subtle">
+      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark trigger-split-text slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
             <div className="lead split-text mb-5">Different disciplines. One shared standard:</div>

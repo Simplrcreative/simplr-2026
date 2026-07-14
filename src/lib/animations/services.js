@@ -229,8 +229,18 @@ export function createServicesScrollAnimation(scope) {
       applyTitleStatState(currentTitle)
     }
 
+    gsap.set(section, {
+      overflow: 'hidden',
+    })
+
+    setActiveTitleOpacity()
+
+    // Initial position MUST be set before tweens are created. Previously this
+    // ran after the pin timeline was built, so invalidateOnRefresh recorded the
+    // pin tween's "from" as 100vw — at pin start (progress 0) titles snapped
+    // back to the right, then scrubbed left again.
     gsap.set(titles, {
-      x: 0,
+      x: '100vw',
     })
 
     if (statNo) {
@@ -239,27 +249,25 @@ export function createServicesScrollAnimation(scope) {
       })
     }
 
-    gsap.set(section, {
-      overflow: 'hidden',
-    })
-
-    setActiveTitleOpacity()
-
-    entranceTween = gsap.to(titles, {
-      x: 0,
-      ease: 'none',
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: section,
-        start: SERVICES_ENTRY_START,
-        end: () => `top ${SERVICES_PIN_TOP}`,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        onUpdate: syncActiveTitleState,
-        onRefresh: syncActiveTitleState,
-        onLeaveBack: resetStatState,
+    entranceTween = gsap.fromTo(
+      titles,
+      { x: '100vw' },
+      {
+        x: 0,
+        ease: 'none',
+        immediateRender: false,
+        scrollTrigger: {
+          trigger: section,
+          start: SERVICES_ENTRY_START,
+          end: () => `top ${SERVICES_PIN_TOP}`,
+          scrub: true,
+          invalidateOnRefresh: true,
+          onUpdate: syncActiveTitleState,
+          onRefresh: syncActiveTitleState,
+          onLeaveBack: resetStatState,
+        },
       },
-    })
+    )
 
     scrubTimeline = gsap.timeline({
       defaults: {
@@ -280,15 +288,17 @@ export function createServicesScrollAnimation(scope) {
       },
     })
 
-    scrubTimeline.to(titles, {
-      x: () => -getHorizontalScrollDistance(section, titles),
-      duration: 1,
-      immediateRender: false,
-    })
-
-    gsap.set(titles, {
-      x: '100vw',
-    })
+    // Explicit from: 0 so pin start always continues from the entrance end
+    // state, never from the off-screen 100vw start position.
+    scrubTimeline.fromTo(
+      titles,
+      { x: 0 },
+      {
+        x: () => -getHorizontalScrollDistance(section, titles),
+        duration: 1,
+        immediateRender: false,
+      },
+    )
 
     return () => {
       entranceTween?.kill()

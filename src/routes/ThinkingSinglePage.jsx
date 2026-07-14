@@ -175,10 +175,10 @@ export default function ThinkingSinglePage() {
       <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="post-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex md:items-end">
+      <section className="post-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[80vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-40 flex flex-col items-center">
+          <div className="col-start-1 md:col-start-3 col-span-12 md:col-span-8 text-coffee mt-50 mb-5 md:mt-40 md:mb-0 flex flex-col items-center">
               <div className="eyebrow">Thinking {categories.length > 0 && (
                 categories.map((category) => {
                   const filterSlug = categoryToFilterSlug(category)

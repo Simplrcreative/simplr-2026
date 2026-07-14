@@ -293,10 +293,10 @@ export default function WorkSinglePage() {
     <>
       <Seo {...seo} />
     
-      <section className="page-hero px-5 pb-10__ md:pb-20__ pb-5 bg-white section-light min-h-[90vh] md:min-h-screen flex md:items-end">
+      <section className="page-hero px-5 pb-10__ md:pb-20__ pb-5 bg-white section-light md:min-h-[80vh] md:min-h-screen flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-40 lg:mt-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">
+          <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-50 mb-5 md:my-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
               <h1 className="hero-title"><span>{title}</span></h1>
@@ -461,8 +461,8 @@ export default function WorkSinglePage() {
               {layout === 'Image & Text' && (
                 <>
                 {/* IMAGE & TEXT SECTION */}
-                  <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee mt-8 md:mt-0`}>
-                    <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
+                  <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee`}>
+                    <RichText html={content} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
                     {video1 ? (
@@ -489,11 +489,11 @@ export default function WorkSinglePage() {
                 <>
                 {/* TWO TEXT BOXES SECTION */}
                   <div className={`col-span-12 md:col-span-5 lg:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
-                    <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
+                    <RichText html={content} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   
                   <div className={`col-start-1 col-span-12 md:col-start-8 md:col-span-5 lg:col-start-9 lg:col-span-4 flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
-                    <RichText html={content2} className={`split-text-coffee text-box ${stickyText2 ? 'sticky-text' : ''}`} />
+                    <RichText html={content2} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText2 ? 'sticky-text' : ''}`} />
                   </div>
                   {/* END TWO TEXT BOXES SECTION */}
                 </>

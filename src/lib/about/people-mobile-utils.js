@@ -23,6 +23,6 @@ export function getNameButtonFontClass(acfFont = '') {
 }
 
 export function getPeopleMobileSectionMinHeight(personCount = 0) {
-  const listHeight = Math.max(personCount, 1) * 61
-  return Math.max(listHeight + 740, 1200)
+  const listHeight = Math.max(personCount, 1) * 60
+  return Math.max(listHeight + 340, 680)
 }

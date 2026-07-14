@@ -826,7 +826,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       </div>
                     </Link>
                     {study.categories?.length > 0 && (
-                      <div className="categories mt-5 hidden md:flex">
+                      <div className="categories mt-5 hidden md:flex gap-1">
                         {study.categories.map(({ name }) => (
                           <CategoryBadge key={`${study.id}-${name}`} name={name} />
                         ))}
@@ -887,7 +887,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   {linkedCaseStudyClient}
                   </div>
                   {linkedCaseStudy && linkedCaseStudyCategories.length > 0 ? (
-                    <div className="categories mt-3 flex">
+                    <div className="categories mt-3 flex gap-1">
                       {linkedCaseStudyCategories.map(({ name }) => (
                         <CategoryBadge key={name} name={name} />
                       ))}

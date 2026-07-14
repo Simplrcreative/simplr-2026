@@ -94,11 +94,13 @@ function handleLogoTransitionClick() {
   requestTransitionCapture()
 }
 
-function createMobileNavLinkClickHandler(closeMobileNav) {
+function createMobileNavLinkClickHandler() {
   return (event) => {
     handleTransitionLinkClick(event)
-    // Defer close so iOS Safari doesn't drop the navigation when the menu unmounts/repaints.
-    requestAnimationFrame(() => closeMobileNav())
+    // Do not close the menu here. Closing on tap slides #mobile-nav away and
+    // reveals TransitionFrame's frozen header clone (z-index 10001), which
+    // briefly stacks above the nav. Route-change layout effect closes it once
+    // page-transitioning is in place.
   }
 }
 
@@ -164,6 +166,23 @@ export default function RootLayout() {
   const closeMobileNav = useCallback(() => {
     setIsNavOpen(false)
     unlockScroll('nav')
+  }, [])
+
+  const toggleMobileNav = useCallback(() => {
+    setIsNavOpen((open) => {
+      if (open) {
+        unlockScroll('nav')
+        return false
+      }
+      // Freeze the menu theme to the page that opened it so a dark→light (or
+      // light→dark) navigation cannot recolour the open panel mid-transition.
+      const nav = document.getElementById('mobile-nav')
+      if (nav) {
+        nav.dataset.menuBg = document.documentElement.dataset.pageBg || 'light'
+      }
+      lockScroll('nav')
+      return true
+    })
   }, [])
 
   useEffect(() => {
@@ -507,21 +526,21 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[1.25rem] right-[1.25rem] w-[3.125rem] h-[3.125rem] flex justify-end ${isNavOpen ? ' active' : ''}`} onClick={() => setIsNavOpen((open) => {
-          const next = !open
-          if (next) {
-            lockScroll('nav')
-          } else {
-            unlockScroll('nav')
-          }
-          return next
-        })}>
-        <div className="menu-icon-dot-alt w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
-        <div className="menu-icon-dot w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
-        <div className="menu-icon-dot-alt w-[0.5rem] h-[0.5rem] rounded-full bg-white"></div>
+      <div className={`menu-icon fixed top-[0.9rem] right-[0.9rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`} onClick={toggleMobileNav}>
+        <div className="flex flex-col gap-[0.25rem]">
+          <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
+          <div className="menu-icon-dot w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
+        </div>
+        <div className="flex flex-col gap-[0.25rem]">
+          <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
+          <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
+        </div>
       </div>
 
-      <nav id="mobile-nav" className={`z-[1003] main flex flex-col lg:hidden flex-wrap items-start gap-[2.5rem] ${isNavOpen ? ' active' : ''}`}>
+      <nav
+        id="mobile-nav"
+        className={`main flex flex-col lg:hidden flex-wrap items-start gap-[2.5rem]${isNavOpen ? ' active' : ''}`}
+      >
         {navigation.map((item) => {
           const prefetch = useRoutePrefetch(item.path)
           return (
@@ -532,11 +551,10 @@ export default function RootLayout() {
               className={(classState) => navLinkClassName(classState, item.key)}
               {...createNavLinkHandlers({
                 prefetch,
-                onClick: createMobileNavLinkClickHandler(closeMobileNav),
+                onClick: createMobileNavLinkClickHandler(),
                 hasFinePointer,
               })}
             >
-              <span className="nav-link__orb" aria-hidden="true" />
               <NavLinkLabel label={item.label} count={item.count} />
               <NavLinkLabel label={item.label} count={item.count} inverted />
             </NavLink>
@@ -547,7 +565,7 @@ export default function RootLayout() {
       <header className={`header fixed z-[1001] md:z-5 w-full pb-5${isHomePage ? '' : ' page-header'}`}>
         <div className="nav-holder flex px-5 pt-[1.25rem] md:pt-[3.125rem] flex-row items-start justify-between">
           
-          <div className="logo-holder">
+          <div className="logo-holder ">
               <Link
                 id="logo-link"
                 to="/"

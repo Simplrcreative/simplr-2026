@@ -254,10 +254,10 @@ export default function ThinkingPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex flex-col md:items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[80vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
             <div className="eyebrow">
               Thinking
               {activeFilterLabel ? (
@@ -271,7 +271,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section className="post-filter px-5 py-8 bg-white flex md:justify-end">
+      <section className="post-filter px-5 pt-22 pb-5 bg-white section-light flex md:justify-end sticky top-0 z-[1]">
         <div className="flex flex-wrap gap-1">
           {filters.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id

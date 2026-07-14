@@ -1036,6 +1036,7 @@ export default function TransitionFrame({ children }) {
       }
 
       const clone = ref.current.cloneNode(true)
+      clone.dataset.transitionSnapshot = 'true'
 
       hideHiddenCanvasLayersInClone(ref.current, clone)
 
@@ -1910,10 +1911,10 @@ export default function TransitionFrame({ children }) {
         }, dockStart)
       }
     } else {
-      tl.to(content, { scale: 0.9, duration: 0.5, ease: 'power4.in', transformOrigin: '50% 50%' }, 0)
-      tl.to(wrapper, { y: -ySnapShotOff, duration: 1, ease: 'power4.in' }, 0.1)
-      tl.to(el, { y: 0, duration: 1, ease: 'power4.out' }, 0.5)
-      tl.to(el, { scale: 1, duration: 0.75, ease: 'power4.out', clearProps: 'all' }, 1)
+      tl.to(content, { scale: 0.90, duration: 0.75, ease: 'power2.in', transformOrigin: '50% 50%' }, 0)
+      tl.to(wrapper, { y: -ySnapShotOff, duration: 1, ease: 'power2.in' }, 0.1)
+      tl.to(el, { y: 0, duration: 1, ease: 'power2.out' }, 0.75)
+      tl.to(el, { scale: 1, duration: 0.75, ease: 'power2.out', clearProps: 'all' }, 1.1)
     }
 
     return () => {
@@ -1967,6 +1968,11 @@ export default function TransitionFrame({ children }) {
         gsap.killTweensOf(realHeader)
         gsap.set(realHeader, { clearProps: 'all' })
       }
+      // Incomplete handoff (HMR / interrupted route) — free capture for the next nav.
+      snapshotRef.current = null
+      altTransitionRef.current = null
+      hasCapturedRef.current = false
+      immediateOverlayRef.current = null
     }
   }, [location.pathname])
 

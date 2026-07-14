@@ -173,7 +173,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
   const cardTitle = getWorkCardTitle(work)
 
   return (
-    <div className="work-card mb-5 md:mb-0">
+    <div className="work-card mb-10 md:mb-0">
     <Link 
       to={buildEntryPath('work', work.slug)} 
       className="block alt-transition-img thumb-swap-trigger" 
@@ -211,7 +211,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card__meta mt-3">
       <h3 className="work-card__title">{cardTitle}</h3>
       {categories.length > 0 && (
-        <div className="work-card__categories gap-1 mt-3 flex flex-wrap">
+        <div className="work-card__categories gap-1 mt-2 flex flex-wrap">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
         </div>
       )}
@@ -241,7 +241,7 @@ function WorkFeatured({ work, cardKey }) {
   return (
     <Link
       to={buildEntryPath('work', work.slug)}
-      className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img thumb-swap-trigger"
+      className="work-featured col-start-1 col-span-12 md:col-span-6 block alt-transition-img thumb-swap-trigger mb-4 md:mb-0"
       data-card-key={cardKey}
       data-transition-source="media"
       data-transition-variant="work-card"
@@ -273,7 +273,7 @@ function WorkFeatured({ work, cardKey }) {
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{cardTitle}</h3>
         {categories.length > 0 && (
-          <div className="work-card__categories gap-1 mt-3 flex flex-wrap">
+          <div className="work-card__categories gap-1 mt-2 flex flex-wrap">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
           </div>
         )}
@@ -308,7 +308,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
     ?? ''
 
   return (
-    <section id={`testimonial-${index}`} className="testimonial px-5 pb-5 md:pb-20 bg-white section-light">
+    <section id={`testimonial-${index}`} className="testimonial px-5 pb-5 md:pb-20 bg-white section-light hidden md:block">
       <div className="grid grid-cols-12 w-full">
         <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
           <div className="testimonial lead max-w-[38ch]">
@@ -628,17 +628,17 @@ export default function WorkPage() {
     <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light min-h-[80vh] flex flex-col md:items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[80vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-40 max-w-[115ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
             <div className="eyebrow">Explore our work</div>
             <h1 className="hero-title">Simplr&apos;s work is a reflection of <span>passion, dedication and craft,</span> spanning numerous industries both <span><i>locally and internationally.</i></span> See how our work has transformed businesses and partnerships.</h1>
           </div>
         </div>
       </section>
 
-      <section className="work-filter px-5 py-8 bg-white section-light flex justify-between">
+      <section className="work-filter px-5 pt-22 pb-5 bg-white section-light flex justify-between sticky top-0 z-[1]">
         {/*<div className="flex flex-wrap justify-between items-center">*/}
           <input
             type="text"

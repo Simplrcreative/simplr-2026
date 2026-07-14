@@ -75,10 +75,10 @@ export default function Est2014Page() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 bg-coffee section-dark min-h-[80vh] flex items-end relative">
-        <div className="grid grid-cols-12 w-full">
+      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark md:min-h-[80vh] flex flex-col md:items-end">
+        <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back " />
-          <div className="col-start-1 col-span-12 md:col-span-9 text-white change-logo mt-40 max-w-[115ch] ">
+          <div className="col-span-12 lg:col-span-9 text-white change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
             <div className="eyebrow">Beyond the work</div>
             <h1 className="hero-title">Simplr has never <span>just been about the work.</span> It&apos;s about the people, <span><i>the energy,</i></span> and the <span>shared ambition behind it.</span> Not everything we do is visible in the outcome - <span><i>some of it lives here.</i></span></h1>
           </div>
@@ -86,7 +86,7 @@ export default function Est2014Page() {
             <Link 
               to="/about#our-people"
               ref={btnRef}
-              className="btn relative bg-white text-coffee md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
+              className="btn alt relative bg-white text-coffee md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
             >
               <span>Join our team</span>
             </Link>

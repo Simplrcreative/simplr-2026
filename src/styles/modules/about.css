@@ -426,7 +426,7 @@
     --people-mobile-portrait-top: 284px;
     --people-mobile-portrait-size: min(51vw, 200px);
     position: relative;
-    padding: 380px 18px 360px;
+    padding: 6rem 1.25rem;
     overflow: clip;
   }
 

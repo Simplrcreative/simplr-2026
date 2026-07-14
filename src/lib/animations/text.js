@@ -12,6 +12,12 @@ function registerPlugins() {
   }
 }
 
+function isTransitionChrome(element) {
+  return Boolean(
+    element?.closest?.('[data-transition-snapshot], [data-frozen-clone]'),
+  )
+}
+
 export function refreshScrollTriggers() {
   registerPlugins()
   requestAnimationFrame(() => {
@@ -31,14 +37,23 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
     return null
   }
 
+  // TransitionFrame clones leave mid-scrub word colors in the outgoing snapshot.
+  // Re-running SplitText on those nodes flashes full text then resets — skip them.
+  if (isTransitionChrome(element)) {
+    return null
+  }
+
   const customTriggerSelector = element.dataset.splitTrigger
   const trigger = customTriggerSelector
     ? document.querySelector(customTriggerSelector)
     : element.closest(triggerSelector)
 
-  if (!trigger) {
+  if (!trigger || isTransitionChrome(trigger)) {
     return null
   }
+
+  const start = element.dataset.splitStart || 'top 90%'
+  const end = element.dataset.splitEnd || 'top 50%'
 
   const split = SplitText.create(element, { type: 'words' })
   gsap.set(split.words, { color: fromColor })
@@ -52,8 +67,8 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
       immediateRender: false,
       scrollTrigger: {
         trigger,
-        start: 'top 90%',
-        end: 'top 50%',
+        start,
+        end,
         scrub: true,
         invalidateOnRefresh: true,
         refreshPriority: -10,
@@ -86,7 +101,7 @@ export function createSplitTextAnimation() {
    */
   function createLazySplitTextObserver(elementSelector, triggerSelector, fromColor, toColor) {
     const elements = Array.from(document.querySelectorAll(elementSelector))
-      .filter((el) => !initializedElements.has(el))
+      .filter((el) => !initializedElements.has(el) && !isTransitionChrome(el))
 
     if (elements.length === 0) {
       return false
@@ -96,6 +111,10 @@ export function createSplitTextAnimation() {
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting || disposed) return
+          if (isTransitionChrome(entry.target)) {
+            observer.unobserve(entry.target)
+            return
+          }
           const instance = initializeSplitTextForElement(
             entry.target,
             triggerSelector,
@@ -119,6 +138,9 @@ export function createSplitTextAnimation() {
 
   function scanForSplitText() {
     if (disposed) return
+    // Transition clones are ignored via isTransitionChrome; still skip while the
+    // overlay is mutating the DOM so we don't work against the handoff.
+    if (document.documentElement.classList.contains('page-transitioning')) return
 
     if (needsWhiteObserver) {
       needsWhiteObserver = !createLazySplitTextObserver(
@@ -143,15 +165,22 @@ export function createSplitTextAnimation() {
     if (!needsWhiteObserver && !needsCoffeeObserver && mutationObserver) {
       // Re-arm flags if uninitialized targets still exist in the document.
       needsWhiteObserver = Array.from(document.querySelectorAll('.split-text'))
-        .some((el) => !initializedElements.has(el))
+        .some((el) => !initializedElements.has(el) && !isTransitionChrome(el))
       needsCoffeeObserver = Array.from(document.querySelectorAll('.split-text-coffee'))
-        .some((el) => !initializedElements.has(el))
+        .some((el) => !initializedElements.has(el) && !isTransitionChrome(el))
 
       if (!needsWhiteObserver && !needsCoffeeObserver) {
         mutationObserver.disconnect()
         mutationObserver = null
       }
     }
+  }
+
+  function onTransitionComplete() {
+    if (disposed) return
+    needsWhiteObserver = true
+    needsCoffeeObserver = true
+    scanForSplitText()
   }
 
   function createLazyMountObserver() {
@@ -165,10 +194,10 @@ export function createSplitTextAnimation() {
         // Always re-check — ClientLogos / deferred home content can mount late,
         // including on return visits when the lazy chunk is already cached.
         needsWhiteObserver = Array.from(document.querySelectorAll('.split-text'))
-          .some((el) => !initializedElements.has(el))
+          .some((el) => !initializedElements.has(el) && !isTransitionChrome(el))
           || needsWhiteObserver
         needsCoffeeObserver = Array.from(document.querySelectorAll('.split-text-coffee'))
-          .some((el) => !initializedElements.has(el))
+          .some((el) => !initializedElements.has(el) && !isTransitionChrome(el))
           || needsCoffeeObserver
         scanForSplitText()
       })
@@ -181,16 +210,34 @@ export function createSplitTextAnimation() {
   needsCoffeeObserver = true
   scanForSplitText()
   createLazyMountObserver()
+  window.addEventListener('page-transition:complete', onTransitionComplete)
 
   return () => {
     disposed = true
     observers.forEach((obs) => obs.disconnect())
     mutationObserver?.disconnect()
     mutationObserver = null
+    window.removeEventListener('page-transition:complete', onTransitionComplete)
+    const isTransitioning = document.documentElement.classList.contains('page-transitioning')
+
     splitTextInstances.forEach(({ element, tween, split }) => {
-      tween.scrollTrigger?.kill()
+      // Bake current mid-scrub colors before killing so GSAP revert cannot flash
+      // full inherited text color on the live page under the overlay.
+      split?.words?.forEach((word) => {
+        word.style.color = getComputedStyle(word).color
+      })
+
+      // kill(revert=false, allowAnimation=true) — leave mid-scrub word colors
+      // as they are; do not reset back to start values.
+      tween.scrollTrigger?.kill(false, true)
       tween.kill()
-      split?.revert?.()
+
+      // Revert only when staying on the page. During route transitions the node
+      // is unmounting; split.revert() unwraps words and briefly shows full text.
+      if (!isTransitioning) {
+        split?.revert?.()
+      }
+
       initializedElements.delete(element)
     })
   }

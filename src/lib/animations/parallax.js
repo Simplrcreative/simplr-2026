@@ -158,7 +158,6 @@ function createParallaxFillAnimations(scope) {
   const media = gsap.matchMedia()
 
   media.add('(prefers-reduced-motion: no-preference)', () => {
-    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
     const cleanups = []
 
     containers.forEach((container) => {
@@ -179,6 +178,8 @@ function createParallaxFillAnimations(scope) {
       const build = () => {
         timeline?.scrollTrigger?.kill()
         timeline?.kill()
+
+        const isDesktop = window.matchMedia('(min-width: 1024px)').matches
 
         gsap.set(mediaEl, {
           display: 'block',
@@ -213,9 +214,10 @@ function createParallaxFillAnimations(scope) {
 
         // Static end values (captured at rest). Function values + refresh were
         // remeasuring the scaled element and wiping the fill on the way back up.
+        // Mobile: keep y at 0 so the fill only expands on x/scale.
         timeline.to(mediaEl, {
           x: metrics.x,
-          y: metrics.y,
+          y: isDesktop ? metrics.y : 0,
           scale: metrics.scale,
           borderRadius: '0px',
           duration: 1,
