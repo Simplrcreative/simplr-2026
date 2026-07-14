@@ -567,7 +567,7 @@
     top: 272px;
     height: calc(100vh - 272px);
     max-height: calc(100vh - 272px);
-    padding: 32px 24px 42px;
+    padding: 1.25rem;
     color: var(--people-mobile-ink);
     background: linear-gradient(180deg, rgba(48, 15, 29, 0.74), var(--color-coffee) 32%);
     transform: translateY(105%);
@@ -584,20 +584,12 @@
     padding-right: 2.5rem;
   }
 
-  .people-mobile .detail-role {
-    margin: 0 0 10px;
-    color: var(--people-mobile-active);
-    font-size: 12px;
-    font-weight: 750;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
+  
 
   .people-mobile .detail-name {
-    margin: 0;
     max-width: 12ch;
     font-family: var(--font-literata);
-    font-size: clamp(2.2rem, 14vw, 3.3rem);
+    font-size: clamp(2rem, 14vw, 2.5rem);
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0;
@@ -605,9 +597,16 @@
 
   .people-mobile .detail-exp,
   .people-mobile .detail-linkedin {
-    margin: 12px 0 0;
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 0.875rem;
+    line-height: 1;
+  }
+
+  .people-mobile .detail-role {
+    color: var(--people-mobile-active);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 1;
   }
 
   .people-mobile .detail-linkedin {
@@ -618,19 +617,16 @@
   .people-mobile .detail-bio-scroll {
     flex: 1;
     min-height: 0;
-    margin-top: 24px;
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
-    padding-right: 0.25rem;
   }
 
   .people-mobile .detail-bio {
-    max-width: 33ch;
-    color: rgba(255, 248, 245, 0.84);
-    font-size: 18px;
-    line-height: 1.48;
+    color: white;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .people-mobile .detail-bio p + p {
@@ -639,20 +635,19 @@
 
   .people-mobile .close-button {
     position: absolute;
-    top: 18px;
-    right: 18px;
-    width: 42px;
-    height: 42px;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 2.5rem;
+    height: 2.5rem;
     /*border: 1px solid rgba(255, 248, 245, 0.28);*/
     border-radius: 999px;
-    /*background: rgba(255, 248, 245, 0.08);*/
     cursor: pointer;
   }
 
   .people-mobile .close-button span {
     position: absolute;
-    left: 11px;
-    right: 11px;
+    left: 12px;
+    right: 12px;
     top: 20px;
     height: 1px;
     background: white;

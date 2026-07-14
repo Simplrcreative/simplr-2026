@@ -5,13 +5,63 @@ import Seo from '../components/Seo.jsx'
 import { buildWorkSingleSeo } from '../lib/page-seo.js'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
-import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll, refreshScrollTriggers } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
 import { initSlider } from '../lib/slider.js'
 import { buildCollectionPath, buildEntryPath, getMediaSourceUrl } from '../lib/wp-api.js'
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large') {
   return getMediaSourceUrl(acfFeaturedThumbnail, preferredSize)
+}
+
+function getMediaDimensions(media) {
+  const node = media?.node ?? media
+  const width = Number(node?.mediaDetails?.width)
+  const height = Number(node?.mediaDetails?.height)
+  if (!(width > 0 && height > 0)) return null
+  return { width, height }
+}
+
+/** Padding-top % for `.ratio` so space is reserved before the image/file loads. */
+function getMediaAspectPadding(media, fallback = '90%') {
+  const dims = getMediaDimensions(media)
+  if (!dims) return fallback
+  return `${(dims.height / dims.width) * 100}%`
+}
+
+function WorkMediaFrame({ media, sticky = false, children }) {
+  // Sticky frames already get a fixed viewport height via `.full-image.sticky`.
+  if (sticky) return children
+
+  const padding = getMediaAspectPadding(media)
+  return (
+    <div
+      className="ratio overflow-hidden rounded-[10px]"
+      style={{
+        '--aspect-ratio-desktop': padding,
+        '--aspect-ratio-mobile': padding,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function WorkContentImage({ media, sticky = false, loaderSrc, mobileSrc, desktopSrc, altText }) {
+  const dims = getMediaDimensions(media)
+  return (
+    <WorkMediaFrame media={media} sticky={sticky}>
+      <PictureImg
+        loaderSrc={loaderSrc}
+        mobileSrc={mobileSrc}
+        desktopSrc={desktopSrc}
+        altText={altText}
+        width={dims?.width}
+        height={dims?.height}
+        pictureClass={`full-image${sticky ? ' overflow-hidden rounded-[10px] sticky' : ''}`}
+      />
+    </WorkMediaFrame>
+  )
 }
 
 function getSliderSource(image) {
@@ -280,12 +330,30 @@ export default function WorkSinglePage() {
     const cleanupNextWork = createNextWorkAnimation()
     const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
     const sliderCleanups = Array.from(document.querySelectorAll('.slider')).map((el) => initSlider(el))
+
+    // Late-loading images can still nudge layout (fonts, sticky, etc.).
+    // Debounced refresh keeps footer-off ScrollTrigger start positions honest.
+    let refreshTimer = 0
+    const scheduleRefresh = () => {
+      window.clearTimeout(refreshTimer)
+      refreshTimer = window.setTimeout(() => refreshScrollTriggers(), 120)
+    }
+    const onMediaLoad = (event) => {
+      const target = event.target
+      if (!(target instanceof HTMLImageElement) && !(target instanceof HTMLVideoElement)) return
+      if (!target.closest?.('.work-content, .featured-image, .next-work')) return
+      scheduleRefresh()
+    }
+    document.addEventListener('load', onMediaLoad, true)
+
     return () => {
       cleanupSplitText?.()
       cleanupWorkImages?.()
       cleanupNextWork?.()
       cleanupWorkThumbHover?.()
       sliderCleanups.forEach((cleanup) => cleanup?.())
+      document.removeEventListener('load', onMediaLoad, true)
+      window.clearTimeout(refreshTimer)
     }
   }, [sections])
 
@@ -473,12 +541,13 @@ export default function WorkSinglePage() {
                         className={sticky1 ? 'sticky' : ''}
                       />
                     ) : (
-                      <PictureImg
+                      <WorkContentImage
+                        media={section?.acfImage1}
+                        sticky={sticky1}
                         loaderSrc={fImage1Loader}
                         mobileSrc={fImage1Mobile}
                         desktopSrc={fImage1}
                         altText={altText1}
-                        pictureClass={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}
                       />
                     )}
                   </div>
@@ -510,12 +579,13 @@ export default function WorkSinglePage() {
                         className={sticky1 ? 'sticky' : ''}
                       />
                     ) : (
-                      <PictureImg
+                      <WorkContentImage
+                        media={section?.acfImage1}
+                        sticky={sticky1}
                         loaderSrc={fImage1Loader}
                         mobileSrc={fImage1Mobile}
                         desktopSrc={fImage1}
                         altText={altText1}
-                        pictureClass={`full-image overflow-hidden rounded-[10px] ${sticky1 ? 'sticky' : ''}`}
                       />
                     )}
                   </div>
@@ -528,12 +598,13 @@ export default function WorkSinglePage() {
                         className={sticky2 ? 'sticky' : ''}
                       />
                     ) : (
-                      <PictureImg
+                      <WorkContentImage
+                        media={section?.acfImage2}
+                        sticky={sticky2}
                         loaderSrc={fImage2Loader}
                         mobileSrc={fImage2Mobile}
                         desktopSrc={fImage2}
                         altText={altText2}
-                        pictureClass={`full-image overflow-hidden rounded-[10px] ${sticky2 ? 'sticky' : ''}`}
                       />
                     )}
                   </div>
@@ -551,12 +622,12 @@ export default function WorkSinglePage() {
                       clickToPlay={clickToPlayVideo1}
                     />
                   ) : (
-                    <PictureImg
+                    <WorkContentImage
+                      media={section?.acfImage1}
                       loaderSrc={fImage1Loader}
                       mobileSrc={fImage1Mobile}
                       desktopSrc={fImage1}
                       altText={altText1}
-                      pictureClass="full-image overflow-hidden rounded-[10px]"
                     />
                   )}
                 </div>
@@ -645,6 +716,7 @@ export default function WorkSinglePage() {
                   data-card-key={nextWork.slug}
                   data-transition-source="media"
                   data-transition-variant="work-next"
+                  data-transition-snapshot-state="hover"
                 >
                   <div className="ratio overflow-hidden overflow-hidden rounded-[10px] thumb-swap" style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}>
                     <PictureImg
@@ -652,14 +724,14 @@ export default function WorkSinglePage() {
                       mobileSrc={nextMobileSrc}
                       desktopSrc={nextDesktopSrc}
                       imgClass='thumb-primary rounded-[10px]'
-                      altText={nextThumbAlt}
+                      altText=''
                     />
                     <PictureImg
                       loaderSrc={nextLoader2Src}
                       mobileSrc={nextMobile2Src}
                       desktopSrc={nextDesktop2Src}
                       imgClass='thumb-secondary rounded-[10px]'
-                      altText=''
+                      altText={nextThumbAlt}
                     />
                   </div>
             

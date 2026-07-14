@@ -876,9 +876,14 @@ export default function TransitionFrame({ children }) {
             const variant = altSource.closest('[data-transition-variant]')?.dataset.transitionVariant
               ?? nav.link?.dataset?.transitionVariant
               ?? null
+            // Work cards + next-case-study both dock the hover (secondary) thumb
+            // to the incoming featured image, which also renders that secondary asset.
+            const preferSecondaryThumb = forceHoverSnapshot && (
+              variant === 'work-card' || variant === 'work-next'
+            )
             const clone = createTransitionClone(altSource, {
               forceHover: forceHoverSnapshot,
-              preferSecondaryImage: forceHoverSnapshot && variant === 'work-card',
+              preferSecondaryImage: preferSecondaryThumb,
             })
 
             if (isCaseStudy) {
@@ -905,7 +910,7 @@ export default function TransitionFrame({ children }) {
               pathname: normalizePathname(nav.url.pathname),
               variant,
               mediaKind: hasVideoSource ? 'video' : 'image',
-              mediaSelector: forceHoverSnapshot && variant === 'work-card'
+              mediaSelector: preferSecondaryThumb
                 ? '.thumb-secondary, img, canvas, video'
                 : 'img, canvas, video',
               dockSelector: nav.link?.dataset?.transitionDockSelector || null,
@@ -1606,10 +1611,10 @@ export default function TransitionFrame({ children }) {
       const dock = getDockRect(dockSelector)
       const hasTargetAtStart = Boolean(dock)
       const isVideoTransition = altTransition?.mediaKind === 'video'
-      const smoothEase = 'power3.inOut'
+      const smoothEase = 'power2.inOut'
       const expandDuration = 0.75
-      const pauseDuration = 0
-      const dockDuration = 1.15
+      const pauseDuration = 0.1
+      const dockDuration = 1.5
       const dockStart = expandDuration + pauseDuration
       const width = window.innerWidth * 1.1
       // Mobile (< md): height-driven expansion so the clone fills the viewport height.
@@ -1664,7 +1669,6 @@ export default function TransitionFrame({ children }) {
       tl.to(altClone, {
         top: expandedTop,
         left: expandedLeft,
-        //filter: 'blur(10px)',
         width: expandedWidth,
         height: expandedHeight,
         borderRadius: 0,
@@ -1792,7 +1796,8 @@ export default function TransitionFrame({ children }) {
           }
 
           tl.to(altCloneMedia, {
-            scale: peakMediaScale,
+            scale: peakMediaScale * 1.2,
+            //rotate: 2,
             transformOrigin: '50% 50%',
             duration: expandDuration,
             ease: smoothEase,
@@ -1800,6 +1805,7 @@ export default function TransitionFrame({ children }) {
 
           tl.to(altCloneMedia, {
             scale: dockMediaScale,
+            //rotate: 0,
             transformOrigin: '50% 50%',
             duration: dockDuration,
             ease: smoothEase,
@@ -1807,12 +1813,11 @@ export default function TransitionFrame({ children }) {
         }
 
         tl.to(altClone, {
-          //filter: 'blur(0px)',
           top: dock.rect.top,
           left: dock.rect.left,
           width: dock.rect.width,
           height: dock.rect.height,
-          rotate: 0,
+          //rotate: 0,
           borderRadius: getComputedStyle(dock.target).borderRadius || altTransition.borderRadius,
           duration: dockDuration,
           ease: smoothEase,

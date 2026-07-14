@@ -139,23 +139,24 @@ export default function PeopleSectionMobile({ people = [] }) {
         {detailPerson ? (
           <>
             <div className="detail-panel__header">
-              <p className="detail-role">{detailPerson.acfRole}</p>
-              <h2 className="detail-name">{detailPerson.acfName}</h2>
-              {detailPerson.acfExperience ? (
+              
+              <h2 className="detail-name mb-5">{detailPerson.acfName}</h2>
+              <p className="detail-role mb-2">{detailPerson.acfRole}</p>
+              {/*{detailPerson.acfExperience ? (
                 <p className="detail-exp">{detailPerson.acfExperience} years exp.</p>
-              ) : null}
+              ) : null}*/}
               {detailPerson.acfLinkedIn ? (
                 <a
                   href={`https://www.linkedin.com/in/${detailPerson.acfLinkedIn}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="detail-linkedin"
+                  className="detail-linkedin mb-10 block"
                 >
                   LinkedIn
                 </a>
               ) : null}
             </div>
-            <div className="detail-bio-scroll" data-lenis-prevent>
+            <div className="detail-bio-scroll pe-2 pb-15" data-lenis-prevent>
               <div
                 className="detail-bio"
                 dangerouslySetInnerHTML={{ __html: detailPerson.acfBio ?? '' }}

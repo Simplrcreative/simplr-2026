@@ -452,6 +452,8 @@ const workByUriQuery = `
                 altText
                 mimeType
                 mediaDetails {
+                  width
+                  height
                   sizes {
                     name
                     sourceUrl
@@ -465,6 +467,8 @@ const workByUriQuery = `
                 altText
                 mimeType
                 mediaDetails {
+                  width
+                  height
                   sizes {
                     name
                     sourceUrl

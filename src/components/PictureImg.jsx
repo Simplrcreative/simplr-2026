@@ -1,6 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText = '', imgClass = '', pictureClass = '', lazyLoad = true, attributes = {} }) {
+export default function PictureImg({
+  loaderSrc,
+  mobileSrc,
+  desktopSrc,
+  altText = '',
+  imgClass = '',
+  pictureClass = '',
+  lazyLoad = true,
+  width,
+  height,
+  attributes = {},
+}) {
 
     const [isIntersecting, setIsIntersecting] = useState(!lazyLoad);
     const [isFullLoaded, setIsFullLoaded] = useState(false);
@@ -61,6 +72,8 @@ export default function PictureImg({ loaderSrc, mobileSrc, desktopSrc, altText =
                 src={loaderSrc}
                 alt={altText}
                 className={imgClass}
+                width={width || undefined}
+                height={height || undefined}
                 onLoad={handleLoad}
                 style={imgStyle}
             />
