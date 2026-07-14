@@ -191,6 +191,11 @@
   font-size: 1rem;
   line-height: 1.2rem;
 }
+.text-box {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
 
 @media (min-width: 768px) {
   .work-type {
@@ -198,6 +203,10 @@
     padding: 0 1.5rem 0 0;
     font-size: 0.75rem;
     padding: 7px 14px 7.5px 14px
+  }
+  .text-box {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
   /*.work-type::after {
     left: auto;
