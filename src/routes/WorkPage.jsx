@@ -211,7 +211,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card__meta mt-3">
       <h3 className="work-card__title">{cardTitle}</h3>
       {categories.length > 0 && (
-        <div className="work-card__categories mt-3 flex flex-wrap">
+        <div className="work-card__categories gap-1 mt-3 flex flex-wrap">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
         </div>
       )}
@@ -273,7 +273,7 @@ function WorkFeatured({ work, cardKey }) {
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{cardTitle}</h3>
         {categories.length > 0 && (
-          <div className="work-card__categories mt-3 flex flex-wrap">
+          <div className="work-card__categories gap-1 mt-3 flex flex-wrap">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
           </div>
         )}
@@ -355,7 +355,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             </div>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
-              <div className="categories mt-3 flex flex-wrap">
+              <div className="categories mt-3 flex flex-wrap gap-1">
                 {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
               </div>
             )}
@@ -638,17 +638,17 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section className="work-filter px-5 py-8 bg-white section-light flex justify-end">
+      <section className="work-filter px-5 py-8 bg-white section-light flex justify-between">
         {/*<div className="flex flex-wrap justify-between items-center">*/}
           <input
             type="text"
             value={keywordFilter}
             onChange={(event) => setKeywordFilter(event.target.value)}
             placeholder="Keyword search"
-            className="work-filter-btn min-w-[12rem]"
+            className="work-filter-btn min-w-[12rem] hidden lg:block"
             aria-label="Filter work by title"
           />
-          <div className="flex flex-wrap gap-0 items-center">
+          <div className="flex flex-wrap gap-1 items-center">
           {FILTERS.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
             return (

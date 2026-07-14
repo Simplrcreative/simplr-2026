@@ -222,25 +222,25 @@ export default function ServicesSinglePage() {
       <div className="bottom-menu hidden md:block fixed z-10 right-5 bottom-5">
         <Link
           to={buildEntryPath('services', 'strategy')}
-          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'strategy') ? 'border-strategy bg-strategy text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          className={`category border leading-none font-medium rounded-full me-1 ${pathname === buildEntryPath('services', 'strategy') ? 'border-strategy bg-strategy text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Strategy
         </Link>
         <Link
           to={buildEntryPath('services', 'branding-design')}
-          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'branding-design') ? 'border-branding-design bg-branding-design text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          className={`category border leading-none font-medium rounded-full me-1 ${pathname === buildEntryPath('services', 'branding-design') ? 'border-branding-design bg-branding-design text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Branding & Design
         </Link>
         <Link
           to={buildEntryPath('services', 'web-design-development')}
-          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'web-design-development') ? 'border-web-design-development bg-web-design-development text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          className={`category border leading-none font-medium rounded-full me-1 ${pathname === buildEntryPath('services', 'web-design-development') ? 'border-web-design-development bg-web-design-development text-coffee pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Web Design & Development
         </Link>
         <Link
           to={buildEntryPath('services', 'motion')}
-          className={`category border leading-none font-medium rounded-full ${pathname === buildEntryPath('services', 'motion') ? 'border-motion bg-motion text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
+          className={`category border leading-none font-medium rounded-full me-1 ${pathname === buildEntryPath('services', 'motion') ? 'border-motion bg-motion text-white pointer-events-none' : 'border-coffee bg-white text-coffee'}`}
         >
         Motion
         </Link>
@@ -252,17 +252,17 @@ export default function ServicesSinglePage() {
         </Link>
       </div>
 
-      <section className="page-hero parallax-fill-section relative w-full px-5 py-5 md:pt-0 md:pb-5 bg-white section-light min-h-[80vh] md:min-h-screen flex flex-col md:justify-end">
+      <section className="page-hero parallax-fill-section relative w-full px-5 py-5 md:pt-0 md:pb-5 bg-white section-light min-h-[90vh] md:min-h-screen flex flex-col justify-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee change-logo mt-40__ mb-12__ md:mb-0 change-logo">
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee change-logo mt-40 lg:mt-0 mb-12 lg:mb-0 change-logo">
             <div className="service-card__label mb-10 md:mb-5">
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
             </div>
             <h1 className="service-card__title">{acfHeading}</h1>
           </div>
-          <div className="col-start-1 md:col-start-2 lg:col-start-8 col-span-12 md:col-span-11 lg:col-span-5">
+          <div className="col-start-1 col-span-12 md:col-start-2__ md:col-span-11__ lg:col-start-8 lg:col-span-5">
             <div className="featured-image">
               {featuredVideo ? (
                   <div

@@ -77,7 +77,6 @@
 .work-card__categories {
   display: flex;
   flex-wrap: wrap;
-  gap: 0;
 }
 
 @media (max-width: 900px) {
