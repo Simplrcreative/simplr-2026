@@ -488,11 +488,11 @@ export default function WorkSinglePage() {
               {layout === 'Two Text Boxes' && (
                 <>
                 {/* TWO TEXT BOXES SECTION */}
-                  <div className={`col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
+                  <div className={`col-span-12 md:col-span-5 lg:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
                     <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   
-                  <div className={`col-start-1 md:col-start-9 col-span-12 md:col-span-4 flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
+                  <div className={`col-start-1 col-span-12 md:col-start-8 md:col-span-5 lg:col-start-9 lg:col-span-4 flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
                     <RichText html={content2} className={`split-text-coffee text-box ${stickyText2 ? 'sticky-text' : ''}`} />
                   </div>
                   {/* END TWO TEXT BOXES SECTION */}
@@ -613,7 +613,7 @@ export default function WorkSinglePage() {
       {testimonial && (
         <section className="work-testimonial px-5 py-5 md:pt-40 md:pb-20">
           <div className="grid grid-cols-12">
-            <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-4 md:ps-2 slide-up-subtle">
+            <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-7 lg:col-span-4 md:ps-2 slide-up-subtle">
               {testimonial.acfTestimonials?.acfTestimonial && (
                 <blockquote
                   className="testimonial-quote mb-5 md:mb-10"

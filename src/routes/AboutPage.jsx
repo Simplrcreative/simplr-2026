@@ -208,7 +208,7 @@ export default function AboutPage() {
       <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark min-h-[80vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 md:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
+          <div className="col-span-12 lg:col-span-6 text-white change-logo mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
             {aboutContent?.acfLandingHeading && (
               <h1
@@ -222,7 +222,7 @@ export default function AboutPage() {
 
       <section className="px-5 bg-coffee section-dark">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-5 text-white md:pt-20 ">
+          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-4 lg:col-span-5 text-white md:pt-20 ">
             {aboutContent?.acfLandingLead && (
               <div
                 className="lead split-text trigger-split-text"
@@ -372,7 +372,7 @@ export default function AboutPage() {
 
       <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden slide-up-subtle">
         <div className="grid grid-cols-12 gap-x-5 w-full">
-          <div className="col-start-1 col-span-12 md:col-start-1 md:col-span-3 lead text-white">
+          <div className="col-start-1 col-span-12 md:col-start-1 md:col-span-3 mb-5 md:mb-0 lead text-white">
             Three core principles
           </div>
           <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-9">
@@ -405,7 +405,7 @@ export default function AboutPage() {
           <div className="col-start-1 col-span-12">
             <div className="lead split-text mb-5 text-white">Our values</div>
           </div>
-          <div className="col-start-1 col-span-12 md:col-span-4 text-white">
+          <div className="col-start-1 col-span-12 md:col-span-6 lg:col-span-5 text-white">
             {values.map((value, index) => (
               <div key={`${value?.acfValue ?? 'value'}-${index}`} className="flex gap-5 align-center mb-4">
                 <div className="font-literata flex flex-col items-center justify-center opacity-90">
@@ -420,7 +420,7 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
-          <div className="col-start-1 col-span-12 md:col-start-5 md:col-span-6 relative">
+          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-5 lg:col-span-6 relative">
             {values.map((value, index) => {
               const isActive = activeValueIndex === index
               const isOff = offValueIndex === index

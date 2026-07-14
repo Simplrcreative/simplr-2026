@@ -377,9 +377,8 @@
 .bullet-body {
   display: flex;
   flex-direction: column;
-  gap: 1.875rem;
-  height: 28rem;
-  padding: 1.56rem;
+  gap: 1.25rem;
+  padding: 1.25rem;
   border-radius: 0.625rem;
 }
 
@@ -409,6 +408,11 @@
 @media (min-width: 768px) {
   .people-mobile {
     display: none;
+  }
+}
+@media (min-width: 1280px) {
+  .bullet-body {
+    min-height: 22rem;
   }
 }
 
@@ -702,7 +706,7 @@
 
 @media (max-width: 1023.9px) {
   .bullet-item {
-    margin-bottom: 4.125rem;
+    margin-bottom: 1.25rem;
   }
 }
 
