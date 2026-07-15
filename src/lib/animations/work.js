@@ -163,6 +163,8 @@ export function createWorkThumbHoverAnimation(scope = document) {
   const cleanups = []
 
   triggers.forEach((trigger) => {
+    if (trigger.closest('.case-studies')) return
+
     const picture = trigger.querySelector('.thumb-swap')
     if (!picture) return
 

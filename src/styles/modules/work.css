@@ -1,5 +1,10 @@
 /* ---- WORK FILTER ---- */
-
+.work-filter, 
+.post-filter {
+  width: calc(100% - 2.5rem);
+  left: 1.25rem;
+  border-radius: 0 0 10px 10px;
+}
 .work-filter-btn {
   font-family: var(--font-aeonik);
   font-size: 0.75rem;
@@ -39,7 +44,7 @@
 
 .thumb-swap .thumb-primary,
 .thumb-swap .thumb-secondary {
-  transition: opacity 0.45s ease;
+  transition: opacity 0.45s ease, filter 0.6s ease !important;
 }
 
 .thumb-swap .thumb-primary {
