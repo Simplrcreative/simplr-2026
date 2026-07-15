@@ -198,7 +198,7 @@
 }
 .text-box.sticky-text {
   position: sticky;
-  top: calc(100% - var(--sticky-text-offset) - 5rem);
+  top: calc(100% - var(--sticky-text-offset) - 2.5rem);
 }
 @media (min-width: 768px) {
   .work-type {
@@ -210,6 +210,9 @@
   .text-box {
     font-size: 1.125rem;
     line-height: 1.75rem;
+  }
+  .text-box.sticky-text {
+    top: calc(100% - var(--sticky-text-offset) - 5rem);
   }
   /*.work-type::after {
     left: auto;
