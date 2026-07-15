@@ -5,7 +5,7 @@ import Seo from '../components/Seo.jsx'
 import { buildWorkSingleSeo } from '../lib/page-seo.js'
 import RichText from '../components/RichText.jsx'
 import CategoryBadge from '../components/CategoryBadge.jsx'
-import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, lockScroll, unlockScroll, refreshScrollTriggers } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createWorkImagesAnimation, createSlideUpAnimations, createNextWorkAnimation, createWorkThumbHoverAnimation, createTestimonialDotAnimation, lockScroll, unlockScroll, refreshScrollTriggers } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
 import { initSlider } from '../lib/slider.js'
 import { buildCollectionPath, buildEntryPath, getMediaSourceUrl } from '../lib/wp-api.js'
@@ -342,6 +342,7 @@ export default function WorkSinglePage() {
     const cleanupWorkImages = createWorkImagesAnimation()
     const cleanupNextWork = createNextWorkAnimation()
     const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
+    const cleanupTestimonial = createTestimonialDotAnimation()
     const sliderCleanups = Array.from(document.querySelectorAll('.slider')).map((el) => initSlider(el))
 
     // Late-loading images can still nudge layout (fonts, sticky, etc.).
@@ -364,6 +365,7 @@ export default function WorkSinglePage() {
       cleanupWorkImages?.()
       cleanupNextWork?.()
       cleanupWorkThumbHover?.()
+      cleanupTestimonial?.()
       sliderCleanups.forEach((cleanup) => cleanup?.())
       document.removeEventListener('load', onMediaLoad, true)
       window.clearTimeout(refreshTimer)
@@ -705,20 +707,23 @@ export default function WorkSinglePage() {
         <section className="work-testimonial px-5 py-5 md:pt-40 md:pb-20">
           <div className="grid grid-cols-12">
             <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-7 lg:col-span-4 md:ps-2 slide-up-subtle">
-              {testimonial.acfTestimonials?.acfTestimonial && (
-                <blockquote
-                  className="testimonial-quote mb-5 md:mb-10"
-                  dangerouslySetInnerHTML={{ __html: testimonial.acfTestimonials.acfTestimonial }}
-                />
-              )}
-              <cite className="testimonial-cite">
-                <strong>{testimonial.acfTestimonials?.acfName || testimonial.title}</strong>
-                {testimonial.acfTestimonials?.acfRole && (
-                  <>
-                  <br/><span className="testimonial-role">{testimonial.acfTestimonials.acfRole}</span>
-                  </>
+              <div className="testimonial lead">
+                <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>
+                {testimonial.acfTestimonials?.acfTestimonial && (
+                  <div 
+                    className="mb-5 md:mb-10 xl:mb-20 text-bold"
+                    dangerouslySetInnerHTML={{ __html: testimonial.acfTestimonials.acfTestimonial }}
+                  />
                 )}
-              </cite>
+                <p>
+                  <b>{testimonial.acfTestimonials?.acfName || testimonial.title}</b>
+                  {testimonial.acfTestimonials?.acfRole && (
+                    <>
+                    <br/><span className="testimonial-role">{testimonial.acfTestimonials.acfRole}</span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
         </section>
