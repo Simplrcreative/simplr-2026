@@ -6,7 +6,7 @@ import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation, createTestimonialDotAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, fetchTestimonialData, fetchWorksData, getMediaSourceUrl } from '../lib/wp-api.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -211,7 +211,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card__meta mt-3">
       <h3 className="work-card__title">{cardTitle}</h3>
       {categories.length > 0 && (
-        <div className="work-card__categories gap-1 mt-2 flex flex-wrap">
+        <div className="work-card__categories gap-1 mt-2 hidden xl:flex flex-wrap">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
         </div>
       )}
@@ -273,7 +273,7 @@ function WorkFeatured({ work, cardKey }) {
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{cardTitle}</h3>
         {categories.length > 0 && (
-          <div className="work-card__categories gap-1 mt-2 flex flex-wrap">
+          <div className="work-card__categories gap-1 mt-2 hidden xl:flex flex-wrap">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
           </div>
         )}
@@ -355,7 +355,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             </div>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
-              <div className="categories mt-3 flex flex-wrap gap-1">
+              <div className="categories mt-3 hidden xl:flex flex-wrap gap-1">
                 {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
               </div>
             )}
@@ -515,6 +515,8 @@ export default function WorkPage() {
       cleanupSlideUpAnimations?.()
     }
   }, [])
+
+  useEffect(() => createTestimonialDotAnimation(), [])
 
   useEffect(() => {
     const cleanupSplitText = createSplitTextAnimation()
@@ -695,7 +697,7 @@ export default function WorkPage() {
                     />
                   )}
 
-                  <div id={`work-grid-${n}`} className="work-grid col-start-1 md:col-start-7 col-span-12 md:col-span-6 flex flex-col justify-between">
+                  <div id={`work-grid-${n}`} className="work-grid col-start-1 col-span-12 md:col-start-7 md:col-span-6 flex flex-col justify-between">
                     <div className="work-cards-top work-cards-row md:flex justify-between md:mb-20" style={rowStyle}>
                       {group.gridItems.slice(0, 2).map((work) => (
                         <WorkCard

@@ -86,3 +86,6 @@ h1.large {
         line-height: 2.1875rem;
     }
 }
+.text-bold {
+    font-weight: 500;
+}

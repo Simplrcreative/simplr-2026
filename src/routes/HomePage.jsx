@@ -3,7 +3,7 @@ import { useLoaderData, useOutletContext, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
 import { routeDefinitions } from '../config/site.js'
-import { createHeroScrollAnimation, createServicesScrollAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll, createWorkThumbHoverAnimation } from '../lib/animations/index.js'
+import { createHeroScrollAnimation, createServicesScrollAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll, createWorkThumbHoverAnimation, createTestimonialDotAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, prefetchWorkEntry } from '../lib/wp-api.js'
 import {
   breadcrumbSchema,
@@ -239,6 +239,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   useEffect(() => {
     if (!introComplete) return
     return createSlideUpAnimations(pageRef.current)
+  }, [introComplete])
+
+  useEffect(() => {
+    if (!introComplete) return
+    return createTestimonialDotAnimation()
   }, [introComplete])
 
   // Refresh scroll triggers after animations initialize
@@ -900,9 +905,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
             <div className="testimonial lead max-w-[38ch] mt-5 md:mt-0">
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (
-                  <div className="mb-5 md:mb-10 xl:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
+                  <div className="mb-5 md:mb-10 xl:mb-20 text-bold"><RichText html={testimonialData.acfTestimonial} /></div>
                 ) : (
-                  <p className="mb-5 md:mb-10 xl:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
+                  <div className="mb-5 md:mb-10 xl:mb-20 text-bold">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</div>
                 )}
                 <p><b>{testimonialData?.acfName || testimonial?.title}</b><br/>{testimonialData?.acfRole}</p>
               </div>

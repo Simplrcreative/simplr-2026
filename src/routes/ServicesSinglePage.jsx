@@ -4,7 +4,7 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation, scrollToTopImmediate } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation, scrollToTopImmediate, createTestimonialDotAnimation } from '../lib/animations/index.js'
 import { buildServiceSingleSeo } from '../lib/page-seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -131,6 +131,7 @@ export default function ServicesSinglePage() {
     const cleanupParallax = createParallaxAnimations(pageRef.current)
     const cleanupSplitText = createSplitTextAnimation()
     const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
+    const cleanupTestimonial = createTestimonialDotAnimation()
     refreshScrollTriggers()
 
     return () => {
@@ -138,6 +139,7 @@ export default function ServicesSinglePage() {
       cleanupSplitText?.()
       cleanupParallax?.()
       cleanupWorkThumbHover?.()
+      cleanupTestimonial?.()
     }
   }, [acfSections, testimonial])
 

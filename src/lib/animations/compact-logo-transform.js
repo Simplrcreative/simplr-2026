@@ -1,6 +1,6 @@
 export const COMPACT_LOGO_BREAKPOINTS = {
   tablet: 768,
-  desktop: 1280,
+  desktop: 1024,
 }
 
 const MOBILE = {
@@ -13,20 +13,20 @@ const MOBILE = {
 }
 
 const TABLET = {
-  logoScale: 0.65,
+  logoScale: 0.40,
   logoY: -10,
   logoDuration: 0.5,
-  taglineScale: 0.6,
-  taglineY: -125,
-  taglineX: 60,
+  taglineScale: 0.5,
+  taglineY: -155,
+  taglineX: 55,
 }
 
 const DESKTOP = {
-  logoScale: 0.35,
+  logoScale: 0.431,
   logoY: -10,
   logoDuration: 0.5,
-  taglineScale: 0.55,
-  taglineY: -178,
+  taglineScale: 0.621,
+  taglineY: -176,
   taglineX: 65,
 }
 

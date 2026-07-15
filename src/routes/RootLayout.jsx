@@ -411,6 +411,46 @@ export default function RootLayout() {
   }, [location.pathname, isHomePage, introComplete, cameFromNonHome])
 
   useEffect(() => {
+    let resizeTimer = 0
+    const onOrientationChange = () => {
+      window.clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(() => {
+        const layout = layoutRef.current
+        if (!layout) return
+
+        // Re-derive compact logo values for the new viewport width.
+        const {
+          logoScale,
+          logoY,
+          taglineScale,
+          taglineY,
+          taglineX,
+        } = getCompactLogoTransform()
+
+        // Non-home pages sit in compact state — update the inline values.
+        if (!isHomePage) {
+          gsap.set(layout.querySelector('.logo'), { scale: logoScale, y: logoY })
+          gsap.set(layout.querySelector('.tagline'), { scale: taglineScale, y: taglineY, x: taglineX })
+        }
+
+        // Rebuild the logo scroll / page animation with fresh measurements.
+        destroyLogoRef.current?.()
+        destroyLogoRef.current = isHomePage
+          ? createLogoScrollAnimation(layout)
+          : createLogoPageAnimation(layout)
+      }, 200)
+    }
+
+    window.addEventListener('orientationchange', onOrientationChange)
+    window.addEventListener('resize', onOrientationChange)
+    return () => {
+      window.removeEventListener('orientationchange', onOrientationChange)
+      window.removeEventListener('resize', onOrientationChange)
+      window.clearTimeout(resizeTimer)
+    }
+  }, [isHomePage])
+
+  useEffect(() => {
     return createSmoothScroll()
   }, [])
 
@@ -517,7 +557,7 @@ export default function RootLayout() {
           onPointerDown={requestTransitionCapture}
           onClick={handleLogoTransitionClick}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="52" height="45" viewBox="0 0 54 47">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 54 47">
             <path d="M31.9489 0C30.5211 0.891479 28.9883 1.30007 27.0474 1.30007C25.3848 1.30007 23.4439 1.0153 20.8541 0.557174C19.9641 0.396213 19.0802 0.260015 18.2148 0.154771C25.3909 1.8882 29.8165 5.3303 31.9489 9.21195V0Z"/>
             <path d="M0.111328 33.9941V46.2334C1.71838 45.2862 3.28834 44.7909 4.91394 44.7352C5.10555 44.729 5.30334 44.7228 5.51349 44.7228C7.32451 44.7228 9.61147 44.9952 12.3002 45.54C12.6154 45.6019 12.9368 45.6638 13.2582 45.7196C5.84726 43.689 2.70115 38.7239 0.111328 33.9941Z"/>
             <path d="M24.5075 45.744C27.3879 44.5739 28.8836 42.3885 28.8836 39.2684C28.8836 37.1635 28.0616 35.2939 26.4422 33.7028C24.0996 31.2946 20.8299 29.8955 17.0409 28.2673C16.0087 27.8215 14.9518 27.3696 13.8701 26.8805C11.305 25.7476 8.90059 24.5094 6.96595 23.5189C2.60837 21.1107 0 17.2043 0 13.0688C0 9.46575 1.39072 6.33319 4.14125 3.764C5.89046 2.12343 7.83128 0.990508 9.93281 0.365234C7.91782 1.44863 6.75579 3.40493 6.75579 5.9184C6.75579 12.8336 13.2582 15.2294 20.1376 17.7738C27.7278 20.5783 35.5715 23.4694 35.5715 32.6999C35.5715 36.9159 34.0509 40.1784 30.9357 42.6733C29.0629 44.1344 26.9366 45.1558 24.5137 45.744H24.5075Z" />

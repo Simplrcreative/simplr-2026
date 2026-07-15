@@ -542,7 +542,7 @@ export default function WorkSinglePage() {
                 <>
                 {/* IMAGE & TEXT SECTION */}
                   <div className={`col-span-12 md:col-span-4 ${txtOrder} ${stickyText1 ? '' : 'flex flex-col justify-end'} trigger-split-text-coffee`}>
-                    <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : 'my-[2.5rem] lg:my-[5rem]'}`}/>
+                    <RichText html={content} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
                     {video1 ? (
