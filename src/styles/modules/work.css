@@ -52,6 +52,15 @@
   z-index: 2;
 }
 
+@media (hover: none), (pointer: coarse) {
+  .thumb-swap .thumb-primary {
+    opacity: 0;
+  }
+  .thumb-swap .thumb-secondary {
+    opacity: 1;
+  }
+}
+
 .thumb-swap-trigger.hover-active .thumb-primary,
 .thumb-swap-trigger[data-transition-hover='true'] .thumb-primary,
 .thumb-swap.hover-active .thumb-primary,

@@ -768,7 +768,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </Link>
       </section>
 
-      <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming xl:min-h-screen">
+      <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
           <div className="grid grid-cols-12 items-emd slide-up md:pt-10">
             <div className="col-start-1 col-span-12 md:col-span-5 xl:col-span-6 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
@@ -797,7 +797,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 )
               })}
             </div>
-            <div className="col-start-1 col-span-12 md:col-start-6 md:col-span-7 xl:col-start-8 xl:col-span-5 order-1 md:order-2 client-work-list xl:min-h-screen rounded-[10px] flex flex-col justify-center">
+            <div className="col-start-1 col-span-12 md:col-start-6 md:col-span-7 xl:col-start-8 xl:col-span-5 order-1 md:order-2 client-work-list min-h-screen rounded-[10px] flex flex-col justify-center">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 
@@ -969,7 +969,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
               <div className="md:col-span-6 xl:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[20rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-coffee">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[16rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

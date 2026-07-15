@@ -379,7 +379,7 @@ export default function WorkSinglePage() {
           <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-50 mb-5 md:my-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
-              <h1 className="hero-title"><span>{title}</span></h1>
+              <h1 className="hero-title mb-10"><span>{title}</span></h1>
             </div>
             <div className="max-w-[80%] pt-5 lg:pt-0">
               {categories.length > 0 && (

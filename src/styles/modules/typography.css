@@ -1,6 +1,6 @@
 h1, h2, h3, h4, h5 {
     font-family: var(--font-literata);
-    line-height: 1.2;
+    line-height: 1.1;
     font-optical-sizing: auto;
     font-weight: 400
 }
