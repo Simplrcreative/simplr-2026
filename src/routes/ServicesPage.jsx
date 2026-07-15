@@ -192,7 +192,7 @@ function ServiceCard({ service }) {
 
             <div className="service-card__body grid grid-cols-12">
               <div className="service-card__content col-start-1 col-span-8 md:col-start-4 md:col-span-8 lg:col-start-2 lg:col-span-5 xl:col-start-4 xl:col-span-3">
-                  <div className="service-card__description">{acfDescription}</div>
+                  <div className="text-body service-card__description">{acfDescription}</div>
                   <div className="button-wrapper mt-10">
                       <Link 
                           to={servicePath}

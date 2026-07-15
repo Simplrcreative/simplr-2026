@@ -13,19 +13,33 @@ function registerPlugins() {
 export function createTestimonialDotAnimation() {
   registerPlugins()
 
-  const testimonials = gsap.utils.toArray('.testimonial')
-  if (!testimonials.length) return () => undefined
+  const dots = gsap.utils.toArray('.testimonial-dot-slide')
+  if (!dots.length) return () => undefined
 
-  const triggers = testimonials.map((el) =>
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 85%',
-      once: true,
-      onEnter: () => el.classList.add('is-visible'),
-    }),
-  )
+  const tweens = dots.map((slideDot) => {
+    const trigger = slideDot.closest('.testimonial')
+    if (!trigger) return null
+
+    gsap.set(slideDot, { x: -30 })
+
+    return gsap.to(slideDot, {
+      x: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger,
+        start: 'top 70%',
+        end: 'top 45%',
+        scrub: true,
+        invalidateOnRefresh: true,
+        refreshPriority: -15,
+      },
+    })
+  }).filter(Boolean)
 
   return () => {
-    triggers.forEach((t) => t.kill())
+    tweens.forEach((tween) => {
+      tween.scrollTrigger?.kill()
+      tween.kill()
+    })
   }
 }

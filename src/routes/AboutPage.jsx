@@ -233,7 +233,7 @@ export default function AboutPage() {
             )}
             {aboutContent?.acfLandingIntroduction && (
               <div
-                className="article-content mt-10 split-text trigger-split-text"
+                className="article-content text-body mt-10 split-text trigger-split-text"
                 data-split-start="top 60%"
                 data-split-end="top 40%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingIntroduction }}
@@ -241,7 +241,7 @@ export default function AboutPage() {
             )}
             {aboutContent?.acfTeamIntroduction && (
               <div
-                className="article-content mt-10 split-text trigger-split-text"
+                className="article-content text-body mt-10 split-text trigger-split-text"
                 data-split-start="top 50%"
                 data-split-end="top 30%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfTeamIntroduction }}

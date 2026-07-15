@@ -321,7 +321,7 @@ export default function ThinkingPage() {
                       attributes = {{ 'data-post-image-frame': true }}
                     />
                   </div>
-                  <h2 className="thinking-post__title pe-10" data-post-title>{postTitle}</h2>
+                  <h2 className="thinking-post__title lead pe-10" data-post-title>{postTitle}</h2>
                 </Link>
               </article>
             )

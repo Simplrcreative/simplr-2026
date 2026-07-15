@@ -223,7 +223,7 @@ export default function ThinkingSinglePage() {
         </div>
       </section>
 
-      <section className="post-content px-5 pb-20 bg-white section-light slide-up-subtle">
+      <section className="post-content text-body px-5 pb-20 bg-white section-light slide-up-subtle">
         <div className="grid grid-cols-12 w-full">
           <div ref={postContentRef} className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-10 lg:col-span-6">
             
@@ -307,7 +307,7 @@ export default function ThinkingSinglePage() {
                         attributes = {{ 'data-post-image-frame': true }}
                       />
                     </div>
-                    <h2 className="thinking-post__title pe-3 md:pe-10" data-post-title>{postTitle}</h2>
+                    <h2 className="thinking-post__title lead pe-3 md:pe-10" data-post-title>{postTitle}</h2>
                   </Link>
                 </article>
               )

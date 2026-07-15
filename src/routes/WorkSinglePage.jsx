@@ -296,6 +296,7 @@ export default function WorkSinglePage() {
   const altText = work?.acfWorkBuilder?.acfFeaturedThumbnail?.node?.altText || title || 'Untitled'
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
   const introduction = work?.acfWorkBuilder?.acfIntroduction ?? []
+  const linkToWebsite = work?.acfWorkBuilder?.acfLinkToWebsite ?? ''
   const swags = work?.acfWorkBuilder?.acfSwag ?? []
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
@@ -447,8 +448,15 @@ export default function WorkSinglePage() {
               )
              })}
           </div>
-          <div className="intro-text col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-8 lg:col-span-5 trigger-split-text-coffee">
+          <div className="text-body col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-8 lg:col-span-5 trigger-split-text-coffee">
             <RichText html={introduction} className="split-text-coffee"/>
+            {linkToWebsite && (
+              <div className="mt-10">
+                <a href={linkToWebsite} target="_blank" rel="noopener noreferrer" className="btn relative alt-transition-text">
+                  <span>Visit Website</span>
+                </a>
+              </div>
+            )}
             {swags && (
               <div className="swags my-20">
               {swags.map((swag, index) => {
@@ -527,7 +535,7 @@ export default function WorkSinglePage() {
         const sliderImages = section?.acfSliderImages?.nodes ?? []
 
         return (
-          <section key={`section-${index}`} className="work-content px-5 pb-5">
+          <section key={`section-${index}`} className="work-content text-body px-5 pb-5">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
                 <>

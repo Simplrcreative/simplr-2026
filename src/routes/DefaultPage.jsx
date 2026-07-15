@@ -26,7 +26,7 @@ export default function DefaultPage() {
         </div>
       </section>
 
-      <section className="post-content px-5 pb-20 bg-white section-light">
+      <section className="post-content text-body px-5 pb-20 bg-white section-light">
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-4 col-span-6">
             

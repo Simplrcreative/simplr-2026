@@ -903,6 +903,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           </div>
           <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 xl:col-start-8  xl:col-span-4 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
             <div className="testimonial lead max-w-[38ch] mt-5 md:mt-0">
+              <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (
                   <div className="mb-5 md:mb-10 xl:mb-20 text-bold"><RichText html={testimonialData.acfTestimonial} /></div>

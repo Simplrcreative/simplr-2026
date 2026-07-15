@@ -103,8 +103,6 @@
 
 .service-card__description {
   font-family: var(--font-aeonik);
-  font-size: 1rem;
-  line-height: 1.2rem;
 }
 
 .service-card__video {
@@ -184,10 +182,6 @@
   .service-card__title {
     font-size: clamp(2rem, 3.5vw, 3.125rem);
   }
-  .service-card__description {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-  }
 }
 
 /* --- SERVICE DETAIL ACCORDION --- */
@@ -221,9 +215,7 @@
   cursor: pointer;
 }
 
-.service-accordion-title,
 .service-accordion-symbol {
-  font-family: var(--font-aeonik);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.2rem;
@@ -238,12 +230,13 @@
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 520ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms ease;
+  transition: grid-template-rows 1s cubic-bezier(.26,.32,.02,.94), opacity 1s cubic-bezier(.26,.32,.02,.94);
 }
 
 .service-accordion-item.is-open .service-accordion-panel {
   grid-template-rows: 1fr;
   opacity: 1;
+  transition: grid-template-rows 0.5s cubic-bezier(.8,.0,.5,.6), opacity 0.5s cubic-bezier(.8,.0,.5,.6);
 }
 
 .service-accordion-content {
@@ -251,15 +244,6 @@
   padding-top: 1.875rem;
   /*padding-bottom: 1.125rem;*/
   max-width: 62ch;
-}
-
-.service-richtext {
-  font-size: 1rem;
-  line-height: 1.2rem;
-}
-
-.service-richtext p {
-  color: rgba(0, 0, 0, 0.9);
 }
 
 @media (max-width: 900px) {
@@ -272,16 +256,11 @@
   }
 }
 @media (min-width: 768px) {
-  .service-richtext {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-  }
-  .service-accordion-title,
   .service-accordion-symbol {
     font-family: var(--font-aeonik);
     font-size: 1.375rem;
     font-weight: 500;
     line-height: 1.625rem;
-    color: #000;
+    color: var(--color-coffee);
   }
 }

@@ -317,8 +317,8 @@ export default function ServicesSinglePage() {
                 </div>
               )}
               {sectionContent && (
-                <div className="col-start-1 md:col-start-4 col-span-12 md:col-span-8 lg:col-span-5 slide-up-subtle">
-                  <RichText html={sectionContent} className="service-richtext pt-10 md:pt-20" />
+                <div className="col-start-1 col-span-12 md:col-start-4  md:col-span-8 lg:col-start-4 lg:col-span-5 slide-up-subtle">
+                  <RichText html={sectionContent} className="lead pt-10 md:pt-20" />
                 </div>
               )}
               {sectionCta && (
@@ -354,12 +354,12 @@ export default function ServicesSinglePage() {
                           onClick={() => toggleAccordion(sectionIndex, accordionIndex)}
                           aria-expanded={isOpen}
                         >
-                          <span className="service-accordion-title">{accordionTitle}</span>
+                          <span className="service-accordion-title lead">{accordionTitle}</span>
                           <span className="service-accordion-symbol" aria-hidden="true">{isOpen ? '-' : '+'}</span>
                         </button>
                         <div className="service-accordion-panel" aria-hidden={!isOpen}>
                           <div className="service-accordion-content">
-                            <RichText html={accordionContent} className="service-richtext" />
+                            <RichText html={accordionContent} className="text-body" />
                           </div>
                         </div>
                       </div>
@@ -419,6 +419,7 @@ export default function ServicesSinglePage() {
             </div>
             <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center trigger-split-text-coffee  mb-15 md:mb-0 ">
               <div className="testimonial lead max-w-[38ch]">
+                <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>
                 <div className="split-text-coffee trigger-split-text-coffee">
                   <div className="mb-10 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
                   <div><b>{testimonialData.acfName || testimonial.title}</b><br/>{testimonialData.acfRole}</div>

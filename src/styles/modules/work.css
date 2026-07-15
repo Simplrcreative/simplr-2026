@@ -180,17 +180,6 @@
   font-weight: 300;
   line-height: 1.4;
 }
-.work-content h3 {
-  font-size: 1.375rem;
-  font-weight: 500;
-  font-family: var(--font-aeonik);
-  line-height: 1.2;
-  margin: 1.25rem 0;
-}
-.work-content h3:first-child {
-  margin: 0 0 1.25rem 0;
-}
-
 .work-testimonial {
   font-size: 1rem;
   line-height: 1.2rem;
@@ -231,12 +220,7 @@
   .work-type:last-of-type::after {
     display: none;
   }*/
-  .work-content h3 {
-    margin: 1.875rem 0;
-  }
-  .work-content h3:first-child {
-    margin: 0 0 1.875rem 0;
-  }
+  
   .swag {
     gap:3.75rem;
     margin-bottom:3.75rem;
@@ -293,29 +277,18 @@
 .testimonial b {
   font-weight: 500!important;
 }
-.testimonial::before {
+.testimonial-dots {
   position: absolute;
   top: 0;
   left: 0;
+  display: flex;
+}
+.testimonial-dot {
   width: 30px;
   height: 30px;
   border-radius: 100%;
   background-color: var(--color-coffee);
-  content: '';
 }
-.testimonial::after {
-  position: absolute;
-  top: 0;
-  left: 30px;
-  width: 30px;
-  height: 30px;
-  border-radius: 100%;
-  background-color: var(--color-coffee);
-  content: '';
-  transform: translateX(-30px);
-  transition: none;
-}
-.testimonial.is-visible::after {
-  transform: translateX(0);
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+.testimonial-dot-slide {
+  will-change: transform;
 }
