@@ -163,10 +163,6 @@ export function createWorkThumbHoverAnimation(scope = document) {
   const cleanups = []
 
   triggers.forEach((trigger) => {
-    // Case studies use CSS hover-active toggles from the scroll animation.
-    // GSAP thumb timelines here fight scroll transforms and defer navigation.
-    if (trigger.closest('.case-studies')) return
-
     const picture = trigger.querySelector('.thumb-swap')
     if (!picture) return
 

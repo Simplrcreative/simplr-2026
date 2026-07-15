@@ -565,7 +565,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const testimonialData = testimonialBlock?.testimonialData ?? null
   const linkedCaseStudy = testimonialBlock?.caseStudy ?? null
   const linkedCaseStudyLoaderImg =  testimonialBlock?.caseStudyLoaderImg || ''
-  const linkedCaseStudyImage = testimonialBlock?.caseStudyImage || ''
+  const linkedCaseStudyImg = testimonialBlock?.caseStudyImage || ''
+  const secondarylinkedCaseStudyLoaderImg =  testimonialBlock?.caseStudyLoaderImg2 || ''
+  const secondarylinkedCaseStudyImg = testimonialBlock?.caseStudyImage2 || ''
   const linkedCaseStudyClient = testimonialBlock?.caseStudyClient || ''
   const linkedCaseStudyCategories = testimonialBlock?.caseStudyCategories ?? []
   const linkedCaseStudySlug = linkedCaseStudy?.slug || ''
@@ -810,22 +812,30 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   <div key={`work-${study.id}`} id={study.slug} className="client-work">
                     <Link
                       to={path}
-                      className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img"
+                      className="client-work-img overflow-hidden rounded-[10px] block alt-transition-img thumb-swap-trigger"
                       data-transition-source="media"
                       data-transition-source-key={study.slug}
                       data-transition-variant="work-card"
+                      data-transition-snapshot-state="hover"
                       onMouseEnter={() => prefetchWorkEntry(study.slug)}
                       title={study.detail}
                     >
                       <div
-                        className="ratio overflow-hidden test"
+                        className="ratio overflow-hidden thumb-swap"
                         style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
                       >
                         <PictureImg
+                          loaderSrc={study.primaryLoaderImg + '.webp'}
+                          mobileSrc={study.primaryThumbnail + '.webp'}
+                          desktopSrc={study.primaryThumbnail + '.webp'}
+                          imgClass="thumb-primary rounded-[10px]"
+                          altText={study.detail}
+                        />
+                         <PictureImg
                           loaderSrc={study.secondaryLoaderImg + '.webp'}
                           mobileSrc={study.secondaryThumbnail + '.webp'}
                           desktopSrc={study.secondaryThumbnail + '.webp'}
-                          imgClass="rounded-[10px]"
+                          imgClass="thumb-secondary rounded-[10px]"
                           altText={study.detail}
                         />
                       </div>
@@ -867,21 +877,21 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 >
                   {/*
                   <picture className="ratio overflow-hidden rounded-[10px]" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
-                    <img src={linkedCaseStudyImage} title={linkedCaseStudyClient} />
+                    <img src={linkedCaseStudyImg} title={linkedCaseStudyClient} />
                   </picture>
                   */}
                   <div className="ratio overflow-hidden rounded-[10px] block thumb-swap" style={{'--aspect-ratio-desktop':'90%', '--aspect-ratio-mobile':'90%'}}>
                     <PictureImg
                       loaderSrc = {linkedCaseStudyLoaderImg + '.webp'}
-                      mobileSrc = {linkedCaseStudyImage + '.webp'}
-                      desktopSrc = {linkedCaseStudyImage + '.webp'}
+                      mobileSrc = {linkedCaseStudyImg + '.webp'}
+                      desktopSrc = {linkedCaseStudyImg + '.webp'}
                       imgClass = 'thumb-primary rounded-[10px]'
                       altText = {linkedCaseStudyClient + 'Testimonial 1'}
                     />
                     <PictureImg
-                      loaderSrc = {linkedCaseStudyLoaderImg + '.webp'}
-                      mobileSrc = {linkedCaseStudyImage + '.webp'}
-                      desktopSrc = {linkedCaseStudyImage + '.webp'}
+                      loaderSrc = {secondarylinkedCaseStudyLoaderImg + '.webp'}
+                      mobileSrc = {secondarylinkedCaseStudyImg + '.webp'}
+                      desktopSrc = {secondarylinkedCaseStudyImg + '.webp'}
                       imgClass = 'thumb-secondary rounded-[10px]'
                       altText = {linkedCaseStudyClient + ' Testimonial 2'}
                     />

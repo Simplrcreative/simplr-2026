@@ -937,6 +937,20 @@ const homeCaseStudiesQuery = `
                     }
                   }
                 }
+                acfSecondaryThumbnail {
+                  node {
+                    guid
+                    altText
+                    mimeType
+                    sourceUrl
+                    mediaDetails {
+                      sizes {
+                        name
+                        sourceUrl
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -1020,16 +1034,13 @@ function normaliseHomeTestimonial(acfHomeBuilder) {
   const testimonialData = testimonial?.acfTestimonials ?? null
   const caseStudy = acfHomeBuilder?.acfCaseStudy?.nodes?.[0] ?? null
   const caseStudyBuilder = caseStudy?.acfWorkBuilder
-  const featuredThumbnailNode = caseStudyBuilder?.acfFeaturedThumbnail?.node
-  const sizes = featuredThumbnailNode?.mediaDetails?.sizes ?? []
-  const loaderImg = (
-    sizes.find((s) => s.name === 'loader')
-    || sizes.find((s) => s.name === 'thumbnail')
-  ) ?? ''
-  const thumbnail = (
-    sizes.find((s) => s.name === 'large')
-    || sizes.find((s) => s.name === 'full')
-  )?.sourceUrl ?? featuredThumbnailNode?.sourceUrl ?? featuredThumbnailNode?.guid ?? ''
+  const featuredThumbnailNode = caseStudyBuilder?.acfFeaturedThumbnail
+  const secondaryThumbnailNode = caseStudyBuilder?.acfSecondaryThumbnail
+
+  const primaryLoaderImg = getMediaSourceUrl(featuredThumbnailNode, 'loader')
+  const primaryImage = getMediaSourceUrl(featuredThumbnailNode, 'large')
+  const secondaryLoaderImg = getMediaSourceUrl(secondaryThumbnailNode, 'loader') || primaryLoaderImg
+  const secondaryImage = getMediaSourceUrl(secondaryThumbnailNode, 'large') || primaryImage
 
   if (!testimonial && !caseStudy) {
     return null
@@ -1039,10 +1050,11 @@ function normaliseHomeTestimonial(acfHomeBuilder) {
     testimonial,
     testimonialData,
     caseStudy,
-    //caseStudyClient: caseStudyBuilder?.acfClient?.nodes?.[0]?.name ?? '',
     caseStudyCategories: caseStudyBuilder?.acfCategory?.nodes ?? [],
-    caseStudyLoaderImg: loaderImg,
-    caseStudyImage: thumbnail,
+    caseStudyLoaderImg: primaryLoaderImg,
+    caseStudyImage: primaryImage,
+    caseStudyLoaderImg2: secondaryLoaderImg,
+    caseStudyImage2: secondaryImage,
   }
 }
 

@@ -96,6 +96,11 @@ export function createCaseStudiesScrollAnimation(scope) {
 
       workImage?.classList.toggle('hover-active', isHovered)
       detail?.classList.toggle('hover-active', isHovered)
+
+      if (workImage) {
+        const eventType = isHovered ? 'pointerenter' : 'pointerleave'
+        workImage.dispatchEvent(new PointerEvent(eventType, { bubbles: false }))
+      }
     }
 
     // Keep hover states in sync between the left client list and right work images.
