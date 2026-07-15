@@ -208,7 +208,7 @@ export default function AboutPage() {
       <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark lg:min-h-[80vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 lg:col-span-6 text-white change-logo my-50 md:mt-40 max-w-[85ch]">
+          <div className="col-span-12 lg:col-span-7 text-white change-logo my-50 md:mt-40 max-w-[85ch]">
             <div className="eyebrow">About</div>
             {aboutContent?.acfLandingHeading && (
               <h1

@@ -1228,6 +1228,8 @@ export default function TransitionFrame({ children }) {
 
     const canCaptureFromEventTarget = (target) => Boolean(extractSameOriginLink(target))
 
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+
     const handlePointerDown = (e) => {
       // Only primary-button navigations; ignore modified clicks/new-tab gestures.
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
@@ -1238,6 +1240,11 @@ export default function TransitionFrame({ children }) {
       // pointerdown, otherwise we can snapshot before thumb2 reaches its
       // hovered end-frame.
       if (nav.link?.dataset?.transitionSnapshotState === 'hover') return
+
+      // On touch/coarse devices, mounting the overlay on pointerdown causes
+      // Safari to suppress the subsequent click event (DOM mutation between
+      // touchstart and touchend). Defer capture to the click handler instead.
+      if (isCoarsePointer) return
 
       capture(e.target)
     }
@@ -1438,9 +1445,11 @@ export default function TransitionFrame({ children }) {
     // Suppress scrollbar flash while content is translated off-screen.
     document.documentElement.style.overflowX = 'hidden'
 
-    let ySnapShotOff = window.innerHeight * 2;
+    //let ySnapShotOff = window.innerHeight * 2;
+    let ySnapShotOff = window.innerHeight * 2.2;
     if (isCompactLogoTabletUp()) {
-      ySnapShotOff = window.innerHeight * 1.5;
+      //ySnapShotOff = window.innerHeight * 1.5;
+      ySnapShotOff = window.innerHeight * 1.8;
     }
 
     if (altClone) {

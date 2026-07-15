@@ -756,7 +756,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
             <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem]">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-20 lg:mb-40 text-strategy text-[5rem]">+</div>
-              <div className="stat-detail lead max-w-[26ch] md:max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
+              <div className="stat-detail lead max-w-[26ch] md:max-w-[20ch] xl:max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
             </div>
           </div>
         </div>
@@ -768,9 +768,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </Link>
       </section>
 
-      <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
+      <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming xl:min-h-screen">
           <div className="grid grid-cols-12 items-emd slide-up md:pt-10">
-            <div className="col-start-1 col-span-12 md:col-span-5 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
+            <div className="col-start-1 col-span-12 md:col-span-5 xl:col-span-6 order-2 md:order-1 client-name-list text-white flex flex-col justify-center mt-5 md:mt-0">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 
@@ -789,7 +789,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       title={study.detail}
                     >
                       {study.client}
-                      <div className="client-detail font-literata text-3xl lg:text-5xl font-light pb-3">
+                      <div className="client-detail font-literata text-2xl md:text-2xl lg:text-3xl xl:text-5xl font-light pb-3 md:pe-10 xl:pe-0">
                         <span className="client-detail-text">{study.detail}</span>
                       </div>
                     </Link>
@@ -797,7 +797,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 )
               })}
             </div>
-            <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-8 lg:col-span-5 order-1 md:order-2 client-work-list min-h-screen overflow-y-hidden_ rounded-[10px] flex flex-col justify-center">
+            <div className="col-start-1 col-span-12 md:col-start-6 md:col-span-7 xl:col-start-8 xl:col-span-5 order-1 md:order-2 client-work-list xl:min-h-screen rounded-[10px] flex flex-col justify-center">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
 
@@ -826,7 +826,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                       </div>
                     </Link>
                     {study.categories?.length > 0 && (
-                      <div className="categories mt-5 hidden md:flex gap-1">
+                      <div className="categories mt-5 hidden md:flex gap-1 flex-wrap">
                         {study.categories.map(({ name }) => (
                           <CategoryBadge key={`${study.id}-${name}`} name={name} />
                         ))}
@@ -839,7 +839,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           </div>
       </section>
 
-      <Suspense fallback={<div ref={clientsRef} className="bg-coffee section-dark min-h-screen" />}>
+      <Suspense fallback={<div ref={clientsRef} className="bg-coffee section-dark pt-0 md:pt-20 xl:pt-0 xl:min-h-screen" />}>
         <LazyClientLogos
           innerRef={clientsRef}
           clients={clients}
@@ -849,7 +849,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       <section className="testimonials p-5 section-light bg-white">
         <div id="testimonial-1" className="grid grid-cols-12">
-          <div className="col-start-1 col-span-12 md:col-span-6 slide-up-from-left">
+          <div className="col-start-1 col-span-12 md:col-span-5 xl:col-span-6 slide-up-from-left">
               <div className="client-work">
                 <Link
                   to={buildEntryPath('work', linkedCaseStudySlug)}
@@ -887,7 +887,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   {linkedCaseStudyClient}
                   </div>
                   {linkedCaseStudy && linkedCaseStudyCategories.length > 0 ? (
-                    <div className="categories mt-3 flex gap-1">
+                    <div className="categories mt-3 flex gap-1 flex-wrap">
                       {linkedCaseStudyCategories.map(({ name }) => (
                         <CategoryBadge key={name} name={name} />
                       ))}
@@ -896,13 +896,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
           </div>
-          <div className="col-start-1 md:col-start-8 col-span-12 md:col-span-4 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
+          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 xl:col-start-8  xl:col-span-4 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
             <div className="testimonial lead max-w-[38ch] mt-5 md:mt-0">
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (
-                  <div className="mb-5 md:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
+                  <div className="mb-5 md:mb-10 xl:mb-20"><RichText html={testimonialData.acfTestimonial} /></div>
                 ) : (
-                  <p className="mb-5 md:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
+                  <p className="mb-5 md:mb-10 xl:mb-20">&ldquo;Simplr&apos;s creativity has brought Satalia&apos;s bold, utopian vision for AI to life. The result is a dynamic, flexible brand identity that reflects our commitment to innovation and inclusivity. Their work has given us a dynamic, forward-thinking brand presence, and we&apos;re excited to share it with the world.&rdquo;</p>
                 )}
                 <p><b>{testimonialData?.acfName || testimonial?.title}</b><br/>{testimonialData?.acfRole}</p>
               </div>
@@ -968,8 +968,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 </div>
               </div>
 
-              <div className="md:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[18rem] md:max-w-[32rem] text-[1rem] md:text-[1.125rem] text-coffee">
+              <div className="md:col-span-6 xl:col-span-5">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[20rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

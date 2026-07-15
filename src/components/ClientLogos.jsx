@@ -62,7 +62,7 @@ export default function ClientLogos({
   if (!logos.length) return null
 
   return (
-    <div ref={innerRef} className="bg-coffee section-dark md:min-h-screen">
+    <div ref={innerRef} className="bg-coffee section-dark pt-0 md:pt-20 xl:pt-0 pb-20 xl:pb-0 xl:min-h-screen">
       <section className="clients py-10 md:pt-40 md:pb-10 overflow-hidden text-white">
         <LogoStrip
           clients={topLogos}

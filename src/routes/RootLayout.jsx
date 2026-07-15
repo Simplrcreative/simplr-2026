@@ -106,11 +106,11 @@ function createMobileNavLinkClickHandler() {
 
 function createNavLinkHandlers({ prefetch, onClick, hasFinePointer }) {
   const handlers = {
-    onPointerDown: requestTransitionCapture,
     onClick,
   }
 
   if (hasFinePointer) {
+    handlers.onPointerDown = requestTransitionCapture
     handlers.onPointerEnter = (event) => {
       showNavLinkOrb(event)
       prefetch()
@@ -526,7 +526,7 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[0.9rem] right-[0.9rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`} onClick={toggleMobileNav}>
+      <div className={`menu-icon fixed top-[0.9rem] right-[0.9rem] md:right-[2.5rem] md:top-[2.5rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`} onClick={toggleMobileNav}>
         <div className="flex flex-col gap-[0.25rem]">
           <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
           <div className="menu-icon-dot w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>

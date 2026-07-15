@@ -325,6 +325,18 @@ export default function WorkSinglePage() {
   }, [])
 
   useEffect(() => {
+    const stickyTexts = Array.from(document.querySelectorAll('.sticky-text'))
+    const setStickyOffsets = () => {
+      stickyTexts.forEach((el) => {
+        el.style.setProperty('--sticky-text-offset', `${el.offsetHeight}px`)
+      })
+    }
+    setStickyOffsets()
+    window.addEventListener('resize', setStickyOffsets)
+    return () => window.removeEventListener('resize', setStickyOffsets)
+  }, [sections])
+
+  useEffect(() => {
     const cleanupSplitText = createSplitTextAnimation()
     const cleanupWorkImages = createWorkImagesAnimation()
     const cleanupNextWork = createNextWorkAnimation()
@@ -529,8 +541,8 @@ export default function WorkSinglePage() {
               {layout === 'Image & Text' && (
                 <>
                 {/* IMAGE & TEXT SECTION */}
-                  <div className={`col-span-12 md:col-span-4 ${txtOrder} flex flex-col justify-end trigger-split-text-coffee`}>
-                    <RichText html={content} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
+                  <div className={`col-span-12 md:col-span-4 ${txtOrder} ${stickyText1 ? '' : 'flex flex-col justify-end'} trigger-split-text-coffee`}>
+                    <RichText html={content} className={`split-text-coffee text-box ${stickyText1 ? 'sticky-text' : 'my-[2.5rem] lg:my-[5rem]'}`}/>
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
                     {video1 ? (

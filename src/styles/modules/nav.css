@@ -90,6 +90,7 @@ nav.light a.is-active .nav-link__orb {
        top: 0;
        right: 0;
        width: 85vw;
+       max-width: 300px;
        height: auto;
        transform-origin: top right;
        transform: translateX(100vw)!important;
@@ -223,7 +224,13 @@ nav.light a.is-active .nav-link__orb {
         color: var(--color-coffee);
         font-size: 1.125rem;
         isolation: isolate;
-        cursor:none;
+        cursor: pointer;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        nav a {
+            cursor: none;
+        }
     }
 
     .nav-link__orb {

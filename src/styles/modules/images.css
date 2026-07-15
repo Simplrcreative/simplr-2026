@@ -19,8 +19,7 @@ picture, video {
     position: relative;
     padding-top: var(--aspect-ratio-mobile);
 }
-.full-image.sticky,
-.text-box.sticky-text {
+.full-image.sticky {
     height: calc(100vh - 2.5rem);
     position: sticky;
     top: 1.25rem;
