@@ -376,6 +376,7 @@
 
 .bullet-body {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 1.25rem;
   padding: 1.25rem;
@@ -709,7 +710,7 @@
   .bullets-grid {
     display: flex;
     gap: 1.25rem;
-    align-items: flex-start;
+    align-items: stretch;
   }
   .bullet-item {
     /*max-width: 35ch;
@@ -763,7 +764,7 @@
   transition: none;
 }
 .how-we-work-section {
-  --how-we-work-size: min(50vw, calc(100vh - 2.5rem));
+  --how-we-work-size: min(50vw, 80vh);
 }
 .how-we-work-stage {
   position: relative;

@@ -411,7 +411,7 @@ export default function AboutPage() {
           <div className="col-start-1 col-span-12">
             <div className="lead split-text mb-5 text-white">Our values</div>
           </div>
-          <div className="col-start-1 col-span-12 md:col-span-6 lg:col-span-5 text-white">
+          <div className="col-start-1 col-span-12 md:col-span-6 lg:col-span-3 text-white">
             {values.map((value, index) => (
               <div key={`${value?.acfValue ?? 'value'}-${index}`} className="flex gap-5 align-center mb-4">
                 <div className="font-literata flex flex-col items-center justify-center opacity-90">
@@ -426,7 +426,7 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
-          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-5 lg:col-span-6 relative">
+          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-4 lg:col-span-6 relative">
             {values.map((value, index) => {
               const isActive = activeValueIndex === index
               const isOff = offValueIndex === index
@@ -443,7 +443,7 @@ export default function AboutPage() {
                 ].filter(Boolean).join(' ')}
               >
                 <div
-                  className="value-content lead mb-5 max-w-[25ch]"
+                  className="value-content lead mb-5"
                   dangerouslySetInnerHTML={{ __html: value?.acfContent ?? '' }}
                 />
                 <h2
@@ -467,7 +467,7 @@ export default function AboutPage() {
 
       <section
         ref={howWeWorkSectionRef}
-        className="py-20 bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden"
+        className="py-20 bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden flex items-center justify-center"
       >
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-1 col-span-12 how-we-work-stage">

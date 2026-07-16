@@ -114,7 +114,7 @@ export function createHowWeWorkAnimation(section) {
   // Crossover (screenshot 1): outgoing at -50vw, incoming at settled.
   // Fully out: left edge at -100vw.
   const settledX = () => getMediaSize()
-  const crossoverX = () => getViewportWidth() * -0.5
+  const crossoverX = () => getViewportWidth() * -0.56
   const exitX = () => getViewportWidth() * -1
   const entrantStartX = () => getViewportWidth() + getMediaSize()
 
