@@ -27,10 +27,10 @@ h2 {
     line-height: 1.2rem;
 }
 .split-text {
-    color: rgba(255, 255, 255, 0)
+    color: rgba(255, 255, 255, 0.15)
 }
 .split-text-coffee {
-    color: rgba(48, 15, 29, 0)
+    color: rgba(48, 15, 29, 0.15)
 }
 .hero-title,
 h2.section-heading {
