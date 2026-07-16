@@ -16,7 +16,7 @@ export default function DefaultPage() {
         pathname={pathname}
       />
 
-      <section className="post-hero px-5 py-20 bg-white section-light min-h-screen flex items-end">
+      <section className="post-hero px-5 py-20 bg-white section-light lg:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-start-3 col-span-8 text-coffee mt-40 flex flex-col items-center">

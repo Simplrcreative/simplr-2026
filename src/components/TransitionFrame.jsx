@@ -118,8 +118,15 @@ function shouldMountAltTransitionClone(altTransition, currentPathname) {
   }
 
   // Fallback for work-detail transitions if pathname formatting differs slightly.
-  return WORK_SINGLE_PATH_RE.test(normalizePathname(currentPathname))
+  if (
+    WORK_SINGLE_PATH_RE.test(normalizePathname(currentPathname))
     && altTransition.variant === 'work-card'
+  ) {
+    return true
+  }
+
+  return SERVICE_SINGLE_PATH_RE.test(normalizePathname(currentPathname))
+    && Boolean(altTransition.dockSelector?.includes('service-featured-media'))
 }
 
 function hideCaseStudyThumbnailInRoot(root, sourceKey) {
@@ -243,6 +250,11 @@ function captureBottomMenuClone(liveBottomMenu) {
   gsap.set(clone, { y: 0, opacity: 1, clearProps: 'transform' })
 
   return clone
+}
+
+function mountFrozenBottomMenuClone(bottomMenuClone) {
+  if (!bottomMenuClone || bottomMenuClone.isConnected) return
+  document.body.appendChild(bottomMenuClone)
 }
 
 function killBottomMenuScrollTrigger() {
@@ -635,6 +647,8 @@ export default function TransitionFrame({ children }) {
     capturedPathRef.current = null
     immediateOverlayRef.current?.remove()
     immediateOverlayRef.current = null
+    document.documentElement.classList.remove('page-transitioning')
+    document.documentElement.style.overflowX = ''
     document.querySelectorAll('[data-frozen-clone="true"]').forEach((node) => node.remove())
     if (hadCapture) {
       window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
@@ -841,7 +855,7 @@ export default function TransitionFrame({ children }) {
 
       if (target) {
         const nav = extractSameOriginLink(target)
-        const altSource = nav ? resolveAltTransitionSource(target, nav.link) : null
+        let altSource = nav ? resolveAltTransitionSource(target, nav.link) : null
 
         if (altSource?.closest('.case-studies')) {
           caseStudySourceKey = altSource.dataset?.transitionSourceKey
@@ -1030,13 +1044,19 @@ export default function TransitionFrame({ children }) {
 
       bottomMenuSnapshotRef.current = null
       const navForBottomMenu = target ? extractSameOriginLink(target) : null
-      if (navForBottomMenu?.link?.closest?.('.bottom-menu')) {
-        bottomMenuNavCaptureRef.current = true
-        killBottomMenuScrollTrigger()
-        const liveBottomMenu = document.querySelector('.bottom-menu')
+      const isOnServiceSingle = SERVICE_SINGLE_PATH_RE.test(capturedPathRef.current || '')
+
+      if (isOnServiceSingle) {
+        const liveBottomMenu = document.querySelector('.bottom-menu:not([data-frozen-clone])')
+
         if (liveBottomMenu) {
           gsap.killTweensOf(liveBottomMenu)
           bottomMenuSnapshotRef.current = captureBottomMenuClone(liveBottomMenu)
+          mountFrozenBottomMenuClone(bottomMenuSnapshotRef.current)
+        }
+
+        if (navForBottomMenu?.link?.closest?.('.bottom-menu')) {
+          bottomMenuNavCaptureRef.current = true
         }
       }
 
@@ -1219,6 +1239,9 @@ export default function TransitionFrame({ children }) {
       }
 
       scheduleCaptureResetIfAborted(3000)
+      } catch (error) {
+        console.error('[TransitionFrame] capture failed:', error)
+        resetCaptureState()
       } finally {
         if (didPrepareCapture) {
           window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
@@ -1240,6 +1263,10 @@ export default function TransitionFrame({ children }) {
       // pointerdown, otherwise we can snapshot before thumb2 reaches its
       // hovered end-frame.
       if (nav.link?.dataset?.transitionSnapshotState === 'hover') return
+
+      // Bottom-menu links must capture on click — pointerdown DOM changes can
+      // suppress the subsequent click and block React Router navigation.
+      if (nav.link?.closest?.('.bottom-menu')) return
 
       // On touch/coarse devices, mounting the overlay on pointerdown causes
       // Safari to suppress the subsequent click event (DOM mutation between
@@ -1429,10 +1456,11 @@ export default function TransitionFrame({ children }) {
     const bottomMenuClone = bottomMenuSnapshotRef.current
     bottomMenuSnapshotRef.current = null
     if (bottomMenuClone) {
-      document.body.appendChild(bottomMenuClone)
+      killBottomMenuScrollTrigger()
+      mountFrozenBottomMenuClone(bottomMenuClone)
       const liveBottomMenu = document.querySelector('.bottom-menu:not([data-frozen-clone])')
       if (liveBottomMenu) {
-        gsap.set(liveBottomMenu, { opacity: 0, pointerEvents: 'none' })
+        gsap.set(liveBottomMenu, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' })
       }
     }
 
@@ -1619,6 +1647,10 @@ export default function TransitionFrame({ children }) {
       const dockSelector = altTransition?.dockSelector || null
       const dock = getDockRect(dockSelector)
       const hasTargetAtStart = Boolean(dock)
+
+      if (dock && isServiceDockTransition) {
+        gsap.set(dock.target, { autoAlpha: 0 })
+      }
       const isVideoTransition = altTransition?.mediaKind === 'video'
       const smoothEase = 'power2.inOut'
       const expandDuration = 0.7

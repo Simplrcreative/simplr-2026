@@ -17,6 +17,12 @@ html.page-transitioning .compact-logo:not([data-frozen-clone]) {
     visibility: hidden !important;
 }
 
+html.page-transitioning .bottom-menu:not([data-frozen-clone]) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 [data-intro-visible='true'] .header,
 [data-intro-visible='true'] .compact-logo,
 [data-intro-visible='true'] .menu-icon,

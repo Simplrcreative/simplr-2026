@@ -4,7 +4,7 @@ import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import RichText from '../components/RichText.jsx'
 import Seo from '../components/Seo.jsx'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation, scrollToTopImmediate, createTestimonialDotAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation, createWorkThumbHoverAnimation, createTestimonialDotAnimation } from '../lib/animations/index.js'
 import { buildServiceSingleSeo } from '../lib/page-seo.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -127,21 +127,49 @@ export default function ServicesSinglePage() {
   const ctaBtnRefs = useRef({})
 
   useEffect(() => {
-    const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
-    const cleanupParallax = createParallaxAnimations(pageRef.current)
-    const cleanupSplitText = createSplitTextAnimation()
-    const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
-    const cleanupTestimonial = createTestimonialDotAnimation()
-    refreshScrollTriggers()
+    let cleanups = []
+
+    const initPageAnimations = () => {
+      cleanups.forEach((cleanup) => cleanup())
+      cleanups = []
+
+      ScrollTrigger.getById('parallax-fill')?.kill()
+
+      const featuredMedia = pageRef.current?.querySelector('[data-transition-dock="service-featured-media"]')
+      if (featuredMedia) {
+        gsap.set(featuredMedia, { x: 0, y: 0, scale: 1, clearProps: 'transform,willChange,borderRadius,zIndex,position' })
+      }
+
+      const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
+      const cleanupParallax = createParallaxAnimations(pageRef.current)
+      const cleanupSplitText = createSplitTextAnimation()
+      const cleanupWorkThumbHover = createWorkThumbHoverAnimation()
+      const cleanupTestimonial = createTestimonialDotAnimation()
+
+      if (cleanupSlideUp) cleanups.push(cleanupSlideUp)
+      if (cleanupParallax) cleanups.push(cleanupParallax)
+      if (cleanupSplitText) cleanups.push(cleanupSplitText)
+      if (cleanupWorkThumbHover) cleanups.push(cleanupWorkThumbHover)
+      if (cleanupTestimonial) cleanups.push(cleanupTestimonial)
+
+      refreshScrollTriggers()
+    }
+
+    const onTransitionComplete = () => {
+      requestAnimationFrame(() => initPageAnimations())
+    }
+
+    if (document.documentElement.classList.contains('page-transitioning')) {
+      window.addEventListener('page-transition:complete', onTransitionComplete, { once: true })
+    } else {
+      initPageAnimations()
+    }
 
     return () => {
-      cleanupSlideUp?.()
-      cleanupSplitText?.()
-      cleanupParallax?.()
-      cleanupWorkThumbHover?.()
-      cleanupTestimonial?.()
+      window.removeEventListener('page-transition:complete', onTransitionComplete)
+      cleanups.forEach((cleanup) => cleanup())
     }
-  }, [acfSections, testimonial])
+  }, [slug, acfSections, testimonial, featuredVideo, featuredImage])
 
   useEffect(() => {
     const cleanups = []
@@ -159,35 +187,43 @@ export default function ServicesSinglePage() {
   }, [acfSections])
 
   useEffect(() => {
-    bottomMenuRef.current = setupBottomMenuScrollTrigger()
+    const initBottomMenu = () => {
+      bottomMenuRef.current?.scrollTrigger?.kill()
+      bottomMenuRef.current = setupBottomMenuScrollTrigger()
+    }
 
     const syncBottomMenuAfterTransition = (event) => {
       if (!event.detail?.fromBottomMenuNav) return
 
-      scrollToTopImmediate()
-
       requestAnimationFrame(() => {
-        const menu = document.querySelector('.bottom-menu')
+        const menu = document.querySelector('.bottom-menu:not([data-frozen-clone])')
         if (menu) {
           gsap.killTweensOf(menu)
           gsap.set(menu, { clearProps: 'all' })
-          gsap.set(menu, { y: 50, opacity: 0, visibility: 'visible' })
+          gsap.set(menu, { y: 50, opacity: 0, visibility: 'visible', pointerEvents: 'auto' })
         }
 
-        bottomMenuRef.current = setupBottomMenuScrollTrigger()
+        initBottomMenu()
         ScrollTrigger.refresh()
       })
+    }
+
+    if (document.documentElement.classList.contains('page-transitioning')) {
+      window.addEventListener('page-transition:complete', initBottomMenu, { once: true })
+    } else {
+      initBottomMenu()
     }
 
     window.addEventListener('page-transition:complete', syncBottomMenuAfterTransition)
 
     return () => {
+      window.removeEventListener('page-transition:complete', initBottomMenu)
       window.removeEventListener('page-transition:complete', syncBottomMenuAfterTransition)
       bottomMenuRef.current?.scrollTrigger?.kill()
-      const menu = document.querySelector('.bottom-menu')
+      const menu = document.querySelector('.bottom-menu:not([data-frozen-clone])')
       if (menu) gsap.killTweensOf(menu)
     }
-  }, [])
+  }, [slug])
 
   function isAccordionOpen(sectionIndex, accordionIndex) {
     const openIndex = openAccordions[sectionIndex]
@@ -254,10 +290,10 @@ export default function ServicesSinglePage() {
         </Link>
       </div>
 
-      <section className="page-hero parallax-fill-section relative w-full px-5 py-5 md:pt-0 md:pb-5 bg-white section-light min-h-[90vh] md:min-h-screen flex flex-col justify-end">
+      <section className="page-hero parallax-fill-section relative w-full px-5 py-5 md:pt-0 md:pb-5 bg-white min-h-[90vh] md:min-h-screen flex flex-col justify-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee change-logo mt-40 lg:mt-0 mb-12 lg:mb-0 change-logo">
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee mt-40 lg:mt-0 mb-12 lg:mb-0">
             <div className="service-card__label mb-10 md:mb-5">
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
@@ -309,7 +345,7 @@ export default function ServicesSinglePage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-5 pb-10 md:py-20 bg-white section-light">
+          <section key={`section-${sectionIndex}`} className="px-5 pb-10 md:py-20 bg-white section-light change-logo">
             <div className="grid grid-cols-12 ">
               {sectionHeading && (
                 <div className="col-start-1 col-span-12 md:col-span-11 lg:col-span-9 md:pe-40 slide-up-subtle">

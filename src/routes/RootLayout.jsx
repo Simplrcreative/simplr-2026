@@ -566,7 +566,7 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[0.9rem] right-[0.9rem] md:right-[2.5rem] md:top-[2.5rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`} onClick={toggleMobileNav}>
+      <div className={`menu-icon fixed top-[1.75rem] right-[1.75rem] md:right-[2.75rem] md:top-[2.75rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`} onClick={toggleMobileNav}>
         <div className="flex flex-col gap-[0.25rem]">
           <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
           <div className="menu-icon-dot w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>

@@ -1,5 +1,6 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { createFeaturedMediaHeaderLightControls } from './hero.js'
 
 let pluginsRegistered = false
 
@@ -169,6 +170,8 @@ function createParallaxFillAnimations(scope) {
       let metrics = { scale: 1, x: 0, y: 0 }
       let timeline
       let resizeTimer
+      let headerLightControls = null
+      const isServiceFeatured = container.matches('[data-transition-dock="service-featured-media"]')
 
       const measureAtRest = () => {
         gsap.set(mediaEl, { x: 0, y: 0, scale: 1 })
@@ -178,6 +181,10 @@ function createParallaxFillAnimations(scope) {
       const build = () => {
         timeline?.scrollTrigger?.kill()
         timeline?.kill()
+        headerLightControls?.cleanup()
+        headerLightControls = isServiceFeatured
+          ? createFeaturedMediaHeaderLightControls(mediaEl)
+          : null
 
         const isDesktop = window.matchMedia('(min-width: 1024px)').matches
 
@@ -192,6 +199,8 @@ function createParallaxFillAnimations(scope) {
 
         // Always measure from identity so end values stay correct on reverse scrub.
         measureAtRest()
+
+        const syncHeaderLight = () => headerLightControls?.sync()
 
         timeline = gsap.timeline({
           defaults: {
@@ -209,8 +218,14 @@ function createParallaxFillAnimations(scope) {
             invalidateOnRefresh: false,
             anticipatePin: 0,
             refreshPriority: 1,
+            onUpdate: syncHeaderLight,
+            onRefresh: syncHeaderLight,
+            onLeave: syncHeaderLight,
+            onLeaveBack: syncHeaderLight,
           },
         })
+
+        syncHeaderLight()
 
         // Static end values (captured at rest). Function values + refresh were
         // remeasuring the scaled element and wiping the fill on the way back up.
@@ -238,6 +253,8 @@ function createParallaxFillAnimations(scope) {
         window.clearTimeout(resizeTimer)
         timeline?.scrollTrigger?.kill()
         timeline?.kill()
+        headerLightControls?.cleanup()
+        headerLightControls = null
         gsap.set(mediaEl, { clearProps: 'transform,willChange,borderRadius,zIndex,position' })
       })
     })

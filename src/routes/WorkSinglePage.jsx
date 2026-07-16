@@ -376,7 +376,7 @@ export default function WorkSinglePage() {
     <>
       <Seo {...seo} />
     
-      <section className="page-hero px-5 pb-10__ md:pb-20__ pb-5 bg-white section-light md:min-h-[80vh] md:min-h-screen flex md:items-end">
+      <section className="page-hero px-5 pb-5 bg-white section-light md:min-h-[100vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-50 mb-5 md:my-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">

@@ -162,6 +162,7 @@ export function createNavSectionTheme(scope) {
 
   const nav = document.querySelector('#desktop-nav')
   const logo = document.querySelector('.logo-holder')
+  const hasParallaxFillHero = Boolean(scope.querySelector('.parallax-fill-section'))
   const themedSections = Array.from(scope.querySelectorAll('.section-light, .section-dark'))
   const changeLogoSections = Array.from(scope.querySelectorAll('.change-logo'))
   const changeLogoBackSections = Array.from(scope.querySelectorAll('.change-logo-back'))
@@ -181,13 +182,14 @@ export function createNavSectionTheme(scope) {
   let themeWatcher = null
   let changeLogoWatcher = null
 
-  if (themedSections.length) {
+  // Service single parallax-fill hero handles nav/logo .light via featured media bounds.
+  if (themedSections.length && !hasParallaxFillHero) {
     const lightState = {
       nav: nav?.classList.contains('light') ?? false,
       logo: logo?.classList.contains('light') ?? false,
     }
     themeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
-  } else {
+  } else if (!hasParallaxFillHero) {
     nav?.classList.remove('light')
     logo?.classList.remove('light')
   }
@@ -303,6 +305,106 @@ function updateHeaderLightClasses(heroImage, nav, logo, lightState, themedSectio
       : NAV_LIGHT_TOP
     lightState.logo = resolveLightState(lightState.logo, bounds.top, mobileLogoThreshold)
     logo?.classList.toggle('light', lightState.logo)
+  }
+}
+
+function isHeroClearOfNav(heroSection, threshold) {
+  if (!heroSection) return true
+
+  const heroBounds = heroSection.getBoundingClientRect()
+  return heroBounds.bottom < threshold
+}
+
+/**
+ * Bounds-based nav/logo .light toggling for expanding featured media (e.g. service
+ * single parallax-fill). Mirrors the home hero video behaviour in updateHeaderLightClasses.
+ */
+export function createFeaturedMediaHeaderLightControls(mediaEl) {
+  if (!mediaEl) return null
+
+  registerPlugins()
+
+  const nav = document.querySelector('#desktop-nav')
+  const logo = document.querySelector('.logo-holder')
+  const heroSection = mediaEl.closest('.parallax-fill-section')
+  const themedSections = Array.from(document.querySelectorAll('.section-light, .section-dark'))
+  const lightState = {
+    nav: nav?.classList.contains('light') ?? false,
+    logo: logo?.classList.contains('light') ?? false,
+  }
+
+  const getSectionThreshold = () => {
+    const navBounds = nav?.getBoundingClientRect()
+    if (navBounds && navBounds.height > 0) return Math.round(navBounds.bottom)
+    return NAV_LIGHT_TOP
+  }
+
+  const sync = () => {
+    const bounds = mediaEl.getBoundingClientRect()
+    const threshold = getSectionThreshold()
+    const heroClearOfNav = isHeroClearOfNav(heroSection, threshold)
+
+    if (isDesktop) {
+      let boundsWantLight = false
+
+      if (!heroClearOfNav) {
+        const navLight = resolveLightState(lightState.nav, bounds.top, NAV_LIGHT_TOP)
+        const logoLight = resolveLightState(lightState.logo, bounds.left, LOGO_LIGHT_LEFT)
+        boundsWantLight = navLight || logoLight
+      } else {
+        lightState.nav = false
+        lightState.logo = false
+      }
+
+      if (boundsWantLight) {
+        applySectionLightState(nav, logo, lightState, true)
+        return
+      }
+
+      const sectionThemeLightState = getSectionThemeLightState(themedSections, threshold)
+      if (sectionThemeLightState !== null) {
+        applySectionLightState(nav, logo, lightState, sectionThemeLightState)
+        return
+      }
+
+      applySectionLightState(nav, logo, lightState, false)
+      return
+    }
+
+    let boundsWantLight = false
+
+    if (!heroClearOfNav) {
+      const logoBounds = logo?.getBoundingClientRect()
+      const mobileLogoThreshold = (logoBounds && logoBounds.height > 0)
+        ? Math.round(logoBounds.bottom)
+        : NAV_LIGHT_TOP
+      boundsWantLight = resolveLightState(lightState.logo, bounds.top, mobileLogoThreshold)
+    } else {
+      lightState.logo = false
+    }
+
+    lightState.nav = false
+    logo?.classList.toggle('light', boundsWantLight)
+  }
+
+  const scrollWatcher = ScrollTrigger.create({
+    trigger: document.documentElement,
+    start: 0,
+    end: 'max',
+    invalidateOnRefresh: true,
+    onUpdate: sync,
+    onRefresh: sync,
+  })
+
+  sync()
+
+  return {
+    sync,
+    cleanup() {
+      scrollWatcher.kill()
+      nav?.classList.remove('light')
+      logo?.classList.remove('light')
+    },
   }
 }
 

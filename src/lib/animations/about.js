@@ -53,6 +53,9 @@ export function createPeopleSectionClear(section, onClear) {
 export function createBulletsAnimation(section) {
   if (!section) return () => undefined
 
+  // Tablet up only — mobile gets the pinned stacking version instead.
+  if (!window.matchMedia('(min-width: 768px)').matches) return () => undefined
+
   const bullets = Array.from(section.querySelectorAll('.bullet-item'))
   if (!bullets.length) return () => undefined
 
@@ -69,13 +72,7 @@ export function createBulletsAnimation(section) {
     scrollTrigger: {
       trigger: section,
       start: 'top 95%',
-      //end: 'top 25%',
-      //end: '+=250%',
-      //pin: true,
-      //pinSpacing: true,
-      //scrub: 2,
-      //markers: true,
-    }
+    },
   })
 
   tl.to(bodyNodes, {
@@ -89,6 +86,126 @@ export function createBulletsAnimation(section) {
     tl.scrollTrigger?.kill()
     tl.kill()
     gsap.set(bodyNodes, { clearProps: 'all' })
+  }
+}
+
+/**
+ * Mobile-only (<768px) companion to createBulletsAnimation.
+ * Bullet 1 scrolls naturally with the lead via inner parallax only.
+ * Bullets 2+ shoot in during pin with uniform duration and spacing.
+ */
+export function createBulletsStackAnimation(section) {
+  if (!section) return () => undefined
+
+  // Mobile only — tablet up uses the fade-in version instead.
+  if (window.matchMedia('(min-width: 768px)').matches) return () => undefined
+
+  const stage = section.querySelector('.bullets-grid')
+  const inner = section.querySelector('.bullets-grid-inner')
+  const items = Array.from(section.querySelectorAll('.bullet-item'))
+  if (!stage || !inner || items.length < 2) return () => undefined
+
+  section.classList.add('bullets--stack')
+
+  const BULLET_PIN_START = 0.1
+  const BULLET_DURATION = 0.32
+  const BULLET_DELAY = 0.2
+  const scrollUnit = () => window.innerHeight * 0.85
+
+  const lead = inner.querySelector('.lead')
+  const leadStyles = lead ? getComputedStyle(lead) : null
+  const leadHeight = (lead?.offsetHeight || 0)
+    + (leadStyles ? parseFloat(leadStyles.marginBottom) || 0 : 0)
+
+  const stackItems = items.slice(1)
+  const itemHeights = items.map((item) => item.offsetHeight)
+  const peeks = items.map((item) => {
+    const heading = item.querySelector('.bullet-heading')
+    const body = item.querySelector('.bullet-body')
+    const paddingTop = body ? parseFloat(getComputedStyle(body).paddingTop) || 0 : 0
+    return (heading?.offsetHeight || 0) + paddingTop * 1
+  })
+
+  const landingY = [0]
+  for (let i = 1; i < items.length; i += 1) {
+    landingY.push(landingY[i - 1] + peeks[i - 1])
+  }
+
+  const stackHeight = landingY[items.length - 1] + itemHeights[items.length - 1]
+  const stageHeight = Math.max(window.innerHeight, itemHeights[0], stackHeight)
+  const approachOffset = window.innerHeight * 0.08
+  const parallaxTravel = window.innerHeight * 0.08
+  const offScreenY = stageHeight + 100
+
+  gsap.set(stage, {
+    position: 'relative',
+    height: stageHeight,
+    minHeight: window.innerHeight,
+    overflow: 'hidden',
+  })
+  gsap.set(inner, {
+    position: 'relative',
+    width: '100%',
+    y: approachOffset,
+  })
+  gsap.set(items[0], { clearProps: 'position,top,left,right,width,transform,zIndex' })
+  gsap.set(stackItems, { position: 'absolute', top: 0, left: 0, right: 0, width: '100%' })
+  stackItems.forEach((item, index) => {
+    gsap.set(item, { y: offScreenY, zIndex: index + 1 })
+  })
+
+  const approachTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: 'top bottom',
+      end: 'top top',
+      scrub: true,
+      invalidateOnRefresh: true,
+    },
+  })
+
+  // Lead + bullet 1 scroll in together — no separate motion on bullet 1.
+  approachTl.to(inner, { y: 0, ease: 'none', duration: 1 }, 0)
+
+  const pinDuration = stackItems.length
+    ? BULLET_PIN_START + stackItems.length * BULLET_DURATION + (stackItems.length - 1) * BULLET_DELAY
+    : 1
+
+  const stackTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: section,
+      start: 'top top',
+      end: () => `+=${pinDuration * scrollUnit()}`,
+      pin: true,
+      pinSpacing: true,
+      scrub: 1,
+      invalidateOnRefresh: true,
+      anticipatePin: 0,
+    },
+  })
+
+  stackTl.fromTo(inner, { y: 0 }, { y: -parallaxTravel, ease: 'none', duration: pinDuration }, 0)
+
+  stackItems.forEach((item, index) => {
+    const start = BULLET_PIN_START + index * (BULLET_DURATION + BULLET_DELAY)
+    stackTl.fromTo(
+      item,
+      { y: offScreenY },
+      { y: landingY[index + 1], ease: 'power2.out', duration: BULLET_DURATION },
+      start,
+    )
+  })
+
+  return () => {
+    approachTl.scrollTrigger?.kill()
+    approachTl.kill()
+    stackTl.scrollTrigger?.kill()
+    stackTl.kill()
+    section.classList.remove('bullets--stack')
+    gsap.set(stackItems, { clearProps: 'all' })
+    gsap.set(items[0], { clearProps: 'position,top,left,right,width,transform,zIndex' })
+    gsap.set(inner, { clearProps: 'all' })
+    gsap.set(stage, { clearProps: 'position,height,minHeight,overflow' })
   }
 }
 

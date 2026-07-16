@@ -12,6 +12,9 @@ h1,
 h2.section-heading {
     font-size: clamp(1.35rem, 4vw, 3.125rem);
 }
+.landing .hero-title {
+    font-size: clamp(1.85rem, 4vw, 3.125rem);
+}
 h2 {
     font-size: clamp(1.35rem, 4vw, 2.5rem);
 }

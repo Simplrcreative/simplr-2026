@@ -8,6 +8,7 @@ import PeopleSectionMobile from '../components/about/PeopleSectionMobile.jsx'
 import {
   createSplitTextAnimation,
   createBulletsAnimation,
+  createBulletsStackAnimation,
   createPeopleScatterAnimation,
   createPeopleSectionClear,
   createBioAnimation,
@@ -117,8 +118,9 @@ export default function AboutPage() {
     setHoveredPerson(null)
   }
 
-  // Bullets animation
+  // Bullets animation — tablet up gets the fade-in, mobile gets the pinned stack.
   useEffect(() => createBulletsAnimation(bulletsSectionRef.current), [])
+  useEffect(() => createBulletsStackAnimation(bulletsSectionRef.current), [])
 
   useEffect(() => {
     if (!howWeWork.length) return undefined
@@ -205,10 +207,10 @@ export default function AboutPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark lg:min-h-[80vh] flex flex-col md:items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark lg:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 lg:col-span-7 text-white change-logo my-50 md:mt-40 max-w-[85ch]">
+          <div className="col-span-12 lg:col-span-7 text-white change-logo mt-50 mb-10 md:mt-40 md:mb-0 max-w-[85ch]">
             <div className="eyebrow">About</div>
             {aboutContent?.acfLandingHeading && (
               <h1
@@ -222,10 +224,10 @@ export default function AboutPage() {
 
       <section className="px-5 bg-coffee section-dark">
         <div className="grid grid-cols-12">
-          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-4 lg:col-span-5 text-white md:pt-20">
+          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-4 lg:col-span-5 text-white">
             {aboutContent?.acfLandingLead && (
               <div
-                className="lead split-text trigger-split-text"
+                className="lead"
                 data-split-start="top 70%"
                 data-split-end="top 50%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingLead}}
@@ -362,13 +364,13 @@ export default function AboutPage() {
       <PeopleSectionMobile people={people} />
       </div>
 
-      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark trigger-split-text slide-up-subtle">
+      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
-            <div className="lead split-text mb-5">Different disciplines. One shared standard:</div>
+            <div className="lead mb-5">Different disciplines. One shared standard:</div>
             {aboutContent?.acfPrinciplesHeading && (
               <h2
-                className="section-heading split-text"
+                className="section-heading"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfPrinciplesHeading }}
               />
             )}
@@ -376,40 +378,47 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section ref={bulletsSectionRef} className="bullets px-5 py-20 bg-coffee section-dark min-h-[50vh] flex items-center overflow-hidden slide-up-subtle">
-        <div className="grid grid-cols-12 gap-x-5 w-full">
-          <div className="col-start-1 col-span-12 md:col-start-1 md:col-span-3 mb-5 md:mb-0 lead text-white">
-            Three core principles
-          </div>
-          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-9">
-            <div className="bullets-grid">
+      <section
+        ref={bulletsSectionRef}
+        data-mobile-animation="false"
+        className="bullets px-5 py-20 bg-coffee section-dark min-h-[75vh] md:min-h-[50vh] flex items-start md:items-center overflow-hidden"
+      >
+        <div className="bullets-grid-inner">
+          <div className="grid grid-cols-12 gap-x-5 w-full">
+            <div className="col-start-1 col-span-12 md:col-start-1 md:col-span-3 mb-10 md:mb-0 lead text-white">
+              Three core principles
+            </div>
+            <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-9">
+              
+                <div className="bullets-grid">
 
-              {principles.map((principle, index) => {
-                return (
-                  <div id={`bullet-item-${index + 1}`} className="bullet-item" key={`${principle?.acfHeading ?? 'principle'}-${index}`}>
-                    <div className={`bullet-body bg-${principle?.acfColour ?? ''}`}>
-                      <h3
-                        className="bullet-heading"
-                        dangerouslySetInnerHTML={{ __html: principle?.acfHeading ?? '' }}
-                      />
-                      <div
-                        className="bullet-text"
-                        dangerouslySetInnerHTML={{ __html: principle?.acfContent ?? '' }}
-                      />
+                {principles.map((principle, index) => {
+                  return (
+                    <div id={`bullet-item-${index + 1}`} className="bullet-item" key={`${principle?.acfHeading ?? 'principle'}-${index}`}>
+                      <div className={`bullet-body bg-${principle?.acfColour ?? ''}`}>
+                        <h3
+                          className="bullet-heading"
+                          dangerouslySetInnerHTML={{ __html: principle?.acfHeading ?? '' }}
+                        />
+                        <div
+                          className="bullet-text"
+                          dangerouslySetInnerHTML={{ __html: principle?.acfContent ?? '' }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
 
+                </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee section-dark values-section trigger-split-text slide-up-subtle">
+      <section className="px-5 py-20 bg-coffee section-dark values-section slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12">
-            <div className="lead split-text mb-5 text-white">Our values</div>
+            <div className="lead mb-5 text-white">Our values</div>
           </div>
           <div className="col-start-1 col-span-12 md:col-span-6 lg:col-span-3 text-white">
             {values.map((value, index) => (
@@ -457,10 +466,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark trigger-split-text slide-up-subtle">
+      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark slide-up-subtle">
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-1 col-span-12 md:col-span-4">
-            <div className="lead split-text text-white">How we work</div>
+            <div className="lead text-white">How we work</div>
           </div>
         </div>
       </section>
@@ -528,10 +537,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee section-dark clients-section trigger-split-text slide-up-subtle">
+      <section className="px-5 py-20 bg-coffee section-dark clients-section slide-up-subtle">
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-1 col-span-12 mb-10">
-            <div className="lead split-text text-white">Our clients</div>
+            <div className="lead text-white">Our clients</div>
           </div>
           <div
             className={`col-start-1 col-span-12 clients-list clients-list--${clientColumnCount}`}

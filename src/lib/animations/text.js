@@ -52,8 +52,14 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
     return null
   }
 
-  const start = element.dataset.splitStart || 'top 90%'
-  const end = element.dataset.splitEnd || 'top 50%'
+  const DESKTOP_START = 'top 75%'
+  const DESKTOP_END = 'top 30%'
+  const MOBILE_START = 'top 65%'
+  const MOBILE_END = 'top 0'
+  const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
+  const start = element.dataset.splitStart || (isDesktop ? DESKTOP_START : MOBILE_START)
+  const end = element.dataset.splitEnd || (isDesktop ? DESKTOP_END : MOBILE_END)
 
   const split = SplitText.create(element, { type: 'words' })
   gsap.set(split.words, { color: fromColor })
@@ -70,6 +76,7 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
         start,
         end,
         scrub: true,
+        //markers: true,
         invalidateOnRefresh: true,
         refreshPriority: -10,
         // If the block is already in/through range on init (route return),

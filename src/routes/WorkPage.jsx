@@ -631,7 +631,7 @@ export default function WorkPage() {
     <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[80vh] flex flex-col md:items-end">
+      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
           <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
