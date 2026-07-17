@@ -6,7 +6,7 @@ import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation, createTestimonialDotAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation, createTestimonialDotAnimation, lenisScrollTo } from '../lib/animations/index.js'
 import { buildEntryPath, fetchTestimonialData, fetchWorksData, getMediaSourceUrl } from '../lib/wp-api.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -380,6 +380,7 @@ export default function WorkPage() {
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [hasMoreWorks, setHasMoreWorks] = useState(true)
   const workResultsRef = useRef(null)
+  const filteredWorkSectionRef = useRef(null)
   const loadSentinelRef = useRef(null)
   const pendingAddedCardKeysRef = useRef(new Set())
 
@@ -435,6 +436,19 @@ export default function WorkPage() {
     () => (isFiltering ? [] : groupWorks(filteredWorks)),
     [filteredWorks, isFiltering],
   )
+
+  // Bring the filtered/searched results into view under the sticky filter bar
+  // whenever a new set of results is served. Scrolling has to go through Lenis
+  // (used for the site's smooth scroll) rather than window.scrollTo, since
+  // Lenis owns the scroll position and would otherwise fight/undo a native call.
+  useEffect(() => {
+    if (!isFiltering) return
+
+    const section = filteredWorkSectionRef.current
+    if (!section) return
+
+    lenisScrollTo(section, { offset: -130 })
+  }, [isFiltering, displayedFilter, keywordFilter])
 
   const loadNextBatch = useCallback(async () => {
     if (isLoadingMore || !hasMoreWorks) {
@@ -686,16 +700,23 @@ export default function WorkPage() {
 
       <div ref={workResultsRef} className="work-results">
         {isFiltering && (
-          <section className="work work-cards-only px-5 pt-5 pb-5 md:pt-10 md:pb-20 bg-white section-light">
-            <div className="work-cards-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
-              {filteredWorks.map((work) => (
-                <WorkCard
-                  key={work.databaseId}
-                  work={work}
-                  cardKey={`work-${work.databaseId}`}
-                />
-              ))}
-            </div>
+          <section
+            ref={filteredWorkSectionRef}
+            className="work work-cards-only px-5 pt-5 pb-5 md:pt-10 md:pb-20 bg-white section-light"
+          >
+            {filteredWorks.length > 0 ? (
+              <div className="work-cards-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
+                {filteredWorks.map((work) => (
+                  <WorkCard
+                    key={work.databaseId}
+                    work={work}
+                    cardKey={`work-${work.databaseId}`}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="work-empty-message lead text-center py-20">No work found.</p>
+            )}
           </section>
         )}
 

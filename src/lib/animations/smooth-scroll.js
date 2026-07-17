@@ -182,6 +182,10 @@ export function refreshSmoothScroll() {
 
 export function lenisScrollTo(target, options = {}) {
   if (lenisInstance) {
+    // Recalculate dimensions/current position first, otherwise a stale
+    // scroll limit (e.g. right after content shrinks/grows) can clamp the
+    // target to the wrong place.
+    lenisInstance.resize()
     lenisInstance.scrollTo(target, options)
     return
   }
@@ -191,7 +195,7 @@ export function lenisScrollTo(target, options = {}) {
     : target instanceof Element
       ? target.getBoundingClientRect().top + window.scrollY
       : 0
-  window.scrollTo({ top, behavior: 'smooth' })
+  window.scrollTo({ top: top + (options.offset ?? 0), behavior: 'smooth' })
 }
 
 export function scrollToTopImmediate() {
