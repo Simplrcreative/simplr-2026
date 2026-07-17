@@ -515,7 +515,7 @@ export default function AboutPage() {
                     </div>
                     <div className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''}`}>
                       <div
-                        className="how-we-work-content max-w-[28ch]"
+                        className="how-we-work-content"
                         dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }}
                       />
                     </div>

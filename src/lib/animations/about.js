@@ -214,7 +214,7 @@ export function createBulletsStackAnimation(section) {
 // arrival — the fluid, spring/liquid "dock" bounce used throughout the
 // how-we-work motion. `BOUNCE` controls how pronounced that overshoot is;
 // 0 = a plain, no-bounce ease-in-out.
-const BOUNCE = 0.35
+const BOUNCE = 0.25
 function easeInOutBack(x) {
   const c1 = BOUNCE
   const c2 = c1 * 1.525
@@ -251,13 +251,13 @@ export function createHowWeWorkAnimation(section) {
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
   // Short pause once a pair has fully docked before the next transition begins.
-  const HOLD = 0
+  const HOLD = 0.05
   const CIRCLE_VH = 0.75
-  const PILL_ACTIVE_VW = 1.8
-  const PILL_CONTRACT_VW = 0
-  const PARALLAX_STRENGTH = 0.5
-  const TEXT_REVEAL_AT = 0.3
-  const TEXT_HIDE_AT = 0.2
+  const PILL_ACTIVE_VW = 1.3
+  const PILL_CONTRACT_VW = 0.05
+  const PARALLAX_STRENGTH = 0.35
+  const TEXT_REVEAL_AT = 0.6
+  const TEXT_HIDE_AT = 0.3
   // Group 0 starts this many viewport-widths off to the right; index -1 is a
   // virtual "offscreen" slot that slides straight into group 0's rest spot
   // using the exact same chain-translate math as every other transition —
