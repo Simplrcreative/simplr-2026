@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PictureImg from '../components/PictureImg.jsx'
@@ -466,72 +466,62 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark slide-up-subtle">
-        <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1 col-span-12 md:col-span-4">
-            <div className="lead text-white">How we work</div>
-          </div>
-        </div>
-      </section>
 
       <section
         ref={howWeWorkSectionRef}
-        className="py-20 bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden flex items-center justify-center"
+        className="bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden flex items-center justify-center"
       >
-        <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1 col-span-12 how-we-work-stage">
-            <div className="how-we-work-media-stack" aria-hidden="true">
+        <div className="grid grid-cols-12 w-full relative">
+          <div className="absolute top-[50%] translate-y-[-50%] left-5">
+            <div className="lead text-white">How we work</div>
+          </div>
+          <div className="col-start-1 col-span-12 how-we-work-stage ">
+            <div className="how-we-work-track">
               {howWeWork.map((item, index) => {
                 const videoSrc = item?.acfVideo?.node?.sourceUrl ?? ''
                 const loaderSrc = getThumbnail(item?.acfImage, 'loader')
                 const mobileSrc = getThumbnail(item?.acfImage, 'medium')
                 const desktopSrc = getThumbnail(item?.acfImage, 'large')
                 const hasImage = Boolean(loaderSrc || mobileSrc || desktopSrc)
+                const itemKey = `${item?.acfHeading ?? 'how-we-work'}-${index}`
 
                 return (
-                  <div
-                    key={`${item?.acfHeading ?? 'how-we-work-media'}-${index}`}
-                    className="how-we-work-item-media"
-                  >
-                    <div
-                      className="lead how-we-work-heading"
-                      dangerouslySetInnerHTML={{ __html: item?.acfHeading ?? '' }}
-                    />
-                    {videoSrc ? (
-                      <video
-                        src={videoSrc}
-                        title={item?.acfHeading ?? ''}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
+                  <Fragment key={itemKey}>
+                    <div className="how-we-work-item-media">
+                      <div className="how-we-work-media-inner">
+                        {videoSrc ? (
+                          <video
+                            src={videoSrc}
+                            title={item?.acfHeading ?? ''}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                          />
+                        ) : hasImage ? (
+                          <PictureImg
+                            loaderSrc={loaderSrc ? `${loaderSrc}.webp` : ''}
+                            mobileSrc={mobileSrc ? `${mobileSrc}.webp` : ''}
+                            desktopSrc={desktopSrc ? `${desktopSrc}.webp` : ''}
+                            altText={item?.acfHeading ?? ''}
+                          />
+                        ) : null}
+                      </div>
+                      <div
+                        className="lead how-we-work-heading"
+                        dangerouslySetInnerHTML={{ __html: item?.acfHeading ?? '' }}
                       />
-                    ) : hasImage ? (
-                      <PictureImg
-                        loaderSrc={loaderSrc ? `${loaderSrc}.webp` : ''}
-                        mobileSrc={mobileSrc ? `${mobileSrc}.webp` : ''}
-                        desktopSrc={desktopSrc ? `${desktopSrc}.webp` : ''}
-                        altText={item?.acfHeading ?? ''}
+                    </div>
+                    <div className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''}`}>
+                      <div
+                        className="how-we-work-content max-w-[28ch]"
+                        dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }}
                       />
-                    ) : null}
-                  </div>
+                    </div>
+                  </Fragment>
                 )
               })}
-            </div>
-
-            <div className="how-we-work-track">
-              {howWeWork.map((item, index) => (
-                <div
-                  key={`${item?.acfHeading ?? 'how-we-work-content'}-${index}`}
-                  className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''}`}
-                >
-                  <div
-                    className="how-we-work-content max-w-[35ch]"
-                    dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }}
-                  />
-                </div>
-              ))}
             </div>
           </div>
         </div>

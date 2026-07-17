@@ -178,7 +178,7 @@ export function createBulletsStackAnimation(section) {
       end: () => `+=${pinDuration * scrollUnit()}`,
       pin: true,
       pinSpacing: true,
-      scrub: 1,
+      scrub: true,
       invalidateOnRefresh: true,
       anticipatePin: 0,
     },
@@ -209,6 +209,29 @@ export function createBulletsStackAnimation(section) {
   }
 }
 
+// Ease-in-out-back: smoothly accelerates then decelerates (no dead zone at
+// either end, unlike a plain ease-out) with a gentle overshoot right at
+// arrival — the fluid, spring/liquid "dock" bounce used throughout the
+// how-we-work motion. `BOUNCE` controls how pronounced that overshoot is;
+// 0 = a plain, no-bounce ease-in-out.
+const BOUNCE = 0.35
+function easeInOutBack(x) {
+  const c1 = BOUNCE
+  const c2 = c1 * 1.525
+  return x < 0.5
+    ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+    : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (x * 2 - 2) + c2) + 2) / 2
+}
+
+/**
+ * Chain of media-circle + content-pill pairs, scrubbed by scroll.
+ * Each pair sits in a horizontal track: the active pair's circle is docked at
+ * the stage's left edge with its pill expanded to the right. Advancing to the
+ * next pair contracts the current pill (which "pushes" its circle offscreen)
+ * while the next circle slides in and its own pill grows out to dock —
+ * a single eased(u) value drives both the contraction/expansion and the
+ * track's translate so the push and the slide are perfectly in sync.
+ */
 export function createHowWeWorkAnimation(section) {
   if (!section) return () => undefined
 
@@ -221,76 +244,175 @@ export function createHowWeWorkAnimation(section) {
     return () => undefined
   }
 
-  const count = contents.length
-  const getViewportWidth = () => window.innerWidth
-  const mediaStack = section.querySelector('.how-we-work-media-stack')
-  // Use layout width (not bounding box) so parent scale transforms during route
-  // transitions don't shrink the measured settled position.
-  const getMediaSize = () => mediaStack?.offsetWidth || getViewportWidth() * 0.5
-  // Settled (screenshot 2): left edge flush with media right edge.
-  // Crossover (screenshot 1): outgoing at -50vw, incoming at settled.
-  // Fully out: left edge at -100vw.
-  const settledX = () => getMediaSize()
-  const crossoverX = () => getViewportWidth() * -0.56
-  const exitX = () => getViewportWidth() * -1
-  const entrantStartX = () => getViewportWidth() + getMediaSize()
+  const count = medias.length
+  const mediaInners = medias.map((item) => item.querySelector('.how-we-work-media-inner') || item)
+  const contentTexts = contents.map((item) => item.querySelector('.how-we-work-content') || item)
 
-  const PHASE_A = 1
-  const PHASE_B = 0.5
-  const transitionCount = Math.max(count - 1, 0)
-  const mediaFade = Math.min(0.12, PHASE_A * 0.2)
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
 
-  gsap.set(medias, { autoAlpha: 0 })
-  gsap.set(medias[0], { autoAlpha: 1 })
+  // Short pause once a pair has fully docked before the next transition begins.
+  const HOLD = 0
+  const CIRCLE_VH = 0.75
+  const PILL_ACTIVE_VW = 1.8
+  const PILL_CONTRACT_VW = 0
+  const PARALLAX_STRENGTH = 0.5
+  const TEXT_REVEAL_AT = 0.3
+  const TEXT_HIDE_AT = 0.2
+  // Group 0 starts this many viewport-widths off to the right; index -1 is a
+  // virtual "offscreen" slot that slides straight into group 0's rest spot
+  // using the exact same chain-translate math as every other transition —
+  // no separate entrance system, so nothing can drift out of sync with it.
+  const ENTRANCE_DISTANCE_VW = 1
 
-  contents.forEach((content, index) => {
-    gsap.set(content, {
-      x: index === 0 ? settledX : entrantStartX,
-      yPercent: -50,
+  let circleSize = 0
+  let pillActive = 0
+  let pillContracted = 0
+
+  const measure = () => {
+    circleSize = window.innerHeight * CIRCLE_VH
+    pillActive = window.innerWidth * PILL_ACTIVE_VW
+    pillContracted = window.innerWidth * PILL_CONTRACT_VW
+
+    stage.style.height = `${circleSize}px`
+    medias.forEach((media) => {
+      media.style.width = `${circleSize}px`
+      media.style.height = `${circleSize}px`
     })
-  })
+    contents.forEach((content) => {
+      content.style.height = `${circleSize}px`
+    })
+  }
 
-  const tl = gsap.timeline({
-    defaults: { ease: 'none' },
-    scrollTrigger: {
-      trigger: section,
-      start: 'top top',
-      end: () => `+=${Math.max(transitionCount, 1) * getViewportWidth() * 1.5}`,
-      pin: true,
-      scrub: true,
-      invalidateOnRefresh: true,
-      anticipatePin: 1,
+  function render(progress) {
+    const safeProgress = clamp(progress, -1, count - 1)
+    const rawIndex = Math.min(Math.floor(safeProgress), count - 1)
+    const rawPhase = clamp(safeProgress - rawIndex, 0, 1)
+    const isEntrance = rawIndex < 0
+    const nextIndex = rawIndex + 1
+    const hasNext = Boolean(medias[nextIndex])
+
+    const u = rawPhase <= HOLD ? 0 : (rawPhase - HOLD) / (1 - HOLD)
+    const eased = easeInOutBack(u)
+
+    // Outgoing pill contracts toward ~90vw; incoming pill grows from ~90vw to
+    // ~160vw. Both use the same eased value so the "push" and the dock are
+    // one continuous motion, with easeInOutBack's overshoot giving the squish
+    // and the landing a subtle liquid bounce. Nothing squishes during the
+    // entrance — group 0 just slides in at its resting width.
+    const pillWidths = contents.map((_, index) => {
+      if (!isEntrance && hasNext && index === rawIndex) {
+        return Math.max(pillActive - (pillActive - pillContracted) * eased, circleSize)
+      }
+      if (!isEntrance && hasNext && index === nextIndex) {
+        return Math.max(pillContracted + (pillActive - pillContracted) * eased, circleSize)
+      }
+      return pillActive
+    })
+
+    const offsets = []
+    let runningX = 0
+    medias.forEach((_, index) => {
+      offsets[index] = runningX
+      runningX += circleSize + pillWidths[index]
+    })
+
+    const currentStopX = isEntrance ? window.innerWidth * ENTRANCE_DISTANCE_VW : -offsets[rawIndex]
+    const nextStopX = hasNext ? -offsets[nextIndex] : currentStopX
+    const chainX = currentStopX + (nextStopX - currentStopX) * eased
+
+    track.style.transform = `translate3d(${chainX}px, 0, 0)`
+
+    const displayProgress = rawIndex + clamp(eased, -0.25, 1.25)
+
+    medias.forEach((media, index) => {
+      const x = offsets[index]
+      media.style.transform = `translate3d(${x}px, 0, 0)`
+
+      const content = contents[index]
+      if (content) {
+        content.style.width = `${pillWidths[index]}px`
+        content.style.transform = `translate3d(${x + circleSize}px, 0, 0)`
+      }
+
+      const inner = mediaInners[index]
+      if (inner) {
+        const localProgress = clamp(displayProgress - index, -1, 1)
+        const parallax = localProgress * circleSize * PARALLAX_STRENGTH
+        inner.style.transform = `translate3d(${parallax}px, 0, 0)`
+      }
+    })
+
+    contentTexts.forEach((textEl, index) => {
+      const isOutgoing = !isEntrance && index === rawIndex
+      const isIncoming = hasNext && index === nextIndex
+
+      let visible = false
+      if (isIncoming) visible = u > TEXT_REVEAL_AT
+      else if (isOutgoing) visible = u <= TEXT_HIDE_AT
+
+      // Groups at or behind the active one have already been shown — when
+      // hidden, they should exit left (matching their circle/pill), not
+      // reset back to the default "waiting to enter from the right" state.
+      const isPast = !isEntrance && index <= rawIndex
+
+      textEl.classList.toggle('is-visible', visible)
+      textEl.classList.toggle('is-past', isPast)
+    })
+  }
+
+  gsap.set(track, { position: 'absolute', top: 0, left: 0, willChange: 'transform' })
+  gsap.set(medias, { position: 'absolute', top: 0, left: 0, willChange: 'transform, width, height' })
+  gsap.set(contents, { position: 'absolute', top: 0, left: 0, willChange: 'transform, width' })
+
+  measure()
+  render(-1)
+
+  // Total scrubbed range is [-1, count - 1]: unit -1..0 is the entrance,
+  // each further unit is one push/dock transition — so `units` below covers
+  // all of it with one consistent per-unit scroll distance.
+  const units = count
+  const getViewportWidth = () => window.innerWidth
+  const totalDistancePx = () => units * getViewportWidth() * 1.5
+
+  // Pin once the section fills the viewport — since it's min-h-screen and
+  // flex-centered, this is the only point where its centered content lines
+  // up with the viewport's vertical center. Starting the pin any earlier
+  // freezes the section box before it's fully in frame, which crops the
+  // (still vertically centered) stage against the top of the viewport.
+  const trigger = ScrollTrigger.create({
+    trigger: section,
+    start: 'top top',
+    end: () => `+=${totalDistancePx()}`,
+    pin: true,
+    scrub: true,
+    invalidateOnRefresh: true,
+    anticipatePin: 1,
+    onUpdate: (self) => render(-1 + self.progress * units),
+    onRefresh: (self) => {
+      measure()
+      render(-1 + self.progress * units)
     },
   })
 
-  for (let index = 0; index < transitionCount; index += 1) {
-    const current = contents[index]
-    const next = contents[index + 1]
-    const currentMedia = medias[index]
-    const nextMedia = medias[index + 1]
-    const phaseAStart = index * (PHASE_A + PHASE_B)
-
-    // Phase A: current exits halfway, next enters halfway (screenshot 1).
-    tl.to(current, { x: crossoverX, duration: PHASE_A }, phaseAStart)
-    tl.fromTo(
-      next,
-      { x: entrantStartX, yPercent: -50 },
-      { x: settledX, yPercent: -50, duration: PHASE_A },
-      phaseAStart,
-    )
-
-    // Media swap only at the halfway crossover.
-    tl.to(currentMedia, { autoAlpha: 0, duration: mediaFade }, phaseAStart + PHASE_A - mediaFade)
-    tl.to(nextMedia, { autoAlpha: 1, duration: mediaFade }, phaseAStart + PHASE_A - mediaFade)
-
-    // Phase B: hold next at settled position while current finishes exiting (screenshot 2).
-    tl.to(current, { x: exitX, duration: PHASE_B }, phaseAStart + PHASE_A)
+  let resizeTimer
+  const onResize = () => {
+    window.clearTimeout(resizeTimer)
+    resizeTimer = window.setTimeout(() => {
+      measure()
+      trigger.refresh()
+    }, 150)
   }
+  window.addEventListener('resize', onResize)
 
   return () => {
-    tl.scrollTrigger?.kill()
-    tl.kill()
-    gsap.set([...contents, ...medias], { clearProps: 'transform,opacity,visibility' })
+    window.removeEventListener('resize', onResize)
+    window.clearTimeout(resizeTimer)
+    trigger.kill()
+    contentTexts.forEach((textEl) => textEl.classList.remove('is-visible', 'is-past'))
+    gsap.set([track, ...medias, ...contents, ...mediaInners], {
+      clearProps: 'transform,width,height,position,top,left,willChange',
+    })
+    gsap.set(stage, { clearProps: 'height' })
   }
 }
 

@@ -1,0 +1,389 @@
+<section class="process-motion" aria-label="How we work">
+  <div class="process-motion__stage">
+    <p class="process-motion__eyebrow">How we work</p>
+    <div class="process-motion__chain"></div>
+  </div>
+
+  <div class="process-motion__controls" aria-label="Motion reference controls">
+    <button type="button" data-prev>Back</button>
+    <button type="button" data-play>Play</button>
+    <input data-progress type="range" min="0" max="400" value="0" aria-label="Animation progress">
+    <button type="button" data-next>Next</button>
+  </div>
+</section>
+
+<style>
+  .process-motion {
+    --maroon: #370918;
+    --lime: #dfeaa2;
+    --coral: #fa563f;
+    --lavender: #c7b9ff;
+    --olive: #837500;
+    --blue: #5868f2;
+    --ink: #2f111b;
+    width: 100%;
+    font-family: inherit;
+  }
+
+  .process-motion__stage {
+    position: relative;
+    height: min(70vw, 620px);
+    min-height: 420px;
+    overflow: hidden;
+    background: var(--maroon);
+  }
+
+  .process-motion__eyebrow {
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    z-index: 20;
+    margin: 0;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .process-motion__chain {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .process-motion__circle,
+  .process-motion__pill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    will-change: transform, width, opacity;
+  }
+
+  .process-motion__circle {
+    background: #18201f;
+  }
+
+  .process-motion__photo {
+    position: absolute;
+    inset: -9%;
+    background:
+      linear-gradient(rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.58)),
+      radial-gradient(circle at 66% 40%, rgba(230, 230, 220, 0.9) 0 10%, transparent 11%),
+      radial-gradient(circle at 42% 64%, rgba(30, 26, 24, 0.96) 0 14%, transparent 15%),
+      linear-gradient(100deg, #70806e 0 18%, #222c2b 18% 26%, #9aa198 26% 30%, #202625 30% 38%, #66706b 38% 50%, #c7c7bb 50% 62%, #5f6e52 62% 70%, #211f1c 70% 100%);
+    background-size: cover;
+    transform: translate3d(var(--photo-x, 0), 0, 0) scale(var(--photo-scale, 1));
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  .process-motion__circle-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: 500;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+    white-space: nowrap;
+  }
+
+  .process-motion__pill {
+    display: grid;
+    align-items: center;
+    padding: 0 clamp(42px, 9vw, 118px);
+    color: var(--ink);
+  }
+
+  .process-motion__copy {
+    max-width: 520px;
+    color: var(--ink);
+    opacity: 0;
+    transform: translate3d(34px, 12px, 0);
+    transition:
+      opacity 520ms ease,
+      transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .process-motion__copy.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .process-motion__copy strong {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .process-motion__controls {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    margin-top: 14px;
+  }
+
+  .process-motion__controls input {
+    width: 100%;
+  }
+
+  @media (max-width: 700px) {
+    .process-motion__stage {
+      min-height: 360px;
+    }
+
+    .process-motion__controls {
+      grid-template-columns: auto auto auto;
+    }
+
+    .process-motion__controls input {
+      grid-column: 1 / -1;
+      order: -1;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.querySelector(".process-motion");
+    const stage = root.querySelector(".process-motion__stage");
+    const chain = root.querySelector(".process-motion__chain");
+    const progressInput = root.querySelector("[data-progress]");
+    const prevButton = root.querySelector("[data-prev]");
+    const nextButton = root.querySelector("[data-next]");
+    const playButton = root.querySelector("[data-play]");
+
+    const steps = [
+      {
+        label: "Understand",
+        color: "var(--lime)",
+        copy: "We map the business, audience, market, and ambition behind the brief."
+      },
+      {
+        label: "Define",
+        color: "var(--coral)",
+        copy: "We sharpen the opportunity into a clear strategic direction and measurable priorities."
+      },
+      {
+        label: "Design",
+        color: "var(--lavender)",
+        copy: "We shape the experience, visual system, and interaction patterns around the idea."
+      },
+      {
+        label: "Build",
+        color: "var(--olive)",
+        copy: "We turn the system into a responsive digital product with polished motion and detail."
+      },
+      {
+        label: "Launch",
+        color: "var(--blue)",
+        copy: "We release, review, and refine so the work keeps improving after it goes live."
+      }
+    ];
+
+    const elements = steps.map((step) => {
+      const circle = document.createElement("div");
+      circle.className = "process-motion__circle";
+      circle.innerHTML = `
+        <div class="process-motion__photo"></div>
+        <span class="process-motion__circle-label">${step.label}</span>
+      `;
+
+      const pill = document.createElement("div");
+      pill.className = "process-motion__pill";
+      pill.style.background = step.color;
+      pill.innerHTML = `
+        <div class="process-motion__copy">
+          <strong>${step.label}</strong>
+          ${step.copy}
+        </div>
+      `;
+
+      chain.append(circle, pill);
+
+      return {
+        circle,
+        photo: circle.querySelector(".process-motion__photo"),
+        pill,
+        copy: pill.querySelector(".process-motion__copy")
+      };
+    });
+
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const smooth = (value) => value * value * (3 - 2 * value);
+
+    const settleEase = (value) => {
+      const t = clamp(value, 0, 1);
+      return t < 0.52
+        ? 0.9 * Math.pow(t / 0.52, 2.15)
+        : 0.9 + 0.1 * (1 - Math.pow(1 - ((t - 0.52) / 0.48), 3));
+    };
+
+    const choreograph = (phase) => {
+      const hold = 0.08;
+      const loadEnd = 0.2;
+      const moveEnd = 0.78;
+
+      if (phase <= hold) return { travel: 0, push: 0, load: 0, reveal: 1 };
+
+      if (phase <= loadEnd) {
+        const t = (phase - hold) / (loadEnd - hold);
+        return {
+          travel: 0,
+          push: 0.2 * Math.sin(t * Math.PI),
+          load: Math.sin(t * Math.PI),
+          reveal: 1 - t
+        };
+      }
+
+      if (phase >= moveEnd) return { travel: 1, push: 0, load: 0, reveal: 1 };
+
+      const t = (phase - loadEnd) / (moveEnd - loadEnd);
+      return {
+        travel: settleEase(t),
+        push: Math.pow(Math.sin(t * Math.PI), 0.42),
+        load: 0,
+        reveal: t > 0.68 ? (t - 0.68) / 0.32 : 0
+      };
+    };
+
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let velocity = 0;
+    let isPlaying = false;
+    let playClock = 0;
+    let lastTime = performance.now();
+
+    const stepEnergy = [0.95, 1.12, 1.32, 1.04, 1.2];
+
+    function render(progress) {
+      const safeProgress = clamp(progress, 0, steps.length - 1);
+      const rect = stage.getBoundingClientRect();
+      const stageW = rect.width;
+      const stageH = rect.height;
+      const mobile = stageW < 700;
+
+      const rawIndex = Math.min(Math.floor(safeProgress), steps.length - 1);
+      const rawPhase = clamp(safeProgress - rawIndex, 0, 1);
+      const motion = choreograph(rawPhase);
+      const displayProgress = clamp(rawIndex + motion.travel, 0, steps.length - 1);
+      const activeIndex = clamp(rawIndex + (motion.travel > 0.58 ? 1 : 0), 0, steps.length - 1);
+
+      const circleSize = mobile ? Math.min(220, stageH * 0.7) : Math.min(stageH * 0.84, stageW * 0.42);
+      const basePillWidth = mobile ? Math.max(400, stageW * 1.02) : Math.max(900, stageW * 0.96);
+      const energy = stepEnergy[rawIndex] || 1;
+      const expandPulse = (mobile ? 310 : 720) * energy;
+      const loadContract = (mobile ? 42 : 90) * energy;
+
+      const y = stageH - circleSize;
+      const circleRightAtRest = mobile ? stageW * 0.48 : stageW * 0.285;
+      const circleLeftAtRest = circleRightAtRest - circleSize;
+
+      const pillWidths = steps.map((_, index) => {
+        if (index === rawIndex) {
+          const collapse = (basePillWidth - circleSize) * motion.push;
+          return basePillWidth - loadContract * motion.load - collapse;
+        }
+        if (index === rawIndex + 1) return basePillWidth + expandPulse * motion.push;
+        return basePillWidth;
+      });
+
+      const offsets = [];
+      let runningX = 0;
+      pillWidths.forEach((width, index) => {
+        offsets[index] = runningX;
+        runningX += circleSize + width;
+      });
+
+      const currentStopX = circleLeftAtRest - (offsets[rawIndex] || 0);
+      const nextStopX = circleLeftAtRest - (offsets[rawIndex + 1] || offsets[rawIndex] || 0);
+      const chainX = currentStopX + (nextStopX - currentStopX) * motion.travel;
+      chain.style.transform = `translate3d(${chainX}px, 0, 0)`;
+
+      elements.forEach((item, index) => {
+        const x = offsets[index];
+        const pillX = x + circleSize;
+        const parallax = (displayProgress - index) * (mobile ? 48 : 96);
+        const photoScale = 1.06 + motion.push * 0.11 + motion.load * 0.03;
+
+        item.circle.style.width = `${circleSize}px`;
+        item.circle.style.height = `${circleSize}px`;
+        item.circle.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        item.circle.style.setProperty("--photo-x", `${parallax}px`);
+        item.circle.style.setProperty("--photo-scale", String(photoScale));
+
+        item.pill.style.width = `${pillWidths[index]}px`;
+        item.pill.style.height = `${circleSize}px`;
+        item.pill.style.transform = `translate3d(${pillX}px, ${y}px, 0)`;
+
+        item.copy.classList.toggle("is-visible", index === activeIndex && motion.reveal > 0.72);
+      });
+    }
+
+    function step(delta) {
+      targetProgress = clamp(Math.round(targetProgress) + delta, 0, steps.length - 1);
+      playClock = targetProgress;
+      progressInput.value = String(targetProgress * 100);
+      isPlaying = false;
+      playButton.textContent = "Play";
+    }
+
+    function tick(now) {
+      const delta = Math.min(32, now - lastTime) / 16.67;
+      lastTime = now;
+
+      if (isPlaying) {
+        playClock += 0.0034 * delta;
+        targetProgress = clamp(playClock, 0, steps.length - 1);
+        progressInput.value = String(targetProgress * 100);
+
+        if (targetProgress >= steps.length - 1) {
+          targetProgress = steps.length - 1;
+          isPlaying = false;
+          playButton.textContent = "Replay";
+        }
+      }
+
+      const pull = (targetProgress - currentProgress) * 0.075;
+      velocity = (velocity + pull) * 0.74;
+      currentProgress += velocity * delta;
+
+      if (Math.abs(targetProgress - currentProgress) < 0.001 && Math.abs(velocity) < 0.001) {
+        currentProgress = targetProgress;
+        velocity = 0;
+      }
+
+      render(currentProgress);
+      requestAnimationFrame(tick);
+    }
+
+    progressInput.addEventListener("input", () => {
+      targetProgress = Number(progressInput.value) / 100;
+      playClock = targetProgress;
+      isPlaying = false;
+      playButton.textContent = "Play";
+    });
+
+    prevButton.addEventListener("click", () => step(-1));
+    nextButton.addEventListener("click", () => step(1));
+
+    playButton.addEventListener("click", () => {
+      if (targetProgress >= steps.length - 1) {
+        targetProgress = 0;
+        currentProgress = 0;
+        velocity = 0;
+        playClock = 0;
+        progressInput.value = "0";
+      }
+
+      playClock = targetProgress;
+      isPlaying = !isPlaying;
+      playButton.textContent = isPlaying ? "Pause" : "Play";
+    });
+
+    window.addEventListener("resize", () => render(currentProgress));
+    requestAnimationFrame(tick);
+  })();
+</script>

@@ -796,40 +796,37 @@
   transition: none;
 }
 .how-we-work-section {
-  --how-we-work-size: min(50vw, 80vh);
+  overflow: hidden;
 }
 .how-we-work-stage {
   position: relative;
-  min-height: var(--how-we-work-size);
-  overflow: hidden;
 }
-.how-we-work-media-stack {
+.how-we-work-track {
   position: absolute;
-  top: 50%;
-  left: 0;
-  z-index: 1;
-  width: var(--how-we-work-size);
-  height: var(--how-we-work-size);
-  transform: translateY(-50%);
-  pointer-events: none;
+  inset: 0;
+  will-change: transform;
 }
 .how-we-work-item-media {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
   border-radius: 9999px;
   overflow: hidden;
 }
-.how-we-work-item-media picture,
-.how-we-work-item-media video,
-.how-we-work-item-media img {
-  width: 100%;
-  height: 100%;
+.how-we-work-media-inner {
+  position: absolute;
+  inset: -6%;
+  will-change: transform;
+}
+.how-we-work-media-inner picture,
+.how-we-work-media-inner video,
+.how-we-work-media-inner img {
+  width: 110%;
+  height: 110%;
   display: block;
 }
-.how-we-work-item-media video,
-.how-we-work-item-media img {
+.how-we-work-media-inner video,
+.how-we-work-media-inner img {
   object-fit: cover;
 }
 
@@ -854,20 +851,12 @@
   align-items: center;
   z-index: 2;
   color: white;
-}
-.how-we-work-track {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  height: var(--how-we-work-size);
-  overflow: hidden;
+  white-space: nowrap;
 }
 .how-we-work-item-content {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 0;
-  width: 100vw;
-  height: var(--how-we-work-size);
   border-radius: 9999px;
   overflow: hidden;
   display: flex;
@@ -875,10 +864,28 @@
   will-change: transform;
 }
 .how-we-work-content {
-  padding: 0 12.5rem;
+  padding: 0 8rem;
   font-size: 3.125rem;
   font-weight: 300;
   line-height: 1.2;
+  opacity: 0;
+  /* Not-yet-shown default: waiting off to the right. This bounce curve is
+     independent of the JS easeOutBack "c1" used for the pill/media chain —
+     tune the 2.2 here to make the text's own bounce more/less aggressive. */
+  transform: translate3d(70px, 0, 0);
+  transition:
+    opacity 0.5s ease,
+    transform 0.75s cubic-bezier(0.25, 0.5, 0.5, 1);
+}
+.how-we-work-content.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0.08s;
+}
+/* Already shown and passed: exits to the left instead of resetting back to
+   the right — matches the direction the circle/pill are actually moving. */
+.how-we-work-content.is-past:not(.is-visible) {
+  transform: translate3d(-70px, 0, 0);
 }
 
 
