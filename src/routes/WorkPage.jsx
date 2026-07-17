@@ -427,7 +427,14 @@ export default function WorkPage() {
     [works, displayedFilter, keywordFilter],
   )
 
-  const groups = useMemo(() => groupWorks(filteredWorks), [filteredWorks])
+  // Default (no filter/search): featured + cards + testimonial per group.
+  // Filtered/searched: flat work-cards only, no featured or testimonial.
+  const isFiltering = displayedFilter !== 'all' || keywordFilter.trim().length > 0
+
+  const groups = useMemo(
+    () => (isFiltering ? [] : groupWorks(filteredWorks)),
+    [filteredWorks, isFiltering],
+  )
 
   const loadNextBatch = useCallback(async () => {
     if (isLoadingMore || !hasMoreWorks) {
@@ -517,7 +524,7 @@ export default function WorkPage() {
     }
   }, [])
 
-  useEffect(() => createTestimonialDotAnimation(), [displayedFilter, groups.length])
+  useEffect(() => createTestimonialDotAnimation(), [displayedFilter, groups.length, isFiltering])
 
   useEffect(() => {
     const cleanupSplitText = createSplitTextAnimation()
@@ -529,7 +536,7 @@ export default function WorkPage() {
       cancelAnimationFrame(rafId)
       cleanupSplitText?.()
     }
-  }, [displayedFilter, groups.length])
+  }, [displayedFilter, groups.length, isFiltering])
 
   useEffect(() => {
     const cleanupWorkThumbHover = createWorkThumbHoverAnimation(workResultsRef.current)
@@ -537,7 +544,7 @@ export default function WorkPage() {
     return () => {
       cleanupWorkThumbHover?.()
     }
-  }, [displayedFilter, groups.length])
+  }, [displayedFilter, groups.length, isFiltering])
 
   useEffect(() => {
     if (!isFilterAnimating) return
@@ -586,8 +593,14 @@ export default function WorkPage() {
     setActiveFilter(nextFilter)
 
     const nextFilteredWorks = works.filter((w) => workMatchesFilter(w, nextFilter))
-    const nextGroups = groupWorks(nextFilteredWorks)
-    const nextKeys = collectCardKeys(nextGroups)
+    const keyword = keywordFilter.trim().toLowerCase()
+    const nextSearchedWorks = keyword
+      ? nextFilteredWorks.filter((w) => getWorkCardTitle(w).toLowerCase().includes(keyword))
+      : nextFilteredWorks
+    const nextIsFiltering = nextFilter !== 'all' || keyword.length > 0
+    const nextKeys = nextIsFiltering
+      ? new Set(nextSearchedWorks.map((w) => `work-${w.databaseId}`))
+      : collectCardKeys(groupWorks(nextSearchedWorks))
 
     const container = workResultsRef.current
     if (!container) {
@@ -672,7 +685,21 @@ export default function WorkPage() {
       </section>
 
       <div ref={workResultsRef} className="work-results">
-        {groups.map((group, i) => {
+        {isFiltering && (
+          <section className="work work-cards-only px-5 pt-5 pb-5 md:pt-10 md:pb-20 bg-white section-light">
+            <div className="work-cards-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
+              {filteredWorks.map((work) => (
+                <WorkCard
+                  key={work.databaseId}
+                  work={work}
+                  cardKey={`work-${work.databaseId}`}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!isFiltering && groups.map((group, i) => {
           const n = i + 1
           const rowStyle = { '--work-row-cols': 2 }
           const linkedTestimonialId = group.testimonialWork
