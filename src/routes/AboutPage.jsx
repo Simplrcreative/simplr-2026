@@ -164,16 +164,13 @@ export default function AboutPage() {
   }, [activeBio])
 
   useEffect(() => {
+    // Locking is triggered from handlePersonClick's scroll onComplete instead
+    // (see below) — locking here as soon as bioLayoutOpen flips true would call
+    // Lenis's stop(), which kills that in-flight centering scroll before it
+    // gets anywhere near its target. This effect only ever needs to unlock.
     if (!bioLayoutOpen) {
       unlockScroll('about-bio')
-      return undefined
     }
-
-    if (!window.matchMedia('(min-width: 768px)').matches) {
-      return undefined
-    }
-
-    lockScroll('about-bio', { preventTouch: false })
 
     return () => unlockScroll('about-bio')
   }, [bioLayoutOpen])
@@ -181,9 +178,24 @@ export default function AboutPage() {
   const handlePersonClick = (name) => {
     setBioLayoutOpen(true)
     setActiveBio(name)
-    if (peopleSectionRef.current) {
-      lenisScrollTo(peopleSectionRef.current)
+
+    const section = peopleSectionRef.current
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
+    if (!section || !isDesktop) {
+      return
     }
+
+    // Center the section in the viewport rather than aligning its top edge —
+    // min-h-screen means the section can be taller than the viewport once
+    // its content (names, meta, etc.) grows, so a plain top-align no longer
+    // lines up with the section's own vertically-centered content.
+    const offset = (section.offsetHeight - window.innerHeight) / 2
+
+    lenisScrollTo(section, {
+      offset,
+      onComplete: () => lockScroll('about-bio', { preventTouch: false }),
+    })
   }
 
   const handlePersonEnter = (person) => {
@@ -469,7 +481,7 @@ export default function AboutPage() {
 
       <section
         ref={howWeWorkSectionRef}
-        className="bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden flex items-center justify-center"
+        className="hidden bg-coffee section-dark min-h-screen how-we-work-section overflow-hidden flex items-center justify-center"
       >
         <div className="grid grid-cols-12 w-full relative">
           <div className="absolute top-[50%] translate-y-[-50%] left-5">
@@ -572,7 +584,7 @@ export default function AboutPage() {
       </section>
 
       {awards.length > 0 ? (
-        <section className="px-5 py-20 bg-coffee section-dark awards-section">
+        <section className="hidden px-5 py-20 bg-coffee section-dark awards-section">
           {awards.map((award, awardIndex) => {
             const projects = Array.isArray(award?.acfProjects) ? award.acfProjects : []
 
