@@ -13,7 +13,7 @@ function getNumCols() {
   return 1
 }
 
-function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
+function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium_large', fallbackSize = 'medium') {
   const thumbnailNode = acfFeaturedThumbnail?.node
   const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
   return (
@@ -106,7 +106,7 @@ export default function Est2014Page() {
 
                   const imgLoaderSrc = getThumbnail(item.source, 'loader')
                   const imgMobileSrc = getThumbnail(item.source, 'medium')
-                  const imgDesktopSrc = getThumbnail(item.source, 'large')
+                  const imgDesktopSrc = getThumbnail(item.source, 'medium_large')
 
                   return (
                     <figure key={item.id} className="beyond-masonry__item">

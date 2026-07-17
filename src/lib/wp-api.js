@@ -270,8 +270,8 @@ const peopleQuery = `
 `
 
 const beyondQuery = `
-  query beyondQuery {
-    acfBeyonds {
+  query beyondQuery($first: Int = 100) {
+    acfBeyonds(first: $first) {
       nodes {
         acfBeyondBuilder {
           acfImages {
