@@ -46,15 +46,10 @@
   display: none
 }
 
-.person-exp,
-.person-linkedin {
+.person-exp {
   font-size: 0.75rem;
   line-height: 1;
   white-space: nowrap;
-}
-
-.person-linkedin {
-  text-decoration: underline;
 }
 
 /* ─── Profile image — inside image column, vertically centered ── */
@@ -159,15 +154,27 @@
     font-size: 0.875rem;
 }
 
-.bio-linkedin {
+.bio-linkedin,
+.person-linkedin {
     display: inline-block;
+    text-transform: lowercase;
+    font-weight: 500;
     font-size: 0.875rem;
-    text-decoration:underline
+    line-height: 1;
+    text-decoration-line: underline;
+    text-decoration-color: white;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.3s ease;
 }
 .bio-linkedin:hover {
-    text-decoration:none
+    text-decoration-color: transparent;
 }
-
+.person-linkedin { 
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+}
 .bio-text {
   font-size: clamp(0.875rem, 5vw, 1rem);
   line-height: 1.5;
@@ -639,8 +646,8 @@
     position: absolute;
     top: 1.25rem;
     right: 1.25rem;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2.7rem;
+    height: 2.7rem;
     /*border: 1px solid rgba(255, 248, 245, 0.28);*/
     border-radius: 999px;
     cursor: pointer;
@@ -651,7 +658,7 @@
     left: 12px;
     right: 12px;
     top: 20px;
-    height: 1px;
+    height: 1.5px;
     background: white;
   }
 

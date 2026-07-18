@@ -374,8 +374,14 @@ nav.light a.is-active .nav-link__orb {
     .logo-holder.footer svg {
         fill: var(--color-coffee)
     }
+    .logo-holder.light.footer svg {
+        fill: white
+    }
     .footer .tagline {
         color: var(--color-coffee)
+    }
+    .footer.light .tagline {
+        color: white
     }
     .nav-link {
         margin-bottom: 2rem;

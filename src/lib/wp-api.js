@@ -323,6 +323,7 @@ const worksListQuery = `
         slug
         title
         acfWorkBuilder {
+          acfOrder
           acfCategory {
             nodes {
               name
@@ -1174,23 +1175,6 @@ export function getMediaSourceUrl(media, preferredSize = 'large') {
   return node?.guid ?? node?.sourceUrl ?? ''
 }
 
-function getCachedWorksPayload(minFirst) {
-  let bestKey = null
-  let bestFirst = Infinity
-
-  for (const key of cache.keys()) {
-    if (!key.startsWith('works:')) continue
-    const cachedFirst = Number.parseInt(key.slice('works:'.length), 10)
-    if (!Number.isFinite(cachedFirst) || cachedFirst < minFirst) continue
-    if (cachedFirst < bestFirst) {
-      bestFirst = cachedFirst
-      bestKey = key
-    }
-  }
-
-  return bestKey ? cache.get(bestKey) : null
-}
-
 /**
  * Warm the Work index route: list + page + testimonials for the first batch.
  * Fire-and-forget; results land in the GraphQL remember() cache.
@@ -1644,6 +1628,30 @@ export function prefetchWorkEntry(slug) {
   ]).catch(() => {}) // Silently ignore errors
 }
 
+/**
+ * Pins works with a positive acfOrder (e.g. 1, 2) to the front, ordered
+ * ascending by that value. Everything else (acfOrder blank/0/invalid) keeps
+ * whatever order the API returned it in (its normal default/chronological
+ * position), just shifted after the pinned items.
+ */
+function sortWorksByPinnedOrder(works) {
+  const pinned = []
+  const rest = []
+
+  works.forEach((work) => {
+    const order = Number(work?.acfWorkBuilder?.acfOrder)
+    if (Number.isFinite(order) && order > 0) {
+      pinned.push(work)
+    } else {
+      rest.push(work)
+    }
+  })
+
+  pinned.sort((a, b) => Number(a.acfWorkBuilder.acfOrder) - Number(b.acfWorkBuilder.acfOrder))
+
+  return pinned.length ? [...pinned, ...rest] : rest
+}
+
 export async function fetchWorksData(options = {}) {
   let first = DEFAULT_WORKS_LIST_FIRST
 
@@ -1659,18 +1667,19 @@ export async function fetchWorksData(options = {}) {
   }
 
   try {
-    // Reuse a larger cached list (e.g. home warmed works:24) instead of refetching works:6.
-    const cachedPayload = getCachedWorksPayload(first)
-    if (cachedPayload) {
-      const data = await cachedPayload
-      const works = data.acfWorks?.nodes ?? []
-      return { works: works.slice(0, first) }
-    }
+    // Always fetch (and cache) the full pool up to MAX_WORKS_LIST_FIRST rather
+    // than exactly `first`. A pinned (acfOrder) work can sit anywhere in the
+    // underlying default/date order, so a narrower fetch could miss it
+    // entirely — it would only "appear" pinned once a later, larger request
+    // (e.g. load-more) happened to reach far enough back to include it.
+    // Every caller shares this one cached pool and just slices to their own
+    // `first`, so this also means there's only ever one network request.
+    const data = await remember(`works:${MAX_WORKS_LIST_FIRST}`, () =>
+      graphQlRequest(worksListQuery, { first: MAX_WORKS_LIST_FIRST }),
+    )
+    const works = sortWorksByPinnedOrder(data.acfWorks?.nodes ?? [])
 
-    const data = await remember(`works:${first}`, () => graphQlRequest(worksListQuery, { first }))
-    const works = data.acfWorks?.nodes ?? []
-
-    return { works }
+    return { works: works.slice(0, first) }
   } catch (error) {
     reportError('Unable to load works data', error)
 

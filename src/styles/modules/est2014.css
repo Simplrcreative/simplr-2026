@@ -106,7 +106,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 1.25rem;
 }
 
 .beyond-masonry__item {
@@ -146,6 +146,6 @@
 @media (min-width: 1280px) {
   .beyond-masonry,
   .beyond-masonry__col {
-    gap: 1rem;
+    gap: 0.625rem;
   }
 }

@@ -120,6 +120,12 @@
     text-underline-offset: 3px;
     transition: text-decoration-color 0.3s ease;
 }
+.bg-coffee {
+  .socials a,
+  .footer-details-meta a {
+    text-decoration-color: white;
+  }
+}
 .socials a:hover,
 .footer-details-meta a:hover {
     text-decoration-color: transparent;

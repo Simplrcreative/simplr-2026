@@ -181,7 +181,7 @@ function ServiceCard({ service }) {
 
   return (
     <article className="service-card bg-white flex flex-col justify-end">
-        <div className="service-card-inner pt-10 md:pt-40">
+        <div className="service-card-inner pt-12 md:pt-40">
             <div className="service-card__header">
                 <div className="service-card__label">
                     <ServiceLabelIcon color={accentColor} />
