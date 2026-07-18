@@ -292,7 +292,7 @@ export default function AboutPage() {
                 {person.acfName}
               </span>
               <span className="hidden md:block person-meta">
-                {person.acfExperience && <span className="person-exp">{person.acfExperience} years exp.</span>}
+                {/*{person.acfExperience && <span className="person-exp">{person.acfExperience} years exp.</span>}*/}
                 {person.acfLinkedIn && (
                   <a
                     href={`https://www.linkedin.com/in/${person.acfLinkedIn}`}
