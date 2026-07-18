@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
@@ -7,12 +7,46 @@ import PictureImg from '../components/PictureImg.jsx'
 
 const FALLBACK_RATIO = { image: 4 / 3, video: 16 / 9 }
 
+// Rough per-item allowance for the vertical gap between stacked items, in the
+// same relative units as 1/ratio (item height for a column of unit width).
+const GAP_ESTIMATE = 0.12
+
 function getNumCols() {
   const w = window.innerWidth
   if (w >= 1280) return 4
   if (w >= 900) return 3
   if (w >= 640) return 2
   return 2
+}
+
+function getItemRatio(item) {
+  return item.ratio
+    ?? (item.width && item.height ? item.width / item.height : null)
+    ?? FALLBACK_RATIO[item.type]
+    ?? 1
+}
+
+// Round-robin (index % numCols) only balances item *count* per column, not
+// height — since items have varying aspect ratios, one column can drift
+// taller than another, and by the tail of a long list that drift becomes a
+// visible gap where shorter columns run out of content first. Bin-packing
+// each item into whichever column is currently shortest (using the aspect
+// ratio we already know from WP media data) keeps columns level throughout.
+function distributeIntoColumns(items, numCols) {
+  const heights = new Array(numCols).fill(0)
+  const cols = Array.from({ length: numCols }, () => [])
+
+  items.forEach((item) => {
+    let shortest = 0
+    for (let i = 1; i < numCols; i += 1) {
+      if (heights[i] < heights[shortest]) shortest = i
+    }
+
+    cols[shortest].push(item)
+    heights[shortest] += 1 / getItemRatio(item) + GAP_ESTIMATE
+  })
+
+  return cols
 }
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium_large', fallbackSize = 'medium') {
@@ -34,10 +68,9 @@ export default function Est2014Page() {
   const [videoRatios, setVideoRatios] = useState({})
   const [numCols, setNumCols] = useState(getNumCols)
 
-  const columns = Array.from({ length: numCols }, (_, colIndex) =>
-    beyondItems
-      .map((item, i) => ({ item, globalIndex: i }))
-      .filter(({ globalIndex }) => globalIndex % numCols === colIndex)
+  const columns = useMemo(
+    () => distributeIntoColumns(beyondItems, numCols),
+    [beyondItems, numCols]
   )
 
   // Most items already know their aspect ratio (WP media dimensions), so their
@@ -118,7 +151,7 @@ export default function Est2014Page() {
           <div ref={galleryRef} className="beyond-masonry">
             {columns.map((colItems, colIndex) => (
               <div key={colIndex} className="beyond-masonry__col">
-                {colItems.map(({ item }) => {
+                {colItems.map((item) => {
                   // Known media dimensions (from WP) reserve the exact box up front —
                   // no waiting on the asset itself to know how tall this item is.
                   const knownRatio = item.ratio ?? (item.width && item.height ? item.width / item.height : null)
