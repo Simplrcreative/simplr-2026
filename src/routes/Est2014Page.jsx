@@ -12,7 +12,7 @@ function getNumCols() {
   if (w >= 1280) return 4
   if (w >= 900) return 3
   if (w >= 640) return 2
-  return 1
+  return 2
 }
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium_large', fallbackSize = 'medium') {

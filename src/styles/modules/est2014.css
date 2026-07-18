@@ -62,10 +62,10 @@
   background: rgba(48, 15, 29, 0.9);
   color: white;
   font-family: var(--font-aeonik);
-  font-size: 0.875rem;
+  font-size: 0.5rem;
   font-weight: 500;
   line-height: 1;
-  padding: 10px 15px;
+  padding: 5px 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -78,6 +78,10 @@
 
   .beyond-row {
     gap: 0.75rem;
+  }
+  .beyond-card__caption {
+    font-size: 0.875rem;
+    padding: 10px 15px;
   }
 }
 
