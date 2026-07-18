@@ -1459,6 +1459,20 @@ export async function fetchPeopleData() {
   }
 }
 
+/**
+ * Fisher–Yates shuffle. Returns a new array — never mutates the input.
+ */
+function shuffleArray(array) {
+  const shuffled = [...array]
+
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+
+  return shuffled
+}
+
 export async function fetchBeyondData() {
   if (!wpConfig.endpoint) {
     return { beyondItems: [] }
@@ -1506,7 +1520,10 @@ export async function fetchBeyondData() {
       })
       .filter(Boolean)
 
-    return { beyondItems }
+    // Randomize display order — WP returns these in their default/authored
+    // order, so shuffle here (each call, since this endpoint isn't cached)
+    // to give a fresh mix of images every time this data is fetched.
+    return { beyondItems: shuffleArray(beyondItems) }
   } catch (error) {
     reportError('Unable to load beyond data', error)
     return { beyondItems: [] }
