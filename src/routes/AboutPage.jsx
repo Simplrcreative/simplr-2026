@@ -443,7 +443,8 @@ export default function AboutPage() {
                   onMouseEnter={() => activateValue(index)}
                   onClick={() => activateValue(index)}
                   dangerouslySetInnerHTML={{ __html: value?.acfValue ?? '' }}
-                />
+                >
+                </div>
               </div>
             ))}
           </div>
@@ -554,12 +555,12 @@ export default function AboutPage() {
                     key={`${client?.acfClient ?? 'client'}-${originalIndex}`}
                     className="client-item flex align-center justify-between gap-5 text-white"
                   >
-                    <div className="flex align-center gap-5">
+                    <div className="flex items-center gap-5">
                       <div className="font-literata flex flex-col items-center justify-center opacity-90">
                         {originalIndex < 9 ? `0${originalIndex + 1}` : originalIndex + 1}
                       </div>
                       <div
-                        className="client lead"
+                        className="client lead flex items-center"
                         onMouseEnter={() => setActiveClientIndex(originalIndex)}
                         onMouseLeave={() => setActiveClientIndex(null)}
                       >
