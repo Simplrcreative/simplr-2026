@@ -11,11 +11,22 @@ export default function PictureImg({
   width,
   height,
   attributes = {},
+  onSettled,
 }) {
 
     const [isIntersecting, setIsIntersecting] = useState(!lazyLoad);
     const [isFullLoaded, setIsFullLoaded] = useState(false);
     const pictureRef = useRef(null);
+    const hasSettledRef = useRef(false);
+
+    // Notify the caller once, whether the full image resolves or fails to load,
+    // so layout-dependent code (e.g. masonry grids driving ScrollTrigger) can
+    // recalculate once every item has settled instead of guessing at a timeout.
+    const notifySettled = () => {
+        if (hasSettledRef.current) return;
+        hasSettledRef.current = true;
+        onSettled?.();
+    };
 
     useEffect(() => {
         if (!lazyLoad) return;
@@ -40,12 +51,21 @@ export default function PictureImg({
     useEffect(() => {
         if (isIntersecting && loaderSrc === mobileSrc && loaderSrc === desktopSrc) {
             setIsFullLoaded(true);
+            notifySettled();
         }
     }, [isIntersecting, loaderSrc, mobileSrc, desktopSrc]);
 
     // Only mark as loaded once the *full* image fires onLoad, not the placeholder
     const handleLoad = () => {
-        if (isIntersecting) setIsFullLoaded(true);
+        if (isIntersecting) {
+            setIsFullLoaded(true);
+            notifySettled();
+        }
+    };
+
+    // A failed load should still unblock any "all items settled" logic upstream.
+    const handleError = () => {
+        notifySettled();
     };
 
     // Filter is on <img>, NOT <picture>, for two reasons:
@@ -75,6 +95,7 @@ export default function PictureImg({
                 width={width || undefined}
                 height={height || undefined}
                 onLoad={handleLoad}
+                onError={handleError}
                 style={imgStyle}
             />
         </picture>

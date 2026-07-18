@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
-import { createSplitTextAnimation, createBtnHoverAnimation } from '../lib/animations/index.js'
+import { createSplitTextAnimation, createBtnHoverAnimation, refreshScrollTriggers } from '../lib/animations/index.js'
 import PictureImg from '../components/PictureImg.jsx'
+
+const FALLBACK_RATIO = { image: 4 / 3, video: 16 / 9 }
 
 function getNumCols() {
   const w = window.innerWidth
@@ -37,6 +39,23 @@ export default function Est2014Page() {
       .map((item, i) => ({ item, globalIndex: i }))
       .filter(({ globalIndex }) => globalIndex % numCols === colIndex)
   )
+
+  // Most items already know their aspect ratio (WP media dimensions), so their
+  // box height is reserved up front and never shifts. A few may be missing
+  // that data and fall back to an estimated ratio instead — once those settle
+  // (load or error) we refresh ScrollTrigger once so any downstream triggers
+  // (e.g. the footer/logo section below) recalculate against the corrected
+  // page height instead of the guessed one.
+  const pendingUnknownRatioRef = useRef(
+    beyondItems.filter((item) => !item.width || !item.height).length
+  )
+
+  const handleUnknownRatioSettled = () => {
+    pendingUnknownRatioRef.current -= 1
+    if (pendingUnknownRatioRef.current <= 0) {
+      refreshScrollTriggers()
+    }
+  }
 
   useEffect(() => {
     const update = () => setNumCols(getNumCols())
@@ -100,16 +119,24 @@ export default function Est2014Page() {
             {columns.map((colItems, colIndex) => (
               <div key={colIndex} className="beyond-masonry__col">
                 {colItems.map(({ item }) => {
+                  // Known media dimensions (from WP) reserve the exact box up front —
+                  // no waiting on the asset itself to know how tall this item is.
+                  const knownRatio = item.ratio ?? (item.width && item.height ? item.width / item.height : null)
+                  const hasKnownRatio = Boolean(knownRatio)
                   const ratio = item.type === 'video'
-                    ? videoRatios[item.id] ?? item.width / item.height
-                    : item.width / item.height
+                    ? videoRatios[item.id] ?? knownRatio
+                    : knownRatio
 
                   const imgLoaderSrc = getThumbnail(item.source, 'loader')
                   const imgMobileSrc = getThumbnail(item.source, 'medium')
                   const imgDesktopSrc = getThumbnail(item.source, 'medium_large')
 
                   return (
-                    <figure key={item.id} className="beyond-masonry__item">
+                    <figure
+                      key={item.id}
+                      className="beyond-masonry__item"
+                      style={{ aspectRatio: ratio || FALLBACK_RATIO[item.type] }}
+                    >
                       {item.type === 'video' ? (
                         <video
                           src={item.source}
@@ -118,7 +145,6 @@ export default function Est2014Page() {
                           autoPlay
                           loop
                           controls={false}
-                          style={{ aspectRatio: ratio || '16/9' }}
                           onLoadedMetadata={(event) => {
                             const width = event.currentTarget.videoWidth
                             const height = event.currentTarget.videoHeight
@@ -128,6 +154,10 @@ export default function Est2014Page() {
                                 [item.id]: width / height,
                               }))
                             }
+                            if (!hasKnownRatio) handleUnknownRatioSettled()
+                          }}
+                          onError={() => {
+                            if (!hasKnownRatio) handleUnknownRatioSettled()
                           }}
                         />
                       ) : (
@@ -138,6 +168,9 @@ export default function Est2014Page() {
                           pictureClass="beyond-masonry__picture"
                           imgClass="beyond-masonry__img"
                           altText={item.caption}
+                          width={item.width || undefined}
+                          height={item.height || undefined}
+                          onSettled={hasKnownRatio ? undefined : handleUnknownRatioSettled}
                         />
                       )}
                       {item.caption ? <figcaption className="beyond-card__caption">{item.caption}</figcaption> : null}
