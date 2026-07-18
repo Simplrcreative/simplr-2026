@@ -584,12 +584,12 @@ export default function AboutPage() {
       </section>
 
       {awards.length > 0 ? (
-        <section className="hidden px-5 py-20 bg-coffee section-dark awards-section">
+        <section className="px-5 py-20 bg-coffee section-dark awards-section">
           {awards.map((award, awardIndex) => {
             const projects = Array.isArray(award?.acfProjects) ? award.acfProjects : []
 
             return (
-              <div key={`${award?.acfAward ?? 'award'}-${awardIndex}`} className="award-group slide-up-subtle mb-15">
+              <div key={`${award?.acfAward ?? 'award'}-${awardIndex}`} className="award-group slide-up-subtle mb-10 md:mb-15">
                 {projects.map((project, projectIndex) => {
                   const caseStudy = project?.acfCaseStudy?.nodes?.[0]
                   const slug = caseStudy?.slug || ''
@@ -604,22 +604,22 @@ export default function AboutPage() {
                       key={`${slug}-${awardIndex}-${projectIndex}`}
                       className="award-item grid grid-cols-12 w-full text-white"
                     >
-                      <div className="col-start-1 col-span-12 md:col-span-4 lead flex flex-col justify-center mb-3">
+                      <div className="award-heading col-start-1 col-span-12 md:col-span-4 lead flex flex-col justify-center mb-5 md:mb-3">
                         {projectIndex === 0 ? (award?.acfAward|| '') : null}
                       </div>
-                      <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-2 lead flex flex-col justify-center mb-3">
+                      <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-2 lead flex flex-col justify-center mb-1 md:mb-3">
                         {client}
                       </div>
-                      <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-3 flex flex-col justify-center mb-3">
+                      <div className="col-start-1 md:col-start-7 col-span-12 md:col-span-3 flex flex-col justify-center mb-1 md:mb-3">
                         {detail}
                       </div>
-                      <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 flex justify-between items-center mb-3">
+                      <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 flex justify-between items-center mb-1 md:mb-3">
                         <div>{year}</div>
                         {slug && (
-                          <div className="relative min-w-[210px] h-[60px] flex items-center justify-end">
+                          <div className="hidden lg:block relative min-w-[210px] h-[60px] flex items-center justify-end">
                             <Link
                               to={buildEntryPath('work', slug)}
-                              className="btn award-btn alt relative"
+                              className=" btn award-btn alt relative"
                               title="View case study"
                               onPointerDown={(event) => {
                                 if (

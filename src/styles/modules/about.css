@@ -1029,3 +1029,9 @@
     pointer-events: auto;
   }
 }
+@media (max-width: 680px) { 
+  .awards-section .award-item .award-heading {
+    font-size: 1.25rem;
+    font-weight: 500;
+  }
+}
