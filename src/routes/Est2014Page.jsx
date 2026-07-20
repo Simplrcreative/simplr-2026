@@ -49,7 +49,7 @@ function distributeIntoColumns(items, numCols) {
   return cols
 }
 
-function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium_large', fallbackSize = 'medium') {
+function getThumbnail(acfFeaturedThumbnail, preferredSize, fallbackSize = 'medium') {
   const thumbnailNode = acfFeaturedThumbnail?.node
   const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
   return (
@@ -161,8 +161,8 @@ export default function Est2014Page() {
                     : knownRatio
 
                   const imgLoaderSrc = getThumbnail(item.source, 'loader')
-                  const imgMobileSrc = getThumbnail(item.source, 'medium')
-                  const imgDesktopSrc = getThumbnail(item.source, 'medium_large')
+                  const imgMobileSrc = getThumbnail(item.source, 'small')
+                  const imgDesktopSrc = getThumbnail(item.source, 'medium')
 
                   return (
                     <figure
