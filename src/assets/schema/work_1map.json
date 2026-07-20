@@ -1,0 +1,65 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/1map/#webpage",
+      "url": "https://simplr.co.za/work/1map/",
+      "name": "The only tool you need to visualise data on a map | Simplr",
+      "description": "Simplr refreshed the 1Map identity with a bold typographic approach, vibrant colour palette, and adaptable visual system designed to integrate seamlessly with product interfaces and technical diagrams.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/1map/#project",
+      "name": "1Map: The only tool you need to visualise data on a map",
+      "headline": "The only tool you need to visualise data on a map",
+      "url": "https://simplr.co.za/work/1map/",
+      "description": "Simplr refreshed the 1Map identity with a bold typographic approach, vibrant colour palette, and adaptable visual system designed to integrate seamlessly with product interfaces and technical diagrams.",
+      "about": {
+        "@type": "Organization",
+        "name": "1Map",
+        "description": "1Map provides innovative mapping technology for visualising data geographically."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Strategy"
+      ],
+      "genre": "Case study",
+      "datePublished": "2018-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/1map/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "1Map",
+          "item": "https://simplr.co.za/work/1map/"
+        }
+      ]
+    }
+  ]
+}

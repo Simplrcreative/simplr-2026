@@ -1,0 +1,65 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/hazendal-soil-festival/#webpage",
+      "url": "https://simplr.co.za/work/hazendal-soil-festival/",
+      "name": "Design rooted in land and legacy | Simplr",
+      "description": "Simplr created the festival's visual identity, rooted in topography and African geometry, with contour lines as the central graphic device symbolising both the physical terrain and humanity's imprint on the land, applied across digital, print, and experiential touchpoints.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/hazendal-soil-festival/#project",
+      "name": "Hazendal Estate: Design rooted in land and legacy",
+      "headline": "Design rooted in land and legacy",
+      "url": "https://simplr.co.za/work/hazendal-soil-festival/",
+      "description": "Simplr created the festival's visual identity, rooted in topography and African geometry, with contour lines as the central graphic device symbolising both the physical terrain and humanity's imprint on the land, applied across digital, print, and experiential touchpoints.",
+      "about": {
+        "@type": "Organization",
+        "name": "Hazendal Estate",
+        "description": "Hazendal Festival's Soil Edition 2024 explored humanity's relationship with land through art, culture, and ecological dialogue at Hazendal Wine Estate."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Motion"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/hazendal-soil-festival/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Hazendal Estate",
+          "item": "https://simplr.co.za/work/hazendal-soil-festival/"
+        }
+      ]
+    }
+  ]
+}

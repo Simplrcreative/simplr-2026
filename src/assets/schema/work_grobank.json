@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/grobank/#webpage",
+      "url": "https://simplr.co.za/work/grobank/",
+      "name": "Rebranding to an agricultural bank | Simplr",
+      "description": "Simplr developed the Grobank brand identity from the ground up, creating a refined visual identity that balances professionalism, trust, and approachability, drawing inspiration from the agricultural landscape.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/grobank/#project",
+      "name": "Grobank: Rebranding to an agricultural bank",
+      "headline": "Rebranding to an agricultural bank",
+      "url": "https://simplr.co.za/work/grobank/",
+      "description": "Simplr developed the Grobank brand identity from the ground up, creating a refined visual identity that balances professionalism, trust, and approachability, drawing inspiration from the agricultural landscape.",
+      "about": {
+        "@type": "Organization",
+        "name": "Grobank",
+        "description": "Grobank is a South African business bank focused on serving the agricultural sector, established by AFGRI Group Holdings."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Strategy",
+        "Templates"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/grobank/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Grobank",
+          "item": "https://simplr.co.za/work/grobank/"
+        }
+      ]
+    }
+  ]
+}

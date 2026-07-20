@@ -1,4 +1,11 @@
-import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchLandingPageData, fetchNavigationData, fetchNextWorkData, fetchPageData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
+import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchHomeFaqsData, fetchLandingPageData, fetchNavigationData, fetchNextWorkData, fetchPageData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
+
+// Cheap and cached; reused so the Thinking single page's author schema can
+// resolve to the same Person `@id` as the About page's People repeater.
+async function fetchPeopleForAuthorLookup() {
+  const { people } = await fetchPeopleData()
+  return people
+}
 
 export function createRootLoader() {
   return async function rootLoader() {
@@ -61,14 +68,20 @@ export function createWorkSingleLoader() {
 
 export function createAboutLoader() {
   return async function aboutLoader() {
-    const [peoplePayload, pagePayload] = await Promise.all([
+    const [peoplePayload, pagePayload, homeFaqsPayload] = await Promise.all([
       fetchPeopleData(),
       fetchPageData('about'),
+      fetchHomeFaqsData(),
     ])
+
+    // Prefer the About page's own FAQs (acfAboutBuilder.acfFaqs); fall back
+    // to the Home page's FAQs if the About page hasn't been given its own.
+    const faqs = peoplePayload.faqs?.length ? peoplePayload.faqs : homeFaqsPayload.faqs
 
     return {
       ...peoplePayload,
       page: pagePayload.page,
+      faqs,
     }
   }
 }
@@ -109,9 +122,10 @@ export function createThinkingPageLoader() {
 
 export function createThinkingSinglePageLoader() {
   return async function ThinkingSinglePageLoader({ params, request }) {
-    const [entry, { posts }] = await Promise.all([
+    const [entry, { posts }, people] = await Promise.all([
       fetchThinkingEntryData(params.slug),
       fetchThinkingPostsData({ first: 8 }),
+      fetchPeopleForAuthorLookup(),
     ])
 
     const canonicalTopicSlug = getThinkingTopicSlug(entry.page)
@@ -129,7 +143,7 @@ export function createThinkingSinglePageLoader() {
       })
     }
 
-    return { ...entry, posts, topicSlug: canonicalTopicSlug }
+    return { ...entry, posts, topicSlug: canonicalTopicSlug, people }
   }
 }
 

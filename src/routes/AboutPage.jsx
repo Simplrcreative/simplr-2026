@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PictureImg from '../components/PictureImg.jsx'
-import { buildStaticPageSeo } from '../lib/page-seo.js'
+import { buildPeopleSchema, buildStaticPageSeo } from '../lib/page-seo.js'
 import { buildEntryPath } from '../lib/wp-api.js'
 import PeopleSectionMobile from '../components/about/PeopleSectionMobile.jsx'
 import {
@@ -34,9 +34,9 @@ function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSi
 export default function AboutPage() {
   useEffect(() => createSplitTextAnimation(), [])
   useEffect(() => createSlideUpAnimations(document.body), [])
-  const { people, aboutContent, page } = useLoaderData()
+  const { people, aboutContent, page, faqs = [] } = useLoaderData()
   const navigate = useNavigate()
-  const seo = buildStaticPageSeo('about', page)
+  const seo = buildStaticPageSeo('about', page, buildPeopleSchema(people), { speakable: ['main'] })
 
   //const aboutContent = page?.acfAboutBuilder ?? []
   const principles = aboutContent?.acfPrinciples ?? []
@@ -45,6 +45,10 @@ export default function AboutPage() {
   const clients = aboutContent?.acfClients ?? []
   const awards = aboutContent?.acfAwards ?? []
   const [activeBio, setActiveBio] = useState(null)
+  const [activeFaqIndex, setActiveFaqIndex] = useState(0)
+  const faqSliderRef = useRef(null)
+  const faqButtonRefs = useRef([])
+  const activeFaq = faqs[activeFaqIndex]
   const [bioLayoutOpen, setBioLayoutOpen] = useState(false)
   const [hoveredPerson, setHoveredPerson] = useState(null)
   const [activeValueIndex, setActiveValueIndex] = useState(0)
@@ -96,6 +100,42 @@ export default function AboutPage() {
       }
     }
   }, [])
+
+  useEffect(() => {
+    const slider = faqSliderRef.current
+    const activeButton = faqButtonRefs.current[activeFaqIndex]
+
+    if (!slider || !activeButton) {
+      return
+    }
+
+    const targetLeft = activeButton.offsetLeft - (slider.clientWidth - activeButton.clientWidth) / 2
+
+    slider.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: 'smooth',
+    })
+  }, [activeFaqIndex])
+
+  function showPreviousFaq() {
+    if (!faqs.length) {
+      return
+    }
+
+    setActiveFaqIndex((currentIndex) =>
+      currentIndex === 0 ? faqs.length - 1 : currentIndex - 1
+    )
+  }
+
+  function showNextFaq() {
+    if (!faqs.length) {
+      return
+    }
+
+    setActiveFaqIndex((currentIndex) =>
+      currentIndex === faqs.length - 1 ? 0 : currentIndex + 1
+    )
+  }
 
   const scatterRef = useRef(null)
   const overlayRef = useRef(null)
@@ -659,6 +699,74 @@ export default function AboutPage() {
           })}
         </section>
       ) : null}
+
+      <section className="px-5 py-20 bg-coffee section-dark faqs flex flex-col justify-center">
+        <div className="grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
+          <div className="trigger-split-text md:col-span-4">
+            <div className="eyebrow">FAQs</div>
+            <h1 className="split-text">Have questions?</h1>
+          </div>
+
+          {activeFaq && (
+            <>
+              <div className="md:col-span-12 md:flex">
+                <div className="flex md:static">
+                 <button
+                    type="button"
+                    onClick={showPreviousFaq}
+                    className="faq-nav-button flex h-[3.125rem] w-[3.125rem] shrink-0 items-center justify-center rounded-full border border-white text-white transition-colors duration-200 hover:border-white hover:bg-white hover:text-coffee"
+                    aria-label="Show previous frequently asked question"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 16 16" className="h-[1.5rem] w-[1.5rem]">
+                      <path d="M9.5 3.5 5 8l4.5 4.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={showNextFaq}
+                    className="faq-nav-button flex h-[3.125rem] w-[3.125rem] shrink-0 items-center justify-center rounded-full border border-white text-white transition-colors duration-200 hover:border-white hover:bg-white hover:text-coffee"
+                    aria-label="Show next frequently asked question"
+                  >
+                    <svg aria-hidden="true" viewBox="0 0 16 16" className="h-[1.5rem] w-[1.5rem]">
+                      <path d="M6.5 3.5 11 8l-4.5 4.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div ref={faqSliderRef} className="faq-slider flex items-center overflow-x-auto pb-2">
+                  
+                  {faqs.map((item, index) => {
+                    const isActive = index === activeFaqIndex
+
+                    return (
+                      <button
+                        key={item.question}
+                        type="button"
+                        ref={(element) => {
+                          faqButtonRefs.current[index] = element
+                        }}
+                        onClick={() => setActiveFaqIndex(index)}
+                        className={`lead faq-pill h-[3.125rem] max-w-[90%] md:max-w-auto shrink-0 rounded-full border px-5 flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-white text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/16 text-white/42 hover:border-white/28 hover:text-white/70'}`}
+                        aria-pressed={isActive}
+                      >
+                        <span className="block text-start md:text-center md:whitespace-nowrap">{item.question}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="md:col-span-6 xl:col-span-5">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[16rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-white">
+                  {activeFaq.answer}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
     </>
   )
 }

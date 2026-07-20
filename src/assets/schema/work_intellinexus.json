@@ -1,0 +1,65 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/intellinexus/#webpage",
+      "url": "https://simplr.co.za/work/intellinexus/",
+      "name": "Crafting data capabilities insights | Simplr",
+      "description": "Simplr repositioned Intellinexus and created a bold new visual identity through a strategically led process of research, discovery, and brand development, delivering a modular, adaptable brand system and a new website.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/intellinexus/#project",
+      "name": "Intellinexus: Crafting data capabilities insights",
+      "headline": "Crafting data capabilities insights",
+      "url": "https://simplr.co.za/work/intellinexus/",
+      "description": "Simplr repositioned Intellinexus and created a bold new visual identity through a strategically led process of research, discovery, and brand development, delivering a modular, adaptable brand system and a new website.",
+      "about": {
+        "@type": "Organization",
+        "name": "Intellinexus",
+        "description": "Intellinexus is a data insights company helping businesses unlock value through intelligence, analysis, and strategic decision-making."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2024-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/intellinexus/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Intellinexus",
+          "item": "https://simplr.co.za/work/intellinexus/"
+        }
+      ]
+    }
+  ]
+}

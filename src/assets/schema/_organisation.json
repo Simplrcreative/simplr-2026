@@ -1,0 +1,89 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://simplr.co.za#organization",
+  "name": "Simplr",
+  "url": "https://simplr.co.za/",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://simplr.co.za/wp-content/uploads/2021/11/cropped-simplr-favicon-round-270x270.png",
+    "width": 270,
+    "height": 270
+  },
+  "slogan": "Creative. Applied. Intelligence.",
+  "description": "Simplr is a Cape Town-based brand identity and digital design agency founded in 2014. Guided by creative intelligence, Simplr brings strategy, branding, UX/UI, web development, motion, and template systems together in one connected process for organisations in South Africa and around the world.",
+  "foundingDate": "2014",
+  "founder": [
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#justin-robinson",
+      "name": "Justin Robinson",
+      "jobTitle": "Co-Founder and Executive Creative Director",
+      "sameAs": ["https://www.linkedin.com/in/justin-robinson-769a324"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#grant-medefindt",
+      "name": "Grant Medefindt",
+      "jobTitle": "Co-Founder and Executive Creative Director",
+      "sameAs": ["https://www.linkedin.com/in/grant-medefindt"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    }
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Unit AS02, The Forum, Lifestyle House, Northbank Lane",
+    "addressLocality": "Century City",
+    "addressRegion": "Western Cape",
+    "postalCode": "7441",
+    "addressCountry": "ZA"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "New business enquiries",
+    "email": "hello@simplr.co.za",
+    "areaServed": ["ZA", "Global"],
+    "availableLanguage": ["English"]
+  },
+  "areaServed": [
+    { "@type": "Place", "name": "Cape Town, South Africa" },
+    { "@type": "Place", "name": "South Africa" },
+    { "@type": "Place", "name": "Global" }
+  ],
+  "knowsAbout": [
+    "Brand Strategy",
+    "Brand Identity Design",
+    "Visual Identity Systems",
+    "Corporate Website Design and Development",
+    "UX and UI Design",
+    "WordPress Development",
+    "Headless WordPress Development",
+    "Motion Design",
+    "Motion Graphics",
+    "Presentation and Document Template Systems",
+    "Brand Naming",
+    "Packaging Design",
+    "Technical SEO",
+    "Structured Data",
+    "Generative Engine Optimisation"
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Brand and Digital Design Services",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Strategy", "url": "https://simplr.co.za/services/strategy/" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Branding and Design", "url": "https://simplr.co.za/services/branding-design/" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Web Design and Development", "url": "https://simplr.co.za/services/web-design-development/" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Motion", "url": "https://simplr.co.za/services/motion/" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Templates", "url": "https://simplr.co.za/services/templates/" } }
+    ]
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/simplrcreative/",
+    "https://www.instagram.com/simplrcreative/",
+    "https://www.facebook.com/simplrcreative/",
+    "https://vimeo.com/simplrcreative/",
+    "https://www.awwwards.com/Simplr-Creative"
+  ]
+}

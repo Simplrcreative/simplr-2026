@@ -1,0 +1,61 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://simplr.co.za#website",
+      "url": "https://simplr.co.za/",
+      "name": "Simplr",
+      "description": "Simplr is a Cape Town-based brand identity and digital design agency. Strategy, branding, web design and development, motion, and template systems in one connected process.",
+      "publisher": { "@id": "https://simplr.co.za#organization" },
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/#webpage",
+      "url": "https://simplr.co.za/",
+      "name": "Simplr | Brand Identity and Digital Design Agency, Cape Town",
+      "description": "Simplr turns complexity into brand and digital clarity. A Cape Town-based agency combining strategy, branding, web design and development, motion, and templates since 2014.",
+      "isPartOf": { "@id": "https://simplr.co.za#website" },
+      "about": { "@id": "https://simplr.co.za#organization" },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://simplr.co.za/#services",
+      "name": "Simplr services",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "item": { "@type": "Service", "name": "Strategy", "url": "https://simplr.co.za/services/strategy/", "description": "Brand positioning, messaging, customer journey mapping, and digital strategy that create the shared clarity behind better creative and commercial decisions.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 2, "item": { "@type": "Service", "name": "Branding and Design", "url": "https://simplr.co.za/services/branding-design/", "description": "Brand identities designed from the ground up: distinctive, scalable, and built to hold their shape across markets, teams, and years.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 3, "item": { "@type": "Service", "name": "Web Design and Development", "url": "https://simplr.co.za/services/web-design-development/", "description": "Corporate and enterprise websites that are strategically structured, visually considered, and engineered for long-term performance.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 4, "item": { "@type": "Service", "name": "Motion", "url": "https://simplr.co.za/services/motion/", "description": "Motion systems, video production, and motion graphics that build brand personality and earn attention across every screen and format.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 5, "item": { "@type": "Service", "name": "Templates", "url": "https://simplr.co.za/services/templates/", "description": "Presentation and document systems for PowerPoint, Google Slides, Word, Keynote, and Canva, built to brand standards and structured for ease of use.", "provider": { "@id": "https://simplr.co.za#organization" } } }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://simplr.co.za/#faq",
+      "url": "https://simplr.co.za/",
+      "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["main"] },
+      "mainEntity": [
+        { "@type": "Question", "name": "What does Simplr do?", "acceptedAnswer": { "@type": "Answer", "text": "Simplr creates brand identities, corporate websites, motion, and communication systems for organisations that need more clarity across how they look, sound, work, and grow." } },
+        { "@type": "Question", "name": "What kind of agency is Simplr?", "acceptedAnswer": { "@type": "Answer", "text": "Simplr is a brand identity and digital design agency. Our work spans strategy, branding and design, website design and development, motion, templates, and digital communication systems." } },
+        { "@type": "Question", "name": "Where is Simplr based?", "acceptedAnswer": { "@type": "Answer", "text": "Simplr is based in Cape Town, South Africa. We work with clients locally and internationally, partnering with organisations that need senior brand thinking and digital execution from one integrated studio." } },
+        { "@type": "Question", "name": "Do you work with clients outside South Africa?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We work with clients in South Africa and around the world, including growing brands, established organisations, and international teams across technology, data, hospitality, retail, professional services, and culture." } },
+        { "@type": "Question", "name": "Can Simplr help with both brand identity and website design?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Brand and digital work are connected in our process. We can define or refresh your identity, then translate it into a website, digital platform, motion system, template library, or campaign toolkit." } },
+        { "@type": "Question", "name": "Do you design and develop websites?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our designers and developers work together from the start, so websites are visually considered, technically sound, responsive, scalable, and built for long-term performance." } },
+        { "@type": "Question", "name": "What is \"Creative. Applied. Intelligence.\"?", "acceptedAnswer": { "@type": "Answer", "text": "It describes how we work. Creative ideas give the brand distinction. Applied design turns those ideas into useful systems. Intelligence keeps the work clear, considered, and built to perform." } },
+        { "@type": "Question", "name": "What makes Simplr different?", "acceptedAnswer": { "@type": "Answer", "text": "Simplr brings strategy, identity, digital platforms, motion, and templates into one connected process. That means the thinking behind the brand carries through into the tools, systems, and experiences people use every day." } },
+        { "@type": "Question", "name": "How do we start a project with Simplr?", "acceptedAnswer": { "@type": "Answer", "text": "Most projects start with a conversation about what you are building, changing, or trying to solve. From there, we define the scope, team, timing, and process needed to move the work forward properly." } },
+        { "@type": "Question", "name": "What technology do you use to build websites?", "acceptedAnswer": { "@type": "Answer", "text": "We choose the stack around the needs of the project. Our team works across WordPress, Laravel, headless CMS platforms, Vue, Vite, React, modern front-end frameworks, and custom integrations, building websites that are fast, secure, scalable, and easy to manage after launch." } }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://simplr.co.za/" }
+      ]
+    }
+  ]
+}

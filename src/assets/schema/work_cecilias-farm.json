@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/cecilias-farm/#webpage",
+      "url": "https://simplr.co.za/work/cecilias-farm/",
+      "name": "From orchard to online: a handcrafted digital refresh | Simplr",
+      "description": "As Cecilia's Farm evolved its brand through a premium packaging refresh, Simplr redesigned and rebuilt the eCommerce website, combining rich lifestyle photography, refined user experience design, and improved content and commerce architecture.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/cecilias-farm/#project",
+      "name": "Cecilia's Farm: From orchard to online: a handcrafted digital refresh",
+      "headline": "From orchard to online: a handcrafted digital refresh",
+      "url": "https://simplr.co.za/work/cecilias-farm/",
+      "description": "As Cecilia's Farm evolved its brand through a premium packaging refresh, Simplr redesigned and rebuilt the eCommerce website, combining rich lifestyle photography, refined user experience design, and improved content and commerce architecture.",
+      "about": {
+        "@type": "Organization",
+        "name": "Cecilia's Farm",
+        "description": "Cecilia's Farm is a South African producer of premium farm products with a heritage of authenticity and craftsmanship."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-06-08",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/cecilias-farm/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Cecilia's Farm",
+          "item": "https://simplr.co.za/work/cecilias-farm/"
+        }
+      ]
+    }
+  ]
+}

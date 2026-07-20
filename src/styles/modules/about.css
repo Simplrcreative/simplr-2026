@@ -988,18 +988,15 @@
 .clients .client-logo img {
   display: block;
   width: auto;
-  max-width: 11rem;
+  /*max-width: 11rem;*/
   object-fit: contain;
   filter: grayscale(1) brightness(100);
   opacity: 0.9;
 }
 
-.clients .client-logo img.landscape {
-  height: 2.75rem;
-}
-
+.clients .client-logo img.landscape, 
 .clients .client-logo img.portrait {
-  height: 5.5rem;
+  height: 6rem;
 }
 
 @media (max-width: 767px) {

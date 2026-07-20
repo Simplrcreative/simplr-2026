@@ -1,0 +1,121 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      "@id": "https://simplr.co.za/about/#webpage",
+      "url": "https://simplr.co.za/about/",
+      "name": "About Simplr | The best brands feel simple. Getting there takes intelligence.",
+      "description": "Simplr is a Cape Town-based brand identity and digital design agency. Since 2014 we have combined strategy, branding, UX/UI, digital experiences, development, motion, and content into one connected process.",
+      "isPartOf": { "@id": "https://simplr.co.za#website" },
+      "about": { "@id": "https://simplr.co.za#organization" },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB",
+      "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["main"] }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#justin-robinson",
+      "name": "Justin Robinson",
+      "jobTitle": "Co-Founder and Executive Creative Director",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/justin-robinson-769a324"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#grant-medefindt",
+      "name": "Grant Medefindt",
+      "jobTitle": "Co-Founder and Executive Creative Director",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/grant-medefindt"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#melanie-kvalsvig",
+      "name": "Melanie Kvalsvig",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/melanie-kvalsvig-42383511"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#andrea-waugh",
+      "name": "Andrea Waugh",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/andrea-waugh-94b7a310"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#melissa-caccia",
+      "name": "Melissa Caccia",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/melissa-caccia-4a55a2290"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#melissa-sherwin",
+      "name": "Melissa Sherwin",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/melissa-sherwin-0559a9299"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#daryl-glass",
+      "name": "Daryl Glass",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/darylglass"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#jade-stander",
+      "name": "Jade Stander",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/jadestander"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#jonathan-leader",
+      "name": "Jonathan Leader",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/jonathan-jono-leader-716658b5"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#byron-zeelie",
+      "name": "Byron Zeelie",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/byron-zeelie-191038155"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#grant-barnard",
+      "name": "Grant Barnard",
+      "url": "https://simplr.co.za/about/",
+      "sameAs": ["https://www.linkedin.com/in/grant-barnard-80a39350"],
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://simplr.co.za/about/#bretta-russel-espin",
+      "name": "Bretta Russel-Espin",
+      "url": "https://simplr.co.za/about/",
+      "worksFor": { "@id": "https://simplr.co.za#organization" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://simplr.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "About", "item": "https://simplr.co.za/about/" }
+      ]
+    }
+  ]
+}

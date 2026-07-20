@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/360-degrees/#webpage",
+      "url": "https://simplr.co.za/work/360-degrees/",
+      "name": "A digital experience that sparks creativity and collaboration | Simplr",
+      "description": "Simplr designed and developed a dynamic website that brings the excitement of a live event into the digital space through immersive video, purposeful animation, and interactive elements.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/360-degrees/#project",
+      "name": "360 Degrees Production House: A digital experience that sparks creativity and collaboration",
+      "headline": "A digital experience that sparks creativity and collaboration",
+      "url": "https://simplr.co.za/work/360-degrees/",
+      "description": "Simplr designed and developed a dynamic website that brings the excitement of a live event into the digital space through immersive video, purposeful animation, and interactive elements.",
+      "about": {
+        "@type": "Organization",
+        "name": "360 Degrees Production House",
+        "description": "360 Degrees Production House is a leading event production company creating immersive live experiences since 2005."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/360-degrees/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "360 Degrees Production House",
+          "item": "https://simplr.co.za/work/360-degrees/"
+        }
+      ]
+    }
+  ]
+}

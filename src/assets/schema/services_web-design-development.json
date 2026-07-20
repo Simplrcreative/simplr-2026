@@ -1,0 +1,48 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Service",
+      "@id": "https://simplr.co.za/services/web-design-development/#service",
+      "name": "Web Design and Development",
+      "serviceType": "Corporate Website Design and Development",
+      "url": "https://simplr.co.za/services/web-design-development/",
+      "description": "Simplr designs and builds corporate and enterprise websites that are strategically structured, visually considered, and engineered for long-term performance. UX designers, UI specialists, and developers work as one team, so technical constraints shape design decisions from the beginning, not after handoff.",
+      "provider": { "@id": "https://simplr.co.za#organization" },
+      "areaServed": [
+        { "@type": "Place", "name": "South Africa" },
+        { "@type": "Place", "name": "Global" }
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Web design and development services",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website Strategy and Architecture" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website UX and UI Design" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website Development" } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "E-Commerce and Website Growth" } }
+        ]
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/services/web-design-development/#webpage",
+      "url": "https://simplr.co.za/services/web-design-development/",
+      "name": "Web Design and Development Services | Simplr",
+      "description": "We design and build digital platforms that perform. Corporate and enterprise websites built across WordPress, Laravel, headless CMS platforms, and modern front-end frameworks.",
+      "isPartOf": { "@id": "https://simplr.co.za#website" },
+      "about": { "@id": "https://simplr.co.za/services/web-design-development/#service" },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB",
+      "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["main"] }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://simplr.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://simplr.co.za/services/" },
+        { "@type": "ListItem", "position": 3, "name": "Web Design and Development", "item": "https://simplr.co.za/services/web-design-development/" }
+      ]
+    }
+  ]
+}

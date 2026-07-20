@@ -2,10 +2,34 @@ import { buildNavigation, fallbackCollections, fallbackPages, routeDefinitions, 
 
 const cache = new Map()
 
+// Shared per-item SEO override fields (title/description/author/publisher/image).
+// Same ACF field group is assigned to Page, Post, and AcfWork in WordPress, so
+// this fragment is reused verbatim across all four content queries below.
+const acfSeoBuilderFields = `
+  acfSeoBuilder {
+    acfSeoTitle
+    acfSeoDescription
+    acfSeoAuthor
+    acfSeoPublisher
+    acfSeoImage {
+      node {
+        guid
+        mediaDetails {
+          sizes {
+            name
+            sourceUrl
+          }
+        }
+      }
+    }
+  }
+`
+
 const contentNodeFields = `
   id
   slug
   date
+  modified
   ... on UniformResourceIdentifiable {
     uri
   }
@@ -32,6 +56,9 @@ const contentNodeFields = `
         altText
       }
     }
+  }
+  ... on Page {
+    ${acfSeoBuilderFields}
   }
 `
 
@@ -99,6 +126,9 @@ const serviceSinglePageQuery = `
       slug
       uri
       title(format: RENDERED)
+      date
+      modified
+      ${acfSeoBuilderFields}
       acfServiceBuilder {
         acfHeading
         acfFeaturedVideo {
@@ -264,6 +294,10 @@ const peopleQuery = `
             }
           }
         }
+        acfFaqs {
+          acfQuestion
+          acfAnswer
+        }
       }
     }
   }
@@ -388,6 +422,9 @@ const workByUriQuery = `
       ... on AcfWork {
         slug
         title
+        date
+        modified
+        ${acfSeoBuilderFields}
         acfWorkBuilder {
           acfCategory {
             nodes {
@@ -671,6 +708,8 @@ const thinkingEntryBySlugQuery = `
         title(format: RENDERED)
         content
         date
+        modified
+        ${acfSeoBuilderFields}
         author {
           node {
             name
@@ -1059,15 +1098,17 @@ function normaliseHomeTestimonial(acfHomeBuilder) {
   }
 }
 
-function normaliseHomeFaqs(acfHomeBuilder) {
-  const faqs = acfHomeBuilder?.acfFaqs ?? []
-
-  return faqs
+function normaliseFaqs(rawFaqs) {
+  return (rawFaqs ?? [])
     .map((item) => ({
       question: String(item?.acfQuestion || '').trim(),
       answer: String(item?.acfAnswer || '').trim(),
     }))
     .filter((item) => item.question && item.answer)
+}
+
+function normaliseHomeFaqs(acfHomeBuilder) {
+  return normaliseFaqs(acfHomeBuilder?.acfFaqs)
 }
 
 async function fetchHomeCaseStudiesData() {
@@ -1096,6 +1137,28 @@ async function fetchHomeCaseStudiesData() {
       testimonialBlock: null,
       faqs: [],
     }
+  }
+}
+
+/**
+ * Home page FAQs, fetched standalone so the About page can use them as a
+ * fallback when it has no FAQs of its own. Shares the same query + cache
+ * entry as fetchHomeCaseStudiesData, so if the Home page has already been
+ * loaded this session it's effectively free.
+ */
+export async function fetchHomeFaqsData() {
+  if (!wpConfig.endpoint) {
+    return { faqs: [] }
+  }
+
+  try {
+    const data = await remember('home:case-studies', () => graphQlRequest(homeCaseStudiesQuery))
+    const acfHomeBuilder = data.page?.acfHomeBuilder
+
+    return { faqs: normaliseHomeFaqs(acfHomeBuilder) }
+  } catch (error) {
+    reportError('Unable to load home FAQs', error)
+    return { faqs: [] }
   }
 }
 
@@ -1240,7 +1303,9 @@ function normaliseNode(node, collectionKey) {
     excerpt: summarise(node.excerpt || node.content || ''),
     content: node.content || '',
     date: node.date || null,
+    modified: node.modified || null,
     author: node.author?.node?.name || siteConfig.name,
+    acfSeoBuilder: node.acfSeoBuilder || null,
     image: node.featuredImage?.node
       ? {
           sourceUrl: node.featuredImage.node.sourceUrl,
@@ -1443,19 +1508,20 @@ export async function fetchHomeData() {
 
 export async function fetchPeopleData() {
   if (!wpConfig.endpoint) {
-    return { people: [], aboutContent: [] }
+    return { people: [], aboutContent: [], faqs: [] }
   }
 
   try {
     const data = await remember('people', () => graphQlRequest(peopleQuery))
     const people = data.page?.acfPeople?.people ?? []
     const aboutContent = data.page?.acfAboutBuilder ?? []
+    const faqs = normaliseFaqs(aboutContent?.acfFaqs)
 
-    return { people, aboutContent }
+    return { people, aboutContent, faqs }
   } catch (error) {
     reportError('Unable to load about page data', error)
 
-    return { people: [], aboutContent: [] }
+    return { people: [], aboutContent: [], faqs: [] }
   }
 }
 

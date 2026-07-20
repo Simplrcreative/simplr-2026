@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/satalia/#webpage",
+      "url": "https://simplr.co.za/work/satalia/",
+      "name": "Evolving visual language for an AI-powered brand | Simplr",
+      "description": "Simplr crafted a forward-thinking identity for Satalia centred on an iridescent supergraphic that evolves and interacts with its surroundings. The work spans brand guidelines, motion, 3D design, presentation design, UX/UI design, and development.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/satalia/#project",
+      "name": "Satalia: Evolving visual language for an AI-powered brand",
+      "headline": "Evolving visual language for an AI-powered brand",
+      "url": "https://simplr.co.za/work/satalia/",
+      "description": "Simplr crafted a forward-thinking identity for Satalia centred on an iridescent supergraphic that evolves and interacts with its surroundings. The work spans brand guidelines, motion, 3D design, presentation design, UX/UI design, and development.",
+      "about": {
+        "@type": "Organization",
+        "name": "Satalia",
+        "description": "Satalia is a global WPP AI company specialising in solving optimisation problems across various industries."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Motion",
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-07-15",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/satalia/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Satalia",
+          "item": "https://simplr.co.za/work/satalia/"
+        }
+      ]
+    }
+  ]
+}

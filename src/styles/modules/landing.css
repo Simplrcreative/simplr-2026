@@ -231,6 +231,13 @@
     margin: -2px 0 0 0;
 }
 
+/* On a dark section (e.g. About page) the pill + text colours invert to
+   white — swap the near-opaque white chip background for a subtle
+   translucent one so it doesn't wash out the white text/border on top. */
+.section-dark .faq-pill {
+    background: rgba(255, 255, 255, 0.08);
+}
+
 .faq-answer-fade {
     line-height: 1.2;
     animation: faqAnswerFade 600ms ease-out;

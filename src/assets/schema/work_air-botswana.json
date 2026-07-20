@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/air-botswana/#webpage",
+      "url": "https://simplr.co.za/work/air-botswana/",
+      "name": "Helping an airline take flight | Simplr",
+      "description": "To commemorate the airline's 30th anniversary, Simplr contributed to the development of a refreshed brand identity that honours the airline's heritage while presenting a more contemporary and recognisable image.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/air-botswana/#project",
+      "name": "Air Botswana: Helping an airline take flight",
+      "headline": "Helping an airline take flight",
+      "url": "https://simplr.co.za/work/air-botswana/",
+      "description": "To commemorate the airline's 30th anniversary, Simplr contributed to the development of a refreshed brand identity that honours the airline's heritage while presenting a more contemporary and recognisable image.",
+      "about": {
+        "@type": "Organization",
+        "name": "Air Botswana",
+        "description": "Air Botswana is the national flag carrier of Botswana, providing scheduled domestic and regional air services from its headquarters in Gaborone."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Strategy",
+        "Templates"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/air-botswana/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Air Botswana",
+          "item": "https://simplr.co.za/work/air-botswana/"
+        }
+      ]
+    }
+  ]
+}

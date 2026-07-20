@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/payspace/#webpage",
+      "url": "https://simplr.co.za/work/payspace/",
+      "name": "Leading the evolution of payroll and HR solutions | Simplr",
+      "description": "Simplr evolved the PaySpace brand identity to strengthen its position in the international workforce management market, introducing an acronym-based logo for international recognition and a contemporary visual language built around rounded linear forms.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/payspace/#project",
+      "name": "PaySpace: Leading the evolution of payroll and HR solutions",
+      "headline": "Leading the evolution of payroll and HR solutions",
+      "url": "https://simplr.co.za/work/payspace/",
+      "description": "Simplr evolved the PaySpace brand identity to strengthen its position in the international workforce management market, introducing an acronym-based logo for international recognition and a contemporary visual language built around rounded linear forms.",
+      "about": {
+        "@type": "Organization",
+        "name": "PaySpace",
+        "description": "PaySpace is an international payroll and human resources software company supporting workforce management across multiple markets."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-07-01",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/payspace/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "PaySpace",
+          "item": "https://simplr.co.za/work/payspace/"
+        }
+      ]
+    }
+  ]
+}

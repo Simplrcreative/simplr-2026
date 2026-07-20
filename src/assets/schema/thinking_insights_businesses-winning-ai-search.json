@@ -1,0 +1,69 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://simplr.co.za/thinking/insights/businesses-winning-ai-search/#article",
+      "headline": "The Businesses Winning at AI Search Are Simply Easier to Understand",
+      "description": "The businesses benefiting most from AI search visibility are not necessarily producing more content. They are simply easier to understand. AI search is not creating a new problem; it is exposing an old one: the structure of how an organisation is understood, both by machines and by people.",
+      "url": "https://simplr.co.za/thinking/insights/businesses-winning-ai-search/",
+      "datePublished": "2026-06-22T12:29:31",
+      "dateModified": "2026-06-22T12:29:31",
+      "image": [
+        "https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/06/businesses-winning-ai-search-hero-768x432.jpg"
+      ],
+      "author": {
+        "@type": "Person",
+        "@id": "https://simplr.co.za/about/#grant-medefindt",
+        "name": "Grant Medefindt",
+        "jobTitle": "Co-Founder and Executive Creative Director",
+        "sameAs": [
+          "https://www.linkedin.com/in/grant-medefindt"
+        ],
+        "worksFor": {
+          "@id": "https://simplr.co.za#organization"
+        }
+      },
+      "publisher": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "mainEntityOfPage": "https://simplr.co.za/thinking/insights/businesses-winning-ai-search/",
+      "articleSection": "Insights",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "inLanguage": "en-GB",
+      "isAccessibleForFree": true,
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "article",
+          "main"
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Thinking",
+          "item": "https://simplr.co.za/thinking/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "The Businesses Winning at AI Search Are Simply Easier to Understand",
+          "item": "https://simplr.co.za/thinking/insights/businesses-winning-ai-search/"
+        }
+      ]
+    }
+  ]
+}

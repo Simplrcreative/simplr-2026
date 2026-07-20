@@ -1,0 +1,68 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/choreograph-brand/#webpage",
+      "url": "https://simplr.co.za/work/choreograph-brand/",
+      "name": "Fuelling growth for the best brands and biggest agencies | Simplr",
+      "description": "As Choreograph launched as a new global brand, Simplr translated its established visual language into cohesive digital experiences across multiple platforms, combining thoughtful UX, meticulous implementation, and a consistent design system to support the market launch.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/choreograph-brand/#project",
+      "name": "Choreograph: Fuelling growth for the best brands and biggest agencies",
+      "headline": "Fuelling growth for the best brands and biggest agencies",
+      "url": "https://simplr.co.za/work/choreograph-brand/",
+      "description": "As Choreograph launched as a new global brand, Simplr translated its established visual language into cohesive digital experiences across multiple platforms, combining thoughtful UX, meticulous implementation, and a consistent design system to support the market launch.",
+      "about": {
+        "@type": "Organization",
+        "name": "Choreograph",
+        "description": "Choreograph is WPP's global data and technology products company."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Motion",
+        "Strategy",
+        "Templates",
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/choreograph-brand/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Choreograph",
+          "item": "https://simplr.co.za/work/choreograph-brand/"
+        }
+      ]
+    }
+  ]
+}

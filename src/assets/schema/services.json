@@ -1,0 +1,36 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://simplr.co.za/services/#webpage",
+      "url": "https://simplr.co.za/services/",
+      "name": "Brand and Digital Design Services | Simplr",
+      "description": "Simplr partners with ambitious organisations, from funded scale-ups to global enterprises, to design brand systems, digital platforms, and communication tools that connect purpose with performance.",
+      "isPartOf": { "@id": "https://simplr.co.za#website" },
+      "about": { "@id": "https://simplr.co.za#organization" },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB",
+      "speakable": { "@type": "SpeakableSpecification", "cssSelector": ["main"] }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://simplr.co.za/services/#services",
+      "name": "Simplr services",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "item": { "@type": "Service", "@id": "https://simplr.co.za/services/strategy/#service", "name": "Strategy", "url": "https://simplr.co.za/services/strategy/", "description": "Strategy that creates clarity and drives growth. Brand positioning, messaging, customer journey mapping, and digital strategy for leadership teams, founders, and CMOs.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 2, "item": { "@type": "Service", "@id": "https://simplr.co.za/services/branding-design/#service", "name": "Branding and Design", "url": "https://simplr.co.za/services/branding-design/", "description": "Brand identities designed from the ground up: distinctive, scalable, and built with the structural rigour to hold their shape across markets, teams, and years.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 3, "item": { "@type": "Service", "@id": "https://simplr.co.za/services/web-design-development/#service", "name": "Web Design and Development", "url": "https://simplr.co.za/services/web-design-development/", "description": "Corporate and enterprise websites that are strategically structured, visually considered, and engineered for long-term performance.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 4, "item": { "@type": "Service", "@id": "https://simplr.co.za/services/motion/#service", "name": "Motion", "url": "https://simplr.co.za/services/motion/", "description": "Motion built into the brand from the ground up: motion systems, video production, and motion graphics that give a brand personality static design can only suggest.", "provider": { "@id": "https://simplr.co.za#organization" } } },
+        { "@type": "ListItem", "position": 5, "item": { "@type": "Service", "@id": "https://simplr.co.za/services/templates/#service", "name": "Templates", "url": "https://simplr.co.za/services/templates/", "description": "Presentation and document systems for PowerPoint, Google Slides, Word, Keynote, and Canva. Brand governance built into every file your team opens.", "provider": { "@id": "https://simplr.co.za#organization" } } }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://simplr.co.za/" },
+        { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://simplr.co.za/services/" }
+      ]
+    }
+  ]
+}

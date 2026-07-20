@@ -1,0 +1,67 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/gain-theory/#webpage",
+      "url": "https://simplr.co.za/work/gain-theory/",
+      "name": "A brand refresh with global impact | Simplr",
+      "description": "Simplr refreshed the Gain Theory identity by expanding the colour palette into five distinct colourways, repurposing the logotype's I as a dynamic supergraphic, introducing a bespoke typeface, and aligning all products and platforms under a clear, scalable hierarchy.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/gain-theory/#project",
+      "name": "Gain Theory: A brand refresh with global impact",
+      "headline": "A brand refresh with global impact",
+      "url": "https://simplr.co.za/work/gain-theory/",
+      "description": "Simplr refreshed the Gain Theory identity by expanding the colour palette into five distinct colourways, repurposing the logotype's I as a dynamic supergraphic, introducing a bespoke typeface, and aligning all products and platforms under a clear, scalable hierarchy.",
+      "about": {
+        "@type": "Organization",
+        "name": "Gain Theory",
+        "description": "Gain Theory is a leading marketing effectiveness and foresight consultancy operating across more than 111 markets."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Motion",
+        "Templates",
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-06-13",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/gain-theory/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Gain Theory",
+          "item": "https://simplr.co.za/work/gain-theory/"
+        }
+      ]
+    }
+  ]
+}

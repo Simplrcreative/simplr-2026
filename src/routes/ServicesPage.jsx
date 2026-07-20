@@ -215,9 +215,21 @@ function ServiceCard({ service }) {
 export default function ServicesPage() {
   const { services, page } = useLoaderData() ?? {}
   const servicesCards = services?.acfServices || []
-  const seo = buildStaticPageSeo('services', page, [
-    serviceCatalogSchema(routeDefinitions.services.path, page?.sections || []),
-  ])
+  const seo = buildStaticPageSeo(
+    'services',
+    page,
+    [
+      serviceCatalogSchema(
+        routeDefinitions.services.path,
+        servicesCards.map(({ acfTitle, acfService, acfDescription }) => ({
+          name: acfTitle || acfService,
+          slug: toSlug(acfService),
+          description: acfDescription,
+        })),
+      ),
+    ],
+    { speakable: ['main'] },
+  )
 
   useEffect(() => {
     let cleanupSplitText = null

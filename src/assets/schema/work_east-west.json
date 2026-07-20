@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/east-west/#webpage",
+      "url": "https://simplr.co.za/work/east-west/",
+      "name": "A luxury apartment development in Mouille Point | Simplr",
+      "description": "Simplr created the development's name, brand identity, and marketing collateral. The name East West was inspired by the building's north-facing orientation, immersed in natural light from sunrise in the east to sunset in the west, expressed through clean architectural forms and a restrained colour palette.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/east-west/#project",
+      "name": "East West: A luxury apartment development in Mouille Point",
+      "headline": "A luxury apartment development in Mouille Point",
+      "url": "https://simplr.co.za/work/east-west/",
+      "description": "Simplr created the development's name, brand identity, and marketing collateral. The name East West was inspired by the building's north-facing orientation, immersed in natural light from sunrise in the east to sunset in the west, expressed through clean architectural forms and a restrained colour palette.",
+      "about": {
+        "@type": "Organization",
+        "name": "East West",
+        "description": "East West is a luxury apartment development in Mouille Point, one of Cape Town's most sought-after coastal neighbourhoods."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-07-03",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/east-west/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "East West",
+          "item": "https://simplr.co.za/work/east-west/"
+        }
+      ]
+    }
+  ]
+}

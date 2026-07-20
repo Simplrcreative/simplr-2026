@@ -1,0 +1,69 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://simplr.co.za/thinking/insights/the-experience-is-the-brand/#article",
+      "headline": "The Experience Is the Brand",
+      "description": "Brand and UX cannot be separated in digital work. A brand can have a strong identity, a sharp strategy, and a beautiful visual language, but if the experience is confusing, slow, or inconsistent, people will believe the experience before they believe the brand deck.",
+      "url": "https://simplr.co.za/thinking/insights/the-experience-is-the-brand/",
+      "datePublished": "2026-06-22T08:50:56",
+      "dateModified": "2026-06-22T08:50:56",
+      "image": [
+        "https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/06/experience-is-the-brand-hero-768x432.jpg"
+      ],
+      "author": {
+        "@type": "Person",
+        "@id": "https://simplr.co.za/about/#grant-medefindt",
+        "name": "Grant Medefindt",
+        "jobTitle": "Co-Founder and Executive Creative Director",
+        "sameAs": [
+          "https://www.linkedin.com/in/grant-medefindt"
+        ],
+        "worksFor": {
+          "@id": "https://simplr.co.za#organization"
+        }
+      },
+      "publisher": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "mainEntityOfPage": "https://simplr.co.za/thinking/insights/the-experience-is-the-brand/",
+      "articleSection": "Insights",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "inLanguage": "en-GB",
+      "isAccessibleForFree": true,
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "article",
+          "main"
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Thinking",
+          "item": "https://simplr.co.za/thinking/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "The Experience Is the Brand",
+          "item": "https://simplr.co.za/thinking/insights/the-experience-is-the-brand/"
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 're
 import { useLoaderData, useOutletContext, Link } from 'react-router-dom'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Seo from '../components/Seo.jsx'
-import { routeDefinitions } from '../config/site.js'
+import { routeDefinitions, siteConfig } from '../config/site.js'
 import { createHeroScrollAnimation, createServicesScrollAnimation, createCaseStudiesScrollAnimation, createSplitTextAnimation, refreshScrollTriggers, createSurfaceColorTransitions, createIntroHeroTitleAnimation, createIntroVideoAnimation, setIntroHeroInitialState, createSlideUpAnimations, lockScroll, unlockScroll, createWorkThumbHoverAnimation, createTestimonialDotAnimation } from '../lib/animations/index.js'
 import { buildEntryPath, prefetchWorkEntry } from '../lib/wp-api.js'
 import {
@@ -13,6 +13,7 @@ import {
   serviceCatalogSchema,
   webPageSchema,
 } from '../lib/seo.js'
+import { extractSeoOverrides } from '../lib/page-seo.js'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import PictureImg from '../components/PictureImg.jsx'
@@ -599,30 +600,43 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     }
   }, [])
 
+  const seoOverrides = extractSeoOverrides(page)
+  const seoTitle = seoOverrides.title || page.title || 'Home'
+  const seoDescription = seoOverrides.description || normaliseDescription(page.intro)
+  const seoImage = seoOverrides.image || page.image?.sourceUrl
+
   return (
     <div ref={pageRef}>
       <Seo
-        title={page.title || 'Home'}
-        description={normaliseDescription(page.intro)}
+        title={seoTitle}
+        description={seoDescription}
         pathname="/"
         type="website"
-        image={page.image?.sourceUrl}
+        image={seoImage}
         schema={[
           webPageSchema({
             pathname: '/',
-            title: page.title,
-            description: normaliseDescription(page.intro),
+            title: seoTitle,
+            description: seoDescription,
             type: routeDefinitions.home.schemaType,
+            dateModified: page.modified,
+            speakable: ['main'],
           }),
           breadcrumbSchema([{ name: 'Home', path: '/' }]),
-          serviceCatalogSchema('/', page.services),
+          serviceCatalogSchema(
+            '/',
+            siteConfig.services.map((service, index) => ({
+              ...service,
+              description: page.services?.[index]?.body,
+            })),
+          ),
           collectionSchema({
             pathname: '/',
             title: page.workShowcase.title,
             description: page.workShowcase.intro,
             items: featuredWork,
           }),
-          faqSchema('/', page.faqs),
+          faqSchema('/', page.faqs, ['main']),
         ]}
       />
       <div

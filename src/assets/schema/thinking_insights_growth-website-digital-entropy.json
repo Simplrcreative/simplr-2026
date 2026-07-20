@@ -1,0 +1,60 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://simplr.co.za/thinking/insights/growth-website-digital-entropy/#article",
+      "headline": "Growth Changes Everything. Except, Usually, Your Website.",
+      "description": "Most organisations think they have a website problem. What they often have is a history problem: a website that has stopped being a managed asset and started being a record of decisions made by people solving problems that may no longer exist. Digital entropy is inevitable; being unprepared for it is not.",
+      "url": "https://simplr.co.za/thinking/insights/growth-website-digital-entropy/",
+      "datePublished": "2026-06-01T12:49:19",
+      "dateModified": "2026-06-01T12:49:19",
+      "image": [
+        "https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/06/growth-changes-everything-1-768x432.jpg"
+      ],
+      "author": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "publisher": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "mainEntityOfPage": "https://simplr.co.za/thinking/insights/growth-website-digital-entropy/",
+      "articleSection": "Insights",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "inLanguage": "en-GB",
+      "isAccessibleForFree": true,
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "article",
+          "main"
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Thinking",
+          "item": "https://simplr.co.za/thinking/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Growth Changes Everything. Except, Usually, Your Website.",
+          "item": "https://simplr.co.za/thinking/insights/growth-website-digital-entropy/"
+        }
+      ]
+    }
+  ]
+}

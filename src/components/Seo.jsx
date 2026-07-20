@@ -25,7 +25,7 @@ export default function Seo({
   const canonical = absoluteUrl(pathname)
   const resolvedDescription = normaliseDescription(description)
   const resolvedImage = absoluteUrl(image || siteConfig.defaultSocialImage)
-  const allSchema = [organizationSchema(), websiteSchema(), ...schema]
+  const graph = [organizationSchema(), websiteSchema(), ...schema].filter(Boolean)
 
   return (
     <Helmet prioritizeSeoTags>
@@ -45,11 +45,9 @@ export default function Seo({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={resolvedDescription} />
       <meta name="twitter:image" content={resolvedImage} />
-      {allSchema.map((entry, index) => (
-        <script key={`${title || 'site'}-schema-${index}`} type="application/ld+json">
-          {JSON.stringify(entry)}
-        </script>
-      ))}
+      <script type="application/ld+json">
+        {JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}
+      </script>
     </Helmet>
   )
 }

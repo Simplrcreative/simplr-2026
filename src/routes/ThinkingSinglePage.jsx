@@ -21,7 +21,7 @@ function categoryToFilterSlug(category) {
 export default function ThinkingSinglePage() {
   const pageRef = useRef(null)
   const postContentRef = useRef(null)
-  const { slug, page, posts = [] } = useLoaderData() ?? {}
+  const { slug, page, posts = [], people = [] } = useLoaderData() ?? {}
   const title = page?.title || 'Untitled'
   const date = page?.date
     ? new Date(page.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')
@@ -41,7 +41,7 @@ export default function ThinkingSinglePage() {
     || profileImageSizes[0]?.sourceUrl
     || ''
 
-  const seo = buildThinkingSingleSeo(page, pathname)
+  const seo = buildThinkingSingleSeo(page, pathname, people)
 
   useEffect(() => {
     const cleanupNextWork = createNextWorkAnimation()

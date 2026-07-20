@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/pave/#webpage",
+      "url": "https://simplr.co.za/work/pave/",
+      "name": "Creating a premium cycling and triathlon clothing and accessory brand | Simplr",
+      "description": "Simplr developed a confident, minimalist identity centred on a distinctive black-and-white logotype, designed for consistent reproduction across apparel, accessories, packaging, and collateral.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/pave/#project",
+      "name": "Pavé: Creating a premium cycling and triathlon clothing and accessory brand",
+      "headline": "Creating a premium cycling and triathlon clothing and accessory brand",
+      "url": "https://simplr.co.za/work/pave/",
+      "description": "Simplr developed a confident, minimalist identity centred on a distinctive black-and-white logotype, designed for consistent reproduction across apparel, accessories, packaging, and collateral.",
+      "about": {
+        "@type": "Organization",
+        "name": "Pavé",
+        "description": "Pave is a premium performance sportswear brand founded by former professional triathlete and coach Brett Faure, manufacturing triathlon suits, cycling apparel, and accessories."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design"
+      ],
+      "genre": "Case study",
+      "datePublished": "2018-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/pave/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Pavé",
+          "item": "https://simplr.co.za/work/pave/"
+        }
+      ]
+    }
+  ]
+}

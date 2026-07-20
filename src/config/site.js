@@ -6,22 +6,84 @@ export const siteConfig = {
   legalName: wpSiteName,
   siteUrl,
   description:
-    'Editorial portfolio scaffold for Simplr with headless WordPress content, motion-led transitions, and search-ready structured data.',
+    'Simplr is a Cape Town-based brand identity and digital design agency founded in 2014. Guided by creative intelligence, Simplr brings strategy, branding, UX/UI, web development, motion, and template systems together in one connected process for organisations in South Africa and around the world.',
+  slogan: 'Creative. Applied. Intelligence.',
+  // Open Graph wants the underscore locale format; JSON-LD wants BCP-47 (hyphenated).
   locale: 'en_GB',
+  inLanguage: 'en-GB',
   foundingDate: '2014-01-01',
   defaultSocialImage: '/social-card.svg',
   allowIndexing: import.meta.env.VITE_ALLOW_INDEXING === 'true',
+  logo: {
+    url: 'https://simplr.co.za/wp-content/uploads/2021/11/cropped-simplr-favicon-round-270x270.png',
+    width: 270,
+    height: 270,
+  },
+  // No public phone line yet — omit `telephone` from schema rather than
+  // publish a placeholder number.
   social: {
-    instagram: 'https://www.instagram.com/',
-    linkedin: 'https://www.linkedin.com/',
+    linkedin: 'https://www.linkedin.com/company/simplrcreative/',
+    instagram: 'https://www.instagram.com/simplrcreative/',
+    facebook: 'https://www.facebook.com/simplrcreative/',
+    vimeo: 'https://vimeo.com/simplrcreative/',
+    awwwards: 'https://www.awwwards.com/Simplr-Creative',
   },
   contact: {
     email: 'hello@simplr.co.za',
-    phone: '+44 20 7946 0958',
     city: 'Cape Town',
     country: 'South Africa',
-    address: 'Unit AS02, The Forum, Lifestyle House, Northbank Lane, Century City, South Africa'
+    countryCode: 'ZA',
+    region: 'Western Cape',
+    postalCode: '7441',
+    streetAddress: 'Unit AS02, The Forum, Lifestyle House, Northbank Lane',
+    address: 'Unit AS02, The Forum, Lifestyle House, Northbank Lane, Century City, South Africa',
   },
+  areaServed: ['Cape Town, South Africa', 'South Africa', 'Global'],
+  knowsAbout: [
+    'Brand Strategy',
+    'Brand Identity Design',
+    'Visual Identity Systems',
+    'Corporate Website Design and Development',
+    'UX and UI Design',
+    'WordPress Development',
+    'Headless WordPress Development',
+    'Motion Design',
+    'Motion Graphics',
+    'Presentation and Document Template Systems',
+    'Brand Naming',
+    'Packaging Design',
+    'Technical SEO',
+    'Structured Data',
+    'Generative Engine Optimisation',
+  ],
+  // The two founders are fixed and unlikely to change, so they're hardcoded
+  // here rather than modelled as a CMS field. `aboutId` must match the
+  // fragment used for this person's entry in the About page's Person schema
+  // (see AboutPage.jsx) so the two references resolve to the same entity.
+  founders: [
+    {
+      name: 'Justin Robinson',
+      jobTitle: 'Co-Founder and Executive Creative Director',
+      aboutId: 'justin-robinson',
+      linkedin: 'https://www.linkedin.com/in/justin-robinson-769a324',
+    },
+    {
+      name: 'Grant Medefindt',
+      jobTitle: 'Co-Founder and Executive Creative Director',
+      aboutId: 'grant-medefindt',
+      linkedin: 'https://www.linkedin.com/in/grant-medefindt',
+    },
+  ],
+  // The five core service offerings, shared between the Organization's
+  // hasOfferCatalog and the Home/Services ItemList schema so every reference
+  // to a given service resolves to the same `#service` @id.
+  services: [
+    { name: 'Strategy', slug: 'strategy' },
+    { name: 'Branding and Design', slug: 'branding-design' },
+    { name: 'Web Design and Development', slug: 'web-design-development' },
+    { name: 'Motion', slug: 'motion' },
+    { name: 'Templates', slug: 'templates' },
+  ],
   transitions: {
     enabled: true,
     /*duration: 1,
@@ -77,7 +139,7 @@ export const routeDefinitions = {
     label: 'Services',
     path: '/services/',
     uri: '/services/',
-    schemaType: 'ServicesPage',
+    schemaType: 'CollectionPage',
   },
   thinking: {
     key: 'thinking',
@@ -98,7 +160,7 @@ export const routeDefinitions = {
     label: 'Est.',
     path: '/est-2014/',
     uri: '/est-2014/',
-    schemaType: 'AboutPage',
+    schemaType: 'WebPage',
     count: '2014',
   },
 }

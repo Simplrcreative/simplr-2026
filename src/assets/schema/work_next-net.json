@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/next-net/#webpage",
+      "url": "https://simplr.co.za/work/next-net/",
+      "name": "Shaping the future of AI-driven visibility | Simplr",
+      "description": "Simplr created a bold, minimal brand identity and digital experience for NextNet as the business evolved from a collection of specialist growth tools into a unified AI search platform. The work spans logo refinement, visual language, UX/UI design, development, and collateral design.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/next-net/#project",
+      "name": "NextNet: Shaping the future of AI-driven visibility",
+      "headline": "Shaping the future of AI-driven visibility",
+      "url": "https://simplr.co.za/work/next-net/",
+      "description": "Simplr created a bold, minimal brand identity and digital experience for NextNet as the business evolved from a collection of specialist growth tools into a unified AI search platform. The work spans logo refinement, visual language, UX/UI design, development, and collateral design.",
+      "about": {
+        "@type": "Organization",
+        "name": "NextNet",
+        "description": "NextNet is an AI-powered SEO and brand visibility platform, backed by Clearview Capital, helping businesses strengthen their presence across search engines, recommendation platforms, and generative AI experiences."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Motion",
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-07-17",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/next-net/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "NextNet",
+          "item": "https://simplr.co.za/work/next-net/"
+        }
+      ]
+    }
+  ]
+}

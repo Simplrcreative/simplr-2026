@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/crucible/#webpage",
+      "url": "https://simplr.co.za/work/crucible/",
+      "name": "A brand for the leaders shaping Africa's future | Simplr",
+      "description": "Simplr designed the Crucible identity around a bespoke icon symbolising collaboration and the exchange of knowledge, suggesting the pages of an open book and a rising sun, supported by a visual language of overlapping shapes and a palette anchored in deep midnight blue and golden yellow.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/crucible/#project",
+      "name": "Crucible: A brand for the leaders shaping Africa's future",
+      "headline": "A brand for the leaders shaping Africa's future",
+      "url": "https://simplr.co.za/work/crucible/",
+      "description": "Simplr designed the Crucible identity around a bespoke icon symbolising collaboration and the exchange of knowledge, suggesting the pages of an open book and a rising sun, supported by a visual language of overlapping shapes and a palette anchored in deep midnight blue and golden yellow.",
+      "about": {
+        "@type": "Organization",
+        "name": "Crucible",
+        "description": "Crucible is a leadership development brand focused on forging the future leaders of Africa."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Strategy",
+        "Templates"
+      ],
+      "genre": "Case study",
+      "datePublished": "2026-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/crucible/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Crucible",
+          "item": "https://simplr.co.za/work/crucible/"
+        }
+      ]
+    }
+  ]
+}

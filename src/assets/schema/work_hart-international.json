@@ -1,0 +1,64 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/hart-international/#webpage",
+      "url": "https://simplr.co.za/work/hart-international/",
+      "name": "When you face risk, you need Hart | Simplr",
+      "description": "Simplr refined Hart's brand identity and redesigned its website, introducing an elevated colour palette, refined typography, and a confident visual language that repositions the company as a world-class leader in global security and risk management.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/hart-international/#project",
+      "name": "Hart International: When you face risk, you need Hart",
+      "headline": "When you face risk, you need Hart",
+      "url": "https://simplr.co.za/work/hart-international/",
+      "description": "Simplr refined Hart's brand identity and redesigned its website, introducing an elevated colour palette, refined typography, and a confident visual language that repositions the company as a world-class leader in global security and risk management.",
+      "about": {
+        "@type": "Organization",
+        "name": "Hart International",
+        "description": "Hart International is a globally recognised risk management company providing integrated security solutions across land, sea, and air in complex operating environments."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Web Design and Development"
+      ],
+      "genre": "Case study",
+      "datePublished": "2020-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/hart-international/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Hart International",
+          "item": "https://simplr.co.za/work/hart-international/"
+        }
+      ]
+    }
+  ]
+}

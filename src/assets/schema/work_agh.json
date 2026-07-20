@@ -1,0 +1,65 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://simplr.co.za/work/agh/#webpage",
+      "url": "https://simplr.co.za/work/agh/",
+      "name": "AFGRI Group Holdings rebrand | Simplr",
+      "description": "Simplr evolved the AFGRI Group Holdings brand into a refined identity that clearly differentiates the holding company from AFGRI Agri Services while maintaining a strong connection to the broader AFGRI brand.",
+      "isPartOf": {
+        "@id": "https://simplr.co.za#website"
+      },
+      "dateModified": "2026-07-18",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://simplr.co.za/work/agh/#project",
+      "name": "AFGRI Group Holdings: AFGRI Group Holdings rebrand",
+      "headline": "AFGRI Group Holdings rebrand",
+      "url": "https://simplr.co.za/work/agh/",
+      "description": "Simplr evolved the AFGRI Group Holdings brand into a refined identity that clearly differentiates the holding company from AFGRI Agri Services while maintaining a strong connection to the broader AFGRI brand.",
+      "about": {
+        "@type": "Organization",
+        "name": "AFGRI Group Holdings",
+        "description": "AFGRI Group Holdings is an investment holding company with a portfolio spanning agricultural services and related businesses."
+      },
+      "creator": {
+        "@id": "https://simplr.co.za#organization"
+      },
+      "keywords": [
+        "Branding and Design",
+        "Strategy"
+      ],
+      "genre": "Case study",
+      "datePublished": "2018-05-29",
+      "dateModified": "2026-07-18",
+      "mainEntityOfPage": "https://simplr.co.za/work/agh/",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://simplr.co.za/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Work",
+          "item": "https://simplr.co.za/work/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "AFGRI Group Holdings",
+          "item": "https://simplr.co.za/work/agh/"
+        }
+      ]
+    }
+  ]
+}
