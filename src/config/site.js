@@ -12,7 +12,7 @@ export const siteConfig = {
   locale: 'en_GB',
   inLanguage: 'en-GB',
   foundingDate: '2014-01-01',
-  defaultSocialImage: '/social-card.svg',
+  defaultSocialImage: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
   allowIndexing: import.meta.env.VITE_ALLOW_INDEXING === 'true',
   logo: {
     url: 'https://simplr.co.za/wp-content/uploads/2021/11/cropped-simplr-favicon-round-270x270.png',
@@ -426,7 +426,7 @@ export const fallbackCollections = {
       date: '2026-01-14T09:00:00.000Z',
       author: 'Simplr',
       image: {
-        sourceUrl: '/social-card.svg',
+        sourceUrl: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
         altText: 'Editorial branded placeholder image for a work entry',
       },
     },
@@ -441,7 +441,7 @@ export const fallbackCollections = {
       date: '2025-11-03T09:00:00.000Z',
       author: 'Simplr',
       image: {
-        sourceUrl: '/social-card.svg',
+        sourceUrl: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
         altText: 'Editorial branded placeholder image for a launch entry',
       },
     },
@@ -456,7 +456,7 @@ export const fallbackCollections = {
       date: '2025-06-21T09:00:00.000Z',
       author: 'Simplr',
       image: {
-        sourceUrl: '/social-card.svg',
+        sourceUrl: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
         altText: 'Editorial branded placeholder image for a commerce system entry',
       },
     },
@@ -473,7 +473,7 @@ export const fallbackCollections = {
       date: '2026-02-05T09:00:00.000Z',
       author: 'Simplr',
       image: {
-        sourceUrl: '/social-card.svg',
+        sourceUrl: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
         altText: 'Editorial branded placeholder image for a thinking article',
       },
     },
@@ -488,7 +488,7 @@ export const fallbackCollections = {
       date: '2025-12-11T09:00:00.000Z',
       author: 'Simplr',
       image: {
-        sourceUrl: '/social-card.svg',
+        sourceUrl: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
         altText: 'Editorial branded placeholder image for a headless article',
       },
     },
@@ -503,7 +503,7 @@ export const fallbackCollections = {
       date: '2025-08-30T09:00:00.000Z',
       author: 'Simplr',
       image: {
-        sourceUrl: '/social-card.svg',
+        sourceUrl: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
         altText: 'Editorial branded placeholder image for a motion article',
       },
     },
