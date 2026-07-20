@@ -311,8 +311,7 @@ export const fallbackPages = {
   about: {
     kicker: 'Studio profile',
     title: 'A considered studio profile with room for story, method, and point of view.',
-    intro:
-      'About is treated as an editorial page rather than a generic agency bio. The default structure supports positioning, process, and credibility signals.',
+    intro: 'Simplr turns complexity into brand and digital clarity.',
     content:
       '<p>Simplr is set up here as a focused, strategy-led creative studio. Replace the fallback copy with WordPress page content and the template will preserve the same structure, hierarchy, and schema coverage.</p>',
     sections: [

@@ -1300,7 +1300,12 @@ function normaliseNode(node, collectionKey) {
     slug: node.slug,
     uri: normaliseUri(node.uri),
     title: node.title || '',
-    excerpt: summarise(node.excerpt || node.content || ''),
+    // Deliberately NOT falling back to `node.content` here: WordPress's
+    // built-in "Page" post type doesn't support excerpts (WPGraphQL never
+    // resolves `excerpt` for it), and these ACF-driven pages' generic WYSIWYG
+    // body field is unused scaffolding (often a placeholder like "Fokkol"),
+    // not real copy — it's the wrong thing to show as a meta description.
+    excerpt: node.excerpt ? summarise(node.excerpt) : '',
     content: node.content || '',
     date: node.date || null,
     modified: node.modified || null,

@@ -37,7 +37,11 @@ export function extractWorkDescription(work) {
 }
 
 export function extractThinkingDescription(page) {
-  return normaliseDescription(page?.excerpt || page?.content || '')
+  // No `|| page?.content` fallback here on purpose: dumping raw, unedited
+  // article body text into a meta description is risky (mid-sentence cuts,
+  // placeholder copy). If there's no real excerpt, normaliseDescription()
+  // already falls back to the generic site description.
+  return normaliseDescription(page?.excerpt)
 }
 
 export function extractWorkImage(work) {
