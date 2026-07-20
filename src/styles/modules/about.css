@@ -160,7 +160,8 @@
 }
 
 .bio-linkedin,
-.person-linkedin {
+.person-linkedin,
+.detail-linkedin {
     display: inline-block;
     text-transform: lowercase;
     font-weight: 500;
@@ -172,7 +173,8 @@
     text-underline-offset: 3px;
     transition: text-decoration-color 0.3s ease;
 }
-.bio-linkedin:hover {
+.bio-linkedin:hover,
+.detail-linkedin:hover {
     text-decoration-color: transparent;
 }
 .person-linkedin { 
@@ -625,7 +627,6 @@
 
   .people-mobile .detail-linkedin {
     display: inline-block;
-    text-decoration: underline;
   }
 
   .people-mobile .detail-bio-scroll {
