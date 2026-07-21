@@ -88,16 +88,11 @@
     scale: 1;
     filter: grayscale(0);
   }
-  15% {
+  12% {
     opacity: 1;
-    rotate: -0.5deg;
-    scale: 1.1;
+    rotate: 0;
+    scale: 1.05;
     filter: grayscale(0);
-  }
-  85% {
-    opacity: 0;
-    scale: 0.8;
-    filter: grayscale(0.5);
   }
   100% {
     opacity: 0;
