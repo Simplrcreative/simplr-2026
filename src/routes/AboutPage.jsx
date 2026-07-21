@@ -353,17 +353,7 @@ export default function AboutPage() {
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
           <div className="people-info col-start-4 col-span-6 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
-            <button
-              ref={closeRef}
-              className="bio-close"
-              aria-label="Close bio"
-              onClick={closeBio}
-            >
-              <svg width="20" height="20" viewBox="0 0 22 22" stroke="currentColor">
-                <path d="M1 1L21 21" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M1 21L21 0.999998" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
+            
             {people.map((person) => {
               const src = getThumbnail(person.acfProfileImage)
               if (!src) return null
@@ -381,8 +371,19 @@ export default function AboutPage() {
           {/* Bio column — single panel, GSAP drives opacity + y; starts hidden */}
           <div
             ref={overlayRef}
-            className="bio-overlay col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-start"
+            className="bio-overlay col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-center"
           >
+            <button
+              ref={closeRef}
+              className="bio-close"
+              aria-label="Close bio"
+              onClick={closeBio}
+            >
+              <svg width="20" height="20" viewBox="0 0 22 22" stroke="currentColor">
+                <path d="M1 1L21 21" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M1 21L21 0.999998" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
             {displayPerson && (
               <div className="bio-content" data-lenis-prevent>
                 <h3 className="bio-name">{displayPerson.acfName}</h3>
