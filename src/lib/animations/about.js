@@ -426,7 +426,7 @@ export function createBioAnimation(scatter, overlay, close, isOpen, onCloseCompl
   if (isOpen) {
     const tl = gsap.timeline()
 
-    tl.to(scatter, { x: scatterX, opacity: 0.5, duration: 0.5, ease: 'power4.out' }, 0)
+    tl.to(scatter, { x: scatterX, opacity: 0.5, duration: 1, ease: 'power4.inOut' }, 0)
 
     if (isDesktop) {
       tl.fromTo(
