@@ -717,7 +717,7 @@
 
   .bullets.bullets--stack {
     align-items: flex-start;
-    min-height: 95vh;
+    min-height: 100vh;
   }
 
   .bullets.bullets--stack .bullets-grid-inner {
@@ -729,7 +729,7 @@
   .bullets.bullets--stack .bullets-grid {
     position: relative;
     width: 100%;
-    min-height: 95vh;
+    min-height: 100vh;
     overflow: hidden;
   }
 
@@ -810,9 +810,9 @@
   }
   .value-item {
     opacity: 0.25;
-    transform-origin: top center;
+    transform-origin: top left;
     transform: scale(0.95);
-    transition: opacity 0.6s ease-out 0.4s, transform 0.6s ease-out 0.4s;
+    transition: opacity 0.3s ease-out 0.1s, transform 0.3s ease-out 0.1s;
   }
   .value-item.active {
     opacity: 1;

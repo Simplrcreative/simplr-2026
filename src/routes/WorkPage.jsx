@@ -705,7 +705,7 @@ export default function WorkPage() {
             className="work work-cards-only px-3 md:px-5 pt-5 pb-5 md:pt-10 md:pb-20 bg-white section-light"
           >
             {filteredWorks.length > 0 ? (
-              <div className="work-cards-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
+              <div className="work-cards-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-0 md:gap-y-10">
                 {filteredWorks.map((work) => (
                   <WorkCard
                     key={work.databaseId}

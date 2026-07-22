@@ -521,9 +521,9 @@ export function createValuesMobileScroll(section, { onActiveChange } = {}) {
     itemSelector: '[data-value-index]',
     getIndex: (el) => Number(el.dataset.valueIndex),
     onActiveChange,
-    triggerRatio: 0.5,
-    firstTriggerRatio: 0.75,
-    lastTriggerRatio: 0.3,
+    triggerRatio: 0.65,
+    firstTriggerRatio: 0.85,
+    lastTriggerRatio: 0.35,
   })
 }
 
