@@ -819,7 +819,7 @@ export default function AboutPage() {
                           faqButtonRefs.current[index] = element
                         }}
                         onClick={() => setActiveFaqIndex(index)}
-                        className={`lead faq-pill max-w-[90%] md:max-w-auto shrink-0 rounded-full border flex items-center justify-center transition-all duration-200 ${isActive ? 'border-white text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/16 text-white/42 hover:border-white/28 hover:text-white/70'}`}
+                        className={`lead faq-pill w-full md:max-w-[90%] md:max-w-auto shrink-0 rounded-full border flex items-center justify-center transition-all duration-200 ${isActive ? 'border-white text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/16 text-white/42 hover:border-white/28 hover:text-white/70'}`}
                         aria-pressed={isActive}
                       >
                         <span className="block text-start md:text-center md:whitespace-nowrap">{item.question}</span>
