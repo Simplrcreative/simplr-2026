@@ -211,7 +211,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card__meta mt-3">
       <h3 className="work-card__title">{cardTitle}</h3>
       {categories.length > 0 && (
-        <div className="work-card__categories gap-1 mt-2 hidden xl:flex flex-wrap">
+        <div className="work-card__categories gap-1 mt-2 md:hidden xl:flex flex-wrap">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
         </div>
       )}
@@ -273,7 +273,7 @@ function WorkFeatured({ work, cardKey }) {
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{cardTitle}</h3>
         {categories.length > 0 && (
-          <div className="work-card__categories gap-1 mt-2 hidden xl:flex flex-wrap">
+          <div className="work-card__categories gap-1 mt-2 md:hidden xl:flex flex-wrap">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
           </div>
         )}
@@ -308,7 +308,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
     ?? ''
 
   return (
-    <section id={`testimonial-${index}`} className="testimonial px-5 pb-5 md:pb-20 bg-white section-light hidden md:block">
+    <section id={`testimonial-${index}`} className="testimonial px-3 md:px-5 pb-5 md:pb-20 bg-white section-light hidden md:block">
       <div className="grid grid-cols-12 w-full">
         <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
           <div className="testimonial lead max-w-[38ch]">
@@ -356,7 +356,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             </div>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
-              <div className="categories mt-3 hidden xl:flex flex-wrap gap-1">
+              <div className="categories mt-3 md:hidden xl:flex flex-wrap gap-1">
                 {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
               </div>
             )}
@@ -658,17 +658,17 @@ export default function WorkPage() {
     <div ref={pageRef}>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
+      <section className="page-hero px-3 md:px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-30 md:mt-20 mb-5 md:mb-0 max-w-[115ch]">
             <div className="eyebrow">Explore our work</div>
             <h1 className="hero-title">Simplr&apos;s work is a reflection of <span>passion, dedication and craft,</span> spanning numerous industries both <span><i>locally and internationally.</i></span> See how our work has transformed businesses and partnerships.</h1>
           </div>
         </div>
       </section>
 
-      <section className="work-filter px-5 pt-22 pb-5 bg-white section-light flex justify-between sticky top-0 z-[1]">
+      <section className="work-filter px-3 md:px-5 pt-22 pb-5 bg-white section-light flex justify-between lg:sticky lg:top-0 z-[1]">
         {/*<div className="flex flex-wrap justify-between items-center">*/}
           <input
             type="text"
@@ -702,7 +702,7 @@ export default function WorkPage() {
         {isFiltering && (
           <section
             ref={filteredWorkSectionRef}
-            className="work work-cards-only px-5 pt-5 pb-5 md:pt-10 md:pb-20 bg-white section-light"
+            className="work work-cards-only px-3 md:px-5 pt-5 pb-5 md:pt-10 md:pb-20 bg-white section-light"
           >
             {filteredWorks.length > 0 ? (
               <div className="work-cards-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
@@ -736,7 +736,7 @@ export default function WorkPage() {
 
           return (
             <div key={group.featured?.databaseId ?? `group-${n}`}>
-              <section id={`work-${n}`} className="work px-5 pb-5 md:pb-20 bg-white section-light">
+              <section id={`work-${n}`} className="work px-3 md:px-5 pb-5 md:pb-20 bg-white section-light">
                 <div className="work-section grid grid-cols-12 gap-5">
 
                   {group.featured && (
@@ -784,7 +784,7 @@ export default function WorkPage() {
         })}
 
         {hasMoreWorks && (
-          <section className="bg-white px-5 pt-10">
+          <section className="bg-white px-3 md:px-5 pt-10">
             <div ref={loadSentinelRef} className="w-full h-px" aria-hidden="true" />
             {isLoadingMore ? (
               <div className="flex justify-center" aria-label="Loading more work">

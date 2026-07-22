@@ -185,14 +185,11 @@
   font-weight: 300;
   line-height: 1.4;
 }
-.work-testimonial {
-  font-size: 1rem;
-  line-height: 1.2rem;
-}
+.work-testimonia .testimonial-quote p,
 .text-box {
-  font-size: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.2rem;
   font-weight: 400;
-  line-height: 1.5rem;
 }
 .text-box.sticky-text {
   position: sticky;
@@ -276,7 +273,7 @@
 }
 
 .testimonial {
-  padding-top: 5rem;
+  padding-top: 3rem;
   position: relative;
 }
 .testimonial b {
@@ -296,4 +293,10 @@
 }
 .testimonial-dot-slide {
   will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .testimonial {
+    padding-top: 5rem;
+  }
 }

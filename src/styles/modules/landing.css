@@ -216,6 +216,9 @@
 }
 
 /* --- FAQS --- */
+.faqs-container {
+    overflow: hidden;
+}
 .faq-slider {
     scrollbar-width: none;
 }
@@ -226,6 +229,9 @@
 
 .faq-pill {
     background: rgba(255, 255, 255, 0.92);
+    line-height: 1.2;
+    padding: 1.25rem;
+    min-height: 3.125rem;
 }
 .faq-pill span {
     margin: -2px 0 0 0;
@@ -246,6 +252,9 @@
 @media (min-width: 768px) {
     .faq-answer-fade {
         line-height: 1.5;
+    }
+    .faq-pill { 
+        padding:0 1.25rem;
     }
 }
 

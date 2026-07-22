@@ -54,8 +54,8 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
 
   const DESKTOP_START = 'top 75%'
   const DESKTOP_END = 'top 30%'
-  const MOBILE_START = 'top 65%'
-  const MOBILE_END = 'top 0'
+  const MOBILE_START = 'top 80%'
+  const MOBILE_END = 'top 35%'
   const isDesktop = window.matchMedia('(min-width: 768px)').matches
 
   const start = element.dataset.splitStart || (isDesktop ? DESKTOP_START : MOBILE_START)

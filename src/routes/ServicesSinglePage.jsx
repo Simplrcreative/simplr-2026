@@ -290,10 +290,10 @@ export default function ServicesSinglePage() {
         </Link>
       </div>
 
-      <section className="page-hero parallax-fill-section relative w-full px-5 py-5 md:pt-0 md:pb-5 bg-white min-h-[90vh] md:min-h-screen flex flex-col justify-end">
+      <section className="page-hero parallax-fill-section relative w-full px-3 md:px-5 py-5 md:pt-0 md:pb-5 bg-white min-h-[80vh]__ md:min-h-screen flex flex-col justify-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee mt-40 lg:mt-0 mb-12 lg:mb-0">
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee mt-30 lg:mt-20 mb-12 lg:mb-0">
             <div className="service-card__label mb-10 md:mb-5">
                 <ServiceLabelIcon color={accentColor} />
                 <span className="service-card__label-text">{title}</span>
@@ -345,7 +345,7 @@ export default function ServicesSinglePage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-5 pb-10 md:py-20 bg-white section-light change-logo">
+          <section key={`section-${sectionIndex}`} className="px-3 md:px-5 pb-10 md:py-20 bg-white section-light change-logo">
             <div className="grid grid-cols-12 ">
               {sectionHeading && (
                 <div className="col-start-1 col-span-12 md:col-span-11 lg:col-span-9 md:pe-40 slide-up-subtle">

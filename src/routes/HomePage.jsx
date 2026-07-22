@@ -553,7 +553,22 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       return
     }
 
-    const targetLeft = activeButton.offsetLeft - (slider.clientWidth - activeButton.clientWidth) / 2
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches
+    let targetLeft
+
+    if (isDesktop) {
+      targetLeft = activeButton.offsetLeft - (slider.clientWidth - activeButton.clientWidth) / 2
+    } else {
+      // Mobile: pin the active pill's left edge to a 1.25rem inset — same
+      // resting position as the first pill — instead of centering (which
+      // drifts as pill widths vary).
+      const inset = 0.75 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+      const delta =
+        activeButton.getBoundingClientRect().left
+        - slider.getBoundingClientRect().left
+        - inset
+      targetLeft = slider.scrollLeft + delta
+    }
 
     slider.scrollTo({
       left: Math.max(0, targetLeft),
@@ -783,7 +798,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
         <Link
           to="services"
-          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-8 md:mt-0"
+          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-5 md:mt-0"
         >
           <span>Explore our services</span>
         </Link>
@@ -925,8 +940,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
           </div>
-          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 xl:col-start-8  xl:col-span-4 flex flex-col md:items-center md:justify-center trigger-split-text-coffee">
-            <div className="testimonial lead max-w-[38ch] mt-5 md:mt-0">
+          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 xl:col-start-8  xl:col-span-4 flex flex-col md:items-center md:justify-center mt-5 md:mt-0 trigger-split-text-coffee">
+            <div className="testimonial lead max-w-[38ch]">
               <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (
@@ -941,17 +956,17 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
       </section>
 
-      <section className="faqs ps-5 pt-20 md:pt-60 bg-white section-light flex flex-col justify-center">
+      <section className="faqs pt-20 md:pt-60 bg-white section-light flex flex-col justify-center">
         <div className="grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
-          <div className="trigger-split-text-coffee md:col-span-4">
+          <div className="px-3 md:px-5 trigger-split-text-coffee md:col-span-4">
             <div className="eyebrow">FAQs</div>
             <h1 className="split-text-coffee">Have questions?</h1>
           </div>
 
           {activeFaq && (
             <>
-              <div className="md:col-span-12 md:flex">
-                <div className="flex md:static">
+              <div className="faqs-container md:col-span-12 md:flex">
+                <div className="flex md:static px-3 md:px-5">
                  <button
                     type="button"
                     onClick={showPreviousFaq}
@@ -975,7 +990,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   </button>
                 </div>
 
-                <div ref={faqSliderRef} className="faq-slider flex items-center overflow-x-auto pb-2">
+                <div ref={faqSliderRef} className="faq-slider flex items-start md:items-center overflow-x-auto px-3 md:px-5 pb-2">
                   
                   {faqs.map((item, index) => {
                     const isActive = index === activeFaqIndex
@@ -988,7 +1003,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                           faqButtonRefs.current[index] = element
                         }}
                         onClick={() => setActiveFaqIndex(index)}
-                        className={`lead faq-pill h-[3.125rem] max-w-[90%] md:max-w-auto shrink-0 rounded-full border px-5 flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
+                        className={`lead faq-pill max-w-[90%] md:max-w-auto shrink-0 rounded-full border flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
                         aria-pressed={isActive}
                       >
                         <span className="block text-start md:text-center md:whitespace-nowrap">{item.question}</span>
@@ -998,8 +1013,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 </div>
               </div>
 
-              <div className="md:col-span-6 xl:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[16rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-coffee">
+              <div className="md:col-span-6 xl:col-span-5 px-3 md:px-5">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[22rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

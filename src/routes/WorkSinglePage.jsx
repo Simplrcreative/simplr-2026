@@ -376,10 +376,10 @@ export default function WorkSinglePage() {
     <>
       <Seo {...seo} />
     
-      <section className="page-hero px-5 pb-5 bg-white section-light md:min-h-[100vh] flex md:items-end">
+      <section className="page-hero px-3 md:px-5 pb-5 bg-white section-light min-h-[80vh] md:min-h-[100vh] flex md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-50 mb-5 md:my-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">
+          <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-35 md:mt-20 mb-5 md:my-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">
             <div>
               <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
               <h1 className="hero-title mb-10"><span>{title}</span></h1>
@@ -435,7 +435,7 @@ export default function WorkSinglePage() {
         </div>
       </section>
 
-      <section className="work-intro px-5 pb-10 pt-0 md:py-20 bg-white change-logo">
+      <section className="work-intro px-3 md:px-5 pb-10 pt-0 md:py-20 bg-white change-logo">
         <div className="grid grid-cols-12">
           <div className="hidden! work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle flex md:inline-block flex-wrap" data-mobile-animation="false">
              {types.map(({ name }, index) => {
@@ -537,7 +537,7 @@ export default function WorkSinglePage() {
         const sliderImages = section?.acfSliderImages?.nodes ?? []
 
         return (
-          <section key={`section-${index}`} className="work-content text-body px-5 pb-5">
+          <section key={`section-${index}`} className="work-content text-body px-3 md:px-5 pb-5">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
                 <>
@@ -704,7 +704,7 @@ export default function WorkSinglePage() {
       })}
 
       {testimonial && (
-        <section className="work-testimonial px-5 py-5 md:pt-40 md:pb-20">
+        <section className="work-testimonial px-3 md:px-5 py-5 md:pt-40 md:pb-20">
           <div className="grid grid-cols-12">
             <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-7 lg:col-span-4 md:ps-2 slide-up-subtle">
               <div className="testimonial lead">
@@ -731,7 +731,7 @@ export default function WorkSinglePage() {
 
       {nextWork && (
         
-      <section className="next-work px-5 py-20 bg-white relative overflow-hidden">
+      <section className="next-work px-3 md:px-5 py-20 bg-white relative overflow-hidden">
         <div className="grid grid-cols-12 relative z-1">
             <div className="col-start-1 md:col-start-5 col-span-12 md:col-span-4 pt-20">
               <div className="client-work">

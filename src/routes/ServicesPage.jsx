@@ -270,17 +270,17 @@ export default function ServicesPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
+      <section className="page-hero px-3 md:px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[90ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-30 mb-5 md:mt-20 md:mb-0 max-w-[90ch]">
             <div className="eyebrow">{services.acfHeading}</div>
             <RichHeading as="h1" html={services.acfIntroductionLead} className="hero-title" />
           </div>
         </div>
       </section>
 
-      <section className="px-5 pb-20 bg-white section-light ">
+      <section className="px-3 md:px-5 pb-20 bg-white section-light ">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-8 lg:col-span-5 text-coffee pt-20">
             <RichText html={services.acfIntroduction} className="lead split-text-coffee trigger-split-text-coffee" />

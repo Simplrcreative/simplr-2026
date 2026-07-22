@@ -127,10 +127,10 @@ export default function Est2014Page() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark md:min-h-[75vh] flex flex-col md:items-end">
+      <section className="page-hero px-3 md:px-5 py-5 md:py-20 bg-coffee section-dark md:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back " />
-          <div className="col-span-12 lg:col-span-9 text-white change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
+          <div className="col-span-12 lg:col-span-9 text-white change-logo mt-30 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
             <div className="eyebrow">Beyond the work</div>
             <h1 className="hero-title">Simplr has never <span>just been about the work.</span> It&apos;s about the people, <span><i>the energy,</i></span> and the <span>shared ambition behind it.</span> Not everything we do is visible in the outcome - <span><i>some of it lives here.</i></span></h1>
           </div>
@@ -146,7 +146,7 @@ export default function Est2014Page() {
         </div>
       </section>
 
-      <section className="beyond-section px-5 pb-5 pt-20 bg-coffee section-dark change-logo">
+      <section className="beyond-section px-3 md:px-5 pb-5 pt-20 bg-coffee section-dark change-logo">
         {beyondItems.length ? (
           <div ref={galleryRef} className="beyond-masonry">
             {columns.map((colItems, colIndex) => (

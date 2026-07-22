@@ -107,9 +107,9 @@ export function createBulletsStackAnimation(section) {
 
   section.classList.add('bullets--stack')
 
-  const BULLET_PIN_START = 0.1
-  const BULLET_DURATION = 0.32
-  const BULLET_DELAY = 0.2
+  const BULLET_PIN_START = 0.5
+  const BULLET_DURATION = 1
+  const BULLET_DELAY = 0.5
   const scrollUnit = () => window.innerHeight * 0.85
 
   const lead = inner.querySelector('.lead')
@@ -123,7 +123,7 @@ export function createBulletsStackAnimation(section) {
     const heading = item.querySelector('.bullet-heading')
     const body = item.querySelector('.bullet-body')
     const paddingTop = body ? parseFloat(getComputedStyle(body).paddingTop) || 0 : 0
-    return (heading?.offsetHeight || 0) + paddingTop * 1
+    return (heading?.offsetHeight || 0) + paddingTop * 2.2
   })
 
   const landingY = [0]
@@ -139,8 +139,8 @@ export function createBulletsStackAnimation(section) {
 
   gsap.set(stage, {
     position: 'relative',
-    height: stageHeight,
-    minHeight: window.innerHeight,
+    height: stageHeight * 0.9,
+    //minHeight: window.innerHeight,
     overflow: 'hidden',
   })
   gsap.set(inner, {
@@ -414,6 +414,117 @@ export function createHowWeWorkAnimation(section) {
     })
     gsap.set(stage, { clearProps: 'height' })
   }
+}
+
+/**
+ * Mobile-only scroll activate: pick the item whose center is closest to a
+ * viewport Y line. First item can use an earlier (lower) line so it engages
+ * sooner; last item can use a higher line so it stays active longer as it
+ * scrolls out.
+ */
+function createMobileScrollActivate(section, {
+  itemSelector,
+  onActiveChange,
+  triggerRatio = 0.5,
+  firstTriggerRatio = 0.5,
+  lastTriggerRatio = 0.5,
+  getIndex = (el) => Number(el.dataset.index),
+} = {}) {
+  if (!section || !itemSelector) return () => undefined
+
+  if (window.matchMedia('(min-width: 768px)').matches) {
+    return () => undefined
+  }
+
+  const findActiveFromScroll = () => {
+    const items = [...section.querySelectorAll(itemSelector)]
+    if (!items.length) {
+      onActiveChange?.(null)
+      return
+    }
+
+    const lastOrder = items.length - 1
+    const triggerY = window.innerHeight * triggerRatio
+    const firstTriggerY = window.innerHeight * firstTriggerRatio
+    const lastTriggerY = window.innerHeight * lastTriggerRatio
+    const firstRect = items[0].getBoundingClientRect()
+    const lastRect = items[lastOrder].getBoundingClientRect()
+    const firstCenter = firstRect.top + firstRect.height * 0.5
+    const lastCenter = lastRect.top + lastRect.height * 0.5
+    const listIsCrossingTrigger = firstCenter <= firstTriggerY && lastCenter >= lastTriggerY
+
+    if (!listIsCrossingTrigger) {
+      onActiveChange?.(null)
+      return
+    }
+
+    let closestIndex = null
+    let closestDistance = Number.POSITIVE_INFINITY
+
+    items.forEach((item, order) => {
+      const rect = item.getBoundingClientRect()
+      let itemTriggerY = triggerY
+      if (order === 0) itemTriggerY = firstTriggerY
+      else if (order === lastOrder) itemTriggerY = lastTriggerY
+      const distance = Math.abs(rect.top + rect.height * 0.5 - itemTriggerY)
+
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestIndex = getIndex(item)
+      }
+    })
+
+    onActiveChange?.(closestIndex)
+  }
+
+  const trigger = ScrollTrigger.create({
+    trigger: section,
+    start: 'top bottom',
+    end: 'bottom top',
+    invalidateOnRefresh: true,
+    onUpdate: findActiveFromScroll,
+    onRefresh: findActiveFromScroll,
+  })
+
+  const onResize = () => findActiveFromScroll()
+  window.addEventListener('resize', onResize)
+  findActiveFromScroll()
+
+  return () => {
+    window.removeEventListener('resize', onResize)
+    trigger.kill()
+  }
+}
+
+/**
+ * Mobile-only: activate the client whose row center is closest to 50% of
+ * the viewport height — same idea as createPeopleMobileScroll, so the logo
+ * reveals as you scroll rather than on hover.
+ */
+export function createClientsMobileScroll(section, { onActiveChange } = {}) {
+  return createMobileScrollActivate(section, {
+    itemSelector: '[data-client-index]',
+    getIndex: (el) => Number(el.dataset.clientIndex),
+    onActiveChange,
+    triggerRatio: 0.5,
+    firstTriggerRatio: 0.75,
+  })
+}
+
+/**
+ * Mobile-only: activate the value whose block center is closest to 50% of
+ * the viewport height (first at 75%, last holds until ~30%). Desktop keeps
+ * hover/click. Lower lastTriggerRatio to hold the final item longer.
+ */
+export function createValuesMobileScroll(section, { onActiveChange } = {}) {
+  return createMobileScrollActivate(section, {
+    itemSelector: '[data-value-index]',
+    getIndex: (el) => Number(el.dataset.valueIndex),
+    onActiveChange,
+    triggerRatio: 0.5,
+    firstTriggerRatio: 0.75,
+    lastTriggerRatio: 0.3,
+  })
 }
 
 export function createBioAnimation(scatter, overlay, close, isOpen, onCloseComplete) {

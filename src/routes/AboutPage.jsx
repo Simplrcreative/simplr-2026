@@ -13,6 +13,8 @@ import {
   createPeopleSectionClear,
   createBioAnimation,
   createHowWeWorkAnimation,
+  createClientsMobileScroll,
+  createValuesMobileScroll,
   createSlideUpAnimations,
   lenisScrollTo,
   lockScroll,
@@ -109,7 +111,21 @@ export default function AboutPage() {
       return
     }
 
-    const targetLeft = activeButton.offsetLeft - (slider.clientWidth - activeButton.clientWidth) / 2
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches
+    let targetLeft
+
+    if (isDesktop) {
+      targetLeft = activeButton.offsetLeft - (slider.clientWidth - activeButton.clientWidth) / 2
+    } else {
+      // Mobile: pin the active pill's left edge to a 1.25rem inset — same
+      // resting position as the first pill — instead of centering.
+      const inset = 0.75 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+      const delta =
+        activeButton.getBoundingClientRect().left
+        - slider.getBoundingClientRect().left
+        - inset
+      targetLeft = slider.scrollLeft + delta
+    }
 
     slider.scrollTo({
       left: Math.max(0, targetLeft),
@@ -143,6 +159,8 @@ export default function AboutPage() {
   const peopleSectionRef = useRef(null)
   const bulletsSectionRef = useRef(null)
   const howWeWorkSectionRef = useRef(null)
+  const clientsSectionRef = useRef(null)
+  const valuesSectionRef = useRef(null)
 
   // Keep last active person so the overlay content doesn't vanish during close animation
   const lastPersonRef = useRef(null)
@@ -166,6 +184,20 @@ export default function AboutPage() {
     if (!howWeWork.length) return undefined
     return createHowWeWorkAnimation(howWeWorkSectionRef.current)
   }, [howWeWork.length])
+
+  useEffect(() => {
+    if (!clients.length) return undefined
+    return createClientsMobileScroll(clientsSectionRef.current, {
+      onActiveChange: setActiveClientIndex,
+    })
+  }, [clients.length])
+
+  useEffect(() => {
+    if (!values.length) return undefined
+    return createValuesMobileScroll(valuesSectionRef.current, {
+      onActiveChange: setActiveValueIndex,
+    })
+  }, [values.length])
 
   useEffect(
     () => {
@@ -259,10 +291,10 @@ export default function AboutPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-coffee section-dark lg:min-h-[75vh] flex flex-col md:items-end">
+      <section className="page-hero px-3 md:px-5 py-5 md:py-20 bg-coffee section-dark lg:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 lg:col-span-7 text-white change-logo mt-50 mb-10 md:mt-40 md:mb-0 max-w-[85ch]">
+          <div className="col-span-12 lg:col-span-7 text-white change-logo mt-30 mb-10 md:mt-40 md:mb-0 max-w-[85ch]">
             <div className="eyebrow">About</div>
             {aboutContent?.acfLandingHeading && (
               <h1
@@ -274,30 +306,30 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 bg-coffee section-dark">
+      <section className="px-3 md:px-5 bg-coffee section-dark">
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-4 lg:col-span-5 text-white">
             {aboutContent?.acfLandingLead && (
               <div
                 className="lead"
-                data-split-start="top 70%"
-                data-split-end="top 50%"
+                data-split-start="top 80%"
+                data-split-end="top 60%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingLead}}
               />
             )}
             {aboutContent?.acfLandingIntroduction && (
               <div
                 className="article-content text-body mt-10 split-text trigger-split-text"
-                data-split-start="top 60%"
-                data-split-end="top 40%"
+                data-split-start="top 70%"
+                data-split-end="top 50%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfLandingIntroduction }}
               />
             )}
             {aboutContent?.acfTeamIntroduction && (
               <div
                 className="article-content text-body mt-10 split-text trigger-split-text"
-                data-split-start="top 50%"
-                data-split-end="top 30%"
+                data-split-start="top 60%"
+                data-split-end="top 40%"
                 dangerouslySetInnerHTML={{ __html: aboutContent.acfTeamIntroduction }}
               />
             )}
@@ -349,7 +381,7 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-5">
+        <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-3 md:px-5">
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
           <div className="people-info col-start-4 col-span-6 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
@@ -417,7 +449,7 @@ export default function AboutPage() {
       <PeopleSectionMobile people={people} />
       </div>
 
-      <section className="px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark slide-up-subtle">
+      <section className="px-3 md:px-5 md:pt-10 md:pb-30 xl:py-20 bg-coffee section-dark slide-up-subtle">
         <div className="grid grid-cols-12">
           <div className="col-start-1 md:col-start-2 lg:col-start-4 col-span-12 md:col-span-9 lg:col-span-5 text-white">
             <div className="lead mb-5">Different disciplines. One shared standard:</div>
@@ -434,7 +466,7 @@ export default function AboutPage() {
       <section
         ref={bulletsSectionRef}
         data-mobile-animation="false"
-        className="bullets px-5 py-20 bg-coffee section-dark min-h-[75vh] md:min-h-[50vh] flex items-start md:items-center overflow-hidden"
+        className="bullets px-3 md:px-5 pt-40 md:py-20 bg-coffee section-dark min-h-[75vh]__ md:min-h-[50vh] flex items-start md:items-center overflow-hidden"
       >
         <div className="bullets-grid-inner">
           <div className="grid grid-cols-12 gap-x-5 w-full">
@@ -468,28 +500,55 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee section-dark values-section slide-up-subtle">
+      <section
+        ref={valuesSectionRef}
+        className="px-3 md:px-5 pb:20 md:py-20 bg-coffee section-dark values-section slide-up-subtle"
+      >
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12">
             <div className="lead mb-5 text-white">Our values</div>
           </div>
           <div className="col-start-1 col-span-12 md:col-span-6 lg:col-span-3 text-white">
             {values.map((value, index) => (
-              <div key={`${value?.acfValue ?? 'value'}-${index}`} className="flex gap-5 align-center mb-4">
-                <div className="font-literata flex flex-col items-center justify-center opacity-90">
-                  {index < 9 ? `0${index + 1}` : index + 1}
+              <div
+                key={`${value?.acfValue ?? 'value'}-${index}`}
+                data-value-index={index}
+                className={`value-item${activeValueIndex === index ? ' active' : ''}`}
+              >
+                <div className="flex gap-5 align-center mb-4">
+                  <div className="font-literata flex flex-col items-center justify-center opacity-80">
+                    {index < 9 ? `0${index + 1}` : index + 1}
+                  </div>
+                  <div
+                    className={`value lead flex flex-col items-center justify-center${activeValueIndex === index ? ' active' : ''}`}
+                    onMouseEnter={() => {
+                      if (window.matchMedia('(min-width: 768px)').matches) {
+                        activateValue(index)
+                      }
+                    }}
+                    onClick={() => {
+                      if (window.matchMedia('(min-width: 768px)').matches) {
+                        activateValue(index)
+                      }
+                    }}
+                    dangerouslySetInnerHTML={{ __html: value?.acfValue ?? '' }}
+                  >
+                  </div>
                 </div>
-                <div
-                  className={`value lead flex flex-col items-center justify-center${activeValueIndex === index ? ' active' : ''}`}
-                  onMouseEnter={() => activateValue(index)}
-                  onClick={() => activateValue(index)}
-                  dangerouslySetInnerHTML={{ __html: value?.acfValue ?? '' }}
-                >
+                <div className="mobile-value-content-container pb-15 px-8">
+                  <div
+                    className="value-content lead mb-5"
+                    dangerouslySetInnerHTML={{ __html: value?.acfContent ?? '' }}
+                  />
+                  <h2
+                    className="value-title section-heading"
+                    dangerouslySetInnerHTML={{ __html: value?.acfTitle ?? '' }}
+                  />
                 </div>
               </div>
             ))}
           </div>
-          <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-4 lg:col-span-6 relative">
+          <div className="hidden md:block col-start-7 col-span-6 lg:col-start-4 lg:col-span-6 relative">
             {values.map((value, index) => {
               const isActive = activeValueIndex === index
               const isOff = offValueIndex === index
@@ -581,7 +640,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-5 py-20 bg-coffee section-dark clients-section slide-up-subtle">
+      <section
+        ref={clientsSectionRef}
+        className="px-3 md:px-5 py-20 bg-coffee section-dark clients-section slide-up-subtle__"
+      >
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-1 col-span-12 mb-10">
             <div className="lead text-white">Our clients</div>
@@ -594,7 +656,8 @@ export default function AboutPage() {
                 {column.map(({ client, originalIndex }) => (
                   <div
                     key={`${client?.acfClient ?? 'client'}-${originalIndex}`}
-                    className="client-item flex align-center justify-between gap-5 text-white"
+                    data-client-index={originalIndex}
+                    className="client-item flex align-center justify-between gap-5 text-white relative"
                   >
                     <div className="flex items-center gap-5">
                       <div className="font-literata flex flex-col items-center justify-center opacity-90">
@@ -602,8 +665,16 @@ export default function AboutPage() {
                       </div>
                       <div
                         className="client lead flex items-center"
-                        onMouseEnter={() => setActiveClientIndex(originalIndex)}
-                        onMouseLeave={() => setActiveClientIndex(null)}
+                        onMouseEnter={() => {
+                          if (window.matchMedia('(min-width: 768px)').matches) {
+                            setActiveClientIndex(originalIndex)
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          if (window.matchMedia('(min-width: 768px)').matches) {
+                            setActiveClientIndex(null)
+                          }
+                        }}
                       >
                         {client?.acfClient}
                       </div>
@@ -626,7 +697,7 @@ export default function AboutPage() {
       </section>
 
       {awards.length > 0 ? (
-        <section className="px-5 py-20 bg-coffee section-dark awards-section">
+        <section className="px-3 md:px-5 py-20 bg-coffee section-dark awards-section">
           {awards.map((award, awardIndex) => {
             const projects = Array.isArray(award?.acfProjects) ? award.acfProjects : []
 
@@ -701,17 +772,17 @@ export default function AboutPage() {
         </section>
       ) : null}
 
-      <section className="px-5 py-20 bg-coffee section-dark faqs flex flex-col justify-center">
+      <section className="py-20 bg-coffee section-dark faqs flex flex-col justify-center">
         <div className="grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
-          <div className="trigger-split-text md:col-span-4">
+          <div className="trigger-split-text md:col-span-4 px-3 md:px-5">
             <div className="eyebrow">FAQs</div>
             <h1 className="split-text">Have questions?</h1>
           </div>
 
           {activeFaq && (
             <>
-              <div className="md:col-span-12 md:flex">
-                <div className="flex md:static">
+              <div className="faqs-container md:col-span-12 md:flex">
+                <div className="flex md:static px-3 md:px-5">
                  <button
                     type="button"
                     onClick={showPreviousFaq}
@@ -735,7 +806,7 @@ export default function AboutPage() {
                   </button>
                 </div>
 
-                <div ref={faqSliderRef} className="faq-slider flex items-center overflow-x-auto pb-2">
+                <div ref={faqSliderRef} className="faq-slider flex items-start md:items-center overflow-x-auto px-3 md:px-5 pb-2">
                   
                   {faqs.map((item, index) => {
                     const isActive = index === activeFaqIndex
@@ -748,7 +819,7 @@ export default function AboutPage() {
                           faqButtonRefs.current[index] = element
                         }}
                         onClick={() => setActiveFaqIndex(index)}
-                        className={`lead faq-pill h-[3.125rem] max-w-[90%] md:max-w-auto shrink-0 rounded-full border px-5 flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-white text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/16 text-white/42 hover:border-white/28 hover:text-white/70'}`}
+                        className={`lead faq-pill max-w-[90%] md:max-w-auto shrink-0 rounded-full border flex items-center justify-center transition-all duration-200 ${isActive ? 'border-white text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]' : 'border-white/16 text-white/42 hover:border-white/28 hover:text-white/70'}`}
                         aria-pressed={isActive}
                       >
                         <span className="block text-start md:text-center md:whitespace-nowrap">{item.question}</span>
@@ -758,8 +829,8 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div className="md:col-span-6 xl:col-span-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[16rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-white">
+              <div className="md:col-span-6 xl:col-span-5 px-3 md:px-5">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[22rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-white">
                   {activeFaq.answer}
                 </div>
               </div>

@@ -3,9 +3,9 @@
 }
 .btn {
     display: inline-flex;
-    padding: 15px 30px;
     justify-content: center;
     align-items: center;
+    padding: 10px 25px;
     gap: 10px;
     border-radius: 100px;
     background: var(--color-coffee);
@@ -14,7 +14,7 @@
     isolation: isolate;
     overflow: visible;
     line-height: 1.2;
-    height: 60px;
+    height: 42.6px;
     transition: background 1s cubic-bezier(.26,.32,.02,.94);
 }
 .btn:hover {
@@ -50,10 +50,10 @@
 .btn::before {
     content: '';
     position: absolute;
-    top: 10px;
-    right: -15px;
-    width: 10px;
-    height: 10px;
+    top: 9px;
+    right: -16.25px;
+    width: 8px;
+    height: 8px;
     transform-origin: top right;
     transform: translate(0);
     transition: transform 0.5s cubic-bezier(.26,.32,.02,.94);
@@ -71,9 +71,9 @@
     position: absolute;
     top: 0;
     right: -25px;
-    width: 30px;
-    height: 30px;
-    border-radius: 30px;
+    width: 26px;
+    height: 26px;
+    border-radius: 26px;
     transform-origin: top right;
     transform: scale(1);
     transition: transform 0.5s cubic-bezier(.26,.32,.02,.94);
@@ -85,12 +85,12 @@
 }
 .btn:hover::before,
 .btn[data-transition-hover='true']::before {
-    transform: scale(1.3) rotate(45deg) translate(5px, 17px);
+    transform: scale(1.4) rotate(45deg) translate(4px, 8px);
     transition: transform 0.25s cubic-bezier(.8,.0,.5,.6);
 }
 .btn:hover::after,
 .btn[data-transition-hover='true']::after {
-    transform: scale(2);
+    transform: scale(1.6);
     transition: transform 0.25s cubic-bezier(.8,.0,.5,.6);
 }
 .btn span {
@@ -112,6 +112,31 @@
     color: white;
 }
 @media screen and (min-width: 768px) {
+    .btn {
+        padding: 15px 30px;
+        gap: 10px;
+        height: 60px;
+    }
+    .btn::before {
+        top: 10px;
+        right: -15px;
+        width: 10px;
+        height: 10px;
+    }
+    .btn::after {
+        right: -25px;
+        width: 30px;
+        height: 30px;
+        border-radius: 30px;
+    }
+    .btn:hover::before,
+    .btn[data-transition-hover='true']::before {
+        transform: scale(1.3) rotate(45deg) translate(5px, 17px);
+    }
+    .btn:hover::after,
+    .btn[data-transition-hover='true']::after {
+        transform: scale(2);
+    }
     .btn-text {
         white-space: nowrap;
     }

@@ -40,10 +40,7 @@
 }
 .thinking-post__title {
   font-family: var(--font-aeonik);
-  font-size: 1rem;
-  line-height: 1.2;
   font-weight: 500;
-  color: var(--color-coffee);
   text-decoration-line: underline;
   text-decoration-color: transparent; /* underline exists, just invisible */
   text-decoration-thickness: auto;

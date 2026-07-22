@@ -254,10 +254,10 @@ export default function ThinkingPage() {
     <>
       <Seo {...seo} />
 
-      <section className="page-hero px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
+      <section className="page-hero px-3 md:px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-50 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
+          <div className="col-span-12 md:col-span-9 text-coffee change-logo mt-30 mb-5 md:mt-40 md:mb-0 max-w-[115ch]">
             <div className="eyebrow">
               Thinking
               {activeFilterLabel ? (
@@ -271,7 +271,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section className="post-filter px-5 pt-22 pb-5 bg-white section-light flex md:justify-end sticky top-0 z-[1]">
+      <section className="post-filter px-3 md:px-5 pt-22 pb-5 bg-white section-light flex md:justify-end lg:sticky lg:top-0 z-[1]">
         <div className="flex flex-wrap gap-1">
           {filters.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
@@ -290,7 +290,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section ref={postsResultsRef} className="posts-results px-5 pb-20 bg-white">
+      <section ref={postsResultsRef} className="posts-results px-3 md:px-5 pb-20 bg-white">
         <div className="thinking-posts-grid">
           {filteredPosts.map((post) => {
             const loaderThumb = getThumbnail(post.acfPostBuilder?.acfFeaturedImage, 'loader')
@@ -329,7 +329,7 @@ export default function ThinkingPage() {
         </div>
 
         {hasMorePosts && (
-          <div className="bg-white px-5 pt-20">
+          <div className="bg-white px-3 md:px-5 pt-20">
             <div ref={postsLoadSentinelRef} className="w-full h-px" aria-hidden="true" />
             {isLoadingMorePosts ? (
               <div className="flex justify-center" aria-label="Loading more thinking posts">

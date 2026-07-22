@@ -66,10 +66,10 @@ export default function LandingPage() {
         pathname={pathname}
       />
 
-      <section className="post-hero px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
+      <section className="post-hero px-3 md:px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-5 text-coffee change-logo mt-40 max-w-[90ch]">
+          <div className="col-span-12 md:col-span-5 text-coffee change-logo mt-30 md:mt-20 change-logo max-w-[90ch]">
               <div className="eyebrow">{title}</div>
               <h1 className="hero-title"><span>{headline}</span></h1>
               <div className="mt-10 max-w-[70ch]">
@@ -106,7 +106,7 @@ export default function LandingPage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-5 py-20 bg-white section-light">
+          <section key={`section-${sectionIndex}`} className="px-3 md:px-5 py-20 bg-white section-light">
             <div className="grid grid-cols-12 w-full">
               {sectionHeading && (
                 <div className="col-span-6 max-w-[70ch] slide-up-subtle">
@@ -225,7 +225,7 @@ export default function LandingPage() {
       })}
 
       {showForm && (
-        <section className="px-5 pt-20">
+        <section className="px-3 md:px-5 pt-20">
           <div className="grid grid-cols-12 w-full">
             <div className="col-start-8 col-span-5 slide-up-subtle">
               <ContactForm style="dark" heading="This is a cool heading" />

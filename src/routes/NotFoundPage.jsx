@@ -10,7 +10,7 @@ export default function NotFoundPage() {
       <Seo title="Not found" pathname="/404" robots="noindex,nofollow" />
       <section className="px-5 py-20 bg-white section-light">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-1  col-span-12 text-coffee mt-40">
+          <div className="col-start-1  col-span-12 text-coffee mt-30 md:mt-20">
               <div className="eyebrow">{status}</div>
               <h1 className="section-title mt-4">Yikes! That's not great</h1>
               <p className="body-copy my-10">
