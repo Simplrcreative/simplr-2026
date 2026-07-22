@@ -214,7 +214,7 @@ export function createBulletsStackAnimation(section) {
 // arrival — the fluid, spring/liquid "dock" bounce used throughout the
 // how-we-work motion. `BOUNCE` controls how pronounced that overshoot is;
 // 0 = a plain, no-bounce ease-in-out.
-const BOUNCE = 0.15
+const BOUNCE = 0
 function easeInOutBack(x) {
   const c1 = BOUNCE
   const c2 = c1 * 1.525
