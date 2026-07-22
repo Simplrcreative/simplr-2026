@@ -71,6 +71,12 @@ function syncLenisLockState() {
 function registerScrollTrigger() {
   if (!scrollTriggerRegistered) {
     gsap.registerPlugin(ScrollTrigger)
+    // iOS Safari shows/hides the bottom chrome and fires resize with a new
+    // innerHeight. Refreshing ScrollTrigger then jumps scrubbed timelines
+    // mid-flight (footer logo vs tagline is the obvious casualty). Ignore
+    // those mobile chrome resizes; still refresh on orientation / real layout
+    // changes via Lenis resize + explicit refreshSmoothScroll callers.
+    ScrollTrigger.config({ ignoreMobileResize: true })
     scrollTriggerRegistered = true
   }
 }
