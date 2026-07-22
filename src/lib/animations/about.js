@@ -107,9 +107,9 @@ export function createBulletsStackAnimation(section) {
 
   section.classList.add('bullets--stack')
 
-  const BULLET_PIN_START = 0.5
-  const BULLET_DURATION = 1
-  const BULLET_DELAY = 0.5
+  const BULLET_PIN_START = 0.1
+  const BULLET_DURATION = 0.5
+  const BULLET_DELAY = 0.1
   const scrollUnit = () => window.innerHeight * 0.85
 
   const lead = inner.querySelector('.lead')
@@ -123,7 +123,7 @@ export function createBulletsStackAnimation(section) {
     const heading = item.querySelector('.bullet-heading')
     const body = item.querySelector('.bullet-body')
     const paddingTop = body ? parseFloat(getComputedStyle(body).paddingTop) || 0 : 0
-    return (heading?.offsetHeight || 0) + paddingTop * 2.2
+    return (heading?.offsetHeight || 0) + paddingTop * 1.5
   })
 
   const landingY = [0]

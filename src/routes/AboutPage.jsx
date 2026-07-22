@@ -466,7 +466,7 @@ export default function AboutPage() {
       <section
         ref={bulletsSectionRef}
         data-mobile-animation="false"
-        className="bullets px-3 md:px-5 pt-40 md:py-20 bg-coffee section-dark min-h-[75vh]__ md:min-h-[50vh] flex items-start md:items-center overflow-hidden"
+        className="bullets px-3 md:px-5 pt-20 md:py-20 bg-coffee section-dark min-h-[75vh]__ md:min-h-[50vh] flex items-start md:items-center overflow-hidden"
       >
         <div className="bullets-grid-inner">
           <div className="grid grid-cols-12 gap-x-5 w-full">

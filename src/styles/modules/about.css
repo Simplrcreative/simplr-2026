@@ -717,7 +717,7 @@
 
   .bullets.bullets--stack {
     align-items: flex-start;
-    /*min-height: 100vh;*/
+    min-height: 95vh;
   }
 
   .bullets.bullets--stack .bullets-grid-inner {
@@ -729,7 +729,7 @@
   .bullets.bullets--stack .bullets-grid {
     position: relative;
     width: 100%;
-    /*min-height: 100vh;*/
+    min-height: 95vh;
     overflow: hidden;
   }
 
