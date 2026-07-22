@@ -957,7 +957,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       </section>
 
       <section className="faqs pt-20 md:pt-60 bg-white section-light flex flex-col justify-center">
-        <div className="grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
+        <div className="grid grid-cols-1 gap-y-5 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
           <div className="px-3 md:px-5 trigger-split-text-coffee md:col-span-4">
             <div className="eyebrow">FAQs</div>
             <h1 className="split-text-coffee">Have questions?</h1>
@@ -966,7 +966,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           {activeFaq && (
             <>
               <div className="faqs-container md:col-span-12 md:flex">
-                <div className="flex md:static px-3 md:px-5">
+                <div className="flex md:static ps-3 md:ps-5">
                  <button
                     type="button"
                     onClick={showPreviousFaq}
@@ -990,7 +990,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                   </button>
                 </div>
 
-                <div ref={faqSliderRef} className="faq-slider flex items-start md:items-center overflow-x-auto px-3 md:px-5 pb-2">
+                <div ref={faqSliderRef} className="faq-slider flex items-start md:items-center overflow-x-auto px-3 md:px-0 pb-2">
                   
                   {faqs.map((item, index) => {
                     const isActive = index === activeFaqIndex
@@ -1003,7 +1003,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                           faqButtonRefs.current[index] = element
                         }}
                         onClick={() => setActiveFaqIndex(index)}
-                        className={`lead faq-pill w-full md:max-w-[90%] md:max-w-auto shrink-0 rounded-full border flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
+                        className={`lead faq-pill w-full md:w-auto md:max-w-[90%] md:max-w-auto shrink-0 rounded-full border flex items-center justify-center leading-tight transition-all duration-200 ${isActive ? 'border-coffee text-coffee shadow-[0_0_0_1px_rgba(48,15,29,0.08)]' : 'border-coffee/16 text-coffee/42 hover:border-coffee/28 hover:text-coffee/70'}`}
                         aria-pressed={isActive}
                       >
                         <span className="block text-start md:text-center md:whitespace-nowrap">{item.question}</span>
@@ -1014,7 +1014,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               </div>
 
               <div className="md:col-span-6 xl:col-span-5 px-3 md:px-5">
-                <div key={activeFaq.question} className="faq-answer-fade max-w-[22rem] md:max-w-[40rem] xl:max-w-[34rem] text-[1rem] xl:text-[1.125rem] text-coffee">
+                <div key={activeFaq.question} className="faq-answer-fade max-w-[22rem] md:max-w-[40rem] xl:max-w-[34rem] text-coffee">
                   {activeFaq.answer}
                 </div>
               </div>

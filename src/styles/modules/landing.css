@@ -230,7 +230,8 @@
 .faq-pill {
     background: rgba(255, 255, 255, 0.92);
     line-height: 1.2;
-    padding: 1.25rem;
+    font-size: 1rem;
+    padding: 0.875rem 1.25rem;
     min-height: 3.125rem;
 }
 .faq-pill span {
@@ -245,16 +246,19 @@
 }
 
 .faq-answer-fade {
+    font-size: 0.875rem;
     line-height: 1.2;
     animation: faqAnswerFade 600ms ease-out;
 }
 
 @media (min-width: 768px) {
-    .faq-answer-fade {
-        line-height: 1.5;
-    }
-    .faq-pill { 
+    .faq-pill {
+        font-size: 1.125rem;
         padding:0 1.25rem;
+    }
+    .faq-answer-fade {
+        font-size: 1.125rem;
+        line-height: 1.5;
     }
 }
 
