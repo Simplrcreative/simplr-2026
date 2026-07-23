@@ -708,9 +708,7 @@ export default function AboutPage() {
                   const slug = caseStudy?.slug || ''
                   const client = caseStudy?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || 'Client'
                   const detail = project?.acfAwardDetails || ''
-                  const year = project?.acfYear
-                    ? new Date(caseStudy.date).getFullYear()
-                    : ''
+                  const year = project?.acfYear || ''
                   
                   return (
                     <div
