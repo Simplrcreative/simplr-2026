@@ -314,10 +314,34 @@ async function waitForRenderedPage(page) {
   await page.waitForTimeout(500)
 }
 
+/** Re-insert the boot loader so reloads don't flash unstyled prerendered content. */
+function ensureBootLoaderInHtml(html) {
+  if (html.includes('id="boot-loader"')) return html
+
+  const bootLoader = `<div id="boot-loader" aria-hidden="true">
+      <div class="boot-dots">
+        <span class="boot-dot-top"></span>
+        <span class="boot-dot-mask"></span>
+        <span class="boot-dot boot-dot-1"></span>
+        <span class="boot-dot boot-dot-2"></span>
+        <span class="boot-dot boot-dot-3"></span>
+        <span class="boot-dot boot-dot-4"></span>
+        <span class="boot-dot boot-dot-5"></span>
+      </div>
+    </div>`
+
+  if (html.includes('<body>')) {
+    return html.replace('<body>', `<body>${bootLoader}`)
+  }
+  if (html.includes('<body ')) {
+    return html.replace(/<body([^>]*)>/, `<body$1>${bootLoader}`)
+  }
+  return html
+}
+
 /* ------------------------------------------------------------------ */
 // Main
 /* ------------------------------------------------------------------ */
-
 async function main() {
   const sitemapPath = path.join(distDir, 'sitemap.xml')
 
@@ -376,7 +400,7 @@ async function main() {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 })
       await waitForRenderedPage(page)
 
-      const html = await page.content()
+      const html = ensureBootLoaderInHtml(await page.content())
       const outputDir = routePathToOutputDir(distDir, routePath)
       await fs.mkdir(outputDir, { recursive: true })
       await fs.writeFile(path.join(outputDir, 'index.html'), html, 'utf8')

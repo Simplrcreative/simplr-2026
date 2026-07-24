@@ -14,8 +14,29 @@ createRoot(document.getElementById('root')).render(
 
 const bootLoader = document.getElementById('boot-loader')
 
-function hideBootLoader() {
+function stylesheetsReady() {
+  const sheets = Array.from(document.styleSheets)
+  if (!sheets.length) return Promise.resolve()
+
+  return Promise.all(
+    Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((link) => {
+      if (link.sheet) return Promise.resolve()
+      return new Promise((resolve) => {
+        link.addEventListener('load', resolve, { once: true })
+        link.addEventListener('error', resolve, { once: true })
+      })
+    }),
+  )
+}
+
+async function hideBootLoader() {
   if (!bootLoader) return
+
+  try {
+    await stylesheetsReady()
+  } catch {
+    // Still dismiss — fallback timeout covers hard failures.
+  }
 
   bootLoader.classList.add('is-hidden')
   window.setTimeout(() => {
@@ -30,11 +51,17 @@ function isHomePath() {
 
 if (bootLoader) {
   if (isHomePath()) {
-    window.addEventListener('intro-overlay-ready', hideBootLoader, { once: true })
+    window.addEventListener('intro-overlay-ready', () => {
+      void hideBootLoader()
+    }, { once: true })
   } else {
-    window.addEventListener('app-shell-ready', hideBootLoader, { once: true })
+    window.addEventListener('app-shell-ready', () => {
+      void hideBootLoader()
+    }, { once: true })
   }
 
   // Fallback in case shell-ready / intro events are missed.
-  window.setTimeout(hideBootLoader, 6000)
+  window.setTimeout(() => {
+    void hideBootLoader()
+  }, 6000)
 }
