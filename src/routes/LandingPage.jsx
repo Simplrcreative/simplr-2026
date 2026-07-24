@@ -245,7 +245,7 @@ export default function LandingPage() {
       {showForm && (
         <section className="px-3 md:px-5 pt-10 md:pt-20">
           <div className="grid grid-cols-12 w-full">
-            <div className="col-start-1 col-span-12 md:col-start-8 md:col-span-5 slide-up-subtle">
+            <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-5 slide-up-subtle">
               <ContactForm style="dark" heading="This is a cool heading" />
             </div>
           </div>
