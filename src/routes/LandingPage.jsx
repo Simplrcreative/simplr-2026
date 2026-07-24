@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link, useLoaderData, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createParallaxAnimations, createBtnHoverAnimation } from '../lib/animations/index.js'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import RichText from '../components/RichText.jsx'
 import RichHeading from '../components/RichHeading.jsx'
 import ContactForm from '../components/ContactForm.jsx'
+
+gsap.registerPlugin(ScrollTrigger)
 
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'large', fallbackSize = 'medium_large') {
   const thumbnailNode = acfFeaturedThumbnail?.node
@@ -35,7 +39,8 @@ export default function LandingPage() {
   const featuredImage = getThumbnail(landingPageContent.acfFeaturedImage)
   const acfSections = landingPageContent?.acfSections || []
   const ctaBtnRefs = useRef({})
-   useEffect(() => {
+
+  useEffect(() => {
     const cleanups = []
 
     Object.values(ctaBtnRefs.current).forEach((btn) => {
@@ -51,42 +56,77 @@ export default function LandingPage() {
   }, [acfSections])
 
   useEffect(() => {
-    const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
-    const cleanupParallax = createParallaxAnimations(pageRef.current)
-    const cleanupSplitText = createSplitTextAnimation()
-    refreshScrollTriggers()
+    let cleanups = []
+
+    const initPageAnimations = () => {
+      cleanups.forEach((cleanup) => cleanup())
+      cleanups = []
+
+      // Match ServicesSinglePage: tear down any previous fill pin, then reset
+      // the featured media so a new scrub starts from identity transforms.
+      ScrollTrigger.getById('parallax-fill')?.kill()
+
+      const featuredMedia = pageRef.current?.querySelector('[data-transition-dock="service-featured-media"]')
+      if (featuredMedia) {
+        gsap.set(featuredMedia, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          clearProps: 'transform,willChange,borderRadius,zIndex,position',
+        })
+      }
+
+      const cleanupSlideUp = createSlideUpAnimations(pageRef.current)
+      const cleanupParallax = createParallaxAnimations(pageRef.current)
+      const cleanupSplitText = createSplitTextAnimation()
+
+      if (cleanupSlideUp) cleanups.push(cleanupSlideUp)
+      if (cleanupParallax) cleanups.push(cleanupParallax)
+      if (cleanupSplitText) cleanups.push(cleanupSplitText)
+
+      refreshScrollTriggers()
+    }
+
+    const onTransitionComplete = () => {
+      requestAnimationFrame(() => initPageAnimations())
+    }
+
+    if (document.documentElement.classList.contains('page-transitioning')) {
+      window.addEventListener('page-transition:complete', onTransitionComplete, { once: true })
+    } else {
+      initPageAnimations()
+    }
 
     return () => {
-      cleanupSlideUp?.()
-      cleanupSplitText?.()
-      cleanupParallax?.()
+      window.removeEventListener('page-transition:complete', onTransitionComplete)
+      cleanups.forEach((cleanup) => cleanup())
+      ScrollTrigger.getById('parallax-fill')?.kill()
     }
-  }, [])
+  }, [pathname, featuredVideo, featuredImage, acfSections])
 
   return (
-    <div ref={pageRef}>
+    <div ref={pageRef} className="relative">
       <Seo
         title={title || 'Thinking'}
         description=""
         pathname={pathname}
       />
 
-      <section className="post-hero px-3 md:px-5 py-10 md:py-20 bg-white section-light min-h-[80vh] flex items-end">
-        <div className="grid grid-cols-12 w-full">
-          <div className="col-span-12 change-logo-back" />
-          <div className="col-span-12 md:col-span-5 text-coffee change-logo mt-30 md:mt-20 change-logo max-w-[90ch]">
-              <div className="eyebrow">{title}</div>
-              <h1 className="hero-title"><span>{headline}</span></h1>
-              <div className="mt-10 max-w-[70ch]">
-                <RichText html={introduction} />
-              </div>
+      <section className="page-hero parallax-fill-section relative w-full px-3 md:px-5 py-5 md:pt-0 md:pb-5 bg-white min-h-[80vh]__ md:min-h-screen flex flex-col justify-end">
+        <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
+          <div className="col-span-12 change-logo-back" aria-hidden="true" />
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee mt-30 lg:mt-0 mb-12 lg:mb-0">
+            <div className="eyebrow max-w-[36ch]">{title}</div>
+            <h1 className="hero-title w-[22ch]"><span>{headline}</span></h1>
+            
           </div>
-          <div className="col-start-6 col-span-7 parallax">
+          <div className="col-start-1 col-span-12 lg:col-start-8 lg:col-span-5">
             <div className="featured-image">
               {featuredVideo ? (
                 <div
-                  className="ratio overflow-hidden rounded-[10px]"
+                  className="ratio service-featured-media parallax-fill rounded-[10px]"
                   style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                  data-transition-dock="service-featured-media"
                 >
                   <video
                     src={featuredVideo}
@@ -97,16 +137,25 @@ export default function LandingPage() {
                     playsInline
                   />
                 </div>
-              ) : featuredImage ? (
+              ) : (
                 <picture
-                  className="ratio overflow-hidden rounded-[10px]"
+                  className="ratio service-featured-media parallax-fill rounded-[10px]"
                   style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                  data-transition-dock="service-featured-media"
                 >
-                  <source srcSet={`${featuredImage}.webp`} type="image/webp" />
-                  <img src={`${featuredImage}.webp`} alt={title} />
+                  {featuredImage ? <source srcSet={`${featuredImage}.webp`} type="image/webp" /> : null}
+                  {featuredImage ? <img src={`${featuredImage}.webp`} alt={title} /> : null}
                 </picture>
-              ) : null}
+              )}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-3 md:px-5 pt-10 lg:pt-20 bg-white section-light">
+        <div className="grid grid-cols-12 w-full">
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 slide-up-subtle">
+           <RichText html={introduction} />
           </div>
         </div>
       </section>
@@ -125,10 +174,13 @@ export default function LandingPage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-3 md:px-5 py-10 md:py-20 bg-white section-light">
+          <section
+            key={`section-${sectionIndex}`}
+            className={`px-3 md:px-5 py-10 md:py-20 bg-white section-light${sectionIndex === 0 ? ' change-logo' : ''}`}
+          >
             <div className="grid grid-cols-12 w-full">
               {sectionHeading && (
-                <div className="col-span-12 lg:col-span-6 max-w-[70ch] mb-5 lg:mb-0 slide-up-subtle">
+                <div className="col-span-12 lg:col-span-5 max-w-[70ch] mb-5 lg:mb-0 slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="font-literata section-heading"/>
                   <div className="mt-10 slide-up-subtle">
                     {sectionIntroduction && (
@@ -187,10 +239,10 @@ export default function LandingPage() {
                             const detail = swag.acfDetail ?? ''
 
                             return (
-                              <div 
+                              <div
                                 key={`swag-${index}`}
                                 className="swag landing-page flex slide-up-subtle"
-                              > 
+                              >
                                 <div className="swag-numbers flex justify-start items-start">
                                   {preUnit && (
                                     <span className="swag-unit pre">{preUnit}</span>
@@ -207,9 +259,6 @@ export default function LandingPage() {
                                     </span>
                                   )}
                                 </div>
-
-                                
-
                               </div>
                             )
                           })}
@@ -227,7 +276,7 @@ export default function LandingPage() {
               )}
               {sectionCta && (
                 <div className="button-wrapper md:col-start-7 col-span-6 slide-up-subtle md:mt-4">
-                  <Link 
+                  <Link
                     to={sectionCta.url}
                     ref={(el) => { ctaBtnRefs.current[sectionIndex] = el }}
                     title={sectionCta.title}
@@ -244,7 +293,7 @@ export default function LandingPage() {
       })}
 
       {showForm && (
-        <section className="px-3 md:px-5 pt-10 md:pt-20">
+        <section className={`px-3 md:px-5 pt-10 md:pt-20${!acfSections?.length ? ' change-logo' : ''}`}>
           <div className="grid grid-cols-12 w-full">
             <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-5 slide-up-subtle">
               <ContactForm style="dark" heading={formHeading} />
