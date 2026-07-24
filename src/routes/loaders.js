@@ -181,8 +181,14 @@ export function createDefaultPageLoader() {
 }
 
 export function createLandingPageLoader() {
-  return async function landingPageLoader({ request }) {
-    const slug = new URL(request.url).pathname.replace(/^\/|\/$/g, '')
+  return async function landingPageLoader({ params }) {
+    const slug = String(params.slug ?? '').replace(/^\/|\/$/g, '')
+
+    // Only single-segment root slugs — nested paths fall through to NotFound.
+    if (!slug || slug.includes('/')) {
+      throw new Response('Not found', { status: 404 })
+    }
+
     const data = await fetchLandingPageData(slug)
     if (!data.page) {
       throw new Response('Not found', { status: 404 })

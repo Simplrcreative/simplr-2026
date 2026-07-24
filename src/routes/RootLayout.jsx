@@ -721,7 +721,7 @@ export default function RootLayout() {
                   <div>Unit AS02, The Forum, Lifestyle House,<br/>Northbank Lane, Century City,<br/>South Africa</div>
                   <div className="mt-5 mb-0 xl:my-[3.75rem]">
                     Simplr © 2026<br/>
-                    <a href="/privacy-policy/" title="Privacy policy">Privacy policy</a> | <a href="/site-map/" title="Sitemap">Sitemap</a>
+                    <a href="/privacy-policy/" title="Privacy policy">Privacy policy</a>
                   </div>
                 </div>
           </div>

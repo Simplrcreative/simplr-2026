@@ -133,10 +133,16 @@ export const router = createBrowserRouter([
             handle: { pageBg: 'light' },
           },
           {
-            path: '*',
+            path: ':slug/',
             element: <LandingPage />,
             loader: createLandingPageLoader(),
             handle: { pageBg: 'light' },
+          },
+          {
+            path: '*',
+            loader: () => {
+              throw new Response('Not found', { status: 404 })
+            },
           },
         ],
       },
