@@ -200,12 +200,15 @@ export function lenisScrollTo(target, options = {}) {
 
 export function scrollToTopImmediate() {
   if (lenisInstance) {
-    lenisInstance.stop()
+    // Prefer immediate scrollTo without stop() — stop() + start() races left
+    // Lenis dead on production after route transitions / logo entrance.
     lenisInstance.scrollTo(0, { immediate: true, force: true })
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
     window.scrollTo(0, 0)
-    syncLenisLockState()
+    if (activeScrollLocks.size === 0) {
+      lenisInstance.start()
+    }
     ScrollTrigger.update()
     return
   }

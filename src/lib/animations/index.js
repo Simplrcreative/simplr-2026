@@ -1,5 +1,5 @@
 export { getCompactLogoTransform, isCompactLogoTabletUp, COMPACT_LOGO_BREAKPOINTS } from './compact-logo-transform.js'
-export { createLogoScrollAnimation, createLogoPageAnimation, setLogoExpandedState } from './nav.js'
+export { createLogoScrollAnimation, createLogoPageAnimation } from './nav.js'
 export { createHeroScrollAnimation, createNavSectionTheme, createFeaturedMediaHeaderLightControls } from './hero.js'
 export { createServicesScrollAnimation } from './services.js'
 export { createCaseStudiesScrollAnimation } from './case-studies.js'

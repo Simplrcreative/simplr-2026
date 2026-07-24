@@ -263,26 +263,37 @@ function createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, get
     )
   }
 
-  // Bounds-based sync only — do NOT use per-section start/onEnter.
-  // Pin spacers + deferred home content (case studies, client logos) shift
-  // calculated starts on production so onEnter fired near the wrong section.
-  ScrollTrigger.getById('change-logo-sync')?.kill()
-
-  const watcher = ScrollTrigger.create({
-    id: 'change-logo-sync',
-    trigger: document.documentElement,
-    start: 0,
-    end: 'max',
-    invalidateOnRefresh: true,
-    onUpdate: syncChangeLogoState,
-    onRefresh: syncChangeLogoState,
-  })
+  // Per-section triggers + pin-spacer-aware sync on refresh.
+  // Avoid a document-wide end:'max' watcher — that thrash-refreshed on
+  // prerendered production pages and broke Lenis/pin scroll.
+  const watchers = [
+    ...changeLogoSections.map((section) =>
+      ScrollTrigger.create({
+        trigger: section,
+        start: () => `top ${getThreshold()}`,
+        invalidateOnRefresh: true,
+        onEnter: () => setCompactLogoActive(true),
+        onEnterBack: () => setCompactLogoActive(true),
+        onRefresh: syncChangeLogoState,
+      }),
+    ),
+    ...changeLogoBackSections.map((section) =>
+      ScrollTrigger.create({
+        trigger: section,
+        start: () => `top ${getThreshold()}`,
+        invalidateOnRefresh: true,
+        onEnter: () => setCompactLogoActive(false),
+        onEnterBack: () => setCompactLogoActive(false),
+        onRefresh: syncChangeLogoState,
+      }),
+    ),
+  ]
 
   syncChangeLogoState()
 
   return {
     kill() {
-      watcher.kill()
+      watchers.forEach((watcher) => watcher.kill())
       setCompactLogoActive(false)
     },
   }

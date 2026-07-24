@@ -5,8 +5,7 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform, setLogoExpandedState } from '../lib/animations/index.js'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform } from '../lib/animations/index.js'
 import { useHasFinePointer } from '../lib/use-is-touch-device.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
@@ -16,8 +15,7 @@ const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
 const HOME_HERO_TITLE_INTRO_EVENT = 'home-hero:title-intro-start'
 const HOME_HERO_VIDEO_INTRO_EVENT = 'home-hero:video-intro-start'
 const INTRO_MIN_VISIBLE_MS = 5000
-// Only used if page-transition:complete is missed — must be longer than a real transition.
-const HOME_RETURN_ENTRANCE_FALLBACK_MS = 4000
+const HOME_RETURN_ENTRANCE_FALLBACK_MS = 2000
 const HOME_NAV_INTRO_DELAY_S = 0.9
 const HOME_HERO_TITLE_AFTER_NAV_S = 0.3
 const HOME_HERO_VIDEO_AFTER_NAV_S = 0.35
@@ -342,71 +340,26 @@ export default function RootLayout() {
       entranceCleanup?.()
       entranceCleanup = null
 
-      const layout = layoutRef.current
-      const logo = layout?.querySelector('.logo')
-      const tagline = layout?.querySelector('.tagline')
-      const implrPaths = Array.from(layout?.querySelectorAll('#logo-implr g') ?? [])
-      const mainNav = layout?.querySelector('#desktop-nav')
-      const menuIcon = layout?.querySelectorAll('.menu-icon')
-
-      // Kill only logo-related tweens — never #desktop-nav / .menu-icon here or
-      // their later entrance steps get cancelled and stay invisible.
-      gsap.killTweensOf([logo, tagline, ...implrPaths].filter(Boolean))
-      scrollToTopImmediate()
-      ScrollTrigger.getById('logo-scroll-scrub')?.kill()
-
-      const {
-        logoScale,
-        logoY,
-        taglineScale,
-        taglineY,
-        taglineX,
-      } = getCompactLogoTransform()
-
-      // Explicit compact start for the unfold.
-      gsap.set(logo, {
-        autoAlpha: 0,
-        scale: logoScale,
-        y: logoY,
-        transformOrigin: 'left top',
-      })
-      gsap.set(implrPaths, { autoAlpha: 0, x: -20, filter: 'blur(10px)' })
-      gsap.set(tagline, {
-        autoAlpha: 0,
-        y: taglineY,
-        x: taglineX,
-        scale: taglineScale,
-        transformOrigin: 'left top',
-      })
-
-      let scrubAttached = false
-      const attachLogoScrub = () => {
-        if (scrubAttached) return
-        scrubAttached = true
-        // Safety: intro scroll-lock must never outlive the entrance sequence.
-        unlockScroll('home-intro-sequence')
-        setLogoExpandedState(layout)
-        destroyLogoRef.current?.()
-        destroyLogoRef.current = createLogoScrollAnimation(layout)
-      }
+      const logo = layoutRef.current?.querySelector('.logo')
+      const tagline = layoutRef.current?.querySelector('.tagline')
+      const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
+      const mainNav = layoutRef.current?.querySelector('#desktop-nav')
+      const menuIcon = layoutRef.current?.querySelectorAll('.menu-icon')
 
       const entranceTl = gsap.timeline({
-        defaults: { overwrite: 'auto' },
-        onComplete: attachLogoScrub,
+        onComplete: () => {
+          destroyLogoRef.current?.()
+          destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
+        },
       })
 
       entranceTl.to(logo, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
       entranceTl.to(tagline, { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
       entranceTl.to(
-        implrPaths,
+        Array.from(implrPaths),
         { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
         0.15,
       )
-      // Snap letters only — do not touch nav (still animating in below).
-      entranceTl.add(() => {
-        setLogoExpandedState(layout)
-      }, 0.55)
-
       entranceTl.to(
         mainNav,
         {
@@ -445,8 +398,7 @@ export default function RootLayout() {
       }
     }
 
-    // Returning to Home: wait for TransitionFrame to finish so we don't start
-    // the unfold (or logo scrub ScrollTriggers) while the page is still transformed.
+    // Returning to Home: wait for the page transition to finish.
     if (returningToHomeRef.current) {
       let hasStarted = false
       const startEntrance = () => {
@@ -456,21 +408,16 @@ export default function RootLayout() {
         playHomeEntranceAnimation()
       }
 
-      // Double-rAF: TransitionFrame's layout effect has already run; if a
-      // transition is in flight, page-transitioning is set. Never start the
-      // unfold early — done() would call applyCompactLogoState mid-stagger.
       let timer = 0
       let cancelled = false
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (cancelled) return
-          if (document.documentElement.classList.contains('page-transitioning')) {
-            window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
-            timer = window.setTimeout(startEntrance, HOME_RETURN_ENTRANCE_FALLBACK_MS)
-            return
-          }
-          startEntrance()
-        })
+        if (cancelled) return
+        if (document.documentElement.classList.contains('page-transitioning')) {
+          window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
+          timer = window.setTimeout(startEntrance, HOME_RETURN_ENTRANCE_FALLBACK_MS)
+          return
+        }
+        startEntrance()
       })
 
       return () => {
