@@ -2,6 +2,8 @@
 .work-filter, 
 .post-filter {
   width: calc(100% - 2.5rem);
+  max-width: 100%;
+  box-sizing: border-box;
   left: 1.25rem;
   border-radius: 0 0 10px 10px;
 }
@@ -34,12 +36,23 @@
     padding: 10px 16px;
   }
 }
+.work-page {
+  overflow-x: clip;
+  max-width: 100%;
+}
 .work-results {
-  will-change: transform, opacity;
+  overflow-x: clip;
+  max-width: 100%;
+}
+.work-card__categories {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .thumb-swap {
   isolation: isolate;
+  overflow: clip;
 }
 
 .thumb-swap .thumb-primary,

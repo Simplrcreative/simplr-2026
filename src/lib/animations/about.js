@@ -531,8 +531,9 @@ export function createBioAnimation(scatter, overlay, close, isOpen, onCloseCompl
   if (!scatter || !overlay) return () => undefined
 
   const bioContent = overlay.querySelector('.bio-content')
-  const isDesktop = window.matchMedia('(min-width: 768px)').matches
-  const scatterX = isDesktop ? '-68%' : '-101%'
+  const isTablet = window.matchMedia('(min-width: 768px)').matches
+  const isDesktop = window.matchMedia('(min-width: 1280px)').matches
+  const scatterX = isDesktop ? '-68%' : isTablet ? '-101%' : '-101%'
 
   if (isOpen) {
     const tl = gsap.timeline()

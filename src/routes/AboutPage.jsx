@@ -350,7 +350,7 @@ export default function AboutPage() {
         />
 
         {/* Names scatter — slides left when bio opens; z-3 sits above image (z-1) */}
-        <div ref={scatterRef} className="people-scatter relative z-[1011] max-w-[98vw] flex flex-wrap items-center justify-center gap-1">
+        <div ref={scatterRef} className="people-scatter relative z-[1011] max-w-[98vw] xl:max-w-[94rem] flex flex-wrap items-center justify-center gap-1">
           {people.map((person) => (
             <div
               key={person.acfName}
@@ -384,7 +384,7 @@ export default function AboutPage() {
         <div className="absolute people-grid w-full grid grid-cols-12 pointer-events-none px-3 md:px-5">
 
           {/* Image column — all images stacked; is-visible drives CSS transition */}
-          <div className="people-info col-start-4 col-span-6 md:col-start-6 md:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
+          <div className="people-info col-start-4 col-span-6 md:col-start-2 md:col-span-4 lg:col-start-4 lg:col-span-3 xl:col-start-6 xl:col-span-2 relative pointer-events-none" style={{ zIndex: 1 }}>
             
             {people.map((person) => {
               const src = getThumbnail(person.acfProfileImage)
@@ -403,7 +403,7 @@ export default function AboutPage() {
           {/* Bio column — single panel, GSAP drives opacity + y; starts hidden */}
           <div
             ref={overlayRef}
-            className="bio-overlay col-start-1 md:col-start-9 col-span-12 md:col-span-3 flex flex-col justify-center"
+            className="bio-overlay col-start-1 col-span-12 md:col-start-7 md:col-span-5 lg:col-start-8 lg:col-span-4 xl:col-start-9 xl:col-span-3 flex flex-col justify-center"
           >
             <button
               ref={closeRef}

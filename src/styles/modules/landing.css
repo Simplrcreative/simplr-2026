@@ -100,25 +100,39 @@
     pointer-events: none;
 }
 
+/* Stable pin: top-align content and kill min-h-screen growth inside the lock. */
+.case-studies--pin-locked > .grid {
+    align-items: start;
+    height: 100%;
+}
+.case-studies--pin-locked .client-name-list,
+.case-studies--pin-locked .client-work-list {
+    justify-content: flex-start;
+    min-height: 0;
+}
+.case-studies--pin-locked .client-name-list {
+    margin-top: 0.75rem;
+}
+@media (min-width: 768px) {
+    .case-studies--pin-locked .client-name-list {
+        margin-top: 0;
+    }
+}
+
 .client-name {
     margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
     opacity: 0.5;
     cursor: pointer;
     transition: opacity 1s ease;
 }
 .client-name.active {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
     opacity: 1;
 }
 .client-name.active:first-child {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
     opacity: 1;
 }
 .client-name.active:last-child {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
     opacity: 1;
 }
 .client-detail {
@@ -155,39 +169,21 @@
     transition: transform 0.3s ease-out*/
 }
 @media (min-width: 768px) {
-    .client-name.active {
-        margin-top: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    .client-name.active:first-child {
-        margin-bottom: 1.5rem;
-    }
-    .client-name.active:last-child {
-        margin-top: 1.5rem;
+    .client-name {
+        margin-top: 0.75rem;
+        margin-bottom: 0.75rem;
     }
 }
 @media (min-width: 1024px) {
-    .client-name.active {
-        margin-top: 2.5rem;
-        margin-bottom: 2.5rem;
-    }
-    .client-name.active:first-child {
-        margin-bottom: 2.5rem;
-    }
-    .client-name.active:last-child {
-        margin-top: 2.5rem;
+    .client-name {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
     }
 }
 @media (min-width: 1280px) {
-    .client-name.active {
-        margin-top: 6.5rem;
-        margin-bottom: 6.5rem;
-    }
-    .client-name.active:first-child {
-        margin-bottom: 6.5rem;
-    }
-    .client-name.active:last-child {
-        margin-top: 6.5rem;
+    .client-name {
+        margin-top: 1.25rem;
+        margin-bottom: 1.25rem;
     }
 }
 /* --- CLIENT LOGOS --- */

@@ -143,7 +143,9 @@
   transform: scale(1.2) translateY(-40px)
 }
 .footer-off {
-  min-height: 50vh
+  /* svh stays stable when iOS Safari toggles its bottom chrome (unlike vh/dvh). */
+  min-height: 50vh;
+  min-height: 50svh;
 }
 .text-body {
   font-size: 0.875rem;
@@ -190,6 +192,7 @@
 }
 @media (min-width: 1024px) {
   .footer-off {
-    min-height: calc(70vh - 54px)
+    min-height: calc(70vh - 54px);
+    min-height: calc(70svh - 54px);
   }
 }

@@ -348,7 +348,7 @@
   }
   .bio-close {
     top: 7.5%;
-    right: 0;
+    right: 3rem;
     left: auto;
     padding: 0;
     /*transform: translateX(-50%);*/
@@ -363,6 +363,12 @@
   .people--bio-closing .person-hover-img.is-visible {
     animation: person-hover-img-close 0.75s ease-in-out forwards;
     transition: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .bio-close {
+    right: 0;
   }
 }
 

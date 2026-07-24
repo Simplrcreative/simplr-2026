@@ -6,7 +6,7 @@ import Seo from '../components/Seo.jsx'
 import CategoryBadge, { slugify } from '../components/CategoryBadge.jsx'
 import PictureImg from '../components/PictureImg.jsx'
 import { buildStaticPageSeo } from '../lib/page-seo.js'
-import { createSplitTextAnimation, refreshScrollTriggers, createSlideUpAnimations, createWorkThumbHoverAnimation, createTestimonialDotAnimation, lenisScrollTo } from '../lib/animations/index.js'
+import { createSplitTextAnimation, refreshSmoothScroll, createSlideUpAnimations, createWorkThumbHoverAnimation, createTestimonialDotAnimation, lenisScrollTo } from '../lib/animations/index.js'
 import { buildEntryPath, fetchTestimonialData, fetchWorksData, getMediaSourceUrl } from '../lib/wp-api.js'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -211,7 +211,7 @@ function WorkCard({ work, aspectRatio = '64%', cardKey }) {
     <div className="work-card__meta mt-3">
       <h3 className="work-card__title">{cardTitle}</h3>
       {categories.length > 0 && (
-        <div className="work-card__categories gap-1 mt-2 md:hidden xl:flex flex-wrap">
+        <div className="work-card__categories flex flex-wrap gap-1 mt-2 md:hidden xl:flex max-w-full">
           {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
         </div>
       )}
@@ -273,7 +273,7 @@ function WorkFeatured({ work, cardKey }) {
       <div className="work-featured__meta mt-3">
         <h3 className="work-card__title">{cardTitle}</h3>
         {categories.length > 0 && (
-          <div className="work-card__categories gap-1 mt-2 md:hidden xl:flex flex-wrap">
+          <div className="work-card__categories flex flex-wrap gap-1 mt-2 md:hidden xl:flex max-w-full">
             {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
           </div>
         )}
@@ -356,7 +356,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
             </div>
             <div className="mt-3 flex">{client || work.title}</div>
             {categories.length > 0 && (
-              <div className="categories mt-3 md:hidden xl:flex flex-wrap gap-1">
+              <div className="work-card__categories flex flex-wrap gap-1 mt-3 md:hidden xl:flex max-w-full">
                 {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
               </div>
             )}
@@ -530,6 +530,30 @@ export default function WorkPage() {
     }
   }, [hasMoreWorks, loadNextBatch])
 
+  // After a batch appends, wait for layout + lazy images to settle before
+  // telling Lenis/ScrollTrigger the new document height — otherwise mobile
+  // chrome and fixed nav can desync when the page suddenly grows.
+  useEffect(() => {
+    if (isLoadingMore) return undefined
+
+    let timeoutId = 0
+    let raf2 = 0
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        refreshSmoothScroll()
+        timeoutId = window.setTimeout(() => {
+          refreshSmoothScroll()
+        }, 450)
+      })
+    })
+
+    return () => {
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
+      window.clearTimeout(timeoutId)
+    }
+  }, [works.length, isLoadingMore])
+
   useEffect(() => {
     const cleanupSlideUpAnimations = createSlideUpAnimations(pageRef.current)
 
@@ -542,12 +566,17 @@ export default function WorkPage() {
 
   useEffect(() => {
     const cleanupSplitText = createSplitTextAnimation()
-    const rafId = requestAnimationFrame(() => {
-      refreshScrollTriggers()
+    // Double rAF: wait until filtered DOM has painted so Lenis + ST see final height.
+    let raf2 = 0
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        refreshSmoothScroll()
+      })
     })
 
     return () => {
-      cancelAnimationFrame(rafId)
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
       cleanupSplitText?.()
     }
   }, [displayedFilter, groups.length, isFiltering])
@@ -596,6 +625,7 @@ export default function WorkPage() {
         onComplete: () => {
           pendingAddedCardKeysRef.current.clear()
           setIsFilterAnimating(false)
+          refreshSmoothScroll()
         },
       },
     )
@@ -655,7 +685,7 @@ export default function WorkPage() {
   }
 
   return (
-    <div ref={pageRef}>
+    <div ref={pageRef} className="work-page overflow-x-clip">
       <Seo {...seo} />
 
       <section className="page-hero px-3 md:px-5 py-5 md:py-20 bg-white section-light md:min-h-[75vh] flex flex-col md:items-end">
@@ -668,17 +698,17 @@ export default function WorkPage() {
         </div>
       </section>
 
-      <section className="work-filter px-3 md:px-5 pt-22 pb-5 bg-white section-light flex justify-between lg:sticky lg:top-0 z-[1]">
+      <section className="work-filter px-3 md:px-3 pt-18 pb-3 bg-white section-light flex justify-end lg:sticky lg:top-0 z-[1] max-w-full min-w-0">
         {/*<div className="flex flex-wrap justify-between items-center">*/}
           <input
             type="text"
             value={keywordFilter}
             onChange={(event) => setKeywordFilter(event.target.value)}
             placeholder="Keyword search"
-            className="work-filter-btn min-w-[12rem] hidden lg:block"
+            className="work-filter-btn min-w-[12rem] hidden"
             aria-label="Filter work by title"
           />
-          <div className="flex flex-wrap gap-1 items-center">
+          <div className="flex flex-wrap gap-1 items-center min-w-0 max-w-full">
           {FILTERS.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
             return (

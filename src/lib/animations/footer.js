@@ -1,9 +1,16 @@
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { getCompactLogoTransform, isCompactLogoTabletUp } from './compact-logo-transform.js'
 
 let pluginsRegistered = false
 
 const FOOTER_LIGHT_CLASS = 'footer'
+
+/**
+ * Header logo / tagline expand–collapse at the footer.
+ * Kept in this file but disabled while we simplify — flip to `true` to restore.
+ */
+export const FOOTER_LOGO_ANIMATION_ENABLED = false
 
 function registerPlugins() {
   if (!pluginsRegistered) {
@@ -52,8 +59,82 @@ function resolveCurrentCompactLogoState(nav, fallbackState = false) {
   return activeState
 }
 
+function createFooterLogoExtras(footer) {
+  const footerLogoTrigger = footer.querySelector('.footer-logo-trigger')
+  const circleText = footer.querySelector('.footer-logo-circle-text')
+  const logoIcon = footer.querySelector('.footer-logo-icon')
+  let circleTimeline = null
+  let iconTween = null
+
+  if (circleText) {
+    gsap.set(circleText, { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%' })
+    circleTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: footerLogoTrigger,
+        start: 'top 95%',
+        toggleActions: 'restart none restart reset',
+        invalidateOnRefresh: false,
+        refreshPriority: -30,
+      },
+    })
+    circleTimeline
+      .to(circleText, {
+        scale: 1,
+        rotation: 360,
+        autoAlpha: 1,
+        duration: 1.6,
+        ease: 'power3.out',
+        transformOrigin: '50% 50%',
+      })
+      .to(circleText, {
+        rotation: 720,
+        scale: 0,
+        autoAlpha: 0,
+        duration: 1.2,
+        ease: 'power3.in',
+        delay: 0.5,
+        transformOrigin: '50% 50%',
+      })
+  }
+
+  if (logoIcon) {
+    gsap.set(logoIcon, { autoAlpha: 0 })
+    iconTween = gsap.to(logoIcon, {
+      autoAlpha: 1,
+      duration: 0.8,
+      ease: 'power2.out',
+      delay: 0.4,
+      scrollTrigger: {
+        trigger: footerLogoTrigger,
+        start: 'top 95%',
+        toggleActions: 'restart none restart reset',
+        invalidateOnRefresh: false,
+        refreshPriority: -30,
+      },
+    })
+  }
+
+  return {
+    circleText,
+    logoIcon,
+    cleanup() {
+      circleTimeline?.scrollTrigger?.kill()
+      circleTimeline?.kill()
+      iconTween?.scrollTrigger?.kill()
+      iconTween?.kill()
+    },
+  }
+}
+
 export function createFooterAnimation(scope) {
   if (!scope) {
+    return () => undefined
+  }
+
+  // Animation disabled — scripts below remain for a later pass.
+  if (!FOOTER_LOGO_ANIMATION_ENABLED) {
+    document.querySelector('#desktop-nav')?.classList.remove(FOOTER_LIGHT_CLASS)
+    document.querySelector('.logo-holder')?.classList.remove(FOOTER_LIGHT_CLASS)
     return () => undefined
   }
 
@@ -70,7 +151,6 @@ export function createFooterAnimation(scope) {
   const logoHolder = document.querySelector('.logo-holder')
   const navHolder = document.querySelector('.nav-holder')
   const footerBlock = document.querySelector('.footer-block')
-  const footerOffItems = Array.from(document.querySelectorAll('.footer-off'))
   const root = document.documentElement
 
   if (!footer || !logo || !tagline || !implrPaths.length) {
@@ -78,355 +158,248 @@ export function createFooterAnimation(scope) {
   }
 
   const media = gsap.matchMedia()
+  const tweenTargets = [logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock].filter(Boolean)
 
+  const applyFooterLightState = (isActive) => {
+    nav?.classList.toggle(FOOTER_LIGHT_CLASS, isActive)
+    logoHolder?.classList.toggle(FOOTER_LIGHT_CLASS, isActive)
+  }
+
+  const clearFooterChrome = () => {
+    nav?.classList.remove(FOOTER_LIGHT_CLASS)
+    logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
+  }
+
+  /**
+   * Snap expand/collapse (no scrub).
+   * Scroll-linked scrub desyncs logo vs tagline when iOS Safari chrome
+   * changes innerHeight or when content height changes invalidate mid-flight.
+   * Time-based tweens cannot get stuck at mismatched scrub progress.
+   */
   media.add('(prefers-reduced-motion: no-preference)', () => {
     let previousCompactLogoState = root.classList.contains('compact-logo-active')
+    let isExpanded = false
+    const extras = createFooterLogoExtras(footer)
 
-    const applyFooterLightState = (isActive) => {
-      nav?.classList.toggle(FOOTER_LIGHT_CLASS, isActive)
-      logoHolder?.classList.toggle(FOOTER_LIGHT_CLASS, isActive)
+    const expandFooterChrome = () => {
+      if (isExpanded) return
+      isExpanded = true
+      previousCompactLogoState = root.classList.contains('compact-logo-active')
+      root.classList.remove('compact-logo-active')
+      applyFooterLightState(true)
+
+      const tween = {
+        duration: 0.55,
+        ease: 'power3.out',
+        overwrite: 'auto',
+      }
+
+      gsap.to(logo, { scale: 1, y: 0, autoAlpha: 1, ...tween })
+      if (logoS) gsap.to(logoS, { x: 0, y: 0, autoAlpha: 1, filter: 'blur(0px)', ...tween })
+      if (logoDot) gsap.to(logoDot, { x: 0, y: 0, autoAlpha: 1, filter: 'blur(0px)', ...tween })
+      gsap.to(implrPaths, {
+        x: 0,
+        filter: 'blur(0px)',
+        autoAlpha: 1,
+        stagger: { each: 0.05, from: 'end' },
+        ...tween,
+      })
+      gsap.to(tagline, { x: 0, y: 0, scale: 1, autoAlpha: 1, ...tween })
+      if (header) gsap.to(header, { y: 0, height: 'auto', ...tween })
+      if (nav) gsap.to(nav, { y: 0, ...tween })
+      if (navHolder) gsap.to(navHolder, { height: 'auto', duration: 0.2, overwrite: 'auto' })
+      if (footerBlock) gsap.to(footerBlock, { autoAlpha: 1, y: 0, ...tween })
     }
 
-    const restorePageState = () => {
+    const collapseFooterChrome = () => {
+      if (!isExpanded) return
+      isExpanded = false
+
       root.classList.toggle(
         'compact-logo-active',
         resolveCurrentCompactLogoState(nav, previousCompactLogoState),
       )
-      nav?.classList.remove(FOOTER_LIGHT_CLASS)
-      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
-    }
+      clearFooterChrome()
 
-    const shouldApplyFooterLightState = (self) =>
-      self.progress > 0 || (self.isActive && self.direction === 1)
+      const {
+        logoScale,
+        logoY,
+        taglineScale,
+        taglineY,
+        taglineX,
+      } = getCompactLogoTransform()
+      const tabletUp = isCompactLogoTabletUp()
 
-    const syncFooterNavState = (self) => {
-      if (shouldApplyFooterLightState(self)) {
-        root.classList.remove('compact-logo-active')
-        applyFooterLightState(true)
-        return
+      const tween = {
+        duration: 0.45,
+        ease: 'power2.inOut',
+        overwrite: 'auto',
       }
 
-      restorePageState()
+      gsap.to(logo, { scale: logoScale, y: logoY, autoAlpha: 1, ...tween })
+      gsap.to(implrPaths, {
+        x: -20,
+        filter: 'blur(10px)',
+        autoAlpha: 0,
+        stagger: 0.04,
+        ...tween,
+      })
+      gsap.to(tagline, {
+        scale: taglineScale,
+        y: taglineY,
+        x: taglineX,
+        autoAlpha: 1,
+        ...tween,
+      })
+      // logoS / logoDot stay in the mark; no separate compact offset from logo scroll
+      if (logoS) gsap.to(logoS, { clearProps: 'transform,opacity,filter', duration: 0.2, overwrite: 'auto' })
+      if (logoDot) gsap.to(logoDot, { clearProps: 'transform,opacity,filter', duration: 0.2, overwrite: 'auto' })
+
+      if (tabletUp) {
+        if (header) gsap.to(header, { y: -20, ...tween })
+        if (nav) gsap.to(nav, { y: -20, ...tween })
+        if (navHolder) gsap.to(navHolder, { height: '30px', duration: 0.2, overwrite: 'auto' })
+      } else {
+        if (header) gsap.to(header, { clearProps: 'transform,height', ...tween })
+        if (nav) gsap.to(nav, { clearProps: 'transform', ...tween })
+        if (navHolder) gsap.to(navHolder, { clearProps: 'height', duration: 0.2, overwrite: 'auto' })
+      }
+
+      if (footerBlock) {
+        gsap.to(footerBlock, {
+          autoAlpha: 0,
+          y: '-20vh',
+          ...tween,
+          onComplete: () => {
+            // Re-sync logo scroll scrub ownership after the reverse settles.
+            ScrollTrigger.update()
+          },
+        })
+      } else {
+        gsap.delayedCall(tween.duration, () => ScrollTrigger.update())
+      }
     }
 
-    const timeline = gsap.timeline({
-      defaults: {
-        ease: 'power4.out',
-      },
-      scrollTrigger: {
-        id: 'footer-logo-reset',
-        trigger: footer,
-        start: 'top 80%',
-        end: 'top 50%',
-        //markers: true,
-        scrub: true,
-        invalidateOnRefresh: true,
-        refreshPriority: -30,
-        onEnter: () => {
-          previousCompactLogoState = root.classList.contains('compact-logo-active')
-          syncFooterNavState(timeline.scrollTrigger)
-        },
-        onEnterBack: () => {
-          syncFooterNavState(timeline.scrollTrigger)
-        },
-        onLeaveBack: () => {
-          restorePageState()
-        },
-        onUpdate: (self) => {
-          syncFooterNavState(self)
-        },
-        onRefresh: (self) => {
-          syncFooterNavState(self)
-        },
-      },
+    const syncFromTrigger = (self) => {
+      // Past the start line (scrolling down into / through footer) → expanded.
+      if (self.direction === 1 && self.progress > 0) {
+        expandFooterChrome()
+        return
+      }
+      if (self.isActive) {
+        expandFooterChrome()
+        return
+      }
+      collapseFooterChrome()
+    }
+
+    const trigger = ScrollTrigger.create({
+      id: 'footer-logo-reset',
+      trigger: footer,
+      start: 'top 85%',
+      end: 'bottom top',
+      invalidateOnRefresh: false,
+      refreshPriority: -30,
+      onEnter: expandFooterChrome,
+      onEnterBack: expandFooterChrome,
+      onLeaveBack: collapseFooterChrome,
+      onRefresh: syncFromTrigger,
     })
 
-    if (footerBlock) {
-      timeline.to(
-        footerBlock,
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 1,
-        },
-        0,
-      )
-    }
-
-    if (footerOffItems.length) {
-     
-
-      timeline.to(
-        footerOffItems,
-        {
-          //autoAlpha: 1,
-          //filter: 'blur(20px)',
-          //y: '-50vh',
-          //duration: 1,
-          //immediateRender: false,
-        },
-        0,
-      )
-      
-    }
-
-    timeline.to(
-      logo,
-      {
-        scale: 1,
-        y: 0,
-        autoAlpha: 1,
-        duration: 1,
-        immediateRender: false,
-      },
-      0.75,
-    )
-
-    if (logoS) {
-      timeline.to(
-        logoS,
-        {
-          x: 0,
-          y: 0,
-          autoAlpha: 1,
-          filter: 'blur(0px)',
-          duration: 1,
-        },
-        0.8,
-      )
-    }
-
-    if (logoDot) {
-      timeline.to(
-        logoDot,
-        {
-          x: 0,
-          y: 0,
-          autoAlpha: 1,
-          filter: 'blur(0px)',
-          duration: 1,
-        },
-        0.85,
-      )
-    }
-
-    timeline.to(
-      implrPaths,
-      {
-        x: 0,
-        filter: 'blur(0px)',
-        autoAlpha: 1,
-         stagger: {
-            each: 0.2,
-            from: 'end',
-            },
-        duration: 1,
-        immediateRender: false,
-      },
-      0.9,
-    )
-
-    timeline.to(
-      tagline,
-      {
-        x: 0,
-        y: 0,
-        autoAlpha: 1,
-        scale: 1,
-        duration: 1,
-        immediateRender: false,
-      },
-      0.75,
-    )
-
-    if (header) {
-      timeline.to(
-        header,
-        {
-          y: 0,
-          height: 'auto',
-          duration: 1,
-          immediateRender: false,
-        },
-        0.75,
-      )
-    }
-
-    if (nav) {
-      timeline.to(
-        nav,
-        {
-          y: 0,
-          duration: 1,
-          immediateRender: false,
-        },
-        0.75,
-      )
-    }
-
-    if (navHolder) {
-      timeline.to(
-        navHolder,
-        {
-          height: 'auto',
-          duration: 0.1,
-          immediateRender: false,
-        },
-        0.75,
-      )
-    }
-
-    // Footer logo: circle text spins in, pauses, spins out; icon fades in.
-    // Use restart (not play) so a completed timeline can run again on re-entry /
-    // route return. reset on leaveBack restores the pre-trigger state.
-    const footerLogoTrigger = footer.querySelector('.footer-logo-trigger')
-    const circleText = footer.querySelector('.footer-logo-circle-text')
-    const logoIcon = footer.querySelector('.footer-logo-icon')
-
-    let circleTimeline = null
-    let iconTween = null
-
-    if (circleText) {
-      gsap.set(circleText, { scale: 0, autoAlpha: 0, transformOrigin: '50% 50%' })
-      circleTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: footerLogoTrigger,
-          start: 'top 95%',
-          toggleActions: 'restart none restart reset',
-          invalidateOnRefresh: true,
-          refreshPriority: -30,
-          //markers: true
-        },
-      })
-      circleTimeline
-        .to(circleText, {
-          scale: 1,
-          rotation: 360,
-          autoAlpha: 1,
-          duration: 1.6,
-          ease: 'power3.out',
-          transformOrigin: '50% 50%',
-        })
-        .to(circleText, {
-          rotation: 720,
-          scale: 0,
-          autoAlpha: 0,
-          duration: 1.2,
-          ease: 'power3.in',
-          delay: 0.5,
-          transformOrigin: '50% 50%',
-        })
-    }
-
-    if (logoIcon) {
-      gsap.set(logoIcon, { autoAlpha: 0 })
-      iconTween = gsap.to(logoIcon, {
-        autoAlpha: 1,
-        duration: 0.8,
-        ease: 'power2.out',
-        delay: 0.4,
-        scrollTrigger: {
-          trigger: footerLogoTrigger,
-          start: 'top 95%',
-          toggleActions: 'restart none restart reset',
-          invalidateOnRefresh: true,
-          refreshPriority: -30,
-        },
+    // Orientation only — never visualViewport resize (Safari chrome).
+    const handleOrientationChange = () => {
+      window.requestAnimationFrame(() => {
+        ScrollTrigger.refresh()
       })
     }
+    window.addEventListener('orientationchange', handleOrientationChange)
 
     return () => {
-      timeline.kill()
-      circleTimeline?.scrollTrigger?.kill()
-      circleTimeline?.kill()
-      iconTween?.scrollTrigger?.kill()
-      iconTween?.kill()
-      gsap.set([logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock, circleText, logoIcon].filter(Boolean), { clearProps: 'all' })
-      gsap.set(document.body, { clearProps: 'backgroundColor' })
-      nav?.classList.remove(FOOTER_LIGHT_CLASS)
-      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
+      window.removeEventListener('orientationchange', handleOrientationChange)
+      trigger.kill()
+      extras.cleanup()
+      gsap.killTweensOf(tweenTargets)
+      gsap.set([...tweenTargets, extras.circleText, extras.logoIcon].filter(Boolean), { clearProps: 'all' })
+      clearFooterChrome()
     }
   })
 
   media.add('(prefers-reduced-motion: reduce)', () => {
     let previousCompactLogoState = root.classList.contains('compact-logo-active')
+    let isExpanded = false
 
-    const applyFooterLightState = () => {
-      nav?.classList.add(FOOTER_LIGHT_CLASS)
-      logoHolder?.classList.add(FOOTER_LIGHT_CLASS)
+    const expandFooterChrome = () => {
+      if (isExpanded) return
+      isExpanded = true
+      previousCompactLogoState = root.classList.contains('compact-logo-active')
+      root.classList.remove('compact-logo-active')
+      applyFooterLightState(true)
+      gsap.set(logo, { scale: 1, y: 0 })
+      gsap.set(implrPaths, { x: 0, filter: 'blur(0px)', autoAlpha: 1 })
+      if (footerBlock) gsap.set(footerBlock, { autoAlpha: 1, y: 0 })
+      gsap.set([logoS, logoDot, tagline, header, nav, navHolder].filter(Boolean), {
+        clearProps: 'transform,opacity,filter,height',
+      })
     }
 
-    const restorePageState = () => {
+    const collapseFooterChrome = () => {
+      if (!isExpanded) return
+      isExpanded = false
       root.classList.toggle(
         'compact-logo-active',
         resolveCurrentCompactLogoState(nav, previousCompactLogoState),
       )
-      nav?.classList.remove(FOOTER_LIGHT_CLASS)
-      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
-    }
+      clearFooterChrome()
 
-    const shouldApplyFooterLightState = (self) =>
-      self.progress > 0 || (self.isActive && self.direction === 1)
+      const {
+        logoScale,
+        logoY,
+        taglineScale,
+        taglineY,
+        taglineX,
+      } = getCompactLogoTransform()
+      const tabletUp = isCompactLogoTabletUp()
 
-    const syncFooterNavState = (self) => {
-      if (shouldApplyFooterLightState(self)) {
-        root.classList.remove('compact-logo-active')
-        applyFooterLightState()
-        return
+      gsap.set(logo, { scale: logoScale, y: logoY, autoAlpha: 1 })
+      gsap.set(implrPaths, { x: -20, filter: 'blur(10px)', autoAlpha: 0 })
+      gsap.set(tagline, {
+        scale: taglineScale,
+        y: taglineY,
+        x: taglineX,
+        autoAlpha: 1,
+      })
+      if (tabletUp) {
+        if (header) gsap.set(header, { y: -20 })
+        if (nav) gsap.set(nav, { y: -20 })
+        if (navHolder) gsap.set(navHolder, { height: '30px' })
       }
-
-      restorePageState()
+      if (footerBlock) gsap.set(footerBlock, { autoAlpha: 0, y: '-50vh' })
+      ScrollTrigger.update()
     }
 
     const trigger = ScrollTrigger.create({
       id: 'footer-logo-reset-reduced',
       trigger: footer,
-      start: 'top 70%',
-      end: 'bottom bottom',
-      invalidateOnRefresh: true,
+      start: 'top 85%',
+      end: 'bottom top',
+      invalidateOnRefresh: false,
       refreshPriority: -30,
-      onEnter: () => {
-        previousCompactLogoState = root.classList.contains('compact-logo-active')
-        syncFooterNavState(trigger)
-        gsap.set(logo, { scale: 1, y: 0 })
-        gsap.set(implrPaths, { x: 0, filter: 'blur(0px)', autoAlpha: 1 })
-        if (footerBlock) {
-          gsap.set(footerBlock, { autoAlpha: 1, y: 0 })
-        }
-        gsap.set([logoS, logoDot, tagline, header, nav, navHolder].filter(Boolean), {
-          clearProps: 'transform,opacity,filter,height',
-        })
-      },
-      onEnterBack: () => {
-        syncFooterNavState(trigger)
-        gsap.set(logo, { scale: 1, y: 0 })
-        gsap.set(implrPaths, { x: 0, filter: 'blur(0px)', autoAlpha: 1 })
-        if (footerBlock) {
-          gsap.set(footerBlock, { autoAlpha: 1, y: 0})
-        }
-        gsap.set([logoS, logoDot, tagline, header, nav, navHolder].filter(Boolean), {
-          clearProps: 'transform,opacity,filter,height',
-        })
-      },
-      onLeaveBack: () => {
-        restorePageState()
-        if (footerBlock) {
-          gsap.set(footerBlock, { autoAlpha: 0, y: '-50vh'})
-        }
-      },
-      onUpdate: (self) => {
-        syncFooterNavState(self)
-      },
+      onEnter: expandFooterChrome,
+      onEnterBack: expandFooterChrome,
+      onLeaveBack: collapseFooterChrome,
       onRefresh: (self) => {
-        syncFooterNavState(self)
+        if (self.isActive || (self.direction === 1 && self.progress > 0)) {
+          expandFooterChrome()
+        } else {
+          collapseFooterChrome()
+        }
       },
     })
 
     return () => {
       trigger.kill()
-      gsap.set([logo, ...implrPaths, logoS, logoDot, tagline, header, nav, navHolder, footerBlock].filter(Boolean), { clearProps: 'all' })
-      nav?.classList.remove(FOOTER_LIGHT_CLASS)
-      logoHolder?.classList.remove(FOOTER_LIGHT_CLASS)
+      gsap.set(tweenTargets, { clearProps: 'all' })
+      clearFooterChrome()
     }
   })
 

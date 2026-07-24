@@ -658,9 +658,9 @@ export default function RootLayout() {
 
       {!hideFooter ? (
         <>
-        <div className={`footer-off ${isDarkPageBg ? 'bg-coffee section-dark' : 'bg-white section-light'}`}></div>
+        <div className={`footer-off__ ${isDarkPageBg ? 'bg-coffee section-dark' : 'bg-white section-light'}`}></div>
 
-        <footer ref={footerRef} className={`px-5 pt-5 md:pt-0 min-h-[50vh] z-[1002] relative relative flex flex-col justify-end ${isDarkPageBg ? 'bg-coffee text-white' : 'bg-white text-coffee'}`}>
+        <footer ref={footerRef} className={`px-5 pb-10 md:pt-0 min-h-[100svh] md:min-h-[100vh] flex flex-col justify-end ${isDarkPageBg ? 'bg-coffee text-white' : 'bg-white text-coffee'}`}>
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-8">

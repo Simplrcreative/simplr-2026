@@ -293,8 +293,7 @@ export default function ServicesPage() {
           <ServiceCard key={i} service={service} />
         ))}
       </section>
-
-      <section className="bg-white py-20 relative z-3"></section>
+     
     </>
   )
 }
