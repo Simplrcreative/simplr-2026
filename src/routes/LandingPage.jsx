@@ -27,6 +27,7 @@ export default function LandingPage() {
   const headline = landingPageContent.acfHeadline || ''
    const showForm = landingPageContent.acfShowForm || false
   const introduction = landingPageContent.acfIntroduction || ''
+  const featuredVideo = landingPageContent.acfFeaturedVideo || ''
   const featuredImage = getThumbnail(landingPageContent.acfFeaturedImage)
   const acfSections = landingPageContent?.acfSections || []
   const ctaBtnRefs = useRef({})
@@ -78,15 +79,29 @@ export default function LandingPage() {
           </div>
           <div className="col-start-6 col-span-7 parallax">
             <div className="featured-image">
-              {featuredImage && (
-                  <picture
-                    className="ratio overflow-hidden rounded-[10px]"
-                    style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
-                  >
-                    {featuredImage && <source srcSet={featuredImage + '.webp'} type="image/webp" />}
-                    {featuredImage && <img src={featuredImage + '.webp'} alt={title} />}
-                  </picture>
-              )}
+              {featuredVideo ? (
+                <div
+                  className="ratio overflow-hidden rounded-[10px]"
+                  style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                >
+                  <video
+                    src={featuredVideo}
+                    poster={featuredImage ? `${featuredImage}.webp` : undefined}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                </div>
+              ) : featuredImage ? (
+                <picture
+                  className="ratio overflow-hidden rounded-[10px]"
+                  style={{ '--aspect-ratio-desktop': '54%', '--aspect-ratio-mobile': '54%' }}
+                >
+                  <source srcSet={`${featuredImage}.webp`} type="image/webp" />
+                  <img src={`${featuredImage}.webp`} alt={title} />
+                </picture>
+              ) : null}
             </div>
           </div>
         </div>
