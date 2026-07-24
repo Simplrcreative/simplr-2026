@@ -782,23 +782,23 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="templates" data-color="text-templates" data-stat="99" data-detail="Template systems built for teams at scale." className="services-title font-literata flex-shrink-0">
+          <div id="templates" data-color="text-templates" data-stat="65" data-detail="Template systems built for teams at scale." className="services-title font-literata flex-shrink-0">
             Templates
           </div>
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-10 md:pt-20">
-          <div className="stat-item flex flex-col sm:flex-row gap-5 xl:justify-between lg:min-w-[56,25rem] max-w-[68rem] relative">
+          <div className="stat-item flex flex-col sm:flex-row gap-5 lg:justify-between lg:min-w-[56,25rem] lg:max-w-[76rem] xl:max-w-[85rem] pe-5 relative">
             <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem]">0</div>
             <div className="flex flex-col">
-              <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-20 lg:mb-40 text-strategy text-[5rem]">+</div>
-              <div className="stat-detail lead max-w-[26ch] md:max-w-[20ch] xl:max-w-[22ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
+              <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-10 lg:mb-20 xl:mb-40 text-strategy text-[5rem]">+</div>
+              <div className="stat-detail lead max-w-[26ch] md:max-w-[20ch] lg:max-w-[22ch] xl:max-w-[24ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
             </div>
           </div>
         </div>
         <Link
           to="services"
-          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-5 md:mt-0"
+          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5.2rem] ms-5 md:ms-0 mt-5 md:mt-0"
         >
           <span>Explore our services</span>
         </Link>
