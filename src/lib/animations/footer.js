@@ -46,7 +46,10 @@ function resolveCurrentCompactLogoState(nav, fallbackState = false) {
   let activeState = fallbackState
 
   for (const trigger of triggerSections) {
-    const bounds = trigger.section.getBoundingClientRect()
+    const parent = trigger.section.parentElement
+    const measureEl =
+      parent?.classList?.contains('pin-spacer') ? parent : trigger.section
+    const bounds = measureEl.getBoundingClientRect()
 
     if (bounds.top > threshold || bounds.top < activeSectionTop) {
       continue

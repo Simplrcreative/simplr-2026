@@ -258,6 +258,15 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     return () => clearTimeout(timer)
   }, [introComplete, shouldRunHomeIntroAnimations])
 
+  // Production: deferred homeData + lazy ClientLogos change page height after
+  // the first ScrollTrigger pass. Refresh again when that content settles so
+  // change-logo bounds stay aligned with brands-grow (not case studies).
+  useEffect(() => {
+    if (!introComplete) return
+    const timer = window.setTimeout(() => refreshScrollTriggers(), 150)
+    return () => window.clearTimeout(timer)
+  }, [introComplete, caseStudies?.length, clients?.length, featuredWork?.length])
+
   // Video visibility and loop management.
   // Native `loop` has no 'loop' event — use `ended` + manual replay to cap plays.
   useEffect(() => {

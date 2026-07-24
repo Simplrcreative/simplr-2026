@@ -204,6 +204,22 @@ export function createNavSectionTheme(scope) {
   }
 }
 
+function getChangeLogoTriggerTop(section) {
+  if (!(section instanceof Element) || !section.isConnected) return null
+
+  // While a section is GSAP-pinned its getBoundingClientRect stays near 0 even
+  // after you've scrolled past it. The pin-spacer still moves with the page and
+  // is the correct "have we reached this marker?" signal.
+  const parent = section.parentElement
+  const measureEl =
+    parent?.classList?.contains('pin-spacer') ? parent : section
+
+  const bounds = measureEl.getBoundingClientRect()
+  if (bounds.height <= 0 && bounds.width <= 0) return null
+
+  return bounds.top
+}
+
 function resolveCompactLogoState(changeLogoSections, changeLogoBackSections, threshold) {
   const triggerSections = [
     ...changeLogoSections.map((section) => ({ section, isCompact: true })),
@@ -214,13 +230,14 @@ function resolveCompactLogoState(changeLogoSections, changeLogoBackSections, thr
   let activeSectionTop = -Infinity
 
   for (const trigger of triggerSections) {
-    const bounds = trigger.section.getBoundingClientRect()
+    const top = getChangeLogoTriggerTop(trigger.section)
+    if (top === null) continue
 
-    if (bounds.top > threshold || bounds.top < activeSectionTop) {
+    if (top > threshold || top < activeSectionTop) {
       continue
     }
 
-    activeSectionTop = bounds.top
+    activeSectionTop = top
     activeState = trigger.isCompact
   }
 
@@ -246,34 +263,26 @@ function createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, get
     )
   }
 
-  const watchers = [
-    ...changeLogoSections.map((section) =>
-      ScrollTrigger.create({
-        trigger: section,
-        start: () => `top ${getThreshold()}`,
-        invalidateOnRefresh: true,
-        onEnter: () => setCompactLogoActive(true),
-        onEnterBack: () => setCompactLogoActive(true),
-        onRefresh: syncChangeLogoState,
-      }),
-    ),
-    ...changeLogoBackSections.map((section) =>
-    ScrollTrigger.create({
-      trigger: section,
-      start: () => `top ${getThreshold()}`,
-      invalidateOnRefresh: true,
-      onEnter: () => setCompactLogoActive(false),
-      onEnterBack: () => setCompactLogoActive(false),
-      onRefresh: syncChangeLogoState,
-    }),
-    ),
-  ]
+  // Bounds-based sync only — do NOT use per-section start/onEnter.
+  // Pin spacers + deferred home content (case studies, client logos) shift
+  // calculated starts on production so onEnter fired near the wrong section.
+  ScrollTrigger.getById('change-logo-sync')?.kill()
+
+  const watcher = ScrollTrigger.create({
+    id: 'change-logo-sync',
+    trigger: document.documentElement,
+    start: 0,
+    end: 'max',
+    invalidateOnRefresh: true,
+    onUpdate: syncChangeLogoState,
+    onRefresh: syncChangeLogoState,
+  })
 
   syncChangeLogoState()
 
   return {
     kill() {
-      watchers.forEach((watcher) => watcher.kill())
+      watcher.kill()
       setCompactLogoActive(false)
     },
   }

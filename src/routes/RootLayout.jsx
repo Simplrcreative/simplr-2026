@@ -5,7 +5,8 @@ import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import { gsap } from 'gsap'
-import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform } from '../lib/animations/index.js'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform, setLogoExpandedState } from '../lib/animations/index.js'
 import { useHasFinePointer } from '../lib/use-is-touch-device.js'
 import { isScrollTriggerDebugEnabled, logRouteScrollTriggerState } from '../lib/animations/scroll-debug.js'
 
@@ -341,29 +342,71 @@ export default function RootLayout() {
       entranceCleanup?.()
       entranceCleanup = null
 
-      const logo = layoutRef.current?.querySelector('.logo')
-      const tagline = layoutRef.current?.querySelector('.tagline')
-      const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
-      const mainNav = layoutRef.current?.querySelector('#desktop-nav')
-      const menuIcon = layoutRef.current?.querySelectorAll('.menu-icon')
+      const layout = layoutRef.current
+      const logo = layout?.querySelector('.logo')
+      const tagline = layout?.querySelector('.tagline')
+      const implrPaths = Array.from(layout?.querySelectorAll('#logo-implr g') ?? [])
+      const mainNav = layout?.querySelector('#desktop-nav')
+      const menuIcon = layout?.querySelectorAll('.menu-icon')
 
-      // Make sure scroll-linked logo scrub starts from a true page top.
+      // Kill only logo-related tweens — never #desktop-nav / .menu-icon here or
+      // their later entrance steps get cancelled and stay invisible.
+      gsap.killTweensOf([logo, tagline, ...implrPaths].filter(Boolean))
       scrollToTopImmediate()
+      ScrollTrigger.getById('logo-scroll-scrub')?.kill()
+
+      const {
+        logoScale,
+        logoY,
+        taglineScale,
+        taglineY,
+        taglineX,
+      } = getCompactLogoTransform()
+
+      // Explicit compact start for the unfold.
+      gsap.set(logo, {
+        autoAlpha: 0,
+        scale: logoScale,
+        y: logoY,
+        transformOrigin: 'left top',
+      })
+      gsap.set(implrPaths, { autoAlpha: 0, x: -20, filter: 'blur(10px)' })
+      gsap.set(tagline, {
+        autoAlpha: 0,
+        y: taglineY,
+        x: taglineX,
+        scale: taglineScale,
+        transformOrigin: 'left top',
+      })
+
+      let scrubAttached = false
+      const attachLogoScrub = () => {
+        if (scrubAttached) return
+        scrubAttached = true
+        // Safety: intro scroll-lock must never outlive the entrance sequence.
+        unlockScroll('home-intro-sequence')
+        setLogoExpandedState(layout)
+        destroyLogoRef.current?.()
+        destroyLogoRef.current = createLogoScrollAnimation(layout)
+      }
 
       const entranceTl = gsap.timeline({
-        onComplete: () => {
-          destroyLogoRef.current?.()
-          destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
-        },
+        defaults: { overwrite: 'auto' },
+        onComplete: attachLogoScrub,
       })
 
       entranceTl.to(logo, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
       entranceTl.to(tagline, { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
       entranceTl.to(
-        Array.from(implrPaths),
+        implrPaths,
         { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
         0.15,
       )
+      // Snap letters only — do not touch nav (still animating in below).
+      entranceTl.add(() => {
+        setLogoExpandedState(layout)
+      }, 0.55)
+
       entranceTl.to(
         mainNav,
         {
@@ -413,19 +456,25 @@ export default function RootLayout() {
         playHomeEntranceAnimation()
       }
 
-      // If the transition already finished (or never ran), start immediately.
-      if (!document.documentElement.classList.contains('page-transitioning')) {
-        startEntrance()
-        return () => {
-          entranceCleanup?.()
-          destroyNavSectionThemeRef.current?.()
-        }
-      }
-
-      window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
-      const timer = setTimeout(startEntrance, HOME_RETURN_ENTRANCE_FALLBACK_MS)
+      // Double-rAF: TransitionFrame's layout effect has already run; if a
+      // transition is in flight, page-transitioning is set. Never start the
+      // unfold early — done() would call applyCompactLogoState mid-stagger.
+      let timer = 0
+      let cancelled = false
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (cancelled) return
+          if (document.documentElement.classList.contains('page-transitioning')) {
+            window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
+            timer = window.setTimeout(startEntrance, HOME_RETURN_ENTRANCE_FALLBACK_MS)
+            return
+          }
+          startEntrance()
+        })
+      })
 
       return () => {
+        cancelled = true
         clearTimeout(timer)
         window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance)
         entranceCleanup?.()

@@ -1483,15 +1483,13 @@ export default function TransitionFrame({ children }) {
       const realHeader = document.querySelector('.header')
       if (realHeader) gsap.set(realHeader, { autoAlpha: 0, y: -20 })
 
-      // Always reset to compact logo geometry, then reverse for home.
+      // Always reset to compact logo geometry; RootLayout unfolds home after
+      // page-transition:complete (do not animate here — it races the unfold).
       applyCompactLogoState()
       gsap.set('.compact-logo', { clearProps: 'all' })
 
       if (isHomePage) {
         document.documentElement.classList.remove('compact-logo-active')
-        // RootLayout owns the home unfold + scroll-scrub handoff after
-        // page-transition:complete. Animating here raced that timeline and
-        // left the logo stuck mid-unfold / with wrong ScrollTrigger starts.
       }
 
       altClone?.remove()
