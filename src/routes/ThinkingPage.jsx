@@ -271,7 +271,7 @@ export default function ThinkingPage() {
         </div>
       </section>
 
-      <section className="post-filter px-3 md:px-5 pt-22 pb-5 bg-white section-light flex md:justify-end lg:sticky lg:top-0 z-[1]">
+      <section className="post-filter px-3 md:px-3 pt-18 pb-3 bg-white section-light flex md:justify-end lg:sticky lg:top-0 z-[1]">
         <div className="flex flex-wrap gap-1">
           {filters.map(({ id, label, bg, text }) => {
             const isActive = activeFilter === id
