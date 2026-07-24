@@ -25,7 +25,8 @@ export default function LandingPage() {
   const title = page?.title || 'Untitled'
   const landingPageContent = page?.acfLandingPageBuilder || ''
   const headline = landingPageContent.acfHeadline || ''
-   const showForm = landingPageContent.acfShowForm || false
+  const showForm = landingPageContent.acfShowForm || false
+  const formHeading = landingPageContent.acfContactFormHeading || ''
   const introduction = landingPageContent.acfIntroduction || ''
   const featuredVideo =
     landingPageContent.featuredVideo?.node?.mediaItemUrl
@@ -246,7 +247,7 @@ export default function LandingPage() {
         <section className="px-3 md:px-5 pt-10 md:pt-20">
           <div className="grid grid-cols-12 w-full">
             <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-5 slide-up-subtle">
-              <ContactForm style="dark" heading="This is a cool heading" />
+              <ContactForm style="dark" heading={formHeading} />
             </div>
           </div>
         </section>
