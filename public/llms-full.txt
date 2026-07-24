@@ -3,16 +3,17 @@
 This website is a headless WordPress front end built with Vite and React.
 
 ## Main pages
-- http://localhost:5173/work
-- http://localhost:5173/about
-- http://localhost:5173/services
-- http://localhost:5173/thinking
-- http://localhost:5173/contact
-- http://localhost:5173/est-2014
+- https://simplr.co.za/work
+- https://simplr.co.za/about
+- https://simplr.co.za/services
+- https://simplr.co.za/thinking
+- https://simplr.co.za/contact
+- https://simplr.co.za/est-2014
 
 ## Dynamic content
 - Work singles are resolved from /work/:slug
 - Thinking singles are resolved from /thinking/:topic/:slug
+- Landing pages are resolved from /:slug at the site root
 
 ## Content model guidance
 - Work should map to a custom post type exposed through WPGraphQL.
@@ -23,3 +24,4 @@ This website is a headless WordPress front end built with Vite and React.
 - Canonical URLs and Open Graph tags are set per route.
 - JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, and ContactPage where relevant.
 - sitemap.xml and robots.txt are generated at build time.
+- HTTP 301 redirects are generated from the WordPress acfRedirection options into public/_redirects and vercel.json.

@@ -23,7 +23,7 @@ Sprint 1 (meta + schema wiring) is largely **done in code**. Next up: validate i
 - [x] Production site URL defaults (`simplr.co.za`)
 - [x] Trailing-slash URLs across router and links
 - [x] Build-time sitemap, robots.txt, llms.txt, llms-full.txt
-- [x] Vercel prerender pipeline (Playwright + `@sparticuz/chromium`)
+- [x] Sevalla prerender pipeline (Playwright + `@sparticuz/chromium`)
 - [x] `VITE_ALLOW_INDEXING` flag — noindex while testing
 - [x] Shared SEO helpers (`Seo.jsx`, `src/lib/seo.js`, `src/lib/page-seo.js`)
 - [x] Loaders fetch WP page meta for static routes
@@ -101,7 +101,7 @@ Sprint 1 (meta + schema wiring) is largely **done in code**. Next up: validate i
 
 | # | Task | Status | Effort |
 |---|------|--------|--------|
-| 4.1 | Set `VITE_ALLOW_INDEXING=true` in Vercel Production | [ ] | S |
+| 4.1 | Set `VITE_ALLOW_INDEXING=true` in Sevalla Production | [ ] | S |
 | 4.2 | Redeploy; confirm robots.txt allows crawl + sitemap | [ ] | S |
 | 4.3 | Submit sitemap — Google Search Console + Bing | [ ] | S |
 | 4.4 | Social preview tests (Facebook, LinkedIn) on 5 URLs | [ ] | S |
@@ -139,6 +139,6 @@ Sprint 1 (meta + schema wiring) is largely **done in code**. Next up: validate i
 ## Change log
 
 - 2026-06-04: Initial phased roadmap
-- 2026-06-19: Added prerender on Vercel, noindex testing flag
+- 2026-06-19: Added prerender on Sevalla, noindex testing flag
 - 2026-06-19: Sprint 1 — `page-seo.js`, loader meta fetch, schema fixes on all main routes
 - 2026-06-19: Expanded to SEO / GEO / AEO / LLMS checklist
