@@ -427,9 +427,12 @@ export function createHeroScrollAnimation(scope) {
     const navHolder = document.querySelector('.nav-holder')
     const nav = document.querySelector('#desktop-nav')
     const logo = document.querySelector('.logo-holder')
-    const themedSections = Array.from(document.querySelectorAll('.section-light, .section-dark'))
-    const changeLogoSections = Array.from(document.querySelectorAll('.change-logo'))
-    const changeLogoBackSections = Array.from(document.querySelectorAll('.change-logo-back'))
+    // Scope to the home page root (landing's parent) so transition clones /
+    // other routes can't contribute stray .change-logo markers.
+    const pageRoot = section?.parentElement ?? scope
+    const themedSections = Array.from(pageRoot.querySelectorAll('.section-light, .section-dark'))
+    const changeLogoSections = Array.from(pageRoot.querySelectorAll('.change-logo'))
+    const changeLogoBackSections = Array.from(pageRoot.querySelectorAll('.change-logo-back'))
     const lightState = {
       nav: nav?.classList.contains('light') ?? false,
       logo: logo?.classList.contains('light') ?? false,
@@ -597,7 +600,8 @@ export function createHeroScrollAnimation(scope) {
     if (isDesktop) {
       sectionThemeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
     }
-    changeLogoWatcher = createChangeLogoWatcher(changeLogoSections, changeLogoBackSections, getSectionThreshold)
+    // change-logo watchers are created in initialise() after the hero pin exists
+    // so their start positions include pin spacing.
 
     gsap.set(heroTitle, {
       willChange: 'opacity',
@@ -759,7 +763,15 @@ export function createHeroScrollAnimation(scope) {
 
       buildTimeline()
 
+      // Refresh first so pin-spacer height is applied, then bind change-logo
+      // triggers whose start positions depend on that spacing.
       ScrollTrigger.refresh()
+      changeLogoWatcher?.kill()
+      changeLogoWatcher = createChangeLogoWatcher(
+        changeLogoSections,
+        changeLogoBackSections,
+        getSectionThreshold,
+      )
     }
 
     window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, refreshTrigger)

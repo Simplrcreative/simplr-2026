@@ -695,24 +695,6 @@ export default function TransitionFrame({ children }) {
     })
   }
 
-  function animateHomeLogoIn() {
-    const timeline = gsap.timeline({
-      defaults: {
-        ease: 'power2.out',
-      },
-    })
-
-    timeline.to('.logo', { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0)
-
-    timeline.to('.tagline', { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.6, ease: 'power2.out' }, 0)
-
-    timeline.to(
-      '#logo-implr g',
-      { x: 0, filter: 'blur(0px)', autoAlpha: 1, stagger: -0.1, duration: 0.4, ease: 'power2.out' },
-      0.15,
-    )
-  }
-
   function extractSameOriginLink(target) {
     const link = target?.closest?.('a[href]')
     if (!link) return null
@@ -1507,7 +1489,9 @@ export default function TransitionFrame({ children }) {
 
       if (isHomePage) {
         document.documentElement.classList.remove('compact-logo-active')
-        animateHomeLogoIn()
+        // RootLayout owns the home unfold + scroll-scrub handoff after
+        // page-transition:complete. Animating here raced that timeline and
+        // left the logo stuck mid-unfold / with wrong ScrollTrigger starts.
       }
 
       altClone?.remove()
@@ -2060,7 +2044,7 @@ export default function TransitionFrame({ children }) {
     if (!siteConfig.transitions.enabled || isFirst) {
       if (isFirst && location.pathname === '/') {
         applyCompactLogoState()
-        // Skip animateHomeLogoIn() on first load — RootLayout handles the
+        // Skip home logo unfold on first load — RootLayout handles the
         // initial home logo reveal after the intro overlay finishes.
       }
       window.dispatchEvent(new Event(PAGE_TRANSITION_COMPLETE_EVENT))

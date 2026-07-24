@@ -26,23 +26,40 @@ export function createLogoScrollAnimation(scope) {
   }
 
   const logo = scope.querySelector('.logo')
+  const tagline = scope.querySelector('.tagline')
+  const header = scope.querySelector('.header')
+  const desktopNav = scope.querySelector('#desktop-nav')
+  const navHolder = scope.querySelector('.nav-holder')
   const implrPaths = scope.querySelectorAll('#logo-implr g')
 
   if (!logo || !implrPaths.length) {
     return () => undefined
   }
 
+  // Scrub must start from the fully expanded entrance state.
   gsap.set(logo, {
+    scale: 1,
+    y: 0,
+    autoAlpha: 1,
     transformOrigin: 'left top',
     willChange: 'transform',
   })
 
-  gsap.set('.tagline', {
-    transformOrigin: 'left top',
-    willChange: 'transform',
-  })
+  if (tagline) {
+    gsap.set(tagline, {
+      scale: 1,
+      x: 0,
+      y: 0,
+      autoAlpha: 1,
+      transformOrigin: 'left top',
+      willChange: 'transform',
+    })
+  }
 
   gsap.set(implrPaths, {
+    x: 0,
+    filter: 'blur(0px)',
+    autoAlpha: 1,
     willChange: 'transform, opacity',
   })
 
@@ -55,6 +72,7 @@ export function createLogoScrollAnimation(scope) {
       start: 'top top',
       end: '+=320',
       scrub: true,
+      invalidateOnRefresh: true,
     },
   })
 
@@ -89,48 +107,69 @@ export function createLogoScrollAnimation(scope) {
     0.35,
   )
 
-  timeline.to(
-    '.tagline',
-    {
-      scale: taglineScale,
-      y: taglineY,
-      x: taglineX,
-      stagger: 0.02,
-      duration: 0.5,
-    },
-    0.3,
-  )
-
-  if (isCompactLogoTabletUp()) {
+  if (tagline) {
     timeline.to(
-      '.header',
+      tagline,
       {
-        y: -20,
+        scale: taglineScale,
+        y: taglineY,
+        x: taglineX,
         duration: 0.5,
       },
       0.3,
-    )
-
-    timeline.to(
-      '#desktop-nav',
-      {
-        y: -20,
-        duration: 0.5,
-      },
-      0.3,
-    )
-
-    timeline.to(
-      '.nav-holder',
-      {
-        height: '30px',
-        duration: 0.1,
-      },
-      0,
     )
   }
 
+  if (isCompactLogoTabletUp()) {
+    if (header) {
+      timeline.to(
+        header,
+        {
+          y: -20,
+          duration: 0.5,
+        },
+        0.3,
+      )
+    }
+
+    if (desktopNav) {
+      timeline.to(
+        desktopNav,
+        {
+          y: -20,
+          duration: 0.5,
+        },
+        0.3,
+      )
+    }
+
+    if (navHolder) {
+      timeline.to(
+        navHolder,
+        {
+          height: '30px',
+          duration: 0.1,
+        },
+        0,
+      )
+    }
+  }
+
+  // If scroll isn't truly at top (Lenis settling / bad ST math after a route
+  // transition), scrub would freeze the logo mid-fold. Force expanded.
+  const syncExpandedAtTop = () => {
+    const st = timeline.scrollTrigger
+    if (!st) return
+    st.refresh()
+    if (ScrollTrigger.scroll() <= st.start + 2) {
+      timeline.progress(0)
+    }
+  }
+
+  requestAnimationFrame(syncExpandedAtTop)
+
   return () => {
+    timeline.scrollTrigger?.kill()
     timeline.kill()
   }
 }

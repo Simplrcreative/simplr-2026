@@ -15,7 +15,8 @@ const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
 const HOME_HERO_TITLE_INTRO_EVENT = 'home-hero:title-intro-start'
 const HOME_HERO_VIDEO_INTRO_EVENT = 'home-hero:video-intro-start'
 const INTRO_MIN_VISIBLE_MS = 5000
-const HOME_RETURN_ENTRANCE_FALLBACK_MS = 350
+// Only used if page-transition:complete is missed — must be longer than a real transition.
+const HOME_RETURN_ENTRANCE_FALLBACK_MS = 4000
 const HOME_NAV_INTRO_DELAY_S = 0.9
 const HOME_HERO_TITLE_AFTER_NAV_S = 0.3
 const HOME_HERO_VIDEO_AFTER_NAV_S = 0.35
@@ -143,6 +144,9 @@ export default function RootLayout() {
   const destroyLogoRef = useRef(null)
   const destroyNavSectionThemeRef = useRef(null)
   const previousPathRef = useRef(null)
+  // Latches for the whole home visit — unlike cameFromNonHome, this does not flip
+  // false on the next render when previousPathRef is updated to '/'.
+  const returningToHomeRef = useRef(false)
   const { navigation } = useLoaderData()
   const location = useLocation()
   const isHomePage = location.pathname === '/'
@@ -160,7 +164,7 @@ export default function RootLayout() {
   const btnRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
-  const playHomeHeroIntro = shouldRunHomeIntroAnimations || cameFromNonHome
+  const playHomeHeroIntro = shouldRunHomeIntroAnimations || returningToHomeRef.current || cameFromNonHome
   const hasFinePointer = useHasFinePointer()
 
   const closeMobileNav = useCallback(() => {
@@ -236,6 +240,13 @@ export default function RootLayout() {
   // and clear any GSAP inline styles left by the scroll animation.
   useLayoutEffect(() => {
     closeMobileNav()
+
+    // Latch before previousPathRef updates in the effect below.
+    if (isHomePage && previousPathRef.current && previousPathRef.current !== '/') {
+      returningToHomeRef.current = true
+    } else if (!isHomePage) {
+      returningToHomeRef.current = false
+    }
 
     destroyLogoRef.current?.()
     destroyLogoRef.current = null
@@ -324,15 +335,24 @@ export default function RootLayout() {
     // Home page: wait for the loader to finish before revealing the logo.
     if (!introComplete) return () => { destroyNavSectionThemeRef.current?.() }
 
+    let entranceCleanup = null
+
     const playHomeEntranceAnimation = () => {
+      entranceCleanup?.()
+      entranceCleanup = null
+
       const logo = layoutRef.current?.querySelector('.logo')
       const tagline = layoutRef.current?.querySelector('.tagline')
       const implrPaths = layoutRef.current?.querySelectorAll('#logo-implr g')
       const mainNav = layoutRef.current?.querySelector('#desktop-nav')
       const menuIcon = layoutRef.current?.querySelectorAll('.menu-icon')
 
+      // Make sure scroll-linked logo scrub starts from a true page top.
+      scrollToTopImmediate()
+
       const entranceTl = gsap.timeline({
         onComplete: () => {
+          destroyLogoRef.current?.()
           destroyLogoRef.current = createLogoScrollAnimation(layoutRef.current)
         },
       })
@@ -375,40 +395,52 @@ export default function RootLayout() {
         HOME_NAV_INTRO_DELAY_S + HOME_HERO_VIDEO_AFTER_NAV_S,
       )
 
-      return () => {
+      entranceCleanup = () => {
         entranceTl.kill()
         destroyLogoRef.current?.()
         destroyLogoRef.current = null
       }
     }
 
-    // Returning to Home should always animate from the compact previous state
-    // after the route handoff finishes, not while the transition overlay is up.
-    if (cameFromNonHome) {
+    // Returning to Home: wait for TransitionFrame to finish so we don't start
+    // the unfold (or logo scrub ScrollTriggers) while the page is still transformed.
+    if (returningToHomeRef.current) {
       let hasStarted = false
       const startEntrance = () => {
         if (hasStarted) return
         hasStarted = true
+        returningToHomeRef.current = false
         playHomeEntranceAnimation()
       }
 
-      // Start when TransitionFrame signals completion.
-      window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
+      // If the transition already finished (or never ran), start immediately.
+      if (!document.documentElement.classList.contains('page-transitioning')) {
+        startEntrance()
+        return () => {
+          entranceCleanup?.()
+          destroyNavSectionThemeRef.current?.()
+        }
+      }
 
-      // Fallback if the event is missed.
+      window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance, { once: true })
       const timer = setTimeout(startEntrance, HOME_RETURN_ENTRANCE_FALLBACK_MS)
 
       return () => {
         clearTimeout(timer)
         window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, startEntrance)
+        entranceCleanup?.()
         destroyNavSectionThemeRef.current?.()
       }
     }
 
     // Initial load after intro overlay — animate logo from compact → full,
     // then hand off to the scroll animation.
-    return playHomeEntranceAnimation()
-  }, [location.pathname, isHomePage, introComplete, cameFromNonHome])
+    playHomeEntranceAnimation()
+    return () => {
+      entranceCleanup?.()
+      destroyNavSectionThemeRef.current?.()
+    }
+  }, [location.pathname, isHomePage, introComplete])
 
   useEffect(() => {
     let resizeTimer = 0
