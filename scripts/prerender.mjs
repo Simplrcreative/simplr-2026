@@ -314,7 +314,11 @@ async function waitForRenderedPage(page) {
   await page.waitForTimeout(500)
 }
 
-/** Re-insert the boot loader so reloads don't flash unstyled prerendered content. */
+/**
+ * Prerender captures HTML after the boot loader has already been removed.
+ * Re-insert it so hard reloads stay covered until CSS/JS hydrate — without
+ * any critical CSS that could fight logo/tagline layout.
+ */
 function ensureBootLoaderInHtml(html) {
   if (html.includes('id="boot-loader"')) return html
 
@@ -342,6 +346,7 @@ function ensureBootLoaderInHtml(html) {
 /* ------------------------------------------------------------------ */
 // Main
 /* ------------------------------------------------------------------ */
+
 async function main() {
   const sitemapPath = path.join(distDir, 'sitemap.xml')
 

@@ -28,44 +28,9 @@
       html[data-home-intro-pending='true'] .header,
       html[data-home-intro-pending='true'] .compact-logo,
       html[data-home-intro-pending='true'] .menu-icon,
-      html[data-home-intro-pending='true'] #mobile-nav,
-      html[data-home-intro-pending='true'] .landing .hero-video,
-      html[data-home-intro-pending='true'] .landing .hero-video-holder,
-      html[data-home-intro-pending='true'] .landing .hero-video-trigger,
-      html[data-home-intro-pending='true'] .landing .play-icon,
-      html[data-home-intro-pending='true'] .play-icon-mobile {
+      html[data-home-intro-pending='true'] #mobile-nav {
         visibility: hidden !important;
         pointer-events: none;
-      }
-
-      /* Critical FOUC guards: prerendered HTML paints before the CSS chunk.
-         Logo SVG is 527×172 without these rules. */
-      .logo-holder {
-        max-width: 11rem;
-      }
-      .logo svg,
-      .logo-holder svg {
-        width: 100%;
-        height: auto;
-        display: block;
-        max-width: 100%;
-      }
-      .compact-logo {
-        opacity: 0;
-        pointer-events: none;
-      }
-      .compact-logo svg {
-        width: 100%;
-        height: 44.75px;
-        display: block;
-      }
-      @media (min-width: 768px) {
-        .logo-holder { max-width: 22rem; }
-        .compact-logo svg { height: 35.8px; }
-      }
-      @media (min-width: 1024px) {
-        .logo-holder { max-width: 26rem; }
-        .compact-logo svg { height: 44.75px; }
       }
 
       #boot-loader {

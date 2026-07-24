@@ -1,7 +1,7 @@
 export default function BrandLogo() {
   return (
     <div className="logo inline-block font-literata text-2xl text-coffee md:mb-5">
-      <svg viewBox="0 0 527 172" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg width="527" height="172" viewBox="0 0 527 172" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <g id="logo-implr">
           <g>
             <path d="M453.161 132.45C457.161 129.058 461.518 122.437 461.518 113.339V64.6008C461.518 57.4588 460.036 52.5599 456.875 49.1863L455.821 48.0737C454.196 46.3331 453.589 45.687 452.036 44.5745L487.394 44.395V113.339C487.394 121.163 490.055 127.587 495.287 132.45H453.143H453.161Z" />

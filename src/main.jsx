@@ -14,12 +14,16 @@ createRoot(document.getElementById('root')).render(
 
 const bootLoader = document.getElementById('boot-loader')
 
+/**
+ * Keep the boot loader up until linked stylesheets (and fonts) are ready.
+ * Avoids FOUC on prerendered pages without overriding logo/tagline CSS.
+ */
 function stylesheetsReady() {
-  const sheets = Array.from(document.styleSheets)
-  if (!sheets.length) return Promise.resolve()
+  const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+  if (!links.length) return Promise.resolve()
 
   return Promise.all(
-    Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((link) => {
+    links.map((link) => {
       if (link.sheet) return Promise.resolve()
       return new Promise((resolve) => {
         link.addEventListener('load', resolve, { once: true })
@@ -29,11 +33,26 @@ function stylesheetsReady() {
   )
 }
 
+function fontsReady() {
+  if (!document.fonts?.ready) return Promise.resolve()
+  return document.fonts.ready.catch(() => undefined)
+}
+
+function nextPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve)
+    })
+  })
+}
+
 async function hideBootLoader() {
-  if (!bootLoader) return
+  if (!bootLoader || bootLoader.dataset.hiding === 'true') return
+  bootLoader.dataset.hiding = 'true'
 
   try {
-    await stylesheetsReady()
+    await Promise.all([stylesheetsReady(), fontsReady()])
+    await nextPaint()
   } catch {
     // Still dismiss — fallback timeout covers hard failures.
   }
