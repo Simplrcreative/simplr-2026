@@ -16,14 +16,14 @@ export default function NotFoundPage() {
               <p className="body-copy my-10">
                 The page may not exist, may have been moved or deleted. Let's get you back on track.
               </p>
-              <div className="flex gap-4">
-              <Link className="inline-flex rounded-full bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/work/">
+              <div className="flex flex-col md:flex-row gap-4">
+              <Link className="inline-flex rounded-full w-fit bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/work/">
                 View our work
               </Link>
-              <Link className="inline-flex rounded-full bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/services/">
+              <Link className="inline-flex rounded-full w-fit bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/services/">
                 View our services
               </Link>
-              <Link className="inline-flex rounded-full bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/contact/">
+              <Link className="inline-flex rounded-full w-fit bg-coffee px-5 py-3 text-xl font-semibold text-white" to="/contact/">
                 Get in touch
               </Link>
               </div>

@@ -27,7 +27,10 @@ export default function LandingPage() {
   const headline = landingPageContent.acfHeadline || ''
    const showForm = landingPageContent.acfShowForm || false
   const introduction = landingPageContent.acfIntroduction || ''
-  const featuredVideo = landingPageContent.acfFeaturedVideo || ''
+  const featuredVideo =
+    landingPageContent.featuredVideo?.node?.mediaItemUrl
+    || landingPageContent.featuredVideo?.node?.guid
+    || ''
   const featuredImage = getThumbnail(landingPageContent.acfFeaturedImage)
   const acfSections = landingPageContent?.acfSections || []
   const ctaBtnRefs = useRef({})

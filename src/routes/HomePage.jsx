@@ -788,7 +788,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
         <div className="service-stats pt-10 md:pt-20">
-          <div className="stat-item flex flex-col sm:flex-row gap-5 lg:justify-between lg:min-w-[56,25rem] lg:max-w-[76rem] xl:max-w-[85rem] pe-5 relative">
+          <div className="stat-item flex flex-col sm:flex-row gap-5 lg:justify-between lg:min-w-[56,25rem] lg:max-w-[70rem]  pe-5 relative">
             <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem]">0</div>
             <div className="flex flex-col">
               <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-10 lg:mb-20 xl:mb-40 text-strategy text-[5rem]">+</div>

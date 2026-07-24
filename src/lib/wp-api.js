@@ -838,7 +838,12 @@ const landingByUriQuery = `
       title(format: RENDERED)
       acfLandingPageBuilder {
         acfHeadline
-        acfFeaturedVideo
+        featuredVideo {
+          node {
+            guid
+            mediaItemUrl
+          }
+        }
         acfFeaturedImage {
           node {
             mediaDetails {
