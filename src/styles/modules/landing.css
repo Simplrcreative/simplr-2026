@@ -283,18 +283,15 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    display: flex;
-    gap: 0 5.625rem;
-    flex-wrap: wrap
 }
 .section-content ul li,
 .section-content ol li {
     position: relative;
-    margin: 0 0 3.75rem 0;
+    margin: 0 0 2.5rem 0;
     padding: 0;
-    width: calc(50% - 5.625rem);
-    font-size: 1.5rem;
-    line-height: 1.8rem;
+    width: 80%;
+    font-size: 1.3rem;
+    line-height: 1.5rem;
 }
 .section-content ul li::before,
 .section-content ol li::before {
@@ -351,4 +348,20 @@
 .section-content blockquote::before,
 .section-content blockquote::after {
     display: none;
+}
+
+@media (min-width: 768px) {
+    .section-content ul,
+    .section-content ol {
+        display: flex;
+        gap: 0 5.625rem;
+        flex-wrap: wrap
+    }
+    .section-content ul li,
+    .section-content ol li {
+        margin: 0 0 3.75rem 0;
+        width: calc(50% - 5.625rem);
+        font-size: 1.5rem;
+        line-height: 1.8rem;
+    }
 }

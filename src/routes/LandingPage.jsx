@@ -66,7 +66,7 @@ export default function LandingPage() {
         pathname={pathname}
       />
 
-      <section className="post-hero px-3 md:px-5 py-20 bg-white section-light min-h-[80vh] flex items-end">
+      <section className="post-hero px-3 md:px-5 py-10 md:py-20 bg-white section-light min-h-[80vh] flex items-end">
         <div className="grid grid-cols-12 w-full">
           <div className="col-span-12 change-logo-back" />
           <div className="col-span-12 md:col-span-5 text-coffee change-logo mt-30 md:mt-20 change-logo max-w-[90ch]">
@@ -106,10 +106,10 @@ export default function LandingPage() {
         }
 
         return (
-          <section key={`section-${sectionIndex}`} className="px-3 md:px-5 py-20 bg-white section-light">
+          <section key={`section-${sectionIndex}`} className="px-3 md:px-5 py-10 md:py-20 bg-white section-light">
             <div className="grid grid-cols-12 w-full">
               {sectionHeading && (
-                <div className="col-span-6 max-w-[70ch] slide-up-subtle">
+                <div className="col-span-12 lg:col-span-6 max-w-[70ch] mb-5 lg:mb-0 slide-up-subtle">
                   <RichHeading as="h2" html={sectionHeading} className="font-literata section-heading"/>
                   <div className="mt-10 slide-up-subtle">
                     {sectionIntroduction && (
@@ -119,12 +119,12 @@ export default function LandingPage() {
                 </div>
               )}
               {sectionContent && (
-                <div className="col-start-7 col-span-6 section-content slide-up-subtle">
+                <div className="col-start-1 col-span-12 lg:col-start-7 lg:col-span-6 section-content slide-up-subtle">
                   <RichText html={sectionContent} />
                 </div>
               )}
               {sectionSteps.length > 0 && (
-                <div className="col-start-7 col-span-5 step-list">
+                <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-5 step-list">
                   {sectionSteps.map((step, stepIndex) => {
                     const stepTitle = step?.acfTitle || ''
                     const stepContent = step?.acfContent || ''
@@ -146,7 +146,7 @@ export default function LandingPage() {
                 </div>
               )}
               {sectionFeatures.length > 0 && (
-                <div className="col-start-7 col-span-5 feature-list">
+                <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-5 feature-list">
                   {sectionFeatures.map((feature, featureIndex) => {
                     const featureTitle = feature?.acfTitle || ''
                     const featureContent = feature?.acfContent || ''
@@ -202,12 +202,12 @@ export default function LandingPage() {
                 </div>
               )}
               {sectionContentAfter && (
-                <div className="col-start-7 col-span-6 section-content slide-up-subtle">
+                <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 section-content slide-up-subtle">
                   <RichText html={sectionContentAfter} />
                 </div>
               )}
               {sectionCta && (
-                <div className="button-wrapper col-start-7 col-span-6 slide-up-subtle mt-4">
+                <div className="button-wrapper md:col-start-7 col-span-6 slide-up-subtle md:mt-4">
                   <Link 
                     to={sectionCta.url}
                     ref={(el) => { ctaBtnRefs.current[sectionIndex] = el }}
@@ -225,9 +225,9 @@ export default function LandingPage() {
       })}
 
       {showForm && (
-        <section className="px-3 md:px-5 pt-20">
+        <section className="px-3 md:px-5 pt-10 md:pt-20">
           <div className="grid grid-cols-12 w-full">
-            <div className="col-start-8 col-span-5 slide-up-subtle">
+            <div className="col-start-1 col-span-12 md:col-start-8 md:col-span-5 slide-up-subtle">
               <ContactForm style="dark" heading="This is a cool heading" />
             </div>
           </div>
