@@ -159,7 +159,7 @@ function ServiceVideo({ src, poster, title, to }) {
           src={src}
           poster={poster}
           title={title}
-          //loop
+          loop
           muted
           playsInline
           preload="none"
