@@ -664,7 +664,7 @@ export default function RootLayout() {
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-8">
-            <h1 className={isDarkPageBg ? 'text-white' : 'text-coffee'}>Let&apos;s build something that works.</h1>
+            <h1 className={isDarkPageBg ? 'text-white' : 'text-coffee'}>Let&apos;s build something that lasts.</h1>
             <div className="button-wrapper">
               <Link 
                 to="contact"
@@ -721,7 +721,7 @@ export default function RootLayout() {
                   <div>Unit AS02, The Forum, Lifestyle House,<br/>Northbank Lane, Century City,<br/>South Africa</div>
                   <div className="mt-5 mb-0 xl:my-[3.75rem]">
                     Simplr © 2026<br/>
-                    <a href="/privacy-policy/" title="Privacy policy">Privacy policy</a>
+                    <a href="/privacy-policy/" title="Privacy policy">Privacy policy</a> | <a href="mailto:hello@simplr.co.za" title="Let's talk">hello@simplr.co.za</a>
                   </div>
                 </div>
           </div>

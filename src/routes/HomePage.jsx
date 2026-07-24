@@ -758,31 +758,31 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
       <section ref={servicesRef} className="services py-10 md:py-20 section-light overflow-hidden relative w-full light-to-coffee-outgoing">
          <div className="services-titles flex flex-nowrap items-center text-[3rem] md:text-[5.5rem] gap-10">
-          <div id="strategy" data-color="text-strategy" data-stat="62" data-detail="Brand and digital strategy projects completed." className="services-title font-literata font-[400] flex-shrink-0">
+          <div id="strategy" data-color="text-strategy" data-stat="25" data-detail="Brand and digital strategy projects completed." className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="branding-design" data-color="text-branding-design" data-stat="38" data-detail="Brand identity systems created and evolved." className="services-title font-light flex-shrink-0 mt-3">
+          <div id="branding-design" data-color="text-branding-design" data-stat="58" data-detail="Brand identity systems created and evolved." className="services-title font-light flex-shrink-0 mt-3">
             Branding&Design 
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="web-design-development" data-color="text-web-design-development" data-stat="56" data-detail="Websites and digital platforms designed and built." className="services-title font-literata flex-shrink-0">
+          <div id="web-design-development" data-color="text-web-design-development" data-stat="78" data-detail="Websites and digital platforms designed and built." className="services-title font-literata flex-shrink-0">
             Web Design&Development
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-           <div id="motion" data-color="text-motion" data-stat="39" data-detail="Motion projects brought to life across screen and story." className="services-title font-light flex-shrink-0 mt-3">
+           <div id="motion" data-color="text-motion" data-stat="23" data-detail="Motion projects brought to life across screen and story." className="services-title font-light flex-shrink-0 mt-3">
             Motion
           </div>
           <svg className="flex-shrink-0 opacity-[0.2] mt-3" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="currentColor">
             <circle cx="6.5" cy="6.5" r="6.5" fill="#300F1D"/>
           </svg>
-          <div id="templates" data-color="text-templates" data-stat="89" data-detail="Template systems built for teams at scale." className="services-title font-literata flex-shrink-0">
+          <div id="templates" data-color="text-templates" data-stat="99" data-detail="Template systems built for teams at scale." className="services-title font-literata flex-shrink-0">
             Templates
           </div>
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>

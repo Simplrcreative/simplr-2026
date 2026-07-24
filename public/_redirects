@@ -1,0 +1,4 @@
+# Cloudflare Pages SPA fallback — serve the app shell for any path that
+# was not prerendered into a static HTML file. Without this, root-level
+# landing pages (and any route missing from the sitemap) return the host 404.
+/*    /index.html   200

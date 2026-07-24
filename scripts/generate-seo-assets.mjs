@@ -171,8 +171,19 @@ async function getDynamicRoutes(env) {
     }
   `
 
+  const landingQuery = `
+    query LandingRoutes {
+      acfLandingPages(first: 100, where: { status: PUBLISH }) {
+        nodes {
+          slug
+        }
+      }
+    }
+  `
+
   let data
   let servicesData = null
+  let landingData = null
 
   try {
     data = await graphQlRequest(endpoint, query, {
@@ -188,6 +199,12 @@ async function getDynamicRoutes(env) {
     servicesData = await graphQlRequest(endpoint, servicesQuery)
   } catch {
     // Non-critical: if the services query fails we still want work/thinking routes.
+  }
+
+  try {
+    landingData = await graphQlRequest(endpoint, landingQuery)
+  } catch {
+    // Non-critical: landing CPT may be unavailable in some environments.
   }
 
   const workRoutes = (data.work?.nodes || [])
@@ -221,7 +238,17 @@ async function getDynamicRoutes(env) {
       return { path, changefreq: 'monthly', priority: '0.7' }
     })
 
-  return uniqueRoutes([...workRoutes, ...thinkingRoutes, ...serviceRoutes])
+  // Root-level campaign pages: /{slug}/ (no collection prefix)
+  const landingRoutes = (landingData?.acfLandingPages?.nodes || [])
+    .map((node) => node?.slug)
+    .filter(Boolean)
+    .map((slug) => ({
+      path: joinRoutePath(slug),
+      changefreq: 'monthly',
+      priority: '0.7',
+    }))
+
+  return uniqueRoutes([...workRoutes, ...thinkingRoutes, ...serviceRoutes, ...landingRoutes])
 }
 
 function buildSitemap(siteUrl, routes) {
@@ -245,11 +272,11 @@ function buildRobots(siteUrl, allowIndexing) {
 }
 
 function buildLlms(siteUrl) {
-  return `# ${siteUrl}\n\n- Primary routes: /work, /about, /services, /thinking, /contact, /est-2014\n- Dynamic editorial routes: /work/:slug and /thinking/:topic/:slug\n- Content source: WordPress via WPGraphQL\n- SEO/GEO assets: structured data, canonical URLs, sitemap.xml, robots.txt, llms-full.txt\n`
+  return `# ${siteUrl}\n\n- Primary routes: /work, /about, /services, /thinking, /contact, /est-2014\n- Dynamic editorial routes: /work/:slug and /thinking/:topic/:slug\n- Root-level landing pages: /:slug\n- Content source: WordPress via WPGraphQL\n- SEO/GEO assets: structured data, canonical URLs, sitemap.xml, robots.txt, llms-full.txt\n`
 }
 
 function buildLlmsFull(siteUrl) {
-  return `# Simplr\n\nThis website is a headless WordPress front end built with Vite and React.\n\n## Main pages\n- ${new URL('/work', siteUrl).toString()}\n- ${new URL('/about', siteUrl).toString()}\n- ${new URL('/services', siteUrl).toString()}\n- ${new URL('/thinking', siteUrl).toString()}\n- ${new URL('/contact', siteUrl).toString()}\n- ${new URL('/est-2014', siteUrl).toString()}\n\n## Dynamic content\n- Work singles are resolved from /work/:slug\n- Thinking singles are resolved from /thinking/:topic/:slug\n\n## Content model guidance\n- Work should map to a custom post type exposed through WPGraphQL.\n- Thinking should map to posts or another exposed content type.\n- About, Services, Contact, and Est. 2014 should be WordPress pages with matching URIs.\n\n## Technical notes\n- Canonical URLs and Open Graph tags are set per route.\n- JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, and ContactPage where relevant.\n- sitemap.xml and robots.txt are generated at build time.\n`
+  return `# Simplr\n\nThis website is a headless WordPress front end built with Vite and React.\n\n## Main pages\n- ${new URL('/work', siteUrl).toString()}\n- ${new URL('/about', siteUrl).toString()}\n- ${new URL('/services', siteUrl).toString()}\n- ${new URL('/thinking', siteUrl).toString()}\n- ${new URL('/contact', siteUrl).toString()}\n- ${new URL('/est-2014', siteUrl).toString()}\n\n## Dynamic content\n- Work singles are resolved from /work/:slug\n- Thinking singles are resolved from /thinking/:topic/:slug\n- Landing pages are resolved from /:slug at the site root\n\n## Content model guidance\n- Work should map to a custom post type exposed through WPGraphQL.\n- Thinking should map to posts or another exposed content type.\n- About, Services, Contact, and Est. 2014 should be WordPress pages with matching URIs.\n\n## Technical notes\n- Canonical URLs and Open Graph tags are set per route.\n- JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, and ContactPage where relevant.\n- sitemap.xml and robots.txt are generated at build time.\n`
 }
 
 async function main() {

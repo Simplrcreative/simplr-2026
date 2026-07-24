@@ -4,17 +4,14 @@
       "PLAYWRIGHT_BROWSERS_PATH": "0"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
+      "source": "/graphql",
+      "destination": "/api/graphql"
     },
     {
-      "src": "/graphql",
-      "dest": "/api/graphql"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
