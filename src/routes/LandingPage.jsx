@@ -152,7 +152,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="px-3 md:px-5 pt-10 lg:pt-20 bg-white section-light">
+      <section className="px-3 md:px-5 pt-10 lg:pt-20 bg-white section-light change-logo">
         <div className="grid grid-cols-12 w-full">
           <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 slide-up-subtle">
            <RichText html={introduction} />
@@ -176,7 +176,7 @@ export default function LandingPage() {
         return (
           <section
             key={`section-${sectionIndex}`}
-            className={`px-3 md:px-5 py-10 md:py-20 bg-white section-light${sectionIndex === 0 ? ' change-logo' : ''}`}
+            className={`px-3 md:px-5 py-10 md:py-20 bg-white section-light${sectionIndex === 0 ? ' change-logo__' : ''}`}
           >
             <div className="grid grid-cols-12 w-full">
               {sectionHeading && (
