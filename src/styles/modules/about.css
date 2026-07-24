@@ -88,11 +88,11 @@
     scale: 1;
     filter: grayscale(0);
   }
-  15% {
-    opacity: 1;
+  17.5% {
+    opacity: 0.9;
     rotate: 0;
-    scale: 1.1;
-    filter: grayscale(0);
+    scale: 1.05;
+    filter: grayscale(0.15);
   }
   100% {
     opacity: 0;
@@ -361,7 +361,7 @@
   }
 
   .people--bio-closing .person-hover-img.is-visible {
-    animation: person-hover-img-close 0.75s ease-in-out forwards;
+    animation: person-hover-img-close 0.85s ease-in-out forwards;
     transition: none;
   }
 }
