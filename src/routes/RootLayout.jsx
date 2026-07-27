@@ -702,7 +702,7 @@ export default function RootLayout() {
                 onClick={handleFooterTransitionLinkClick}
                 title="Contact Simplr"
               >
-                <span>Let&apos;s chat</span>
+                <span>Start a project</span>
               </Link>
             </div>
           </div>

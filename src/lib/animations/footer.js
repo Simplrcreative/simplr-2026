@@ -75,6 +75,7 @@ function createFooterLogoExtras(footer) {
       scrollTrigger: {
         trigger: footerLogoTrigger,
         start: 'top 95%',
+        markers: true,
         toggleActions: 'restart none restart reset',
         invalidateOnRefresh: false,
         refreshPriority: -30,

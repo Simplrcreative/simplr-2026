@@ -136,7 +136,7 @@ export default function Est2014Page() {
           </div>
           <div className="col-start-1 md:col-start-10 col-span-12 md:col-span-3 text-white flex justify-end items-end">
             <Link 
-              to="/about#our-people"
+              to="/about"
               ref={btnRef}
               className="btn alt relative bg-white text-coffee md:absolute md:right-[1.25rem] md:bottom-[5rem] ms-5 md:ms-0 mt-10 md:mt-0"
             >
