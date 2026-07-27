@@ -64,6 +64,22 @@ export default function ThinkingPage() {
     animatedPostKeysRef.current.clear()
   }, [initialPosts])
 
+  // Block footer-logo swap until infinite scroll is exhausted (short early
+  // batches otherwise sit the footer in view and false-trigger .active).
+  useEffect(() => {
+    document.documentElement.dataset.footerLogoBlocked = hasMorePosts ? 'true' : 'false'
+    if (hasMorePosts) {
+      document.querySelector('.footer-logo')?.classList.remove('active')
+      document.querySelector('.compact-logo')?.classList.remove('off')
+    } else {
+      refreshScrollTriggers()
+    }
+    return () => {
+      delete document.documentElement.dataset.footerLogoBlocked
+      refreshScrollTriggers()
+    }
+  }, [hasMorePosts])
+
   const filters = useMemo(() => {
     const categoriesBySlug = new Map()
 

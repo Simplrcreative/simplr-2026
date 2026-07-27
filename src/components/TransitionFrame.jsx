@@ -99,6 +99,13 @@ function mountFrozenCompactLogoClone(compactLogoClone) {
   document.body.appendChild(compactLogoClone)
 }
 
+function mountFrozenFooterLogoClone(footerLogoClone) {
+  if (!footerLogoClone || footerLogoClone.isConnected) return
+
+  footerLogoClone.dataset.frozenClone = 'true'
+  document.body.appendChild(footerLogoClone)
+}
+
 function normalizePathname(pathname) {
   if (!pathname) return '/'
   const path = pathname.split('?')[0].split('#')[0]
@@ -608,6 +615,7 @@ export default function TransitionFrame({ children }) {
   const altTransitionRef = useRef(null)
   const headerSnapshotRef = useRef(null)
   const compactLogoSnapshotRef = useRef(null)
+  const footerLogoSnapshotRef = useRef(null)
   const bottomMenuSnapshotRef = useRef(null)
   const bottomMenuNavCaptureRef = useRef(false)
   const capturedScrollYRef = useRef(0)
@@ -639,6 +647,7 @@ export default function TransitionFrame({ children }) {
     altTransitionRef.current = null
     headerSnapshotRef.current = null
     compactLogoSnapshotRef.current = null
+    footerLogoSnapshotRef.current = null
     bottomMenuSnapshotRef.current = null
     bottomMenuNavCaptureRef.current = false
     capturedScrollYRef.current = 0
@@ -650,6 +659,9 @@ export default function TransitionFrame({ children }) {
     document.documentElement.classList.remove('page-transitioning')
     document.documentElement.style.overflowX = ''
     document.querySelectorAll('[data-frozen-clone="true"]').forEach((node) => node.remove())
+    const liveFooterLogo = document.querySelector('.footer-logo')
+    liveFooterLogo?.style.removeProperty('opacity')
+    liveFooterLogo?.style.removeProperty('visibility')
     if (hadCapture) {
       window.dispatchEvent(new Event(PAGE_TRANSITION_CAPTURE_COMPLETE_EVENT))
     }
@@ -1000,9 +1012,12 @@ export default function TransitionFrame({ children }) {
       // --- Compact-logo clone (only when it's the currently visible logo) ---
       const isCompactLogoActive = document.documentElement.classList.contains('compact-logo-active')
       const liveCompactLogo = isCompactLogoActive ? document.querySelector('.compact-logo') : null
-      if (liveCompactLogo) {
+      // Footer swap sets .off — respect opacity 0 and skip a visible clone.
+      const compactIsOff = liveCompactLogo?.classList.contains('off')
+      if (liveCompactLogo && !compactIsOff) {
         const rect = liveCompactLogo.getBoundingClientRect()
         const clonedCompact = liveCompactLogo.cloneNode(true)
+        const cs = getComputedStyle(liveCompactLogo)
         // Bake in position/dimensions so the clone renders identically when
         // detached from its Tailwind layout context.
         Object.assign(clonedCompact.style, {
@@ -1011,8 +1026,8 @@ export default function TransitionFrame({ children }) {
           left: `${rect.left}px`,
           width: `${rect.width}px`,
           height: `${rect.height}px`,
-          opacity: '1',
-          visibility: 'visible',
+          opacity: cs.opacity,
+          visibility: cs.visibility,
           pointerEvents: 'none',
           zIndex: '10000',
         })
@@ -1021,8 +1036,49 @@ export default function TransitionFrame({ children }) {
         compactLogoSnapshotRef.current = null
       }
 
+      // --- Footer-logo clone (when the footer swap logo is the visible one) ---
+      const liveFooterLogo = document.querySelector('.footer-logo.active')
+      if (liveFooterLogo) {
+        const rect = liveFooterLogo.getBoundingClientRect()
+        const cs = getComputedStyle(liveFooterLogo)
+        const clonedFooterLogo = liveFooterLogo.cloneNode(true)
+        clonedFooterLogo.classList.remove('active')
+        // Bake color so a pageBg flip (dark→light) can't turn the clone coffee
+        // mid-transition via currentColor inheritance.
+        Object.assign(clonedFooterLogo.style, {
+          position: 'fixed',
+          top: `${rect.top}px`,
+          left: `${rect.left}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`,
+          opacity: cs.opacity,
+          visibility: 'visible',
+          color: cs.color,
+          transform: cs.transform === 'none' ? '' : cs.transform,
+          transformOrigin: cs.transformOrigin,
+          pointerEvents: 'none',
+          zIndex: '10000',
+          transition: 'none',
+        })
+        clonedFooterLogo.querySelectorAll('svg').forEach((svg) => {
+          svg.style.fill = cs.color
+          svg.style.color = cs.color
+        })
+        footerLogoSnapshotRef.current = clonedFooterLogo
+
+        // Hide the live logo immediately — RootLayout updates pageBg in
+        // useLayoutEffect before page-transitioning is applied, which would
+        // otherwise flash a coffee-colored live logo on dark pages.
+        liveFooterLogo.style.setProperty('opacity', '0', 'important')
+        liveFooterLogo.style.setProperty('visibility', 'hidden', 'important')
+        liveFooterLogo.classList.remove('active')
+      } else {
+        footerLogoSnapshotRef.current = null
+      }
+
       mountFrozenHeaderClone(headerSnapshotRef.current)
       mountFrozenCompactLogoClone(compactLogoSnapshotRef.current)
+      mountFrozenFooterLogoClone(footerLogoSnapshotRef.current)
 
       bottomMenuSnapshotRef.current = null
       const navForBottomMenu = target ? extractSameOriginLink(target) : null
@@ -1416,6 +1472,22 @@ export default function TransitionFrame({ children }) {
       })
     }
 
+    // --- Footer-logo clone (footer swap state) ---
+    const footerLogoClone = footerLogoSnapshotRef.current
+    footerLogoSnapshotRef.current = null
+    if (footerLogoClone) {
+      if (!footerLogoClone.isConnected) {
+        mountFrozenFooterLogoClone(footerLogoClone)
+      }
+      gsap.to(footerLogoClone, {
+        autoAlpha: 0,
+        y: -20,
+        duration: 0.35,
+        ease: 'power2.in',
+        onComplete: () => footerLogoClone.remove(),
+      })
+    }
+
     // --- Outgoing header clone (Logo Device + nav) ---
     // Animate the outgoing header out using the frozen clone captured on pointerdown.
     // The clone is appended directly to <body> (fixed, above the overlay) so it
@@ -1487,6 +1559,11 @@ export default function TransitionFrame({ children }) {
       // page-transition:complete (do not animate here — it races the unfold).
       applyCompactLogoState()
       gsap.set('.compact-logo', { clearProps: 'all' })
+      const liveFooterLogo = document.querySelector('.footer-logo')
+      liveFooterLogo?.classList.remove('active')
+      liveFooterLogo?.style.removeProperty('opacity')
+      liveFooterLogo?.style.removeProperty('visibility')
+      document.querySelector('.compact-logo')?.classList.remove('off')
 
       if (isHomePage) {
         document.documentElement.classList.remove('compact-logo-active')
@@ -1962,6 +2039,10 @@ export default function TransitionFrame({ children }) {
       if (compactLogoClone) {
         gsap.killTweensOf(compactLogoClone)
         compactLogoClone.remove()
+      }
+      if (footerLogoClone) {
+        gsap.killTweensOf(footerLogoClone)
+        footerLogoClone.remove()
       }
       if (headerClone) {
         gsap.killTweensOf(headerClone)

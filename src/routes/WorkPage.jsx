@@ -390,6 +390,22 @@ export default function WorkPage() {
     setIsLoadingMore(false)
   }, [initialWorks])
 
+  // Block footer-logo swap until infinite scroll is exhausted (short early
+  // batches otherwise sit the footer in view and false-trigger .active).
+  useEffect(() => {
+    document.documentElement.dataset.footerLogoBlocked = hasMoreWorks ? 'true' : 'false'
+    if (hasMoreWorks) {
+      document.querySelector('.footer-logo')?.classList.remove('active')
+      document.querySelector('.compact-logo')?.classList.remove('off')
+    } else {
+      ScrollTrigger.refresh()
+    }
+    return () => {
+      delete document.documentElement.dataset.footerLogoBlocked
+      ScrollTrigger.refresh()
+    }
+  }, [hasMoreWorks])
+
   // Testimonials are deferred from the loader so the grid can commit without waiting on N+1 fetches.
   useEffect(() => {
     let cancelled = false

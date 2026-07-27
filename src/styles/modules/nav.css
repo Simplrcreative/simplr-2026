@@ -17,6 +17,10 @@ html.page-transitioning .compact-logo:not([data-frozen-clone]) {
     visibility: hidden !important;
 }
 
+html.page-transitioning .footer-logo:not([data-frozen-clone]) {
+    opacity: 0 !important;
+}
+
 html.page-transitioning .bottom-menu:not([data-frozen-clone]) {
     opacity: 0 !important;
     visibility: hidden !important;
@@ -324,7 +328,7 @@ nav.light a.is-active .nav-link__orb {
 .compact-logo {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 500ms ease;
+    transition: opacity 0.5s ease;
 }
 
 .compact-logo-active .logo-holder {
@@ -344,6 +348,11 @@ nav.light a.is-active .nav-link__orb {
 
 .compact-logo svg {
     fill: white;
+}
+.compact-logo.off {
+    opacity: 0 !important;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .tagline {

@@ -133,17 +133,20 @@
 .post-content ul li, 
 .post-content ol li {
   margin: 0 0 0.5rem 0;
-  padding: 0;
+  padding: 0 0 0 26px;
   list-style: none;
+  position: relative;
 }
 .post-content ul li::before {
-  content: "•";
-  font-size: 280%;
-  line-height: 0;
-  margin: 0 1.3rem 0 0;
-  position: relative;
-  top: 0.5rem;
-  color: var(--color-coffee);
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 0px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="11" viewBox="0 0 22 11" fill="none"><rect width="21.1707" height="10.2439" rx="5.12195" fill="%23300F1D"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 16px;
+  height: 8px;
 }
 .post-content ol {
   list-style: none;

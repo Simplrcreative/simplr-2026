@@ -63,7 +63,121 @@ function resolveCurrentCompactLogoState(nav, fallbackState = false) {
   return activeState
 }
 
+/**
+ * Fade footer logo in / compact logo out when the footer zone is in view.
+ * No pin, no scrub — class toggles only.
+ *
+ * Work / Thinking set `data-footer-logo-blocked="true"` while more infinite-scroll
+ * content can still load, so a short first batch can't falsely trip the swap.
+ *
+ * Enter callbacks are ignored during ScrollTrigger.refresh() — layout shifts
+ * (images, infinite scroll, fonts) otherwise fire a false onEnter, then the
+ * real one later when the user actually reaches the footer.
+ */
+function isFooterLogoSwapBlocked() {
+  return document.documentElement.dataset.footerLogoBlocked === 'true'
+}
+
+function createFooterLogoSwap(footer) {
+  const trigger =
+    footer.previousElementSibling?.classList?.contains('footer-logo-trigger')
+      ? footer.previousElementSibling
+      : null
+  const footerLogo = footer.querySelector('.footer-logo')
+  const compactLogo = document.querySelector('.compact-logo')
+
+  if (!trigger || !footerLogo) {
+    return { cleanup() {} }
+  }
+
+  const setActive = (isActive) => {
+    if (isActive && isFooterLogoSwapBlocked()) {
+      footerLogo.classList.remove('active')
+      compactLogo?.classList.remove('off')
+      return
+    }
+    footerLogo.classList.toggle('active', isActive)
+    compactLogo?.classList.toggle('off', isActive)
+  }
+
+  let armed = false
+  let isRefreshing = false
+  let st = null
+  setActive(false)
+
+  const onRefreshInit = () => {
+    isRefreshing = true
+  }
+
+  const onRefreshComplete = () => {
+    isRefreshing = false
+    // Layout may have pushed the footer out of range — always allow turn-off.
+    if (st && !st.isActive) setActive(false)
+  }
+
+  ScrollTrigger.addEventListener('refreshInit', onRefreshInit)
+  ScrollTrigger.addEventListener('refresh', onRefreshComplete)
+
+  st = ScrollTrigger.create({
+    id: 'footer-logo-swap',
+    trigger,
+    start: 'top 35%',
+    endTrigger: footer,
+    end: 'bottom top',
+    // Only user scroll may turn the logo ON. Refresh-driven enters are ignored.
+    onEnter: () => {
+      if (!armed || isRefreshing) return
+      setActive(true)
+    },
+    onEnterBack: () => {
+      if (!armed || isRefreshing) return
+      setActive(true)
+    },
+    // Leaving may happen from scroll OR from content growing above — always honor.
+    onLeave: () => {
+      if (!armed) return
+      setActive(false)
+    },
+    onLeaveBack: () => {
+      if (!armed) return
+      setActive(false)
+    },
+    invalidateOnRefresh: true,
+    refreshPriority: -40,
+  })
+
+  // When Work/Thinking finish loading, allow a one-shot sync if already in range.
+  const blockedObserver = new MutationObserver(() => {
+    if (!armed) return
+    if (isFooterLogoSwapBlocked()) {
+      setActive(false)
+      return
+    }
+    if (st?.isActive) setActive(true)
+  })
+  blockedObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-footer-logo-blocked'],
+  })
+
+  queueMicrotask(() => {
+    armed = true
+    setActive(false)
+  })
+
+  return {
+    cleanup() {
+      blockedObserver.disconnect()
+      ScrollTrigger.removeEventListener('refreshInit', onRefreshInit)
+      ScrollTrigger.removeEventListener('refresh', onRefreshComplete)
+      st?.kill()
+      setActive(false)
+    },
+  }
+}
+
 function createFooterLogoExtras(footer) {
+  // Circle / icon live on the in-footer trigger, not the pre-footer sentinel.
   const footerLogoTrigger = footer.querySelector('.footer-logo-trigger')
   const circleText = footer.querySelector('.footer-logo-circle-text')
   const logoIcon = footer.querySelector('.footer-logo-icon')
@@ -142,13 +256,15 @@ export function createFooterAnimation(scope) {
     return () => undefined
   }
 
-  // Circle / icon extras stay active; header logo expand–collapse stays behind the flag.
+  // Circle / icon extras + logo swap stay active; header expand–collapse stays behind the flag.
   if (!FOOTER_LOGO_ANIMATION_ENABLED) {
     document.querySelector('#desktop-nav')?.classList.remove(FOOTER_LIGHT_CLASS)
     document.querySelector('.logo-holder')?.classList.remove(FOOTER_LIGHT_CLASS)
 
+    const logoSwap = createFooterLogoSwap(footer)
     const extras = createFooterLogoExtras(footer)
     return () => {
+      logoSwap.cleanup()
       extras.cleanup()
     }
   }

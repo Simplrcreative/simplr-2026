@@ -28,7 +28,7 @@ export default function DefaultPage() {
 
       <section className="post-content text-body px-3 md:px-5 pb-20 bg-white section-light">
         <div className="grid grid-cols-12 w-full">
-          <div className="col-start-4 col-span-6">
+          <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-6">
             
             {content && (
             <RichText html={content} />
