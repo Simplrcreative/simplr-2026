@@ -275,7 +275,7 @@ export default function LandingPage() {
                 </div>
               )}
               {sectionCta && (
-                <div className="button-wrapper md:col-start-7 col-span-6 slide-up-subtle md:mt-4">
+                <div className="button-wrapper col-start-1 col-span-12 md:col-start-7 md:col-span-6 slide-up-subtle md:mt-4">
                   <Link
                     to={sectionCta.url}
                     ref={(el) => { ctaBtnRefs.current[sectionIndex] = el }}
