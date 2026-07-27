@@ -692,7 +692,7 @@ export default function RootLayout() {
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-8">
-            <h1 className={isDarkPageBg ? 'text-white' : 'text-coffee'}>Let&apos;s build something that lasts.</h1>
+            <h1 className={isDarkPageBg ? 'text-white' : 'text-coffee'}>Let&apos;s design something that lasts.</h1>
             <div className="button-wrapper">
               <Link 
                 to="contact"
