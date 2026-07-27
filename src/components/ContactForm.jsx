@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
 import { createBtnHoverAnimation } from '../lib/animations/index.js'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''
+
+const MIN_SUBMIT_MS = 2500
+const HONEYPOT_NAME = 'company_website'
 
 const ENQUIRY_TYPES = [
   { name: 'Strategy', value: 'strategy', bg: 'bg-strategy', text: 'text-coffee' },
@@ -23,7 +27,7 @@ const FIELDS = [
   { label: 'Budget expectation', name: 'budget', type: 'text' },
 ]
 
-const INITIAL_FORM = { name: '', company: '', email: '', budget: '', message: '' }
+const INITIAL_FORM = { name: '', company: '', email: '', budget: '', message: '', [HONEYPOT_NAME]: '' }
 
 function validate(fields) {
   const errors = {}
@@ -37,40 +41,131 @@ function validate(fields) {
   return errors
 }
 
-export default function ContactForm({ style='light', heading='' }) {
+function loadRecaptchaScript() {
+  if (typeof window === 'undefined' || !RECAPTCHA_SITE_KEY) return Promise.resolve()
+  if (window.grecaptcha?.render) return Promise.resolve()
+
+  const existing = document.querySelector('script[data-simplr-recaptcha="true"]')
+  if (existing) {
+    return new Promise((resolve) => {
+      if (window.grecaptcha?.render) {
+        resolve()
+        return
+      }
+      existing.addEventListener('load', () => resolve(), { once: true })
+    })
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'
+    script.async = true
+    script.defer = true
+    script.dataset.simplrRecaptcha = 'true'
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load reCAPTCHA'))
+    document.head.appendChild(script)
+  })
+}
+
+export default function ContactForm({
+  style = 'light',
+  heading = '',
+  buttonClassName = 'btn relative disabled:opacity-50 disabled:cursor-not-allowed',
+}) {
   let textColor = 'text-white'
   let inputColor = 'border-white/40'
   let checkColor = 'bg-white/20 peer-checked:bg-white peer-checked:border-white'
-  if(style === 'dark') {
+  if (style === 'dark') {
     textColor = 'text-coffee'
     inputColor = 'border-coffee/40'
     checkColor = 'bg-coffee/20 peer-checked:bg-coffee peer-checked:border-coffee'
   }
+
   const btnRef = useRef(null)
+  const mountedAtRef = useRef(Date.now())
+  const recaptchaContainerRef = useRef(null)
+  const recaptchaWidgetIdRef = useRef(null)
+  const honeypotId = useId()
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [enquiry, setEnquiry] = useState([])
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle') // 'idle' | 'submitting' | 'success' | 'error'
+  const [recaptchaReady, setRecaptchaReady] = useState(!RECAPTCHA_SITE_KEY)
+  const showForm = status !== 'success'
 
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
+  }, [status])
+
+  useEffect(() => {
+    mountedAtRef.current = Date.now()
   }, [])
-  
+
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY || !showForm) return undefined
+
+    let cancelled = false
+
+    loadRecaptchaScript()
+      .then(() => {
+        if (cancelled || !recaptchaContainerRef.current || !window.grecaptcha) return
+
+        const renderWidget = () => {
+          if (cancelled || recaptchaWidgetIdRef.current !== null) return
+          if (!recaptchaContainerRef.current) return
+
+          recaptchaWidgetIdRef.current = window.grecaptcha.render(recaptchaContainerRef.current, {
+            sitekey: RECAPTCHA_SITE_KEY,
+            theme: style === 'dark' ? 'light' : 'dark',
+          })
+          setRecaptchaReady(true)
+        }
+
+        if (window.grecaptcha.render) {
+          renderWidget()
+          return
+        }
+
+        window.grecaptcha.ready(renderWidget)
+      })
+      .catch((err) => {
+        console.error(err)
+        if (!cancelled) setRecaptchaReady(false)
+      })
+
+    return () => {
+      cancelled = true
+      recaptchaWidgetIdRef.current = null
+    }
+  }, [style, showForm])
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }))
   }
 
   const handleEnquiryChange = (value) => {
     if (value === 'all-services') {
-      setEnquiry(prev => prev.includes('all-services') ? [] : ['all-services'])
+      setEnquiry((prev) => (prev.includes('all-services') ? [] : ['all-services']))
     } else {
-      setEnquiry(prev => {
-        const filtered = prev.filter(v => v !== 'all-services' && v !== value)
+      setEnquiry((prev) => {
+        const filtered = prev.filter((v) => v !== 'all-services' && v !== value)
         return prev.includes(value) ? filtered : [...filtered, value]
       })
     }
+  }
+
+  const resetRecaptcha = () => {
+    if (recaptchaWidgetIdRef.current !== null && window.grecaptcha?.reset) {
+      window.grecaptcha.reset(recaptchaWidgetIdRef.current)
+    }
+  }
+
+  const fakeSuccess = () => {
+    setStatus('success')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleSubmit = async (e) => {
@@ -80,19 +175,45 @@ export default function ContactForm({ style='light', heading='' }) {
       setErrors(validationErrors)
       return
     }
+
+    // Honeypot / timing traps: look successful to bots, never hit EmailJS.
+    const filledTooFast = Date.now() - mountedAtRef.current < MIN_SUBMIT_MS
+    const honeypotFilled = Boolean(formData[HONEYPOT_NAME]?.trim())
+    if (honeypotFilled || filledTooFast) {
+      fakeSuccess()
+      return
+    }
+
+    let recaptchaToken = ''
+    if (RECAPTCHA_SITE_KEY) {
+      recaptchaToken = window.grecaptcha?.getResponse?.(recaptchaWidgetIdRef.current) || ''
+      if (!recaptchaToken) {
+        setErrors((prev) => ({ ...prev, recaptcha: 'Please confirm you are not a robot.' }))
+        return
+      }
+    }
+
     setStatus('submitting')
+    setErrors((prev) => ({ ...prev, recaptcha: undefined }))
+
     try {
+      const payload = {
+        from_name: formData.name,
+        company: formData.company,
+        reply_to: formData.email,
+        budget: formData.budget || 'Not specified',
+        enquiry_types: enquiry.length ? enquiry.join(', ') : 'Not specified',
+        message: formData.message || 'No message provided',
+      }
+
+      if (recaptchaToken) {
+        payload['g-recaptcha-response'] = recaptchaToken
+      }
+
       await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
-        {
-          from_name: formData.name,
-          company: formData.company,
-          reply_to: formData.email,
-          budget: formData.budget || 'Not specified',
-          enquiry_types: enquiry.length ? enquiry.join(', ') : 'Not specified',
-          message: formData.message || 'No message provided',
-        },
+        payload,
         { publicKey: EMAILJS_PUBLIC_KEY },
       )
       setStatus('success')
@@ -100,6 +221,7 @@ export default function ContactForm({ style='light', heading='' }) {
     } catch (err) {
       console.error('EmailJS error:', err)
       setStatus('error')
+      resetRecaptcha()
     }
   }
 
@@ -111,12 +233,33 @@ export default function ContactForm({ style='light', heading='' }) {
           <p className="opacity-60 max-w-[48ch]">Your enquiry has been received. Someone from the Simplr team will reach out to you shortly.</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} noValidate className={`flex flex-col gap-9 ${textColor}`}>
-          {heading &&(
-            <p className="text-[22px] leading-6">
-              <strong className="font-medium">{heading}</strong>
+        <form onSubmit={handleSubmit} noValidate className={`relative flex flex-col gap-9 ${textColor}`}>
+          {heading ? (
+            <p className="text-[22px] leading-6 md:text-[22px]">
+              {typeof heading === 'string' ? (
+                <strong className="font-medium">{heading}</strong>
+              ) : (
+                heading
+              )}
             </p>
-          )}
+          ) : null}
+
+          {/* Honeypot — hidden from people, attractive to bots */}
+          <div
+            aria-hidden="true"
+            className="absolute -left-[10000px] top-auto h-0 w-0 overflow-hidden opacity-0"
+          >
+            <label htmlFor={honeypotId}>Company website</label>
+            <input
+              id={honeypotId}
+              type="text"
+              name={HONEYPOT_NAME}
+              value={formData[HONEYPOT_NAME]}
+              onChange={handleChange}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
 
           <div className="flex flex-col gap-7">
             {FIELDS.map(({ label, name, type }) => (
@@ -130,7 +273,7 @@ export default function ContactForm({ style='light', heading='' }) {
                     value={formData[name]}
                     onChange={handleChange}
                     placeholder=" "
-                    className={`bg-transparent border-b  outline-none pb-2 w-full ${inputColor} ${textColor}`}
+                    className={`bg-transparent border-b outline-none pb-2 w-full ${inputColor} ${textColor}`}
                   />
                 </div>
                 {errors[name] && (
@@ -139,11 +282,11 @@ export default function ContactForm({ style='light', heading='' }) {
               </div>
             ))}
 
-            <div className="flex gap-[50px] items-start">
+            <div className="flex flex-col md:flex-row gap-[50px] items-start">
               <span className="text-base shrink-0">Type of enquiry</span>
               <div className="flex flex-col gap-[5px]">
                 {ENQUIRY_TYPES.map(({ name, value, bg, text }) => (
-                  <label key={value} className="flex items-center cursor-pointer">
+                  <label key={value} className="flex items-center cursor-pointer gap-1">
                     <input
                       type="checkbox"
                       name="enquiry"
@@ -167,21 +310,35 @@ export default function ContactForm({ style='light', heading='' }) {
                 value={formData.message}
                 onChange={handleChange}
                 placeholder=" "
-                className={`bg-transparent border-b outline-none text-coffee resize-none h-[100px] w-full ${inputColor}`}
+                className={`bg-transparent border-b outline-none resize-none h-[100px] w-full ${inputColor} ${textColor}`}
               />
             </div>
           </div>
+
+          <div className="flex flex-col md:flex-row justify-between">
+
+          {RECAPTCHA_SITE_KEY ? (
+            <div className="flex flex-col gap-2">
+              <div ref={recaptchaContainerRef} />
+              {!recaptchaReady && (
+                <p className={`text-sm opacity-60 ${textColor}`}>Loading verification…</p>
+              )}
+              {errors.recaptcha && (
+                <p className="text-sm text-red-400">{errors.recaptcha}</p>
+              )}
+            </div>
+          ) : null}
 
           {status === 'error' && (
             <p className="text-sm text-red-400">Something went wrong — please try again or email us directly at <a href="mailto:hello@simplr.co.za" className="underline">hello@simplr.co.za</a>.</p>
           )}
 
-          <div className="flex justify-end">
+          
             <button
               ref={btnRef}
               type="submit"
-              disabled={status === 'submitting'}
-              className="btn relative disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={status === 'submitting' || (Boolean(RECAPTCHA_SITE_KEY) && !recaptchaReady)}
+              className={buttonClassName}
             >
               <span>{status === 'submitting' ? 'Sending…' : 'Send enquiry'}</span>
             </button>
