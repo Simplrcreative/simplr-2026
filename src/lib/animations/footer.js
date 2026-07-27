@@ -121,7 +121,7 @@ function createFooterLogoSwap(footer) {
   st = ScrollTrigger.create({
     id: 'footer-logo-swap',
     trigger,
-    start: 'top 35%',
+    start: 'top 20%',
     endTrigger: footer,
     end: 'bottom top',
     // Only user scroll may turn the logo ON. Refresh-driven enters are ignored.
