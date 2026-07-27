@@ -4,6 +4,7 @@ import { prefetchRoute, useRoutePrefetch } from '../lib/useRoutePrefetch.js'
 import BrandLogo from '../components/BrandLogo.jsx'
 import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
+import CookieConsent from '../components/CookieConsent.jsx'
 import { gsap } from 'gsap'
 import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform } from '../lib/animations/index.js'
 import { useHasFinePointer } from '../lib/use-is-touch-device.js'
@@ -833,7 +834,8 @@ export default function RootLayout() {
           </footer>
         </>
       ) : null}
-      
+
+      <CookieConsent />
     </div>
   )
 }
