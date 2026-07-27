@@ -318,7 +318,7 @@ export default function ContactForm({
           <div className="flex flex-col md:flex-row justify-between">
 
           {RECAPTCHA_SITE_KEY ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mb-5 md:mb-0">
               <div ref={recaptchaContainerRef} />
               {!recaptchaReady && (
                 <p className={`text-sm opacity-60 ${textColor}`}>Loading verification…</p>
