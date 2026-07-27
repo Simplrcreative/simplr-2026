@@ -9,6 +9,7 @@ const FOOTER_LIGHT_CLASS = 'footer'
 /**
  * Header logo / tagline expand–collapse at the footer.
  * Kept in this file but disabled while we simplify — flip to `true` to restore.
+ * Circle text + footer logo icon extras still run when this is `false`.
  */
 export const FOOTER_LOGO_ANIMATION_ENABLED = false
 
@@ -75,7 +76,6 @@ function createFooterLogoExtras(footer) {
       scrollTrigger: {
         trigger: footerLogoTrigger,
         start: 'top 95%',
-        markers: true,
         toggleActions: 'restart none restart reset',
         invalidateOnRefresh: false,
         refreshPriority: -30,
@@ -135,16 +135,24 @@ export function createFooterAnimation(scope) {
     return () => undefined
   }
 
-  // Animation disabled — scripts below remain for a later pass.
-  if (!FOOTER_LOGO_ANIMATION_ENABLED) {
-    document.querySelector('#desktop-nav')?.classList.remove(FOOTER_LIGHT_CLASS)
-    document.querySelector('.logo-holder')?.classList.remove(FOOTER_LIGHT_CLASS)
-    return () => undefined
-  }
-
   registerPlugins()
 
   const footer = scope.matches?.('footer') ? scope : scope.querySelector('footer')
+  if (!footer) {
+    return () => undefined
+  }
+
+  // Circle / icon extras stay active; header logo expand–collapse stays behind the flag.
+  if (!FOOTER_LOGO_ANIMATION_ENABLED) {
+    document.querySelector('#desktop-nav')?.classList.remove(FOOTER_LIGHT_CLASS)
+    document.querySelector('.logo-holder')?.classList.remove(FOOTER_LIGHT_CLASS)
+
+    const extras = createFooterLogoExtras(footer)
+    return () => {
+      extras.cleanup()
+    }
+  }
+
   const logo = document.querySelector('.logo')
   const implrPaths = Array.from(document.querySelectorAll('#logo-implr g'))
   const logoS = document.querySelector('#logo-s')
