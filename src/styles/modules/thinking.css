@@ -140,7 +140,7 @@
 .post-content ul li::before {
   content: '';
   position: absolute;
-  top: 7px;
+  top: 11px;
   left: 0px;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="11" viewBox="0 0 22 11" fill="none"><rect width="21.1707" height="10.2439" rx="5.12195" fill="%23300F1D"/></svg>');
   background-repeat: no-repeat;
