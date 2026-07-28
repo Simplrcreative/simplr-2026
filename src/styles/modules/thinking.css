@@ -60,7 +60,6 @@
     gap: 4rem 1.125rem;
   }
 }
-
 @media (max-width: 767px) {
   .thinking-posts-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -90,12 +89,14 @@
   }
 }
 .post-content h2 {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
+  font-weight: 500;
   margin: 3rem 0 1.875rem 0;
 }
 .post-content h2:first-child {
   margin-top: 0;
 }
+
 .post-content h3 {
   font-family: var(--font-aeonik);
   font-size: 1.125rem;
@@ -178,4 +179,9 @@
 .post-hero span.category {
   display:inline-block;
   transform: translateY(-3px)
+}
+ @media (min-width: 768px) {
+  .post-content h2 {
+    font-size: 1.5rem;
+  }
 }
