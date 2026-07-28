@@ -326,9 +326,10 @@ nav.light a.is-active .nav-link__orb {
 }
 
 .compact-logo {
+    transform-origin: left top;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .compact-logo-active .logo-holder {
@@ -350,9 +351,17 @@ nav.light a.is-active .nav-link__orb {
     fill: white;
 }
 .compact-logo.off {
-    opacity: 0 !important;
-    visibility: hidden;
+    
+    opacity: 0!important;
+    transform: scale(1.2);
+    z-index: 1003;
     pointer-events: none;
+    transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+}
+@media (min-width: 768px) {
+    .compact-logo.off {
+        transform: scale(1.5);
+    }
 }
 
 .tagline {

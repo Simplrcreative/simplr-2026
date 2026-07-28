@@ -205,12 +205,12 @@
   pointer-events: none;
   transform-origin: left top;
   transform: scale(1);
-  transition: opacity 0.5s ease, transform 0.5s ease
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 .footer-logo.active {
   opacity: 1;
   transform: scale(1.2);
-  transition: opacity 0.5s ease, transform 0.5s ease 0.1s;
+  transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
 }
 .footer-logo svg {
   width: 175px;
