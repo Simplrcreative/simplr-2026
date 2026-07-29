@@ -200,7 +200,7 @@
   position: fixed;
   top: 1.25rem;
   left: 1.25rem;
-  z-index: 1002;
+  z-index: 2000;
   opacity: 0;
   pointer-events: none;
   transform-origin: left top;
