@@ -162,6 +162,8 @@ export default function RootLayout() {
   const deferredNavigationState = useDeferredValue(navigationState)
   const isNavigating = deferredNavigationState !== 'idle'
   const btnRef = useRef(null)
+  const menuButtonRef = useRef(null)
+  const mobileNavRef = useRef(null)
   const footerNavigation = navigation.filter(({ key }) => key !== 'thinking')
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
   const playHomeHeroIntro = shouldRunHomeIntroAnimations || returningToHomeRef.current || cameFromNonHome
@@ -176,11 +178,13 @@ export default function RootLayout() {
     setIsNavOpen((open) => {
       if (open) {
         unlockScroll('nav')
+        // Prefer leaving focus on the control when the user closes it directly.
+        queueMicrotask(() => menuButtonRef.current?.focus())
         return false
       }
       // Freeze the menu theme to the page that opened it so a dark→light (or
       // light→dark) navigation cannot recolour the open panel mid-transition.
-      const nav = document.getElementById('mobile-nav')
+      const nav = mobileNavRef.current || document.getElementById('mobile-nav')
       if (nav) {
         nav.dataset.menuBg = document.documentElement.dataset.pageBg || 'light'
       }
@@ -188,6 +192,33 @@ export default function RootLayout() {
       return true
     })
   }, [])
+
+  // Escape-to-close + focus move into / back out of the panel.
+  useEffect(() => {
+    const nav = mobileNavRef.current
+    if (nav) {
+      if (isNavOpen) nav.removeAttribute('inert')
+      else nav.setAttribute('inert', '')
+    }
+
+    if (!isNavOpen) return undefined
+
+    const onKeyDown = (event) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      closeMobileNav()
+      menuButtonRef.current?.focus()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+
+    const firstLink = nav?.querySelector('a')
+    firstLink?.focus()
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [isNavOpen, closeMobileNav])
 
   useEffect(() => {
     window.dispatchEvent(new Event('app-shell-ready'))
@@ -600,20 +631,30 @@ export default function RootLayout() {
         </Link>
       </div>
 
-      <div className={`menu-icon fixed top-[1.75rem] right-[1.75rem] md:right-[2.75rem] md:top-[2.75rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`} onClick={toggleMobileNav}>
-        <div className="flex flex-col gap-[0.25rem]">
-          <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
-          <div className="menu-icon-dot w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
-        </div>
-        <div className="flex flex-col gap-[0.25rem]">
-          <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
-          <div className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white"></div>
-        </div>
-      </div>
+      <button
+        ref={menuButtonRef}
+        type="button"
+        className={`menu-icon fixed top-[1.75rem] right-[1.75rem] md:right-[2.75rem] md:top-[2.75rem] w-[1.75rem] h-[1.75rem] bg-black rounded-full flex justify-center items-center ${isNavOpen ? ' active' : ''}`}
+        aria-label={isNavOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={isNavOpen}
+        aria-controls="mobile-nav"
+        onClick={toggleMobileNav}
+      >
+        <span className="flex flex-col gap-[0.25rem]" aria-hidden="true">
+          <span className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white" />
+          <span className="menu-icon-dot w-[0.35rem] h-[0.35rem] rounded-full bg-white" />
+        </span>
+        <span className="flex flex-col gap-[0.25rem]" aria-hidden="true">
+          <span className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white" />
+          <span className="menu-icon-dot-alt w-[0.35rem] h-[0.35rem] rounded-full bg-white" />
+        </span>
+      </button>
 
       <nav
+        ref={mobileNavRef}
         id="mobile-nav"
         className={`main flex flex-col lg:hidden flex-wrap items-start gap-[2.5rem]${isNavOpen ? ' active' : ''}`}
+        aria-hidden={!isNavOpen}
       >
         {navigation.map((item) => {
           const prefetch = useRoutePrefetch(item.path)
@@ -725,7 +766,7 @@ export default function RootLayout() {
         
         <div className="grid grid-cols-12">
           <div className="col-start-1 col-span-12 md:col-span-8">
-            <h1 className={isDarkPageBg ? 'text-white' : 'text-coffee'}>Let&apos;s design something that lasts.</h1>
+            <h2 className={`h1 ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>Let&apos;s design something that lasts.</h2>
             <div className="button-wrapper">
               <Link 
                 to="contact"

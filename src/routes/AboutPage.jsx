@@ -774,7 +774,7 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 gap-y-5 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
           <div className="trigger-split-text md:col-span-4 px-3 md:px-5">
             <div className="eyebrow">FAQs</div>
-            <h1 className="split-text">Have questions?</h1>
+            <h2 className="h1 split-text">Have questions?</h2>
           </div>
 
           {activeFaq && (

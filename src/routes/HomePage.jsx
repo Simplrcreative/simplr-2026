@@ -969,7 +969,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         <div className="grid grid-cols-1 gap-y-5 md:grid-cols-12 md:gap-x-5 md:gap-y-12 slide-up">
           <div className="px-3 md:px-5 trigger-split-text-coffee md:col-span-4">
             <div className="eyebrow">FAQs</div>
-            <h1 className="split-text-coffee">Have questions?</h1>
+            <h2 className="h1 split-text-coffee">Have questions?</h2>
           </div>
 
           {activeFaq && (

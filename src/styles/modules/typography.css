@@ -9,6 +9,7 @@ h1, h2, h3, h4, h5 {
     white-space: nowrap;
 }
 h1, 
+.h1,
 h2.section-heading {
     font-size: clamp(1.35rem, 4vw, 3.125rem);
 }
@@ -73,12 +74,14 @@ h2.section-heading span {
     transform: translateX(200vw);
     opacity: 1
 }
-h1.large {
+h1.large,
+.h1.large {
     font-size: 2rem;
     line-height: 1;
 }
 @media (min-width: 768px) {
-    h1.large {
+    h1.large,
+    .h1.large {
         font-size: clamp(4rem, 4vw, 5.3rem);
     }
     .lead {

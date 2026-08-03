@@ -149,9 +149,20 @@ nav.light a.is-active .nav-link__orb {
         cursor: pointer;
         z-index: 100051;
         transition: transform 0.25s ease;
-        mix-blend-mode:difference;
+        mix-blend-mode: difference;
         gap: 0.25rem;
         transform: rotate(0);
+        border: 0;
+        padding: 0;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .menu-icon:focus {
+        outline: none;
+    }
+    .menu-icon:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 3px;
     }
     .menu-icon.active  {
         transform: rotate(-90deg)!important
