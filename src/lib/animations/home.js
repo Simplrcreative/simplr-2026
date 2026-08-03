@@ -13,13 +13,13 @@ function registerPlugins() {
 export function setIntroHeroInitialState(section) {
     if (!section) return
 
-    const heroVideo = section.querySelector('.hero-video')
+    const heroVideoFrame = section.querySelector('.hero-video-frame') || section.querySelector('.hero-video')
     const heroTitle = section.querySelector('.hero-title')
     const mobilePlayIcon = section.querySelector('.play-icon-mobile')
     const isMobile = window.matchMedia('(max-width: 767.9px)').matches
 
-    if (heroVideo) {
-        gsap.set(heroVideo, {
+    if (heroVideoFrame) {
+        gsap.set(heroVideoFrame, {
             autoAlpha: 0,
             scale: 0.1,
             transformOrigin: 'bottom right',
@@ -49,13 +49,13 @@ export function setIntroHeroInitialState(section) {
 export function createIntroVideoAnimation(section, delay = 0) {
     if (!section) return () => undefined
 
-    const heroVideo = section.querySelector('.hero-video')
-    if (!heroVideo) return () => undefined
+    const heroVideoFrame = section.querySelector('.hero-video-frame') || section.querySelector('.hero-video')
+    if (!heroVideoFrame) return () => undefined
 
     const mobilePlayIcon = section.querySelector('.play-icon-mobile')
     const isMobile = window.matchMedia('(max-width: 767.9px)').matches
 
-    gsap.set(heroVideo, {
+    gsap.set(heroVideoFrame, {
         autoAlpha: 0,
         scale: 0.1,
         transformOrigin: 'bottom right',
@@ -73,7 +73,7 @@ export function createIntroVideoAnimation(section, delay = 0) {
 
     const heroVideoIntro = gsap.timeline({ delay })
 
-    heroVideoIntro.to(heroVideo, {
+    heroVideoIntro.to(heroVideoFrame, {
         autoAlpha: 1,
         scale: 1,
         duration: 1,
@@ -99,7 +99,7 @@ export function createIntroVideoAnimation(section, delay = 0) {
 
     return () => {
         heroVideoIntro.kill()
-        gsap.set(heroVideo, { clearProps: 'opacity,visibility,transform,willChange' })
+        gsap.set(heroVideoFrame, { clearProps: 'opacity,visibility,transform,willChange' })
         if (mobilePlayIcon && isMobile) {
             gsap.set(mobilePlayIcon, { clearProps: 'opacity,visibility,transform,willChange' })
         }

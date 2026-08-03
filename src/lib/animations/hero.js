@@ -441,7 +441,9 @@ export function createHeroScrollAnimation(scope) {
   media.add('(prefers-reduced-motion: no-preference)', () => {
     const section = scope.matches?.('.landing') ? scope : scope.querySelector('.landing')
     const heroTitle = section?.querySelector('.hero-title')
-    const heroImage = section?.querySelector('.hero-video')
+    const heroVideo = section?.querySelector('.hero-video')
+    // Prefer the frame so poster + video scroll/scale as one composition.
+    const heroImage = section?.querySelector('.hero-video-frame') || heroVideo
     const mobilePlayIcon = section?.querySelector('.play-icon-mobile')
     const heroVideoHolder = section?.querySelector('.hero-video-holder')
     const navHolder = document.querySelector('.nav-holder')
@@ -796,33 +798,35 @@ export function createHeroScrollAnimation(scope) {
 
     window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, refreshTrigger)
 
-    // Handle both image and video elements
-    const isVideo = heroImage.tagName === 'VIDEO'
-    
-    if (isVideo) {
-      // For video elements, start animation immediately or when metadata is loaded
-      if (heroImage.readyState >= 1) {
-        // Video metadata already loaded
+    // Frame has CSS aspect-ratio, so it is measurable without waiting on media.
+    // Fall back to video metadata / poster image load when there is no frame.
+    const posterImg = heroImage?.querySelector?.('.hero-video-poster img')
+    const waitTarget = heroVideo || posterImg || heroImage
+    const isVideo = waitTarget?.tagName === 'VIDEO'
+    const isFrame = heroImage?.classList?.contains('hero-video-frame')
+
+    if (isFrame) {
+      initialise()
+    } else if (isVideo) {
+      if (waitTarget.readyState >= 1) {
         initialise()
       } else {
-        // Wait for video metadata to load
-        heroImage.addEventListener('loadedmetadata', initialise, { once: true })
+        waitTarget.addEventListener('loadedmetadata', initialise, { once: true })
       }
+    } else if (waitTarget?.complete && waitTarget.naturalWidth > 0) {
+      initialise()
+    } else if (waitTarget) {
+      waitTarget.addEventListener('load', initialise, { once: true })
+      waitTarget.decode?.().then(initialise).catch(() => undefined)
     } else {
-      // For image elements
-      if (heroImage.complete && heroImage.naturalWidth > 0) {
-        initialise()
-      } else {
-        heroImage.addEventListener('load', initialise, { once: true })
-        heroImage.decode?.().then(initialise).catch(() => undefined)
-      }
+      initialise()
     }
 
     return () => {
       isDisposed = true
       window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, refreshTrigger)
-      heroImage.removeEventListener('loadedmetadata', initialise)
-      heroImage.removeEventListener('load', initialise)
+      waitTarget?.removeEventListener?.('loadedmetadata', initialise)
+      waitTarget?.removeEventListener?.('load', initialise)
       timeline?.kill()
       changeLogoWatcher?.kill()
       sectionThemeWatcher?.kill()

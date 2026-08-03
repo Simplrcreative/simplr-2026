@@ -1023,6 +1023,14 @@ const homeHeroMediaQuery = `
         acfHeroVideoPoster {
           node {
             guid
+            sourceUrl
+            altText
+            mediaDetails {
+              sizes {
+                name
+                sourceUrl
+              }
+            }
           }
         }
         acfHeroVideoFull {
@@ -1173,6 +1181,8 @@ async function fetchHomeHeroMediaData() {
   if (!wpConfig.endpoint) {
     return {
       heroVideoPoster: '',
+      heroVideoPosterDisplay: '',
+      heroVideoPosterMobile: '',
       heroVideoPosterAlt: '',
       heroVideoLoop: '',
       heroVideoFull: '',
@@ -1180,19 +1190,25 @@ async function fetchHomeHeroMediaData() {
   }
 
   try {
-    const result = await remember('home:hero-media', () => graphQlRequest(homeHeroMediaQuery))
+    const result = await remember('home:hero-media:v2', () => graphQlRequest(homeHeroMediaQuery))
     const acfHomeBuilder = result?.page?.acfHomeBuilder
+    const posterNode = acfHomeBuilder?.acfHeroVideoPoster?.node
+    const posterFull = getMediaSourceUrl(posterNode, 'full') || posterNode?.guid || ''
 
     return {
       heroVideoLoop: acfHomeBuilder?.acfHeroVideoLoop?.node?.guid ?? '',
-      heroVideoPoster: acfHomeBuilder?.acfHeroVideoPoster?.node?.guid ?? '',
-      heroVideoPosterAlt: '',
+      heroVideoPoster: posterFull,
+      heroVideoPosterDisplay: getMediaSourceUrl(posterNode, 'medium_large') || posterFull,
+      heroVideoPosterMobile: getMediaSourceUrl(posterNode, 'medium_large') || getMediaSourceUrl(posterNode, 'medium') || posterFull,
+      heroVideoPosterAlt: posterNode?.altText || 'Simplr showreel',
       heroVideoFull: acfHomeBuilder?.acfHeroVideoFull?.node?.guid ?? '',
     }
   } catch (error) {
     reportError('Unable to load home hero media', error)
     return {
       heroVideoPoster: '',
+      heroVideoPosterDisplay: '',
+      heroVideoPosterMobile: '',
       heroVideoPosterAlt: '',
       heroVideoLoop: '',
       heroVideoFull: '',

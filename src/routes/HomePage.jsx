@@ -48,6 +48,8 @@ const HOME_PAGE_FALLBACK = {
     heroVideoLoop: '',
     heroVideoFull: '',
     heroVideoPoster: '',
+    heroVideoPosterDisplay: '',
+    heroVideoPosterMobile: '',
     heroVideoPosterAlt: 'Hero video poster',
   },
   featuredWork: [],
@@ -79,13 +81,22 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const heroVideoLoop = page.heroVideoLoop ?? ''
   const heroVideoFull = page.heroVideoFull ?? ''
   const heroVideoPoster = page.heroVideoPoster ?? ''
+  const heroVideoPosterDisplay = page.heroVideoPosterDisplay || heroVideoPoster
+  const heroVideoPosterMobile = page.heroVideoPosterMobile || heroVideoPosterDisplay
   const heroVideoPosterAlt = page.heroVideoPosterAlt ?? 'Hero video poster'
   const hasHeroFullVideo = Boolean(heroVideoFull)
+  const heroPosterSrc = heroVideoPosterMobile
+    ? `${heroVideoPosterMobile}.webp`
+    : ''
+  const heroPosterDesktopSrc = heroVideoPosterDisplay
+    ? `${heroVideoPosterDisplay}.webp`
+    : heroPosterSrc
 
   const [activeFaqIndex, setActiveFaqIndex] = useState(0)
   const [isHeroModalMounted, setIsHeroModalMounted] = useState(false)
   const [isHeroModalOpen, setIsHeroModalOpen] = useState(false)
   const [isHeroModalPlaybackReady, setIsHeroModalPlaybackReady] = useState(false)
+  const [isHeroVideoReady, setIsHeroVideoReady] = useState(false)
   const isHeroModalVisible = isHeroModalMounted
 
   // Set up surface colour transitions immediately — elements exist now that HomePageContent
@@ -269,13 +280,16 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   // Video visibility and loop management.
   // Native `loop` has no 'loop' event — use `ended` + manual replay to cap plays.
+  // Keep the poster visible until the first frame is ready so mobile never flashes black.
   useEffect(() => {
     const video = heroVideoRef.current
-    if (!video) return
+    if (!video || !heroVideoLoop) return
 
     let playCount = 0
     const MAX_PLAYS = 3
     let isInView = false
+
+    const markReady = () => setIsHeroVideoReady(true)
 
     const canPlay = () => isInView && !document.hidden && playCount < MAX_PLAYS
 
@@ -316,6 +330,12 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       { threshold: 0.3 },
     )
 
+    if (video.readyState >= 2) {
+      markReady()
+    } else {
+      video.addEventListener('loadeddata', markReady, { once: true })
+    }
+
     observer.observe(video)
     video.addEventListener('ended', onEnded)
     document.addEventListener('visibilitychange', onVisibilityChange)
@@ -323,10 +343,11 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     return () => {
       observer.disconnect()
       video.removeEventListener('ended', onEnded)
+      video.removeEventListener('loadeddata', markReady)
       document.removeEventListener('visibilitychange', onVisibilityChange)
       video.pause()
     }
-  }, [])
+  }, [heroVideoLoop])
 
   // Close hero modal when pressing Escape
   useEffect(() => {
@@ -706,15 +727,40 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                     <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
                   </svg>
                 </div>
-                <video
-                  ref={heroVideoRef}
-                  className="hero-video block w-full aspect-[16/10] object-cover overflow-hidden rounded-[10px]"
-                  muted
-                  playsInline
-                  poster={heroVideoPoster || undefined}
-                >
-                  {heroVideoLoop ? <source src={heroVideoLoop} type="video/mp4" /> : null}
-                </video>
+                <div className="hero-video-frame relative w-full aspect-[16/10] overflow-hidden rounded-[10px]">
+                  {heroPosterSrc ? (
+                    <picture className="hero-video-poster absolute inset-0 block h-full w-full">
+                      {heroPosterDesktopSrc && heroPosterDesktopSrc !== heroPosterSrc ? (
+                        <source
+                          media="(min-width: 768px)"
+                          srcSet={heroPosterDesktopSrc}
+                          type="image/webp"
+                        />
+                      ) : null}
+                      <source srcSet={heroPosterSrc} type="image/webp" />
+                      <img
+                        src={heroPosterSrc}
+                        alt={heroVideoPosterAlt}
+                        className="absolute inset-0 block h-full w-full object-cover"
+                        width={768}
+                        height={480}
+                        decoding="async"
+                        fetchPriority="high"
+                        loading="eager"
+                      />
+                    </picture>
+                  ) : null}
+                  <video
+                    ref={heroVideoRef}
+                    className={`hero-video absolute inset-0 block h-full w-full object-cover ${isHeroVideoReady ? 'is-ready' : ''}`}
+                    muted
+                    playsInline
+                    preload="metadata"
+                    poster={heroPosterSrc || (heroVideoPoster ? `${heroVideoPoster}.webp` : undefined)}
+                  >
+                    {heroVideoLoop ? <source src={heroVideoLoop} type="video/mp4" /> : null}
+                  </video>
+                </div>
               </button>
             </div>
           </div>
@@ -745,10 +791,9 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
               controls
               autoPlay={isHeroModalPlaybackReady}
               playsInline
-              poster=''
+              poster={heroPosterDesktopSrc || heroPosterSrc || undefined}
             >
               {isHeroModalPlaybackReady ? <source src={heroVideoFull} type="video/mp4" /> : null}
-              {heroVideoPoster ? <img src={heroVideoPoster} alt={heroVideoPosterAlt} /> : null}
             </video>
           </div>
         </div>
