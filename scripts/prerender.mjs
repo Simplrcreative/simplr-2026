@@ -311,6 +311,25 @@ async function waitForRenderedPage(page) {
     return title.length > 0 && title !== 'Simplr'
   }, { timeout: 20000 }).catch(() => undefined)
 
+  // Ensure Helmet has written the real description (not just the shell title).
+  await page.waitForFunction(() => {
+    const metas = Array.from(document.querySelectorAll('meta[name="description"]'))
+    return metas.some((meta) => {
+      const content = (meta.getAttribute('content') || '').trim()
+      return Boolean(content) && !content.includes('headless WordPress scaffold')
+    })
+  }, { timeout: 20000 }).catch(() => undefined)
+
+  // Drop any leftover shell description tags so only Helmet's remains.
+  await page.evaluate(() => {
+    document.querySelectorAll('meta[name="description"]:not([data-rh])').forEach((meta) => {
+      meta.remove()
+    })
+    document.querySelectorAll('meta[name="robots"]:not([data-rh])').forEach((meta) => {
+      meta.remove()
+    })
+  })
+
   await page.waitForTimeout(500)
 }
 

@@ -9,7 +9,14 @@ import {
 } from '../lib/seo.js'
 
 function toFullTitle(title) {
-  return title ? `${title} | ${siteConfig.name}` : siteConfig.name
+  if (!title) return siteConfig.name
+
+  const suffix = ` | ${siteConfig.name}`
+  if (title === siteConfig.name || title.endsWith(suffix)) {
+    return title
+  }
+
+  return `${title}${suffix}`
 }
 
 export default function Seo({
