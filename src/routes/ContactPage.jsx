@@ -38,7 +38,7 @@ export default function ContactPage() {
           </div>
           <div className="col-start-1 col-span-12 lg:col-start-7 lg:col-span-6 xl:col-start-8 xl:col-span-5 pt-10 md:pt-20">
             <ContactForm
-              style="light"
+              variant="light"
               buttonClassName="btn alt relative disabled:opacity-50 disabled:cursor-not-allowed"
               heading={
                 <>

@@ -8,7 +8,9 @@ const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY || ''
 
 const MIN_SUBMIT_MS = 2500
-const HONEYPOT_NAME = 'company_website'
+// Obscure name on purpose — "company" / "website" honeypots get autofilled and
+// then silently fake-succeed without hitting EmailJS.
+const HONEYPOT_NAME = 'ne_hp_field'
 
 const ENQUIRY_TYPES = [
   { name: 'Strategy', value: 'strategy', bg: 'bg-strategy', text: 'text-coffee' },
@@ -69,14 +71,17 @@ function loadRecaptchaScript() {
 }
 
 export default function ContactForm({
-  style = 'light',
+  variant = 'light',
+  // Back-compat: LandingPage historically passed `style="dark"`.
+  style: legacyStyle,
   heading = '',
   buttonClassName = 'btn relative disabled:opacity-50 disabled:cursor-not-allowed',
 }) {
+  const tone = legacyStyle || variant
   let textColor = 'text-white'
   let inputColor = 'border-white/40'
   let checkColor = 'bg-white/20 peer-checked:bg-white peer-checked:border-white'
-  if (style === 'dark') {
+  if (tone === 'dark') {
     textColor = 'text-coffee'
     inputColor = 'border-coffee/40'
     checkColor = 'bg-coffee/20 peer-checked:bg-coffee peer-checked:border-coffee'
@@ -107,6 +112,13 @@ export default function ContactForm({
 
     let cancelled = false
 
+    const clearWidget = () => {
+      if (recaptchaContainerRef.current) {
+        recaptchaContainerRef.current.innerHTML = ''
+      }
+      recaptchaWidgetIdRef.current = null
+    }
+
     loadRecaptchaScript()
       .then(() => {
         if (cancelled || !recaptchaContainerRef.current || !window.grecaptcha) return
@@ -115,11 +127,20 @@ export default function ContactForm({
           if (cancelled || recaptchaWidgetIdRef.current !== null) return
           if (!recaptchaContainerRef.current) return
 
-          recaptchaWidgetIdRef.current = window.grecaptcha.render(recaptchaContainerRef.current, {
-            sitekey: RECAPTCHA_SITE_KEY,
-            theme: style === 'dark' ? 'light' : 'dark',
-          })
-          setRecaptchaReady(true)
+          // Fresh node each render — grecaptcha throws if the element was used before.
+          clearWidget()
+
+          try {
+            recaptchaWidgetIdRef.current = window.grecaptcha.render(recaptchaContainerRef.current, {
+              sitekey: RECAPTCHA_SITE_KEY,
+              theme: tone === 'dark' ? 'light' : 'dark',
+            })
+            setRecaptchaReady(true)
+          } catch (err) {
+            console.error(err)
+            clearWidget()
+            if (!cancelled) setRecaptchaReady(false)
+          }
         }
 
         if (window.grecaptcha.render) {
@@ -136,9 +157,9 @@ export default function ContactForm({
 
     return () => {
       cancelled = true
-      recaptchaWidgetIdRef.current = null
+      clearWidget()
     }
-  }, [style, showForm])
+  }, [tone, showForm])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -180,7 +201,19 @@ export default function ContactForm({
     const filledTooFast = Date.now() - mountedAtRef.current < MIN_SUBMIT_MS
     const honeypotFilled = Boolean(formData[HONEYPOT_NAME]?.trim())
     if (honeypotFilled || filledTooFast) {
+      if (import.meta.env.DEV) {
+        console.warn('[ContactForm] Bot trap triggered — skipping EmailJS', {
+          honeypotFilled,
+          filledTooFast,
+        })
+      }
       fakeSuccess()
+      return
+    }
+
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+      console.error('[ContactForm] Missing EmailJS env vars')
+      setStatus('error')
       return
     }
 
@@ -226,14 +259,14 @@ export default function ContactForm({
   }
 
   return (
-    <div className={`contact-form ${style}`}>
+    <div className={`contact-form ${tone}`}>
       {status === 'success' ? (
         <div className={`flex flex-col gap-6 py-10 ${textColor}`}>
           <p className="text-[22px] leading-6 font-medium">Thank you — we&apos;ll be in touch shortly.</p>
           <p className="opacity-60 max-w-[48ch]">Your enquiry has been received. Someone from the Simplr team will reach out to you shortly.</p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} noValidate className={`relative flex flex-col gap-9 ${textColor}`}>
+        <form onSubmit={handleSubmit} noValidate className={`relative flex flex-col gap-9 ${textColor}`} autoComplete="on">
           {heading ? (
             <p className="text-[22px] leading-6 md:text-[22px]">
               {typeof heading === 'string' ? (
@@ -244,12 +277,12 @@ export default function ContactForm({
             </p>
           ) : null}
 
-          {/* Honeypot — hidden from people, attractive to bots */}
+          {/* Honeypot — hidden from people; obscure name avoids browser autofill */}
           <div
             aria-hidden="true"
             className="absolute -left-[10000px] top-auto h-0 w-0 overflow-hidden opacity-0"
           >
-            <label htmlFor={honeypotId}>Company website</label>
+            <label htmlFor={honeypotId}>Leave blank</label>
             <input
               id={honeypotId}
               type="text"
@@ -258,6 +291,8 @@ export default function ContactForm({
               onChange={handleChange}
               tabIndex={-1}
               autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
           </div>
 
