@@ -29,8 +29,8 @@ export default function IntroOverlay({ shouldFadeOut = false, onFadeOutComplete 
     // Hold the overlay in place; fade out is handled by RootLayout state
     gsap.set(overlayNode, { autoAlpha: 1 })
 
-    // Sequential looping dot animation: each dot slides out then back before the next starts
-    // 5 dots × 0.6s each = 3s per cycle — matches the minimum timer in RootLayout
+    // Sequential looping dot animation: each dot slides out then back before the next starts.
+    // RootLayout dismisses after INTRO_MIN_VISIBLE_MS (~2s), so this usually plays part of one cycle.
     const dots = overlayNode.querySelectorAll('.dot')
     const dotsTimeline = gsap.timeline({ repeat: -1 })
     dots.forEach((dot) => {

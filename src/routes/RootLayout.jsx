@@ -15,7 +15,8 @@ const PAGE_TRANSITION_COMPLETE_EVENT = 'page-transition:complete'
 const HOME_NAV_INTRO_START_EVENT = 'home-nav:intro-start'
 const HOME_HERO_TITLE_INTRO_EVENT = 'home-hero:title-intro-start'
 const HOME_HERO_VIDEO_INTRO_EVENT = 'home-hero:video-intro-start'
-const INTRO_MIN_VISIBLE_MS = 5000
+// Keep a short brand beat without holding LCP hostage on throttled mobile.
+const INTRO_MIN_VISIBLE_MS = 2000
 const HOME_RETURN_ENTRANCE_FALLBACK_MS = 2000
 const HOME_NAV_INTRO_DELAY_S = 0.9
 const HOME_HERO_TITLE_AFTER_NAV_S = 0.3
@@ -259,10 +260,11 @@ export default function RootLayout() {
   // Start minimum timer for intro, then dismiss.
   useEffect(() => {
     if (!isIntroVisible) return
-    
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const timer = setTimeout(() => {
       setShouldFadeOutIntro(true)
-    }, INTRO_MIN_VISIBLE_MS)
+    }, reducedMotion ? 0 : INTRO_MIN_VISIBLE_MS)
 
     return () => clearTimeout(timer)
   }, [isHomePage, isIntroVisible])

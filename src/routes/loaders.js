@@ -159,7 +159,6 @@ export function createEst2014PageLoader() {
     const [data, pagePayload] = await Promise.all([
       fetchBeyondData(),
       fetchPageData('est2014'),
-      import('../infinite-canvas/scene.jsx'),
     ])
 
     return {

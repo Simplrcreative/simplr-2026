@@ -15,10 +15,8 @@
     "postinstall": "PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium"
   },
   "dependencies": {
-    "@sparticuz/chromium": "^149.0.0",
     "@emailjs/browser": "^4.4.1",
-    "@react-three/drei": "^9.122.0",
-    "@react-three/fiber": "^8.18.0",
+    "@sparticuz/chromium": "^149.0.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
     "gsap": "^3.15.0",
@@ -27,8 +25,7 @@
     "react-dom": "^18.3.1",
     "react-helmet-async": "^3.0.0",
     "react-router-dom": "^7.14.1",
-    "tailwindcss": "^4.2.2",
-    "three": "^0.184.0"
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
