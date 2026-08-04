@@ -187,6 +187,7 @@ function createParallaxFillAnimations(scope) {
           : null
 
         const isDesktop = window.matchMedia('(min-width: 1024px)').matches
+        const blurTargets = Array.from(section.querySelectorAll('[data-blur]'))
 
         gsap.set(mediaEl, {
           display: 'block',
@@ -196,6 +197,15 @@ function createParallaxFillAnimations(scope) {
           zIndex: 0,
           position: 'relative',
         })
+
+        if (blurTargets.length) {
+          gsap.set(blurTargets, {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            willChange: 'opacity, transform, filter',
+          })
+        }
 
         // Always measure from identity so end values stay correct on reverse scrub.
         measureAtRest()
@@ -236,7 +246,18 @@ function createParallaxFillAnimations(scope) {
           scale: metrics.scale,
           borderRadius: '0px',
           duration: 1,
-        })
+        }, 0)
+
+        // Match home hero title: lift + blur as the featured media fills.
+        if (blurTargets.length) {
+          timeline.to(blurTargets, {
+            opacity: 0,
+            y: -400,
+            filter: 'blur(20px)',
+            duration: 1,
+            delay: 0.1,
+          }, 0)
+        }
       }
 
       const onResize = () => {
@@ -256,6 +277,9 @@ function createParallaxFillAnimations(scope) {
         headerLightControls?.cleanup()
         headerLightControls = null
         gsap.set(mediaEl, { clearProps: 'transform,willChange,borderRadius,zIndex,position' })
+        gsap.set(section.querySelectorAll('[data-blur]'), {
+          clearProps: 'opacity,transform,filter,willChange',
+        })
       })
     })
 

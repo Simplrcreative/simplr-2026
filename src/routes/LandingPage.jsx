@@ -115,10 +115,9 @@ export default function LandingPage() {
       <section className="page-hero parallax-fill-section relative w-full px-3 md:px-5 py-5 md:pt-0 md:pb-5 bg-white min-h-[80vh]__ md:min-h-screen flex flex-col justify-end">
         <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
           <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee mt-30 lg:mt-0 mb-12 lg:mb-0">
+          <div className="col-start-1 col-span-12 md:col-span-10 lg:col-span-5 text-coffee mt-30 lg:mt-0 mb-12 lg:mb-0" data-blur>
             <div className="eyebrow max-w-[36ch]">{title}</div>
             <h1 className="hero-title w-[22ch]"><span>{headline}</span></h1>
-            
           </div>
           <div className="col-start-1 col-span-12 lg:col-start-8 lg:col-span-5">
             <div className="featured-image">
