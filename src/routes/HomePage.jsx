@@ -723,7 +723,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                 onClick={openHeroVideoModal}
               > 
                 <div className="play-icon-mobile">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="ms-1" width="16" height="auto" viewBox="0 0 18 20" fill="white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="ms-1" width="16" viewBox="0 0 18 20" fill="white">
                     <path d="M18 10L0 20L9.08523e-07 0L18 10Z"></path>
                   </svg>
                 </div>
