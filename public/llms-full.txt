@@ -1,27 +1,26 @@
 # Simplr
 
-This website is a headless WordPress front end built with Vite and React.
+> Headless WordPress front end for Simplr — brand identity and digital design.
 
 ## Main pages
-- https://simplr.co.za/work
-- https://simplr.co.za/about
-- https://simplr.co.za/services
-- https://simplr.co.za/thinking
-- https://simplr.co.za/contact
-- https://simplr.co.za/est-2014
+
+- [Home](https://simplr.co.za/)
+- [Work](https://simplr.co.za/work/)
+- [About](https://simplr.co.za/about/)
+- [Services](https://simplr.co.za/services/)
+- [Thinking](https://simplr.co.za/thinking/)
+- [Contact](https://simplr.co.za/contact/)
+- [Est. 2014](https://simplr.co.za/est-2014/)
 
 ## Dynamic content
-- Work singles are resolved from /work/:slug
-- Thinking singles are resolved from /thinking/:topic/:slug
-- Landing pages are resolved from /:slug at the site root
 
-## Content model guidance
-- Work should map to a custom post type exposed through WPGraphQL.
-- Thinking should map to posts or another exposed content type.
-- About, Services, Contact, and Est. 2014 should be WordPress pages with matching URIs.
+- Work singles: https://simplr.co.za/work/:slug/
+- Thinking singles: https://simplr.co.za/thinking/:topic/:slug/
+- Landing pages: https://simplr.co.za/:slug/
 
 ## Technical notes
+
 - Canonical URLs and Open Graph tags are set per route.
-- JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, and ContactPage where relevant.
+- JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, FAQPage, and ContactPage where relevant.
 - sitemap.xml and robots.txt are generated at build time.
-- HTTP 301 redirects are generated from the WordPress acfRedirection options into public/_redirects and vercel.json.
+- HTTP 301 redirects are generated from WordPress into public/_redirects.

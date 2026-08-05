@@ -61,7 +61,13 @@ function initializeSplitTextForElement(element, triggerSelector, fromColor, toCo
   const start = element.dataset.splitStart || (isDesktop ? DESKTOP_START : MOBILE_START)
   const end = element.dataset.splitEnd || (isDesktop ? DESKTOP_END : MOBILE_END)
 
-  const split = SplitText.create(element, { type: 'words' })
+  const split = SplitText.create(element, {
+    type: 'words',
+    // Default aria:"auto" puts aria-label on a plain <div>, which fails
+    // "Elements must only use permitted ARIA attributes" (Agentic a11y).
+    // Word spans remain in the tree, so screen readers still get the text.
+    aria: false,
+  })
   gsap.set(split.words, { color: fromColor })
 
   const tween = gsap.fromTo(

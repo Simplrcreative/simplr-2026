@@ -272,11 +272,57 @@ function buildRobots(siteUrl, allowIndexing) {
 }
 
 function buildLlms(siteUrl) {
-  return `# ${siteUrl}\n\n- Primary routes: /work, /about, /services, /thinking, /contact, /est-2014\n- Dynamic editorial routes: /work/:slug and /thinking/:topic/:slug\n- Root-level landing pages: /:slug\n- Content source: WordPress via WPGraphQL\n- SEO/GEO assets: structured data, canonical URLs, sitemap.xml, robots.txt, llms-full.txt\n`
+  const base = siteUrl.replace(/\/$/, '')
+  return `# Simplr
+
+> Cape Town brand identity and digital design agency. Strategy, branding, websites, motion, and templates.
+
+## Main pages
+
+- [Home](${base}/): Studio overview and selected work
+- [Work](${base}/work/): Project archive
+- [About](${base}/about/): Studio, people, and approach
+- [Services](${base}/services/): Strategy, branding, web, motion, templates
+- [Thinking](${base}/thinking/): Articles and notes
+- [Contact](${base}/contact/): Enquiries
+- [Est. 2014](${base}/est-2014/): Studio chronology
+
+## Optional
+
+- [Full site map for agents](${base}/llms-full.txt)
+- [XML sitemap](${base}/sitemap.xml)
+`
 }
 
 function buildLlmsFull(siteUrl) {
-  return `# Simplr\n\nThis website is a headless WordPress front end built with Vite and React.\n\n## Main pages\n- ${new URL('/work', siteUrl).toString()}\n- ${new URL('/about', siteUrl).toString()}\n- ${new URL('/services', siteUrl).toString()}\n- ${new URL('/thinking', siteUrl).toString()}\n- ${new URL('/contact', siteUrl).toString()}\n- ${new URL('/est-2014', siteUrl).toString()}\n\n## Dynamic content\n- Work singles are resolved from /work/:slug\n- Thinking singles are resolved from /thinking/:topic/:slug\n- Landing pages are resolved from /:slug at the site root\n\n## Content model guidance\n- Work should map to a custom post type exposed through WPGraphQL.\n- Thinking should map to posts or another exposed content type.\n- About, Services, Contact, and Est. 2014 should be WordPress pages with matching URIs.\n\n## Technical notes\n- Canonical URLs and Open Graph tags are set per route.\n- JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, and ContactPage where relevant.\n- sitemap.xml and robots.txt are generated at build time.\n- HTTP 301 redirects are generated from the WordPress acfRedirection options into public/_redirects.\n`
+  const base = siteUrl.replace(/\/$/, '')
+  return `# Simplr
+
+> Headless WordPress front end for Simplr — brand identity and digital design.
+
+## Main pages
+
+- [Home](${base}/)
+- [Work](${base}/work/)
+- [About](${base}/about/)
+- [Services](${base}/services/)
+- [Thinking](${base}/thinking/)
+- [Contact](${base}/contact/)
+- [Est. 2014](${base}/est-2014/)
+
+## Dynamic content
+
+- Work singles: ${base}/work/:slug/
+- Thinking singles: ${base}/thinking/:topic/:slug/
+- Landing pages: ${base}/:slug/
+
+## Technical notes
+
+- Canonical URLs and Open Graph tags are set per route.
+- JSON-LD is emitted for Organization, WebSite, CollectionPage, WebPage, Article, Service ItemList, FAQPage, and ContactPage where relevant.
+- sitemap.xml and robots.txt are generated at build time.
+- HTTP 301 redirects are generated from WordPress into public/_redirects.
+`
 }
 
 /**
