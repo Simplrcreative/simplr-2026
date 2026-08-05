@@ -112,7 +112,8 @@
 }
 
 .socials a,
-.footer-details-meta a {
+.footer-details-meta a,
+.contact-info a {
     line-height: 1;
     text-decoration-line: underline;
     text-decoration-color: var(--color-coffee);
@@ -122,12 +123,14 @@
 }
 .bg-coffee {
   .socials a,
-  .footer-details-meta a {
+  .footer-details-meta a,
+  .contact-info a {
     text-decoration-color: white;
   }
 }
 .socials a:hover,
-.footer-details-meta a:hover {
+.footer-details-meta a:hover,
+.contact-info a:hover {
     text-decoration-color: transparent;
 }
 .socials a {
