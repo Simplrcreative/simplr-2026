@@ -163,13 +163,15 @@ export function createNavSectionTheme(scope) {
   const nav = document.querySelector('#desktop-nav')
   const logo = document.querySelector('.logo-holder')
   const hasParallaxFillHero = Boolean(scope.querySelector('.parallax-fill-section'))
+  // Footer spacer always has section-light/dark; exclude it so theme watching
+  // tracks page sections only (footer chrome owns its own light/logo swap).
   const themedSections = Array.from(scope.querySelectorAll('.section-light, .section-dark'))
+    .filter((el) => !el.classList.contains('footer-logo-trigger'))
   const changeLogoSections = Array.from(scope.querySelectorAll('.change-logo'))
   const changeLogoBackSections = Array.from(scope.querySelectorAll('.change-logo-back'))
 
   if (!themedSections.length && !changeLogoSections.length && !changeLogoBackSections.length) {
-    nav?.classList.remove('light')
-    logo?.classList.remove('light')
+    // Lazy route chunks may not be mounted yet. Leave pageBg-seeded .light alone.
     return () => undefined
   }
 
@@ -189,9 +191,6 @@ export function createNavSectionTheme(scope) {
       logo: logo?.classList.contains('light') ?? false,
     }
     themeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
-  } else if (!hasParallaxFillHero) {
-    nav?.classList.remove('light')
-    logo?.classList.remove('light')
   }
 
   if (changeLogoSections.length || changeLogoBackSections.length) {

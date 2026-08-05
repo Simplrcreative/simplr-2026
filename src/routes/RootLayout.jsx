@@ -151,7 +151,12 @@ export default function RootLayout() {
   const returningToHomeRef = useRef(false)
   const { navigation } = useLoaderData()
   const location = useLocation()
+  const matches = useMatches()
   const isHomePage = location.pathname === '/'
+  // Route handle drives first-paint chrome; TransitionFrame mirrors this on SPA nav.
+  const pageBg = matches.findLast((m) => m.handle?.pageBg)?.handle.pageBg ?? 'light'
+  const hideFooter = matches.findLast((m) => m.handle?.hideFooter !== undefined)?.handle.hideFooter ?? false
+  const isDarkPageBg = pageBg === 'dark'
   const [isIntroVisible, setIsIntroVisible] = useState(() => {
     if (typeof window !== 'undefined' && window.__PRERENDER__) return false
     return window.location.pathname === '/'
@@ -291,8 +296,12 @@ export default function RootLayout() {
     destroyNavSectionThemeRef.current = null
     
     scrollToTopImmediate()
-    document.querySelector('#desktop-nav')?.classList.remove('light')
-    document.querySelector('.logo-holder')?.classList.remove('light')
+    // Seed from route handle immediately — don't wait for section markers /
+    // TransitionFrame. Dark hard-refresh must paint with .light already on.
+    const nav = document.querySelector('#desktop-nav')
+    const logo = document.querySelector('.logo-holder')
+    nav?.classList.toggle('light', pageBg === 'dark')
+    logo?.classList.toggle('light', pageBg === 'dark')
     document.documentElement.classList.remove('compact-logo-active')
     const footerLogo = document.querySelector('.footer-logo')
     footerLogo?.classList.remove('active')
@@ -358,14 +367,82 @@ export default function RootLayout() {
         clearProps: 'opacity,visibility,transform',
       })
     }
-  }, [closeMobileNav, location.pathname, isHomePage])
+  }, [closeMobileNav, location.pathname, isHomePage, pageBg])
 
   useEffect(() => {
     if (!isHomePage) {
-      // Non-home: set up logo page animation and nav theme immediately.
+      // Logo page animation is independent of page markers — bind once and leave
+      // it alone. Recreating it (previous retries) desynced the footer reveal.
+      destroyLogoRef.current?.()
       destroyLogoRef.current = createLogoPageAnimation(layoutRef.current)
-      destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
-      return () => { destroyNavSectionThemeRef.current?.() }
+
+      // Nav theme / change-logo must wait for the lazy page chunk. The footer
+      // spacer always has .section-light/.section-dark, so those must not count
+      // as ready — otherwise we bind with no .change-logo watchers.
+      let cancelled = false
+      let observer = null
+      let fallbackTimer = 0
+
+      const hasChangeLogoMarkers = () => Boolean(
+        layoutRef.current?.querySelector('.change-logo, .change-logo-back'),
+      )
+
+      const bindNavTheme = () => {
+        if (cancelled) return
+        destroyNavSectionThemeRef.current?.()
+        destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
+      }
+
+      const bindNavThemeWhenReady = () => {
+        if (cancelled) return
+
+        if (hasChangeLogoMarkers()) {
+          bindNavTheme()
+          return
+        }
+
+        const root = layoutRef.current
+        if (!root) {
+          bindNavTheme()
+          return
+        }
+
+        observer = new MutationObserver(() => {
+          if (cancelled || !hasChangeLogoMarkers()) return
+          observer?.disconnect()
+          observer = null
+          window.clearTimeout(fallbackTimer)
+          bindNavTheme()
+        })
+        observer.observe(root, { childList: true, subtree: true })
+
+        fallbackTimer = window.setTimeout(() => {
+          observer?.disconnect()
+          observer = null
+          bindNavTheme()
+        }, 2500)
+      }
+
+      const onTransitionComplete = () => {
+        if (cancelled) return
+        // Rebind after transition so change-logo triggers measure final layout.
+        // Do not recreate createLogoPageAnimation here — footer chrome owns that.
+        if (hasChangeLogoMarkers()) bindNavTheme()
+      }
+
+      bindNavThemeWhenReady()
+      window.addEventListener(PAGE_TRANSITION_COMPLETE_EVENT, onTransitionComplete)
+
+      return () => {
+        cancelled = true
+        observer?.disconnect()
+        window.clearTimeout(fallbackTimer)
+        window.removeEventListener(PAGE_TRANSITION_COMPLETE_EVENT, onTransitionComplete)
+        destroyNavSectionThemeRef.current?.()
+        destroyNavSectionThemeRef.current = null
+        destroyLogoRef.current?.()
+        destroyLogoRef.current = null
+      }
     }
 
     // Home page: always wire up the nav section theme.
@@ -560,16 +637,11 @@ export default function RootLayout() {
     }
   }, [location.pathname])
 
-  // Derive pageBg from the matched route's handle, falling back to 'light'.
-  // Set handle: { pageBg: 'dark' } on any route that opens on a coffee section.
-  const matches = useMatches()
-  const pageBg = matches.findLast((m) => m.handle?.pageBg)?.handle.pageBg ?? 'light'
-  const hideFooter = matches.findLast((m) => m.handle?.hideFooter !== undefined)?.handle.hideFooter ?? false
-  const isDarkPageBg = pageBg === 'dark'
-
-  // Set html[data-page-bg] synchronously before the browser paints.
+  // Keep data-page-bg + .light in sync when only the handle changes.
   useLayoutEffect(() => {
     document.documentElement.dataset.pageBg = pageBg
+    document.querySelector('#desktop-nav')?.classList.toggle('light', pageBg === 'dark')
+    document.querySelector('.logo-holder')?.classList.toggle('light', pageBg === 'dark')
   }, [pageBg])
 
   useEffect(() => {
