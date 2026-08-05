@@ -321,6 +321,8 @@ async function waitForRenderedPage(page) {
   }, { timeout: 20000 }).catch(() => undefined)
 
   // Drop any leftover shell description tags so only Helmet's remains.
+  // Also keep a single JSON-LD block — deferred home data can leave a stale
+  // fallback script beside the resolved one if Helmet fails to replace it.
   await page.evaluate(() => {
     document.querySelectorAll('meta[name="description"]:not([data-rh])').forEach((meta) => {
       meta.remove()
@@ -328,6 +330,13 @@ async function waitForRenderedPage(page) {
     document.querySelectorAll('meta[name="robots"]:not([data-rh])').forEach((meta) => {
       meta.remove()
     })
+
+    const ldScripts = Array.from(
+      document.querySelectorAll('script[type="application/ld+json"]'),
+    )
+    if (ldScripts.length > 1) {
+      ldScripts.slice(0, -1).forEach((script) => script.remove())
+    }
   })
 
   await page.waitForTimeout(500)

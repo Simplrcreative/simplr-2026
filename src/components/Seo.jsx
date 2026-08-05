@@ -52,9 +52,14 @@ export default function Seo({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={resolvedDescription} />
       <meta name="twitter:image" content={resolvedImage} />
-      <script type="application/ld+json">
-        {JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}
-      </script>
+      <script
+        type="application/ld+json"
+        // Children text nodes don't replace reliably in react-helmet-async —
+        // updates append a second <script>, which breaks validators on PRD.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }),
+        }}
+      />
     </Helmet>
   )
 }

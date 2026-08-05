@@ -58,7 +58,7 @@ const HOME_PAGE_FALLBACK = {
   clients: [],
 }
 
-function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null, clients = [] }) {
+function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBlock = null, clients = [], seoReady = true }) {
   const pageRef = useRef(null)
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
@@ -652,38 +652,40 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   return (
     <div ref={pageRef}>
-      <Seo
-        title={seoTitle}
-        description={seoDescription}
-        pathname="/"
-        type="website"
-        image={seoImage}
-        schema={[
-          webPageSchema({
-            pathname: '/',
-            title: seoTitle,
-            description: seoDescription,
-            type: routeDefinitions.home.schemaType,
-            dateModified: page.modified,
-            speakable: ['main'],
-          }),
-          breadcrumbSchema([{ name: 'Home', path: '/' }]),
-          serviceCatalogSchema(
-            '/',
-            siteConfig.services.map((service, index) => ({
-              ...service,
-              description: page.services?.[index]?.body,
-            })),
-          ),
-          collectionSchema({
-            pathname: '/',
-            title: page.workShowcase.title,
-            description: page.workShowcase.intro,
-            items: featuredWork,
-          }),
-          faqSchema('/', page.faqs, ['main']),
-        ]}
-      />
+      {seoReady ? (
+        <Seo
+          title={seoTitle}
+          description={seoDescription}
+          pathname="/"
+          type="website"
+          image={seoImage}
+          schema={[
+            webPageSchema({
+              pathname: '/',
+              title: seoTitle,
+              description: seoDescription,
+              type: routeDefinitions.home.schemaType,
+              dateModified: page.modified,
+              speakable: ['main'],
+            }),
+            breadcrumbSchema([{ name: 'Home', path: '/' }]),
+            serviceCatalogSchema(
+              '/',
+              siteConfig.services.map((service, index) => ({
+                ...service,
+                description: page.services?.[index]?.body,
+              })),
+            ),
+            collectionSchema({
+              pathname: '/',
+              title: page.workShowcase.title,
+              description: page.workShowcase.intro,
+              items: featuredWork,
+            }),
+            faqSchema('/', page.faqs, ['main']),
+          ]}
+        />
+      ) : null}
       <div
         className="play-icon"
         onClick={isHeroModalVisible ? () => closeHeroVideoModal({ scrollToNextSection: true }) : undefined}
@@ -1083,20 +1085,21 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 export default function HomePage() {
   const { homeData } = useLoaderData()
   const [resolvedHomeData, setResolvedHomeData] = useState(HOME_PAGE_FALLBACK)
+  const [seoReady, setSeoReady] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
     Promise.resolve(homeData)
       .then((data) => {
-        if (!cancelled && data) {
-          setResolvedHomeData(data)
-        }
+        if (cancelled) return
+        if (data) setResolvedHomeData(data)
+        setSeoReady(true)
       })
       .catch(() => {
-        if (!cancelled) {
-          setResolvedHomeData(HOME_PAGE_FALLBACK)
-        }
+        if (cancelled) return
+        setResolvedHomeData(HOME_PAGE_FALLBACK)
+        setSeoReady(true)
       })
 
     return () => {
@@ -1119,6 +1122,7 @@ export default function HomePage() {
       caseStudies={caseStudies}
       testimonialBlock={testimonialBlock}
       clients={clients}
+      seoReady={seoReady}
     />
   )
 }
