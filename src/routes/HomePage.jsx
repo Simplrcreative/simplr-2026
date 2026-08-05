@@ -745,7 +745,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
                         width={768}
                         height={480}
                         decoding="async"
-                        fetchPriority="high"
+                        fetchpriority="high"
                         loading="eager"
                       />
                     </picture>
