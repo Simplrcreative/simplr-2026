@@ -168,8 +168,8 @@ export function createNavSectionTheme(scope) {
   const changeLogoBackSections = Array.from(scope.querySelectorAll('.change-logo-back'))
 
   if (!themedSections.length && !changeLogoSections.length && !changeLogoBackSections.length) {
-    nav?.classList.remove('light')
-    logo?.classList.remove('light')
+    // Page chrome may not be mounted yet (lazy route chunks). Leave any
+    // pageBg-seeded .light classes alone — RootLayout owns the initial state.
     return () => undefined
   }
 
@@ -189,9 +189,6 @@ export function createNavSectionTheme(scope) {
       logo: logo?.classList.contains('light') ?? false,
     }
     themeWatcher = createSectionThemeWatcher(themedSections, nav, logo, lightState, getSectionThreshold)
-  } else if (!hasParallaxFillHero) {
-    nav?.classList.remove('light')
-    logo?.classList.remove('light')
   }
 
   if (changeLogoSections.length || changeLogoBackSections.length) {

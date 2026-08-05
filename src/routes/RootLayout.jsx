@@ -362,10 +362,46 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!isHomePage) {
-      // Non-home: set up logo page animation and nav theme immediately.
-      destroyLogoRef.current = createLogoPageAnimation(layoutRef.current)
-      destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
-      return () => { destroyNavSectionThemeRef.current?.() }
+      // Non-home: set up logo page animation and nav theme. Lazy route chunks
+      // often mount after this effect's first pass — retry until section
+      // markers exist so scroll-based .light toggling still binds.
+      let cancelled = false
+      let rafId = 0
+      let attempts = 0
+      const MAX_ATTEMPTS = 90
+
+      const hasThemeMarkers = () => Boolean(
+        layoutRef.current?.querySelector(
+          '.section-light, .section-dark, .change-logo, .change-logo-back, .parallax-fill-section',
+        ),
+      )
+
+      const setup = () => {
+        if (cancelled) return
+        destroyLogoRef.current?.()
+        destroyNavSectionThemeRef.current?.()
+        destroyLogoRef.current = createLogoPageAnimation(layoutRef.current)
+        destroyNavSectionThemeRef.current = createNavSectionTheme(layoutRef.current)
+      }
+
+      const trySetup = () => {
+        if (cancelled) return
+        setup()
+        if (hasThemeMarkers() || attempts >= MAX_ATTEMPTS) return
+        attempts += 1
+        rafId = requestAnimationFrame(trySetup)
+      }
+
+      trySetup()
+
+      return () => {
+        cancelled = true
+        cancelAnimationFrame(rafId)
+        destroyNavSectionThemeRef.current?.()
+        destroyNavSectionThemeRef.current = null
+        destroyLogoRef.current?.()
+        destroyLogoRef.current = null
+      }
     }
 
     // Home page: always wire up the nav section theme.
@@ -568,8 +604,20 @@ export default function RootLayout() {
   const isDarkPageBg = pageBg === 'dark'
 
   // Set html[data-page-bg] synchronously before the browser paints.
+  // Also seed nav/logo .light for dark routes — TransitionFrame does this on
+  // SPA navigations, but direct loads / refreshes never run that path, and
+  // createNavSectionTheme can race ahead of lazy page chunks.
   useLayoutEffect(() => {
     document.documentElement.dataset.pageBg = pageBg
+    const nav = document.querySelector('#desktop-nav')
+    const logo = document.querySelector('.logo-holder')
+    if (pageBg === 'dark') {
+      nav?.classList.add('light')
+      logo?.classList.add('light')
+    } else {
+      nav?.classList.remove('light')
+      logo?.classList.remove('light')
+    }
   }, [pageBg])
 
   useEffect(() => {
