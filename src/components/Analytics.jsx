@@ -18,11 +18,22 @@ export default function Analytics() {
   const [enabled, setEnabled] = useState(() => getCookieConsent() === 'accepted')
 
   useEffect(() => {
-    if (!isAnalyticsConfigured()) return undefined
+    if (!isAnalyticsConfigured()) {
+      if (import.meta.env.DEV) {
+        console.info('[GA] Not configured — check VITE_GA_MEASUREMENT_ID and restart Vite.')
+      }
+      return undefined
+    }
 
-    if (getCookieConsent() === 'accepted') {
+    const consent = getCookieConsent()
+    if (consent === 'accepted') {
       setEnabled(true)
       loadGoogleAnalytics()
+    } else if (import.meta.env.DEV) {
+      console.info(
+        '[GA] Waiting for cookie consent (Accept All). Current:',
+        consent ?? 'not answered',
+      )
     }
 
     const onConsent = (event) => {
@@ -40,7 +51,7 @@ export default function Analytics() {
 
   useEffect(() => {
     if (!enabled || !isAnalyticsConfigured()) return
-    loadGoogleAnalytics()
+    if (!loadGoogleAnalytics()) return
     trackPageView(`${location.pathname}${location.search}`)
   }, [enabled, location.pathname, location.search])
 
