@@ -33,9 +33,20 @@ export default function Seo({
   const resolvedDescription = normaliseDescription(description)
   const resolvedImage = absoluteUrl(image || siteConfig.defaultSocialImage)
   const graph = [organizationSchema(), websiteSchema(), ...schema].filter(Boolean)
+  const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
 
   return (
-    <Helmet prioritizeSeoTags>
+    <Helmet
+      prioritizeSeoTags
+      // react-helmet-async only recognises script `innerHTML` / `src` — JSX
+      // dangerouslySetInnerHTML is dropped, so schema never reaches <head>.
+      script={[
+        {
+          type: 'application/ld+json',
+          innerHTML: jsonLd,
+        },
+      ]}
+    >
       <html lang="en-GB" />
       <title>{fullTitle}</title>
       <link rel="canonical" href={canonical} />
@@ -52,14 +63,6 @@ export default function Seo({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={resolvedDescription} />
       <meta name="twitter:image" content={resolvedImage} />
-      <script
-        type="application/ld+json"
-        // Children text nodes don't replace reliably in react-helmet-async —
-        // updates append a second <script>, which breaks validators on PRD.
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }),
-        }}
-      />
     </Helmet>
   )
 }
