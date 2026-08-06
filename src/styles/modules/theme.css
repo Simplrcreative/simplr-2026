@@ -213,7 +213,7 @@
 .footer-logo.active {
   opacity: 1;
   transform: scale(1.2);
-  transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+  transition: opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s;
 }
 .footer-logo svg {
   width: 175px;

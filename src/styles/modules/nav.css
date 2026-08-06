@@ -366,7 +366,7 @@ nav.light a.is-active .nav-link__orb {
     transform: scale(1.2);
     z-index: 1003;
     pointer-events: none;
-    transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+    transition: opacity 0.5s ease 0.15s, transform 0.5s ease 0.15s;
 }
 @media (min-width: 768px) {
     .compact-logo.off {
