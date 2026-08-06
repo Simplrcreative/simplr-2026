@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Outlet, useOutletContext } from 'react-router-dom'
 import RootLayout from '../routes/RootLayout.jsx'
+import NotFoundPage from '../routes/NotFoundPage.jsx'
 import {
   createHomeLoader,
   createWorkLoader,
@@ -29,7 +30,6 @@ const ContactPage = lazy(() => import('../routes/ContactPage.jsx'))
 const Est2014Page = lazy(() => import('../routes/Est2014Page.jsx'))
 const LandingPage = lazy(() => import('../routes/LandingPage.jsx'))
 const DefaultPage = lazy(() => import('../routes/DefaultPage.jsx'))
-const NotFoundPage = lazy(() => import('../routes/NotFoundPage.jsx'))
 
 function PageOutlet() {
   const context = useOutletContext()
@@ -49,11 +49,9 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <PageOutlet />,
-        errorElement: (
-          <Suspense fallback={null}>
-            <NotFoundPage />
-          </Suspense>
-        ),
+        // Eager import — a lazy errorElement fails after deploys when the old
+        // hashed chunk is gone, and then React Router shows its crash screen.
+        errorElement: <NotFoundPage />,
         handle: { pageBg: 'light' },
         children: [
           {

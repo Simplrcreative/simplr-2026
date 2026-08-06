@@ -4,6 +4,30 @@ import { HelmetProvider } from 'react-helmet-async'
 import App from './App.jsx'
 import './styles/app.css'
 
+// After a deploy, open tabs still hold the old entry bundle. Lazy route chunks
+// with previous hashes 404 — reload once so the browser picks up the new HTML.
+const CHUNK_RELOAD_KEY = 'simplr:chunk-reload'
+let chunkReloadAttempted = false
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault()
+  if (chunkReloadAttempted) return
+  chunkReloadAttempted = true
+  try {
+    if (sessionStorage.getItem(CHUNK_RELOAD_KEY) === '1') return
+    sessionStorage.setItem(CHUNK_RELOAD_KEY, '1')
+  } catch {
+    // sessionStorage blocked — in-memory flag still prevents a reload loop.
+  }
+  window.location.reload()
+})
+window.addEventListener('load', () => {
+  try {
+    sessionStorage.removeItem(CHUNK_RELOAD_KEY)
+  } catch {
+    // ignore
+  }
+})
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HelmetProvider>
