@@ -485,6 +485,8 @@ const workByUriQuery = `
             acfAlignment
             acfContent
             acfContent2
+            acfColumns1
+            acfColumns2
             acfImage1 {
               node {
                 guid

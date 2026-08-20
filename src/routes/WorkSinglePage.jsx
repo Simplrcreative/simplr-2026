@@ -485,7 +485,7 @@ export default function WorkSinglePage() {
         </div>
 
         <div className="change-logo-back absolute top-0 inset-x-0 h-px" aria-hidden="true" />
-        
+
       </section>
       
       {Array.isArray(sections) && sections.map((section, index) => {
@@ -501,6 +501,10 @@ export default function WorkSinglePage() {
         }
         const content = section?.acfContent || ''
         const content2 = section?.acfContent2 || ''
+        const columns = section?.acfColumns1 || '4'
+        const columns2 = section?.acfColumns2 || '4'
+        // ACF returns strings ("6"); === 6 never matches. Span from the right of 12.
+        const columnStart = String(13 - Number(columns2))
         const video1 = section?.acfVideo1?.node?.guid || ''
         const video2 = section?.acfVideo2?.node?.guid || ''
         const clickToPlayVideo1 = isTruthyFlag(section?.acfClickToPlayVideo1)
@@ -540,7 +544,7 @@ export default function WorkSinglePage() {
               {layout === 'Image & Text' && (
                 <>
                 {/* IMAGE & TEXT SECTION */}
-                  <div className={`col-span-12 md:col-span-4 ${txtOrder} ${stickyText1 ? '' : 'flex flex-col justify-end'} trigger-split-text-coffee`}>
+                  <div className={`col-span-12 md:col-span-${columns} ${txtOrder} ${stickyText1 ? '' : 'flex flex-col justify-end'} trigger-split-text-coffee`}>
                     <RichText html={content} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   <div className={`col-span-12 md:col-span-6 ${imgOrder}`}>
@@ -568,11 +572,11 @@ export default function WorkSinglePage() {
               {layout === 'Two Text Boxes' && (
                 <>
                 {/* TWO TEXT BOXES SECTION */}
-                  <div className={`col-span-12 md:col-span-5 lg:col-span-4 flex flex-col justify-end trigger-split-text-coffee`}>
+                  <div className={`col-span-12 md:col-span-${columns} flex flex-col justify-end trigger-split-text-coffee`}>
                     <RichText html={content} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText1 ? 'sticky-text' : ''}`}/>
                   </div>
                   
-                  <div className={`col-start-1 col-span-12 md:col-start-8 md:col-span-5 lg:col-start-9 lg:col-span-4 flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
+                  <div className={`col-start-1 col-span-12 md:col-start-${columnStart} md:col-span-${columns2} flex flex-col justify-end trigger-split-text-coffee mt-5 md:mt-0`}>
                     <RichText html={content2} className={`my-[2.5rem] lg:my-[5rem] split-text-coffee text-box ${stickyText2 ? 'sticky-text' : ''}`} />
                   </div>
                   {/* END TWO TEXT BOXES SECTION */}
