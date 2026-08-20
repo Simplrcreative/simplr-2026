@@ -297,7 +297,7 @@ export default function WorkSinglePage() {
   const types = work?.acfWorkBuilder?.acfType?.nodes ?? []
   const introduction = work?.acfWorkBuilder?.acfIntroduction ?? []
   const linkToWebsite = work?.acfWorkBuilder?.acfLinkToWebsite ?? ''
-  const swags = work?.acfWorkBuilder?.acfSwag ?? []
+  const swags = work?.acfWorkBuilder?.acfSwag ?? ''
   const sections = work?.acfWorkBuilder?.acfSections || []
   const testimonial = useLoaderData()?.testimonial ?? null
   const nextWork = useLoaderData()?.nextWork ?? null
@@ -376,125 +376,112 @@ export default function WorkSinglePage() {
     <>
       <Seo {...seo} />
     
-      <section className="page-hero px-3 md:px-5 pb-5 bg-white section-light min-h-[80vh] md:min-h-[100vh] flex md:items-end">
-        <div className="grid grid-cols-12 w-full grid-rows-[30px_auto]">
-          <div className="col-span-12 change-logo-back" aria-hidden="true" />
-          <div className="col-start-1 col-span-12 lg:col-span-5 text-coffee mt-35 md:mt-20 mb-5 md:my-0 max-w-[50ch] lg:max-w-[60ch] flex flex-col justify-end lg:justify-between">
-            <div>
-              <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
-              <h1 className="hero-title mb-10"><span>{title}</span></h1>
-            </div>
-            <div className="max-w-[80%] pt-5 lg:pt-0">
-              {categories.length > 0 && (
-                <div className="categories flex flex-wrap gap-1">
-                  {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
-                </div>
-              )}
-              {types.length > 0 && (
-                <div className="work-types mt-1 mb-5 lg:mb-0 flex flex-wrap gap-1">
-                {types.map(({ name }) => {
-                  return (
-                    <Fragment key={name}>
-                      <div className="work-type leading-none">
-                        {name}
-                      </div>
-                    </Fragment>
-                  )
-                })}
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="col-start-1 col-span-12 lg:col-start-8 lg:col-span-5">
-            <div className="featured-image thumb-swap-trigger__">
-              {loaderSrc && (
-                <div
-                  className="ratio pt-[65%]! md:pt-[65%]! lg:pt-[90%]! overflow-hidden rounded-[10px] thumb-swap__"
-                  //style={{ '--aspect-ratio-desktop': '90%', '--aspect-ratio-mobile': '65%' }}
-                >
-                  <PictureImg
-                    loaderSrc = {secondaryLoaderSrc + '.webp'}
-                    mobileSrc = {secondaryMobileSrc + '.webp'}
-                    desktopSrc = {secondaryDesktopSrc + '.webp'}
-                    imgClass = 'thumb-primary rounded-[10px]'
-                    altText = {altText}
-                    lazyLoad = {false}
-                  />
-                  {/*<PictureImg
-                    loaderSrc = {loaderSrc + '.webp'}
-                    mobileSrc = {mobileSrc + '.webp'}
-                    desktopSrc = {desktopSrc + '.webp'}
-                    imgClass = 'thumb-secondary rounded-[10px]'
-                    altText = ''
-                    lazyLoad = {false}
-                  />*/}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/*
+        Hero + intro share one grid so .sticky-title sticks through both.
+        On lg, a spacer above the title panel bottom-aligns it with the featured
+        image (same height via aspect-ratio), then sticky takes over on scroll.
+      */}
+      <section className="work-top page-hero relative px-3 md:px-5 pb-10 md:pb-20 bg-white section-light">
+        <div className="change-logo-back absolute top-0 inset-x-0 h-px" aria-hidden="true" />
 
-      <section className="work-intro px-3 md:px-5 pb-10 pt-0 md:py-20 bg-white change-logo">
-        <div className="grid grid-cols-12">
-          <div className="hidden! work-types col-start-1 col-span-12 md:col-span-5 mb-10 md:mb-0 slide-up-subtle flex md:inline-block flex-wrap" data-mobile-animation="false">
-             {types.map(({ name }, index) => {
-              const insertBreak = (index + 1) % 3 === 0 && index < types.length - 1
-              return (
-                <Fragment key={name}>
-                  <div className={`work-type leading-none${insertBreak ? ' work-type--line-end' : ''}`}>
-                    {name}
-                  </div>
-                  {insertBreak && <br className="hidden md:block" />}
-                </Fragment>
-              )
-             })}
-          </div>
-          <div className="text-body col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-8 lg:col-span-5 trigger-split-text-coffee">
-            <RichText html={introduction} className="split-text-coffee"/>
-            {linkToWebsite && (
-              <div className="mt-10">
-                <a href={linkToWebsite} target="_blank" rel="noopener noreferrer" className="btn relative alt-transition-text">
-                  <span>Visit Website</span>
-                </a>
+        <div className="grid grid-cols-12 w-full">
+          <div className="work-top-title col-start-1 col-span-12 lg:col-span-5 text-coffee">
+            <div className="work-top-title-spacer" aria-hidden="true" />
+            <div className="sticky-title mb-5 lg:mb-0 max-w-[50ch] lg:max-w-none lg:sticky lg:top-5 lg:self-start lg:w-full lg:flex lg:flex-col lg:justify-between">
+              <div className="hero-title-container max-w-[60ch] mt-35 md:mt-20">
+                <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
+                <h1 className="hero-title mb-10 lg:mb-0"><span>{title}</span></h1>
               </div>
-            )}
-            {swags && (
-              <div className="swags my-20">
-              {swags.map((swag, index) => {
-                const preUnit = swag.acfPreUnit ?? ''
-                const postUnit = swag.acfPostUnit ?? ''
-                const number = swag.acfNumber ?? ''
-                const detail = swag.acfDetail ?? ''
+              <div className="work-types-container max-w-[80%] pt-5 lg:pt-0">
+                {categories.length > 0 && (
+                  <div className="categories flex flex-wrap gap-1">
+                    {categories.map(({ name }) => <CategoryBadge key={name} name={name} />)}
+                  </div>
+                )}
+                {types.length > 0 && (
+                  <div className="work-types mt-1 mb-5 lg:mb-0 flex flex-wrap gap-1">
+                    {types.map(({ name }) => (
+                      <Fragment key={name}>
+                        <div className="work-type leading-none">
+                          {name}
+                        </div>
+                      </Fragment>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
-                return (
-                  <div 
-                    key={`swag-${index}`}
-                    className="swag flex flex-col md:flex-row slide-up-subtle"
-                  > 
-                    <div className="swag-numbers flex justify-start md:justify-end items-start">
-                      {preUnit && (
-                        <span className="swag-unit pre">{preUnit}</span>
-                      )}
-                      {number && (
-                        <span className="swag-number">{number}</span>
-                      )}
-                      {postUnit && (
-                        <span className="swag-unit">{postUnit}</span>
-                      )}
+          <div className="work-top-main col-start-1 col-span-12 lg:col-start-8 lg:col-span-5">
+            <div className="work-top-image-stage min-h-[80vh] lg:min-h-svh flex flex-col justify-end pb-5">
+              <div className="featured-image thumb-swap-trigger__">
+                {loaderSrc && (
+                  <div
+                    className="ratio pt-[65%]! md:pt-[65%]! lg:pt-[90%]! overflow-hidden rounded-[10px] thumb-swap__"
+                  >
+                    <PictureImg
+                      loaderSrc={secondaryLoaderSrc + '.webp'}
+                      mobileSrc={secondaryMobileSrc + '.webp'}
+                      desktopSrc={secondaryDesktopSrc + '.webp'}
+                      imgClass="thumb-primary rounded-[10px]"
+                      altText={altText}
+                      lazyLoad={false}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="work-intro pt-0 md:pt-20 change-logo">
+              <div className="grid grid-cols-12">
+                <div className="text-body col-span-12 md:col-start-4 md:col-span-8 lg:col-span-12 lg:col-start-1 trigger-split-text-coffee pb-10">
+                  <RichText html={introduction} className="split-text-coffee" />
+                  {linkToWebsite && (
+                    <div className="mt-10">
+                      <a href={linkToWebsite} target="_blank" rel="noopener noreferrer" className="btn relative alt-transition-text">
+                        <span>Visit Website</span>
+                      </a>
                     </div>
+                  )}
+                  {swags && (
+                    <div className="swags mt-20 mb-10">
+                      {swags.map((swag, index) => {
+                        const preUnit = swag.acfPreUnit ?? ''
+                        const postUnit = swag.acfPostUnit ?? ''
+                        const number = swag.acfNumber ?? ''
+                        const detail = swag.acfDetail ?? ''
 
-                    {detail && (
-                      <div className="swag-detail">
-                        {detail}
-                      </div>
-                    )}
+                        return (
+                          <div
+                            key={`swag-${index}`}
+                            className="swag flex flex-col md:flex-row slide-up-subtle"
+                          >
+                            <div className="swag-numbers flex justify-start md:justify-end items-start">
+                              {preUnit && (
+                                <span className="swag-unit pre">{preUnit}</span>
+                              )}
+                              {number && (
+                                <span className="swag-number">{number}</span>
+                              )}
+                              {postUnit && (
+                                <span className="swag-unit">{postUnit}</span>
+                              )}
+                            </div>
 
-                  </div>
-                )
-              })}
+                            {detail && (
+                              <div className="swag-detail">
+                                {detail}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
-             )}
+            </div>
           </div>
         </div>
       </section>

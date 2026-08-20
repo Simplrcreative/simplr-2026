@@ -313,3 +313,22 @@
     padding-top: 5rem;
   }
 }
+/* Work single: title column matches featured-image height + bottom alignment,
+   then sticks through .work-intro without a JS pin. */
+@media (min-width: 1024px) {
+  .work-top-title {
+    container-type: inline-size;
+    container-name: work-top-title;
+  }
+
+  /* Push the title panel down so it shares the image's bottom edge
+     (pb-5 = 1.25rem) and matches image height (90% of this column width). */
+  .work-top-title-spacer {
+    height: calc(100svh - 1.25rem - 90cqw);
+    min-height: 0;
+  }
+
+  .work-top .sticky-title {
+    aspect-ratio: 10 / 9;
+  }
+}
