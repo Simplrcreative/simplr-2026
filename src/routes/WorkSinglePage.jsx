@@ -382,7 +382,6 @@ export default function WorkSinglePage() {
         image (same height via aspect-ratio), then sticky takes over on scroll.
       */}
       <section className="work-top page-hero relative px-3 md:px-5 pb-10 md:pb-20 bg-white section-light">
-        <div className="change-logo-back absolute top-0 inset-x-0 h-px" aria-hidden="true" />
 
         <div className="grid grid-cols-12 w-full">
           <div className="work-top-title col-start-1 col-span-12 lg:col-span-5 text-coffee">
@@ -433,7 +432,7 @@ export default function WorkSinglePage() {
               </div>
             </div>
 
-            <div className="work-intro pt-0 md:pt-20 change-logo">
+            <div className="work-intro pt-0 md:pt-20">
               <div className="grid grid-cols-12">
                 <div className="text-body col-span-12 md:col-start-4 md:col-span-8 lg:col-span-12 lg:col-start-1 trigger-split-text-coffee pb-10">
                   <RichText html={introduction} className="split-text-coffee" />
@@ -484,6 +483,9 @@ export default function WorkSinglePage() {
             </div>
           </div>
         </div>
+
+        <div className="change-logo-back absolute top-0 inset-x-0 h-px" aria-hidden="true" />
+        
       </section>
       
       {Array.isArray(sections) && sections.map((section, index) => {
@@ -524,7 +526,7 @@ export default function WorkSinglePage() {
         const sliderImages = section?.acfSliderImages?.nodes ?? []
 
         return (
-          <section key={`section-${index}`} className="work-content text-body px-3 md:px-5 pb-5">
+          <section key={`section-${index}`} className="work-content text-body px-3 md:px-5 pb-5 change-logo">
             <div className="grid grid-cols-12">
               {layout === 'Text Only' && (
                 <>
