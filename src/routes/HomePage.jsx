@@ -997,7 +997,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
           </div>
           <div className="col-start-1 col-span-12 md:col-start-7 md:col-span-6 xl:col-start-8  xl:col-span-4 flex flex-col md:items-center md:justify-center mt-5 md:mt-0 trigger-split-text-coffee">
-            <div className="testimonial lead max-w-[38ch]">
+            <div className="testimonial lead max-w-[38ch] mt-10">
               <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>
               <div className="split-text-coffee trigger-split-text-coffee">
                 {testimonialData?.acfTestimonial ? (

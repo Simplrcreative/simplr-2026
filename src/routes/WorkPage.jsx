@@ -311,7 +311,7 @@ function TestimonialSection({ work, testimonialData, fallbackTestimonial, index,
     <section id={`testimonial-${index}`} className="testimonial px-3 md:px-5 pb-5 md:pb-20 bg-white section-light hidden md:block">
       <div className="grid grid-cols-12 w-full">
         <div className="col-start-1 md:col-start-2 col-span-12 md:col-span-4 flex flex-col items-center justify-center trigger-split-text-coffee">
-          <div className="testimonial lead max-w-[38ch]">
+          <div className="testimonial lead max-w-[38ch] mt-10">
           {quote && <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>}
             <div className="split-text-coffee trigger-split-text-coffee">
               {quote && <div className="mb-5 md:mb-20" dangerouslySetInnerHTML={{ __html: `${quote}` }} />}

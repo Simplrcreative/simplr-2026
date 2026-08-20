@@ -389,7 +389,7 @@ export default function WorkSinglePage() {
             <div className="sticky-title mb-5 lg:mb-0 max-w-[50ch] lg:max-w-none lg:sticky lg:top-5 lg:self-start lg:w-full lg:flex lg:flex-col lg:justify-between">
               <div className="hero-title-container max-w-[60ch] mt-35 md:mt-20">
                 <div className="eyebrow">{work?.acfWorkBuilder?.acfClient?.nodes?.[0]?.name || ''}</div>
-                <h1 className="hero-title mb-10 lg:mb-0"><span>{title}</span></h1>
+                <h1 className="hero-title mb-10"><span>{title}</span></h1>
               </div>
               <div className="work-types-container max-w-[80%] pt-5 lg:pt-0">
                 {categories.length > 0 && (
@@ -412,8 +412,8 @@ export default function WorkSinglePage() {
             </div>
           </div>
 
-          <div className="work-top-main col-start-1 col-span-12 lg:col-start-8 lg:col-span-5">
-            <div className="work-top-image-stage min-h-[80vh] lg:min-h-svh flex flex-col justify-end pb-5">
+          <div className="work-top-main col-start-1 col-span-12 lg:col-start-8 lg:col-span-5 mt-10 md:mt-0">
+            <div className="work-top-image-stage min-h-[80vh]_ lg:min-h-svh flex flex-col justify-end pb-5">
               <div className="featured-image thumb-swap-trigger__">
                 {loaderSrc && (
                   <div
@@ -432,9 +432,9 @@ export default function WorkSinglePage() {
               </div>
             </div>
 
-            <div className="work-intro pt-0 md:pt-20">
+            <div className="work-intro pt-[2.5rem] md:pt-20">
               <div className="grid grid-cols-12">
-                <div className="text-body col-span-12 md:col-start-4 md:col-span-8 lg:col-span-12 lg:col-start-1 trigger-split-text-coffee pb-10">
+                <div className="text-body col-span-12 md:col-start-4 md:col-span-8 lg:col-span-12 lg:col-start-1 trigger-split-text-coffee lg:pb-10">
                   <RichText html={introduction} className="split-text-coffee" />
                   {linkToWebsite && (
                     <div className="mt-10">
@@ -504,7 +504,8 @@ export default function WorkSinglePage() {
         const columns = section?.acfColumns1 || '4'
         const columns2 = section?.acfColumns2 || '4'
         // ACF returns strings ("6"); === 6 never matches. Span from the right of 12.
-        const columnStart = String(13 - Number(columns2))
+        //const columnStart = String(13 - Number(columns2))
+        const columnStart = 7
         const video1 = section?.acfVideo1?.node?.guid || ''
         const video2 = section?.acfVideo2?.node?.guid || ''
         const clickToPlayVideo1 = isTruthyFlag(section?.acfClickToPlayVideo1)
@@ -700,7 +701,7 @@ export default function WorkSinglePage() {
         <section className="work-testimonial px-3 md:px-5 py-5 md:pt-40 md:pb-20">
           <div className="grid grid-cols-12">
             <div className="col-start-1 col-span-12 md:col-start-4 md:col-span-8 lg:col-start-7 lg:col-span-4 md:ps-2 slide-up-subtle">
-              <div className="testimonial lead">
+              <div className="testimonial lead mt-10">
                 <span className="testimonial-dots"><span className="testimonial-dot"></span><span className="testimonial-dot testimonial-dot-slide"></span></span>
                 {testimonial.acfTestimonials?.acfTestimonial && (
                   <div 
