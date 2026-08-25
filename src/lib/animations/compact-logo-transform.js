@@ -9,7 +9,6 @@ const MOBILE = {
   logoDuration: 0,
   taglineScale: 0.66,
   taglineY: -88,
-  taglineY: -58,
   taglineX: 65,
 }
 
