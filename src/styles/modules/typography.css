@@ -100,3 +100,14 @@ h1.large,
 .text-bold {
     font-weight: 500;
 }
+.hero-title-container {
+    align-items: end;
+    padding-bottom: 1rem;
+}
+
+@media (min-height: 580px) {
+    .hero-title-container {
+        align-items: start;
+        padding-bottom: 0;
+    }
+}

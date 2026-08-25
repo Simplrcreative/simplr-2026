@@ -380,6 +380,13 @@ nav.light a.is-active .nav-link__orb {
     line-height: 1.5rem;
     font-weight: 400;
 }
+
+@media (max-height: 680px) {
+    .tagline {
+        display: none;
+    }
+}
+
 .tagline span {
     font-family: var(--font-literata);
     font-style: italic;
