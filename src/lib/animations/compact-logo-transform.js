@@ -17,8 +17,8 @@ const TABLET = {
   logoY: -10,
   logoDuration: 0.5,
   taglineScale: 0.5,
-  taglineY: -155,
-  taglineX: 55,
+  taglineY: -124,
+  taglineX: 44,
 }
 
 const DESKTOP = {
