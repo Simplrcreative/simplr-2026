@@ -712,12 +712,12 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
       </div>
       
-      <section ref={heroRef} className="landing relative w-full px-5 min-h-[100svh] md:min-h-screen flex flex-col justify-end change-logo-back">
+      <section ref={heroRef} className="landing relative w-full px-5  min-h-[max(100svh,580px)] sm:min-h-[max(100vh,680px)] flex flex-col justify-end change-logo-back">
           <div className="hero-title-container grid grid-cols-12 items-start__ gap-x-5 w-full">
-            <div className="col-start-1 col-span-12 lg:col-span-7 max-w-[40ch] md:max-w-[60ch] lg:max-w-[70ch] mt-60__ mb-10 lg:my-0"> 
+            <div className="col-start-1 col-span-12 md:col-span-7 max-w-[40ch] md:max-w-[60ch] lg:max-w-[70ch] mt-60__ mb-10 lg:my-0"> 
               <h1 className="hero-title text-coffee">Simplr turns <span>complexity</span> into <span><i>brand and digital clarity.</i></span></h1>
             </div>
-            <div className="hero-video-holder col-start-1 lg:col-start-8 col-span-12 md:col-span-5 section-dark lg:flex lg:items-end lg:justify-end pb-5 relative"> 
+            <div className="hero-video-holder col-start-1 md:col-start-8 col-span-12 md:col-span-5 section-dark lg:flex lg:items-end lg:justify-end pb-5 relative"> 
               <button
                 type="button"
                 className="hero-video-trigger block w-full text-left"
