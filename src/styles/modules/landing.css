@@ -107,6 +107,24 @@
 }
 /* END SPECIAL STAT PLUS SIZES */
 
+/* SPECIAL CASE STUDIES GRID RULES */
+section.case-studies {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+@media (min-width: 768px) and (min-height: 744px) {
+    .case-studies-grid {
+       padding-top: 2.5rem;
+    }
+    section.case-studies {
+        padding-top: 7.5rem;
+        padding-bottom: 7.5rem;
+    }
+}
+/* END SPECIAL CASE STUDIES GRID RULES */
+
 @media (max-width: 767.9px) {
     .stat-no {
         position: relative

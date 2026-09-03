@@ -866,8 +866,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </Link>
       </section>
 
-      <section ref={caseStudiesRef} className="case-studies px-5 py-20 md:py-30 section-dark light-to-coffee-incoming min-h-screen">
-          <div className="grid grid-cols-12 items-start md:pt-10">
+      <section ref={caseStudiesRef} className="case-studies section-dark light-to-coffee-incoming min-h-screen">
+          <div className="grid grid-cols-12 items-start case-studies-grid">
             <div className="col-start-1 col-span-12 md:col-span-5 xl:col-span-6 order-2 md:order-1 client-name-list text-white flex flex-col justify-start mt-5 md:mt-0">
               {caseStudies.map((study) => {
                 const path = buildEntryPath('work', study.slug)
