@@ -1,4 +1,41 @@
 /* --- SERVICES --- */
+/* Clip the titles marquee horizontally only. .stat-no uses a sub-1 line-height,
+   so the digits bleed below their box and overflow-hidden cropped them whenever
+   the height-gated section padding was absent. */
+section.services {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+.service-stats {
+  padding-top: 2.5rem;
+}
+.wierd-size-btn {
+  display: none
+}
+@media (min-height: 744px) {
+  section.services {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+@media (min-width: 768px) and (max-height: 744px) {
+  .explore-services-btn {
+    display: none;
+  }
+  .wierd-size-btn {
+    display: flex
+  }
+}
+@media (min-width: 768px) and (min-height: 744px) {
+  section.services {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  .service-stats {
+    padding-top: 5rem;
+  }
+}
+
 .services-title {
     /*opacity: 0.3;*/
     text-decoration-line: underline;

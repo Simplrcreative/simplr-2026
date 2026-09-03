@@ -812,8 +812,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
         </div>
       </section>
 
-      <section ref={servicesRef} className="services py-10 md:py-20 section-light overflow-hidden relative w-full light-to-coffee-outgoing">
-         <div className="services-titles flex flex-nowrap items-center text-[3rem] md:text-[5.5rem] gap-10">
+      <section ref={servicesRef} className="services section-light relative w-full light-to-coffee-outgoing">
+         <div className="services-titles flex flex-nowrap items-center gap-10">
           <div id="strategy" data-color="text-strategy" data-stat="25" data-detail="Brand and digital strategy projects completed." className="services-title font-literata font-[400] flex-shrink-0">
             Strategy
           </div>
@@ -843,18 +843,24 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           </div>
           <div className="services-titles-end-spacer flex-none w-[100vw] text-white" aria-hidden="true" >.</div>
         </div>
-        <div className="service-stats pt-10 md:pt-20">
+        <div className="service-stats">
           <div className="stat-item flex flex-col sm:flex-row gap-5 lg:justify-between lg:min-w-[56,25rem] lg:max-w-[70rem]  pe-5 relative">
             <div data-initial="62" className="stat-no ps-5 md:ps-0 text-strategy md:min-w-[32rem]">0</div>
             <div className="flex flex-col">
-              <div className="stat-plus absolute top-0 right-[2.5rem] md:static mb-10 lg:mb-20 xl:mb-40 text-strategy text-[5rem]">+</div>
+              <div className="stat-plus absolute top-0 right-[2.5rem] md:static text-strategy text-[5rem]">+</div>
               <div className="stat-detail lead max-w-[26ch] md:max-w-[20ch] lg:max-w-[22ch] xl:max-w-[24ch] px-5 md:px-0 mt-5 md:mt-0">Brand and digital strategy projects completed.</div>
+              <Link
+          to="services"
+          className="wierd-size-btn btn relative my-5"
+        >
+          <span>Explore our services</span>
+        </Link>
             </div>
           </div>
         </div>
         <Link
           to="services"
-          className="btn relative md:absolute md:right-[1.25rem] md:bottom-[5.2rem] ms-5 md:ms-0 mt-5 md:mt-0"
+          className="explore-services-btn btn relative md:absolute md:right-[1.25rem] md:bottom-[5.2rem] ms-5 md:ms-0 mt-5 md:mt-0"
         >
           <span>Explore our services</span>
         </Link>

@@ -48,13 +48,64 @@
 }
 
 .stat-no {
-    line-height: 0.69;
     color: var(--color-strategy);
-    font-size: 12rem;
+    line-height: 0.69;
 }
 .stat-plus {
     line-height: 0.28;
 }
+
+/* SPECIAL STAT NO SIZES */
+@media (max-width: 767.9px) {
+    .stat-no {
+        font-size: 12rem;
+    }
+}
+@media (min-width: 768px) {
+    .stat-no {
+        font-size: 24rem;
+    }
+}
+@media (min-width: 1280px) and (min-height: 744px) {
+    .stat-no {
+        font-size: 36rem;
+    }
+}
+/* END SPECIAL STAT NO SIZES */
+
+/* SPECIAL SERVICES TITLE SIZES */
+@media (max-width: 767.9px) {
+    .services-title {
+        font-size: 3rem;
+    }
+}
+@media (min-width: 768px) {
+    .services-title {
+        font-size: 4rem;
+    }
+}
+@media (min-width: 1280px) and (min-height: 744px) {
+    .services-title {
+        font-size: 5.5rem;
+    }
+}
+/* END SPECIAL SERVICES TITLE SIZES */
+
+/* SPECIAL STAT PLUS SIZES */
+.stat-plus {
+    margin-bottom: 2.5rem;
+}
+@media (min-width: 1024px) and (min-height: 744px) {
+    .stat-plus {
+        margin-bottom: 5rem;
+    }
+}
+@media (min-width: 1280px) and (min-height: 744px) {
+    .stat-plus {
+        margin-bottom: 10rem;
+    }
+}
+/* END SPECIAL STAT PLUS SIZES */
 
 @media (max-width: 767.9px) {
     .stat-no {
@@ -95,9 +146,7 @@
     .stat-detail {
         line-height: 1.2;
     }
-    .stat-no {
-        font-size: 25rem;
-    }
+   
     .hero-video-frame,
     .hero-video {
         cursor: none;
@@ -110,11 +159,7 @@
         display: none;
     }
 }
-@media (min-width: 1280px) {
-    .stat-no {
-        font-size: 36rem;
-    }
-}
+
 
 
 /* --- CASE STUDIES --- */

@@ -63,7 +63,7 @@ export default function ContactPage() {
               <div className="col-span-12 lg:col-span-3 lg:col-start-1 xl:col-start-4 mt-3 md:mt-5">
                 <p>
                   <span className="font-literata"><i>Join the team</i></span><br/>
-                 <a href="mailto:hcareers@simplr.co.za">careers@simplr.co.za</a>
+                 <a href="mailto:careers@simplr.co.za">careers@simplr.co.za</a>
                 </p>
               </div>
               <div className="col-span-12 lg:col-span-3 lg:col-start-5 xl:col-start-7 mt-3 md:mt-5">

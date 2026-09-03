@@ -180,12 +180,12 @@ export const navigation = buildNavigation()
 
 export const fallbackPages = {
   home: {
-    kicker: 'Independent creative systems',
+    kicker: 'Simplr turns complexity into brand and digital clarity.',
     title: 'Strategy, identity, digital systems, and motion built to hold attention and survive scale.',
     intro:
-      'This is the dedicated home page scaffold. Use it to frame the studio point of view, signal core offers, and direct visitors into Work, Services, and Thinking without forcing them into the archive first.',
+      '',
     content:
-      '<p>Simplr is scaffolded here as an editorial home page rather than a redirect. That gives you room for positioning, lead narrative, featured proof, and stronger first-impression SEO.</p><p>When WordPress is connected, this route can resolve from the site front page or a page exposed at the root URI, while preserving the same layout and schema support.</p>',
+      '<p>We help organisations make sense of who they are, what they need to say, and how their brand should work across identity, websites, motion, and communication systems.</p><p>From our Cape Town studio, we partner with clients in South Africa and around the world to create work that connects purpose with performance.</p>',
     services: [
       {
         title: 'Strategy',
