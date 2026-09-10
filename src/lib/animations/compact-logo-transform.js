@@ -25,7 +25,8 @@ const DESKTOP = {
   logoScale: 0.431,
   logoY: -10,
   logoDuration: 0.5,
-  taglineScale: 0.621,
+  //taglineScale: 0.621,
+  taglineScale: 0.8,
   taglineY: -176,
   taglineX: 65,
 }
