@@ -6,6 +6,7 @@ import IntroOverlay from '../components/IntroOverlay.jsx'
 import TransitionFrame from '../components/TransitionFrame.jsx'
 import CookieConsent from '../components/CookieConsent.jsx'
 import Analytics from '../components/Analytics.jsx'
+import { fetchNavigationData } from '../lib/wp-api.js'
 import { gsap } from 'gsap'
 import { createLogoScrollAnimation, createLogoPageAnimation, createNavSectionTheme, createSmoothScroll, refreshSmoothScroll, createBtnHoverAnimation, createFooterAnimation, scrollToTopImmediate, lockScroll, unlockScroll, getCompactLogoTransform } from '../lib/animations/index.js'
 import { useHasFinePointer } from '../lib/use-is-touch-device.js'
@@ -149,7 +150,8 @@ export default function RootLayout() {
   // Latches for the whole home visit — unlike cameFromNonHome, this does not flip
   // false on the next render when previousPathRef is updated to '/'.
   const returningToHomeRef = useRef(false)
-  const { navigation } = useLoaderData()
+  const { navigation: initialNavigation } = useLoaderData()
+  const [navigation, setNavigation] = useState(initialNavigation)
   const location = useLocation()
   const matches = useMatches()
   const isHomePage = location.pathname === '/'
@@ -175,6 +177,17 @@ export default function RootLayout() {
   const cameFromNonHome = isHomePage && previousPathRef.current && previousPathRef.current !== '/'
   const playHomeHeroIntro = shouldRunHomeIntroAnimations || returningToHomeRef.current || cameFromNonHome
   const hasFinePointer = useHasFinePointer()
+
+  useEffect(() => {
+    let isCurrent = true
+    fetchNavigationData().then((items) => {
+      if (isCurrent) setNavigation(items)
+    })
+
+    return () => {
+      isCurrent = false
+    }
+  }, [])
 
   const closeMobileNav = useCallback(() => {
     setIsNavOpen(false)

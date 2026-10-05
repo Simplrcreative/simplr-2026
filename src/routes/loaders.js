@@ -1,4 +1,5 @@
-import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchHomeFaqsData, fetchLandingPageData, fetchNavigationData, fetchNextWorkData, fetchPageData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
+import { buildEntryPath, fetchBeyondData, fetchDefaultPageData, fetchHomeData, fetchHomeFaqsData, fetchLandingPageData, fetchNextWorkData, fetchPageData, fetchPeopleData, fetchServicesSinglePageData, fetchServicesData, fetchTestimonialData, fetchThinkingEntryData, fetchThinkingPostsData, fetchWorksData, fetchWorkEntryData, getThinkingTopicSlug, prefetchWorkEntry } from '../lib/wp-api.js'
+import { buildNavigation } from '../config/site.js'
 
 // Cheap and cached; reused so the Thinking single page's author schema can
 // resolve to the same Person `@id` as the About page's People repeater.
@@ -8,12 +9,11 @@ async function fetchPeopleForAuthorLookup() {
 }
 
 export function createRootLoader() {
-  return async function rootLoader() {
-    // Keep root route non-blocking so app shell + intro overlay render immediately.
-    // Route-specific loaders fetch their own data.
-
+  return function rootLoader() {
+    // Work count is hydrated after the shell renders; don't hold the app shell
+    // on a GraphQL request needed only for a decorative navigation count.
     return {
-      navigation: await fetchNavigationData(),
+      navigation: buildNavigation(),
     }
   }
 }

@@ -62,18 +62,13 @@ const contentNodeFields = `
   }
 `
 
-const siteSettingsQuery = `
-  query SiteSettings {
+const pageByUriQuery = `
+  query PageByUri($uri: String!) {
     generalSettings {
       title
       description
       url
     }
-  }
-`
-
-const pageByUriQuery = `
-  query PageByUri($uri: String!) {
     nodeByUri(uri: $uri) {
       __typename
       ... on ContentNode {
@@ -1346,6 +1341,14 @@ function normaliseNode(node, collectionKey) {
   }
 }
 
+function normaliseSiteSettings(settings) {
+  return {
+    title: settings?.title || siteConfig.name,
+    description: settings?.description || siteConfig.description,
+    url: settings?.url || siteConfig.siteUrl,
+  }
+}
+
 function mergePageContent(pageKey, livePage) {
   const fallbackPage = fallbackPages[pageKey]
 
@@ -1418,42 +1421,12 @@ export async function graphQlRequest(query, variables = {}) {
   return payload.data
 }
 
-export async function getSiteSettings() {
-  if (!wpConfig.endpoint) {
-    return {
-      title: siteConfig.name,
-      description: siteConfig.description,
-      url: siteConfig.siteUrl,
-    }
-  }
-
-  try {
-    const data = await remember('site-settings', () => graphQlRequest(siteSettingsQuery))
-
-    return {
-      title: data.generalSettings?.title || siteConfig.name,
-      description: data.generalSettings?.description || siteConfig.description,
-      url: data.generalSettings?.url || siteConfig.siteUrl,
-    }
-  } catch (error) {
-    reportError('Unable to read site settings from WordPress', error)
-
-    return {
-      title: siteConfig.name,
-      description: siteConfig.description,
-      url: siteConfig.siteUrl,
-    }
-  }
-}
-
 export async function fetchPageData(pageKey) {
-  const siteSettings = await getSiteSettings()
-
   if (!wpConfig.endpoint) {
     return {
       pageKey,
       page: mergePageContent(pageKey, null),
-      siteSettings,
+      siteSettings: normaliseSiteSettings(),
     }
   }
 
@@ -1465,7 +1438,7 @@ export async function fetchPageData(pageKey) {
     return {
       pageKey,
       page: mergePageContent(pageKey, normaliseNode(data.nodeByUri, pageKey)),
-      siteSettings,
+      siteSettings: normaliseSiteSettings(data.generalSettings),
     }
   } catch (error) {
     reportError(`Unable to load page for ${pageKey}`, error)
@@ -1473,7 +1446,7 @@ export async function fetchPageData(pageKey) {
     return {
       pageKey,
       page: mergePageContent(pageKey, null),
-      siteSettings,
+      siteSettings: normaliseSiteSettings(),
     }
   }
 }
