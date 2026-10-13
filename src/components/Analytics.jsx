@@ -9,29 +9,33 @@ import {
   loadGoogleAnalytics,
   trackPageView,
 } from '../lib/analytics.js'
+import { loadApolloTracker } from '../lib/apollo-tracker.js'
 
 /**
- * Loads GA4 only after cookie consent is accepted, then tracks SPA navigations.
+ * Loads GA4 and the Apollo website tracker only after cookie consent is
+ * accepted, then tracks SPA navigations in GA4.
  */
 export default function Analytics() {
   const location = useLocation()
   const [enabled, setEnabled] = useState(() => getCookieConsent() === 'accepted')
 
   useEffect(() => {
-    if (!isAnalyticsConfigured()) {
-      if (import.meta.env.DEV) {
-        console.info('[GA] Not configured — check VITE_GA_MEASUREMENT_ID and restart Vite.')
-      }
-      return undefined
+    if (import.meta.env.DEV && !isAnalyticsConfigured()) {
+      console.info('[GA] Not configured — check VITE_GA_MEASUREMENT_ID and restart Vite.')
+    }
+
+    const loadTrackers = () => {
+      loadGoogleAnalytics()
+      loadApolloTracker()
     }
 
     const consent = getCookieConsent()
     if (consent === 'accepted') {
       setEnabled(true)
-      loadGoogleAnalytics()
+      loadTrackers()
     } else if (import.meta.env.DEV) {
       console.info(
-        '[GA] Waiting for cookie consent (Accept All). Current:',
+        '[Analytics] Waiting for cookie consent (Accept All). Current:',
         consent ?? 'not answered',
       )
     }
@@ -39,7 +43,7 @@ export default function Analytics() {
     const onConsent = (event) => {
       if (event.detail?.choice === 'accepted') {
         setEnabled(true)
-        loadGoogleAnalytics()
+        loadTrackers()
         return
       }
       setEnabled(false)

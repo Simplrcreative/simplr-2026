@@ -37,6 +37,7 @@ createRoot(document.getElementById('root')).render(
 )
 
 const bootLoader = document.getElementById('boot-loader')
+let bootLoaderDismissed = false
 
 /**
  * Keep the boot loader up until linked stylesheets (and fonts) are ready.
@@ -71,7 +72,7 @@ function nextPaint() {
 }
 
 async function hideBootLoader() {
-  if (!bootLoader || bootLoader.dataset.hiding === 'true') return
+  if (!bootLoader || bootLoaderDismissed || bootLoader.dataset.hiding === 'true') return
   bootLoader.dataset.hiding = 'true'
 
   try {
@@ -81,6 +82,12 @@ async function hideBootLoader() {
     // Still dismiss — fallback timeout covers hard failures.
   }
 
+  dismissBootLoader()
+}
+
+function dismissBootLoader() {
+  if (!bootLoader || bootLoaderDismissed) return
+  bootLoaderDismissed = true
   bootLoader.classList.add('is-hidden')
   window.setTimeout(() => {
     bootLoader.remove()
@@ -105,6 +112,6 @@ if (bootLoader) {
 
   // Fallback in case shell-ready / intro events are missed.
   window.setTimeout(() => {
-    void hideBootLoader()
+    dismissBootLoader()
   }, 6000)
 }
