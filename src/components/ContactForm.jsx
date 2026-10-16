@@ -1,6 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import emailjs from '@emailjs/browser'
 import { createBtnHoverAnimation } from '../lib/animations/index.js'
+import {
+  getPageType,
+  trackFormError,
+  trackFormStart,
+  trackGenerateLead,
+} from '../lib/analytics-events.js'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
@@ -30,6 +36,7 @@ const FIELDS = [
 ]
 
 const INITIAL_FORM = { name: '', company: '', email: '', budget: '', message: '', [HONEYPOT_NAME]: '' }
+const FORM_NAME = 'contact_enquiry'
 
 function validate(fields) {
   const errors = {}
@@ -76,6 +83,8 @@ export default function ContactForm({
   style: legacyStyle,
   heading = '',
   buttonClassName = 'btn relative disabled:opacity-50 disabled:cursor-not-allowed',
+  ctaLocation = 'contact_form',
+  leadType = 'new_business',
 }) {
   const tone = legacyStyle || variant
   let textColor = 'text-white'
@@ -98,6 +107,31 @@ export default function ContactForm({
   const [status, setStatus] = useState('idle') // 'idle' | 'submitting' | 'success' | 'error'
   const [recaptchaReady, setRecaptchaReady] = useState(!RECAPTCHA_SITE_KEY)
   const showForm = status !== 'success'
+  const formStartedRef = useRef(false)
+
+  const leadContext = () => ({
+    formName: FORM_NAME,
+    pageType: getPageType(),
+    ctaLocation,
+    leadType,
+  })
+
+  const markFormStarted = () => {
+    if (formStartedRef.current) return
+    formStartedRef.current = true
+    trackFormStart(leadContext())
+  }
+
+  const selectedService = () => (
+    enquiry.length ? [...enquiry].sort().join(',') : 'unspecified'
+  )
+
+  const describeErrors = (nextErrors) => {
+    const keys = Object.keys(nextErrors)
+    if (keys.includes('recaptcha')) return 'recaptcha'
+    if (keys.length === 1 && keys[0] === 'email' && formData.email.trim()) return 'invalid_email'
+    return 'validation'
+  }
 
   useEffect(() => {
     if (btnRef.current) return createBtnHoverAnimation(btnRef.current)
@@ -163,11 +197,13 @@ export default function ContactForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    if (name !== HONEYPOT_NAME) markFormStarted()
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }))
   }
 
   const handleEnquiryChange = (value) => {
+    markFormStarted()
     if (value === 'all-services') {
       setEnquiry((prev) => (prev.includes('all-services') ? [] : ['all-services']))
     } else {
@@ -194,6 +230,7 @@ export default function ContactForm({
     const validationErrors = validate(formData)
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
+      trackFormError({ ...leadContext(), errorType: describeErrors(validationErrors) })
       return
     }
 
@@ -214,6 +251,7 @@ export default function ContactForm({
     if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
       console.error('[ContactForm] Missing EmailJS env vars')
       setStatus('error')
+      trackFormError({ ...leadContext(), errorType: 'submit_failed' })
       return
     }
 
@@ -221,7 +259,9 @@ export default function ContactForm({
     if (RECAPTCHA_SITE_KEY) {
       recaptchaToken = window.grecaptcha?.getResponse?.(recaptchaWidgetIdRef.current) || ''
       if (!recaptchaToken) {
-        setErrors((prev) => ({ ...prev, recaptcha: 'Please confirm you are not a robot.' }))
+        const nextErrors = { ...errors, recaptcha: 'Please confirm you are not a robot.' }
+        setErrors(nextErrors)
+        trackFormError({ ...leadContext(), errorType: 'recaptcha' })
         return
       }
     }
@@ -249,11 +289,13 @@ export default function ContactForm({
         payload,
         { publicKey: EMAILJS_PUBLIC_KEY },
       )
+      trackGenerateLead({ ...leadContext(), service: selectedService() })
       setStatus('success')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
       console.error('EmailJS error:', err)
       setStatus('error')
+      trackFormError({ ...leadContext(), errorType: 'submit_failed' })
       resetRecaptcha()
     }
   }

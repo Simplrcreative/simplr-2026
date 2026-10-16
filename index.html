@@ -9,6 +9,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4efe7" />
     <title>Simplr</title>
+    <!-- Consent Mode v2 must precede gtag.js so the first hit is consent-aware.
+         The tag loads even before cookie consent so Tag Assistant / GA4
+         diagnostics can see it; storage stays denied until Accept All. -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = window.gtag || gtag;
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        functionality_storage: 'denied',
+        personalization_storage: 'denied',
+        security_storage: 'granted',
+        wait_for_update: 500
+      });
+      try {
+        if (window.localStorage.getItem('simplr-cookie-consent') === 'accepted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+            analytics_storage: 'granted',
+            functionality_storage: 'granted',
+            personalization_storage: 'granted'
+          });
+        }
+      } catch (e) {}
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA_MEASUREMENT_ID%" data-simplr-ga="true"></script>
     <script>history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
     <script>
       (function () {

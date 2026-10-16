@@ -17,6 +17,7 @@ import { extractSeoOverrides } from '../lib/page-seo.js'
 import CategoryBadge from '../components/CategoryBadge.jsx'
 import RichText from '../components/RichText.jsx'
 import PictureImg from '../components/PictureImg.jsx'
+import { createVideoSession } from '../lib/analytics-events.js'
 
 const LazyClientLogos = lazy(() => import('../components/ClientLogos.jsx'))
 const HOME_SCROLL_INIT_DELAY_MS = 200
@@ -63,6 +64,8 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
   const heroRef = useRef(null)
   const heroVideoRef = useRef(null)
   const heroVideoModalRef = useRef(null)
+  const heroModalPlayerRef = useRef(null)
+  const heroVideoSessionRef = useRef(null)
   const openHeroModalTimeoutRef = useRef(null)
   const openHeroModalPlaybackTimeoutRef = useRef(null)
   const closeHeroModalTimeoutRef = useRef(null)
@@ -449,6 +452,13 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
 
   function openHeroVideoModal() {
     if (!hasHeroFullVideo) return
+    if (!heroVideoSessionRef.current) {
+      heroVideoSessionRef.current = createVideoSession({
+        title: 'hero_showreel',
+        location: 'home_hero',
+      })
+      heroVideoSessionRef.current.open()
+    }
     heroVideoRef.current?.pause()
     clearPendingHeroModalClose()
     clearPendingHeroModalOpen()
@@ -545,6 +555,10 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
     clearPendingHeroModalOpen()
     if (!isHeroModalVisible) return
 
+    const player = heroModalPlayerRef.current
+    heroVideoSessionRef.current?.close(player?.currentTime, player?.duration)
+    heroVideoSessionRef.current = null
+
     document.documentElement.removeAttribute(PLAY_ICON_CLOSE_ATTR)
 
     if (scrollToNextSection) {
@@ -574,6 +588,26 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
       clearPendingHeroModalClose()
     }
   }, [])
+
+  useEffect(() => {
+    const video = heroModalPlayerRef.current
+    const session = heroVideoSessionRef.current
+    if (!video || !session || !isHeroModalPlaybackReady) return undefined
+
+    const onPlay = () => session.start()
+    const onTimeUpdate = () => session.progress(video.currentTime, video.duration)
+    const onEnded = () => session.complete()
+
+    video.addEventListener('play', onPlay)
+    video.addEventListener('timeupdate', onTimeUpdate)
+    video.addEventListener('ended', onEnded)
+
+    return () => {
+      video.removeEventListener('play', onPlay)
+      video.removeEventListener('timeupdate', onTimeUpdate)
+      video.removeEventListener('ended', onEnded)
+    }
+  }, [isHeroModalPlaybackReady])
 
   useEffect(() => {
     const slider = faqSliderRef.current
@@ -788,6 +822,7 @@ function HomePageContent({ page, featuredWork, caseStudies = [], testimonialBloc
           >
             
             <video
+              ref={heroModalPlayerRef}
               className={`hero-video-modal-player block w-full bg-black transition-opacity ease-out ${isHeroModalOpen ? 'opacity-100' : 'opacity-0'}`}
               style={{ transitionDuration: `${HERO_MODAL_CONTENT_FADE_DURATION_MS}ms` }}
               controls

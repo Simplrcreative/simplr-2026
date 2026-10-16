@@ -69,7 +69,7 @@ export default function ContactPage() {
               <div className="col-span-12 lg:col-span-3 lg:col-start-5 xl:col-start-7 mt-3 md:mt-5">
                 <p>
                   <span className="font-literata"><i>Say hello</i></span><br/>
-                 +27 87 702 6641
+                 <a href="tel:+27877026641">+27 87 702 6641</a>
                 </p>
               </div>
             </div>
@@ -77,6 +77,8 @@ export default function ContactPage() {
           <div className="col-start-1 col-span-12 lg:col-start-7 lg:col-span-6 xl:col-start-8 xl:col-span-5 pt-10 md:pt-20">
             <ContactForm
               variant="light"
+              ctaLocation="contact_page"
+              leadType="new_business"
               buttonClassName="btn alt relative disabled:opacity-50 disabled:cursor-not-allowed"
               heading={
                 <>
