@@ -223,3 +223,21 @@
     transform: scale(1.5);
   }
 }
+/* 13" Windows laptops sit near 600px of viewport height. At max scroll the
+   footer content is anchored to the viewport bottom, so it rises into the fixed
+   .footer-logo (86px tall) and the heading disappears behind the wordmark.
+   Reclaim the padding that only exists to breathe on tall screens. */
+@media (min-width: 768px) and (max-height: 744px) {
+  footer.site-footer {
+    padding-bottom: 1.25rem;
+  }
+  footer.site-footer .footer-bottom {
+    padding-top: 2.5rem;
+  }
+  footer.site-footer .socials {
+    margin-bottom: 1.25rem;
+  }
+  footer.site-footer .button-wrapper .btn {
+    margin-top: 1.25rem;
+  }
+}

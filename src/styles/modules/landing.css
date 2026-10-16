@@ -123,6 +123,17 @@ section.case-studies {
         padding-bottom: 7.5rem;
     }
 }
+@media (min-width: 768px) and (max-height: 744px) {
+    /* The pin locks the section to window.innerHeight with overflow:hidden, but
+       .ratio is sized width-first (90% of the column) and ignores height, so the
+       .categories pills fall outside the locked box. Clamp by viewport height —
+       max-height can't do this, a padding-driven aspect box won't shrink below
+       its own padding. .ratio children are absolute + object-fit:cover, so the
+       image just crops. */
+    .case-studies .client-work-img .ratio {
+        padding-top: min(90%, calc(100svh - 11.5rem));
+    }
+}
 /* END SPECIAL CASE STUDIES GRID RULES */
 
 @media (max-width: 767.9px) {

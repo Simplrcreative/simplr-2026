@@ -823,7 +823,7 @@ export default function RootLayout() {
         <>
         <div className={`footer-logo-trigger py-5 footer-off__ ${isDarkPageBg ? 'bg-coffee section-dark' : 'bg-white section-light'}`}></div>
 
-        <footer ref={footerRef} className={`px-5 pb-10 md:pt-0 min-h-[100svh] md:min-h-[100vh] flex flex-col justify-end ${isDarkPageBg ? 'bg-coffee text-white' : 'bg-white text-coffee'}`}>
+        <footer ref={footerRef} className={`site-footer px-5 pb-10 md:pt-0 min-h-[100svh] md:min-h-[100vh] flex flex-col justify-end ${isDarkPageBg ? 'bg-coffee text-white' : 'bg-white text-coffee'}`}>
           <div className={`footer-logo md:mb-5 ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>
             <svg width="100%" viewBox="0 0 527 172" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <g>
@@ -892,7 +892,7 @@ export default function RootLayout() {
           </div>
         </div>
 
-        <div className="pt-10 pb-5 lg:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
+        <div className="footer-bottom pt-10 pb-5 lg:pb-0 xl:pt-20 grid grid-cols-1 gap-14 lg:grid-cols-12n">
           <div className="footer-details lg:col-start-1 lg:col-span-6">
                 <div className={`socials flex flex-col lg:flex-row gap-[1.25rem] lg:gap-[2.5rem] mb-5 xl:mb-[3.75rem] ${isDarkPageBg ? 'text-white' : 'text-coffee'}`}>
                   {Object.entries(socials).map(([title, url]) => (
