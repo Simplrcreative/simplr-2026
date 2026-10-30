@@ -21,6 +21,24 @@ import {
   unlockScroll,
 } from '../lib/animations/index.js'
 
+// CMS still has lorem under these four stages. Replace only that placeholder
+// so a later real edit in WordPress is left alone.
+const HOW_WE_WORK_PLACEHOLDER_COPY = {
+  Define: 'We turn that understanding into a position, a proposition, and the decisions the work has to hold.',
+  Design: 'We shape identity, interface, and motion as one system, so the brand holds together everywhere it appears.',
+  Build: 'We design and develop the experience so the strategy survives a real site, a real CMS, and a real audience.',
+  Evolve: 'We leave teams with a system they can publish and extend, so the work stays clear after launch.',
+}
+
+function howWeWorkContent(item) {
+  const raw = item?.acfContent ?? ''
+  const heading = String(item?.acfHeading ?? '').replace(/<[^>]*>/g, '').trim()
+  const replacement = HOW_WE_WORK_PLACEHOLDER_COPY[heading]
+
+  if (replacement && /lorem ipsum/i.test(raw)) return `<p>${replacement}</p>`
+  return raw
+}
+
 function getThumbnail(acfFeaturedThumbnail, preferredSize = 'medium', fallbackSize = 'medium_large') {
   const thumbnailNode = acfFeaturedThumbnail?.node
   const sizes = thumbnailNode?.mediaDetails?.sizes ?? []
@@ -629,7 +647,7 @@ export default function AboutPage() {
                     <div className={`how-we-work-item-content relative z-2 bg-${item?.acfColour ?? ''}`}>
                       <div
                         className="how-we-work-content"
-                        dangerouslySetInnerHTML={{ __html: item?.acfContent ?? '' }}
+                        dangerouslySetInnerHTML={{ __html: howWeWorkContent(item) }}
                       />
                     </div>
                   </Fragment>

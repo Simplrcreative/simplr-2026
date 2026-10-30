@@ -45,6 +45,28 @@ export function slugifyName(name) {
     .replace(/\s+/g, '-')
 }
 
+// CMS stores a LinkedIn slug ("darylglass"). Schema sameAs needs a full URL.
+export function linkedInProfileUrl(value) {
+  const raw = String(value || '').trim()
+  if (!raw) return ''
+  if (/^https?:\/\//i.test(raw)) return raw
+
+  const slug = raw
+    .replace(/^@/, '')
+    .replace(/^\/+/, '')
+    .replace(/^(company|in)\//, '')
+
+  return `https://www.linkedin.com/in/${slug}`
+}
+
+function isCorporateAuthor(name) {
+  const value = String(name || '').trim().toLowerCase()
+  if (!value) return true
+
+  return value === siteConfig.name.trim().toLowerCase()
+    || value === siteConfig.legalName.trim().toLowerCase()
+}
+
 // Builds a `Person` entity for a team member, matching the `@id` convention
 // used on the About page (`#first-last`) so the same person referenced from
 // elsewhere (e.g. an Article author) resolves to one entity.
@@ -59,7 +81,7 @@ export function personSchema({ name, slug, jobTitle, linkedin, pathname = '/abou
     name,
     url: absoluteUrl(pathname),
     ...(jobTitle ? { jobTitle } : {}),
-    ...(linkedin ? { sameAs: [linkedin] } : {}),
+    ...(linkedInProfileUrl(linkedin) ? { sameAs: [linkedInProfileUrl(linkedin)] } : {}),
     worksFor: { '@id': `${siteConfig.siteUrl}#organization` },
   }
 }
@@ -214,10 +236,14 @@ export function articleSchema({
   // manual SEO override) to publish under a different named publisher instead.
   publisher,
 }) {
-  const authorEntity =
-    author && typeof author === 'object'
-      ? personSchema(author) || { '@type': 'Person', name: siteConfig.name }
-      : { '@type': 'Person', name: author || siteConfig.name }
+  const authorName = typeof author === 'string' ? author : author?.name
+  // "Simplr" is the studio, not a person. Point at the Organization instead
+  // of inventing a Person with the company name.
+  const authorEntity = isCorporateAuthor(authorName)
+    ? { '@id': `${siteConfig.siteUrl}#organization` }
+    : author && typeof author === 'object'
+      ? personSchema({ ...author, linkedin: linkedInProfileUrl(author.linkedin) }) || { '@type': 'Person', name: authorName }
+      : { '@type': 'Person', name: authorName }
 
   return {
     '@type': 'Article',

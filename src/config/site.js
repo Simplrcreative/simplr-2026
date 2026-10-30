@@ -15,9 +15,11 @@ export const siteConfig = {
   defaultSocialImage: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
   allowIndexing: import.meta.env.VITE_ALLOW_INDEXING === 'true',
   logo: {
-    url: 'https://simplr.co.za/wp-content/uploads/2021/11/cropped-simplr-favicon-round-270x270.png',
-    width: 270,
-    height: 270,
+    // The old /wp-content/uploads path on simplr.co.za is the SPA, so it
+    // returns HTML. This CMS asset is a real image.
+    url: 'https://simplrdashboard.kinsta.cloud/wp-content/uploads/2026/07/simplr-og.jpg',
+    width: 1200,
+    height: 630,
   },
   // No public phone line yet — omit `telephone` from schema rather than
   // publish a placeholder number.
@@ -227,7 +229,7 @@ export const fallbackPages = {
       kicker: 'Featured work',
       title: 'Selected projects, systems, and launch environments.',
       intro:
-        'The homepage can feature a tighter edit of work while the full archive stays on the Work page. The data source is shared, so you are not maintaining two separate content models.',
+        'Selected work across brand identity, digital experiences, and the systems that hold them together.',
     },
     clients: [
       'Atlas',
